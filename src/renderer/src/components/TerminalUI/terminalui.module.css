@@ -1,11 +1,5 @@
-.main{
-    width: 40rem;
-    height: 30rem;
+.main {
 
     border: 1px solid white;
+    grid-area: 2 / 2 / 3 / 3;
 }
-
-/* .terminal{
-    width: 100%;
-    height: 100%;
-} */

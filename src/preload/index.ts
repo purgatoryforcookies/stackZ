@@ -1,8 +1,13 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { Cmd } from '../types'
 
 // Custom APIs for renderer
-const api = {}
+const api = {
+  getCommands: (): Promise<Cmd[]> => ipcRenderer.invoke('getCommands'),
+  startTerminal: (id: number): Promise<boolean> => ipcRenderer.invoke('toggleTerminal', id, true),
+  stopTerminal: (id: number): Promise<boolean> => ipcRenderer.invoke('toggleTerminal', id, false)
+}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

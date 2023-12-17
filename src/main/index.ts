@@ -1,31 +1,48 @@
-import { app, shell, BrowserWindow } from 'electron'
+import electron, { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
-import { socketServer } from '../service/socket'
+import { socketServer } from './src/service/CommandService'
+import { Palette } from './src/Palette'
 
-socketServer.listen(3000)
 
-socketServer.on('connection', (socket) => {
-  console.log(`Client ${socket.id} connected`)
-})
+// const savedCommandsPath = path.join(__dirname, './commands.json')
+
+const savedCommandsPath = './commands.json'
+
+
+
+const palette = new Palette(savedCommandsPath, socketServer)
+palette.startServer()
 
 function createWindow(): void {
 
+  // dev setup to open screen on 2nd monitor
+  let displays = electron.screen.getAllDisplays()
+  let externalDisplay = displays.find((display) => {
+    return display.bounds.x !== 0 || display.bounds.y !== 0
+  })
+
+
   const mainWindow = new BrowserWindow({
     width: 1200,
-    height: 670,
+    height: 800,
     show: false,
     autoHideMenuBar: false,
     ...(process.platform === 'linux' ? {} : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
-    }
+    },
+    x: externalDisplay!.bounds.x + 50, //DEV
+    y: externalDisplay!.bounds.y + 50 //DEV
+
   })
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    // dev setup to not focus on it on save
+    mainWindow.blur()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -74,5 +91,15 @@ app.on('window-all-closed', () => {
   }
 })
 
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+ipcMain.handle('getCommands', () => {
+  return palette.get()
+})
+
+ipcMain.handle('toggleTerminal', (_, id: number, state: boolean) => {
+  if (state) {
+    return palette.startTerminal(id)
+  }
+  else {
+    return palette.stopTerminal(id)
+  }
+})

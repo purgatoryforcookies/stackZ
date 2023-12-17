@@ -1,6 +1,7 @@
 import { io } from "socket.io-client";
 
-const URL = "http://localhost:3000";
-const socket = io(URL);
 
-export default socket;
+export const SOCKET_HOST = "http://localhost:3000"
+
+
+export const baseSocket = io(SOCKET_HOST)

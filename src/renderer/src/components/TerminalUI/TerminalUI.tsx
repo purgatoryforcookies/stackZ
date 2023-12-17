@@ -1,24 +1,32 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import styles from './terminalui.module.css'
-import { TerminalEngine } from '@renderer/service/TerminalEngine'
+import { ExtendedCmd } from 'src/types'
 
-function TerminalUI() {
+
+
+
+type TerminalUIProps = {
+  engines: ExtendedCmd,
+  toAttach: number | null
+}
+
+
+function TerminalUI({ engines, toAttach }: TerminalUIProps) {
 
   const terminalRef = useRef(null)
-  const [ terminal ] = useState<TerminalEngine>(new TerminalEngine())
-
 
   useEffect(() => {
+
+    if (!toAttach) return
+
+
     if (terminalRef.current) {
-      terminal.attachTo(terminalRef.current)
-      terminal.startListening()
+      const eng = engines.get(toAttach)?.engine
+      if (!eng) return
+      eng.attachTo(terminalRef.current)
     }
 
-    return () => {
-      terminal.detach()
-    }
-
-  }, [])
+  }, [toAttach])
 
   return (
     <div className={styles.main} >

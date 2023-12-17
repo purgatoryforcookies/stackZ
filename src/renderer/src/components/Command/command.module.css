@@ -1,0 +1,33 @@
+.commandItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.code {
+    flex: 1
+}
+
+.code:hover {
+    cursor: pointer;
+}
+
+.status {
+    width: 30px;
+    height: 30px;
+    background-color: brown;
+}
+
+.invoke {
+    background-color: rgb(3, 73, 17);
+    text-align: center;
+    padding: 5px;
+    width: 3rem;
+    border-radius: 5px;
+}
+
+.invoke:hover {
+    cursor: pointer;
+    scale: 1.03;
+}
