@@ -5,7 +5,9 @@ import { z } from 'zod'
 export const CmdSchema = z.object({
     id: z.number(),
     command: z.object({
-        cmd: z.string()
+        cmd: z.string(),
+        env: z.record(z.string().min(1), z.string()).optional(),
+        variables: z.record(z.string().min(1), z.string()).optional()
     })
 })
 

@@ -11,7 +11,12 @@ type DetailHeaderProps = {
 type Status = {
     id: number
     isRunning: boolean
-    env: any
+    env: {
+        host: Record<string, string>
+        fromJson: Record<string, string>,
+        variables: Record<string, string>
+    },
+    cmd: string
 }
 
 
@@ -19,6 +24,7 @@ type Status = {
 function DetailHeader({ selected, engines }: DetailHeaderProps) {
 
     const [status, setStatus] = useState<Status | null>(null)
+
 
     useEffect(() => {
         baseSocket.on("terminalState", (d) => {
@@ -40,31 +46,54 @@ function DetailHeader({ selected, engines }: DetailHeaderProps) {
 
     return (
         <div className={styles.main}>
+            <div className={styles.container}>
 
-            <div className={styles.level}>
-                <div className={styles.title}>{titles[0]}</div>
-                <div className={styles.body}>
-                    {status ? Object.keys(status.env).map((e: any) => (
-                        <>
+
+
+                <div className={styles.level}>
+                    <div className={styles.title}>{titles[0]}</div>
+                    <div className={styles.body}>
+                        {status ? Object.keys(status.env.host).map((e: any) => (
                             <div className={styles.listItem}>
                                 <div className={styles.env}>{e}</div>
-                                <div className={styles.env}></div>
-                                <div className={styles.env}>{status.env[e].slice(0, 20)}</div>
+                                <div className={styles.value}>{status.env.host[e]}</div>
                             </div>
 
-                        </>
-                    )) : 'No env found'}
+                        )) : 'No env found'}
+                    </div>
                 </div>
-            </div>
-            <div className={styles.level}>
-                <div className={styles.title}>{titles[1]}</div>
-            </div>
-            <div className={styles.level}>
-                <div className={styles.title}>{titles[2]}</div>
-            </div>
-            {/* <div className={styles.level}>
+                <div className={styles.level}>
+                    <div className={styles.title}>{titles[1]}</div>
+                    <div className={styles.body}>
+                        {status?.env.fromJson ? Object.keys(status.env.fromJson).map((e: any) => (
+                            <div className={styles.listItem}>
+                                <div className={styles.env}>{e}</div>
+                                <div className={styles.value}>{status.env.fromJson[e]}</div>
+                            </div>
+
+                        )) : 'No env found'}
+                    </div>
+                </div>
+                <div className={styles.level}>
+                    <div className={styles.title}>{titles[2]}</div>
+                    <div className={styles.body}>
+                        {status?.env.variables ? Object.keys(status.env.variables).map((e: any) => (
+                            <div className={styles.listItem}>
+                                <div className={styles.env}>{e}</div>
+                                <div className={styles.value}>{status.env.variables[e]}</div>
+                            </div>
+
+                        )) : 'No env found'}
+                    </div>
+                </div>
+                {/* <div className={styles.level}>
                 <div className={styles.title}>{titles[3]}</div>
             </div> */}
+
+            </div>
+            <div className={styles.footer}>
+                {status?.cmd}
+            </div>
 
         </div>
     )
