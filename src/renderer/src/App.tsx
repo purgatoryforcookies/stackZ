@@ -1,17 +1,19 @@
 import TerminalUI from './components/TerminalUI/TerminalUI'
-import Sidebar from './components/Sidebar/Sidebar'
+import Palette from './components/Palette/Palette'
 import DetailHeader from './components/DetailHeader/DetailHeader'
 import { useEffect, useState } from 'react'
 import { ExtendedCmd, TerminalInvokes } from '../../types'
 import { TerminalUIEngine } from './service/TerminalUIEngine'
 import { SOCKET_HOST } from './service/socket'
-
+import Nav from './components/Nav/Nav'
+import { Resizable } from 're-resizable'
 
 
 function App(): JSX.Element {
 
   const [terminals, setTerminals] = useState<ExtendedCmd | null>(null)
-  const [selected, setSelected] = useState<number | null>(null)
+  const [selected, setSelected] = useState<number | null>(1)
+  const [paletteWidth, setPaletteWidth] = useState<string>()
 
   useEffect(() => {
 
@@ -31,6 +33,15 @@ function App(): JSX.Element {
     }
     fetchTerminals()
 
+    const fetchPaletteWidth = async () => {
+      const width = await window.store.get('paletteWidth')
+      if (!width) setPaletteWidth('300px')
+      else setPaletteWidth(width)
+
+    }
+    fetchPaletteWidth()
+
+
   }, [])
 
   const handleSelection = (id: number, method = TerminalInvokes.CONN) => {
@@ -46,20 +57,47 @@ function App(): JSX.Element {
       default:
         break
     }
-
-
   }
 
   return (
-    <div className="container">
-      {terminals ?
-        <Sidebar data={terminals} onClick={handleSelection} />
+    <div className='app'>
+      <Nav />
+
+      {paletteWidth ? <div className="content">
+
+        <Resizable
+          defaultSize={{
+            width: paletteWidth,
+            height: '100%',
+          }}
+          enable={{ right: true }}
+          minWidth={300}
+          maxWidth={900}
+          onResize={() => {
+            if (!terminals || !selected) return
+            terminals?.get(selected)?.engine.resize()
+          }}
+          onResizeStop={(__, _, ref) => window.store
+            .set('paletteWidth', ref.style.width)}>
+          {terminals ?
+            <Palette data={terminals} onClick={handleSelection} selected={selected} />
+            : "Loading..."}
+        </Resizable>
+
+
+        <div className="container">
+          <div className="details">
+            <DetailHeader />
+
+          </div>
+          <div className="codeContent">
+
+            {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : "Loading..."}
+          </div>
+        </div>
+
+      </div>
         : "Loading..."}
-
-      <DetailHeader />
-      {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : "Loading..."}
-
-
     </div>
   )
 }

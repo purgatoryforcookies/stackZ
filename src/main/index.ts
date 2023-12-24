@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
 import { socketServer } from './src/service/CommandService'
 import { Palette } from './src/Palette'
-
+import { store } from './src/service/Store'
 
 // const savedCommandsPath = path.join(__dirname, './commands.json')
 
@@ -25,7 +25,7 @@ function createWindow(): void {
 
 
   const mainWindow = new BrowserWindow({
-    width: 1200,
+    width: 1500,
     height: 800,
     show: false,
     autoHideMenuBar: false,
@@ -102,4 +102,16 @@ ipcMain.handle('toggleTerminal', (_, id: number, state: boolean) => {
   else {
     return palette.stopTerminal(id)
   }
+})
+
+ipcMain.handle('killAll', () => {
+  return palette.killAll()
+})
+
+ipcMain.handle('getStore', (_, key) => {
+  return store.get(key, '300px')
+})
+
+ipcMain.handle('setStore', (_, key, value) => {
+  return store.set(key, value)
 })

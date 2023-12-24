@@ -6,7 +6,13 @@ import { Cmd } from '../types'
 const api = {
   getCommands: (): Promise<Cmd[]> => ipcRenderer.invoke('getCommands'),
   startTerminal: (id: number): Promise<boolean> => ipcRenderer.invoke('toggleTerminal', id, true),
-  stopTerminal: (id: number): Promise<boolean> => ipcRenderer.invoke('toggleTerminal', id, false)
+  stopTerminal: (id: number): Promise<boolean> => ipcRenderer.invoke('toggleTerminal', id, false),
+  killAll: (): Promise<boolean> => ipcRenderer.invoke('killAll')
+}
+
+const store = {
+  get: (key: string): Promise<string> => ipcRenderer.invoke('getStore', key),
+  set: (key: string, value: string): Promise<void> => ipcRenderer.invoke('setStore', key, value)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -16,6 +22,7 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
+    contextBridge.exposeInMainWorld('store', store)
   } catch (error) {
     console.error(error)
   }
@@ -24,4 +31,6 @@ if (process.contextIsolated) {
   window.electron = electronAPI
   // @ts-ignore (define in dts)
   window.api = api
+  // @ts-ignore (define in dts)
+  window.store = store
 }

@@ -1,6 +1,24 @@
+:root {
+
+  --background: #1e1717;
+  --primary: #fefeff;
+  --secondary: grey;
+  --primary-accent: #eec52a;
+  --secondary-accent: #f7571c;
+
+
+
+  /* --primary: black;
+  --secondary: grey;
+  --tertiary: blue; */
+}
+
+html {
+  font-size: 14px;
+}
+
+
 body {
-  display: flex;
-  flex-direction: column;
   font-family:
     Roboto,
     -apple-system,
@@ -12,39 +30,54 @@ body {
     'Cantarell',
     'Open Sans',
     sans-serif;
-  color: #86a5b1;
-  background-color: #2f3241;
+  color: var(--primary);
+  background-color: var(--background);
 }
 
 * {
   padding: 0;
   margin: 0;
+  box-sizing: border-box;
 }
 
-ul {
-  list-style: none;
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  flex: 1;
 }
 
-a {
-  color: #9feaf9;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  outline: none;
+.content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex: 1;
+
 }
 
-a:hover {
-  border-bottom: 1px solid;
+.sidebar {
+  margin: 1rem;
+  padding: 1rem;
 }
 
 .container {
-  display: grid;
-  grid-template-columns: 0.5fr 1fr;
-  grid-template-rows: 0.6fr 1fr;
-  grid-column-gap: 2rem;
-  grid-row-gap: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid white;
+  flex: 1;
+}
 
+::-webkit-scrollbar {
+  width: 12px;
+}
 
-  margin: 0 auto;
-  padding: 15px 10px 0 10px;
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.6);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  -webkit-box-shadow: inset 0 0 4px var(--primary-accent);
 }

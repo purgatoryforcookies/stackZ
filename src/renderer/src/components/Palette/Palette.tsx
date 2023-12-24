@@ -1,27 +1,25 @@
 import { ExtendedCmd, TerminalInvokes } from 'src/types'
 import Command from '../Command/Command'
-import styles from './sidebar.module.css'
+import styles from './palette.module.css'
 
-type SidebarProps = {
+type PaletteProps = {
     data: ExtendedCmd
     onClick: (id: number, method?: TerminalInvokes) => void
+    selected: number | null
 }
 
-function Sidebar({ data, onClick }: SidebarProps) {
+function Palette({ data, onClick, selected }: PaletteProps) {
 
 
     return (
         <div className={styles.main}>
-            <div className={styles.header}>
-                <h2>Palette</h2>
-            </div>
             <div className={styles.body}>
                 {Array.from(data.values()).map((cmd) => {
-                    return <Command key={cmd.id} data={cmd} handleClick={onClick} />
+                    return <Command key={cmd.id} data={cmd} handleClick={onClick} selected={selected} />
                 })}
             </div>
         </div>
     )
 }
 
-export default Sidebar
+export default Palette

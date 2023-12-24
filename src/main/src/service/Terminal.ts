@@ -9,15 +9,17 @@ export class Terminal {
     cmd: string
     shell: string
     ptyProcess: IPty | null
+    tester: any
+    isRunning: boolean
 
     constructor(cmd: Cmd, socketId: string, server: SocketServer) {
         this.cmdId = cmd.id
         this.socketId = socketId
         this.server = server
         this.cmd = cmd.command.cmd
-        // this.shell = process.platform === 'win32' ? "powershell.exe" : "bash"
-        this.shell = process.platform === 'win32' ? "C:/Program Files/Git/git-bash.exe" : "bash"
+        this.shell = process.platform === 'win32' ? "powershell.exe" : "bash"
         this.ptyProcess = null
+        this.isRunning = false
     }
 
     start() {
@@ -27,6 +29,7 @@ export class Terminal {
             env: process.env,
             useConpty: process.platform === "win32" ? false : true
         })
+        this.isRunning = true
 
         this.ptyProcess.onData((data) => {
             this.sendToClient(data)
@@ -35,16 +38,21 @@ export class Terminal {
             this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? "No signal"} \r\n$ `)
 
         })
-        this.server.emit('terminalState', { id: this.cmdId, isRunning: true })
+        this.server.emit('terminalState', { id: this.cmdId, isRunning: this.isRunning })
         this.test()
     }
 
     stop() {
         if (!this.ptyProcess) return
-        console.log(this.ptyProcess.pid)
+        console.log("Killing", this.cmdId)
         this.ptyProcess.kill()
-        this.server.emit('terminalState', { id: this.cmdId, isRunning: false })
+        this.isRunning = false
+        this.server.emit('terminalState', { id: this.cmdId, isRunning: this.isRunning })
+        clearInterval(this.tester)
 
+    }
+    ping() {
+        this.server.emit('terminalState', { id: this.cmdId, isRunning: this.isRunning })
     }
 
     sendToClient(data: string) {
@@ -59,7 +67,7 @@ export class Terminal {
     }
 
     test() {
-        setInterval(() => {
+        this.tester = setInterval(() => {
             this.write(`echo "hello from ${this.cmdId}"`)
             this.prompt()
         }, 2500)

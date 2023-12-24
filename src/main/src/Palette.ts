@@ -3,8 +3,6 @@ import { Terminal } from "./service/Terminal";
 import { readJsonFile } from "./service/util";
 
 
-
-
 export class Palette {
     commands: Cmd[]
     terminals: Map<number, Terminal>
@@ -39,8 +37,14 @@ export class Palette {
                 client.emit('error', { message: 'Are you even a terminal?' })
                 return
             }
-            this.terminals.set(remoteTerminalID, new Terminal(localCmd, client.id, this.server))
-            client.emit("hello")
+            const existing = this.terminals.get(remoteTerminalID)
+            if (!existing) {
+                this.terminals.set(remoteTerminalID, new Terminal(localCmd, client.id, this.server))
+                client.emit("hello")
+                return
+            }
+            existing.ping()
+
         })
         this.server.on("hello", (client) => {
             client.emit("hello")
@@ -65,6 +69,12 @@ export class Palette {
         if (!terminal) return false
         terminal.stop()
         return true
+    }
+
+    killAll() {
+        this.terminals.forEach((terminal) => {
+            terminal.stop()
+        })
     }
 
 }
