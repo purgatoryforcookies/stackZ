@@ -21,9 +21,6 @@ function Command({ data, handleClick, selected }: CommandProps) {
             setStatus(d.isRunning)
         })
 
-        return () => {
-            baseSocket.off("terminalState")
-        }
     }, [])
 
     const handleState = async () => {

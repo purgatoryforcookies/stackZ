@@ -14,9 +14,9 @@ export class Terminal {
 
     constructor(cmd: Cmd, socketId: string, server: SocketServer) {
         this.cmdId = cmd.id
+        this.cmd = cmd.command.cmd
         this.socketId = socketId
         this.server = server
-        this.cmd = cmd.command.cmd
         this.shell = process.platform === 'win32' ? "powershell.exe" : "bash"
         this.ptyProcess = null
         this.isRunning = false
@@ -38,7 +38,7 @@ export class Terminal {
             this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? "No signal"} \r\n$ `)
 
         })
-        this.server.emit('terminalState', { id: this.cmdId, isRunning: this.isRunning })
+        this.server.emit('terminalState', { id: this.cmdId, isRunning: this.isRunning, env: process.env })
         this.test()
     }
 
@@ -47,12 +47,12 @@ export class Terminal {
         console.log("Killing", this.cmdId)
         this.ptyProcess.kill()
         this.isRunning = false
-        this.server.emit('terminalState', { id: this.cmdId, isRunning: this.isRunning })
+        this.server.emit('terminalState', { id: this.cmdId, isRunning: this.isRunning, env: process.env })
         clearInterval(this.tester)
 
     }
     ping() {
-        this.server.emit('terminalState', { id: this.cmdId, isRunning: this.isRunning })
+        this.server.emit('terminalState', { id: this.cmdId, isRunning: this.isRunning, env: process.env })
     }
 
     sendToClient(data: string) {

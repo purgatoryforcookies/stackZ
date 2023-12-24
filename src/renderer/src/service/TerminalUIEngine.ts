@@ -7,7 +7,7 @@ import 'xterm/css/xterm.css';
 export class TerminalUIEngine {
     private terminal = new Terminal({
         theme: {
-            // background: '#1e1717',
+            background: '#1e1717',
             cursor: '#f7571c',
 
         },

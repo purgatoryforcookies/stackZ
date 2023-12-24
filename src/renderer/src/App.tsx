@@ -70,6 +70,7 @@ function App(): JSX.Element {
             width: paletteWidth,
             height: '100%',
           }}
+          className='sidebar'
           enable={{ right: true }}
           minWidth={300}
           maxWidth={900}
@@ -86,14 +87,9 @@ function App(): JSX.Element {
 
 
         <div className="container">
-          <div className="details">
-            <DetailHeader />
+          {selected ? <DetailHeader selected={selected} engines={terminals} /> : "Loading..."}
 
-          </div>
-          <div className="codeContent">
-
-            {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : "Loading..."}
-          </div>
+          {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : "Loading..."}
         </div>
 
       </div>

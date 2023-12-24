@@ -15,6 +15,7 @@
 
 html {
   font-size: 14px;
+  overflow-x: hidden;
 }
 
 
@@ -52,19 +53,16 @@ body {
   flex-direction: row;
   justify-content: space-between;
   flex: 1;
-
 }
 
 .sidebar {
-  margin: 1rem;
-  padding: 1rem;
+  border-right: 1px solid rgb(53, 51, 51);
 }
 
 .container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border: 1px solid white;
   flex: 1;
 }
 

@@ -40,7 +40,7 @@ export class Palette {
             const existing = this.terminals.get(remoteTerminalID)
             if (!existing) {
                 this.terminals.set(remoteTerminalID, new Terminal(localCmd, client.id, this.server))
-                client.emit("hello")
+
                 return
             }
             existing.ping()
