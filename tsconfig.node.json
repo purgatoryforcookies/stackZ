@@ -6,12 +6,17 @@
     "src/preload/*",
     "src/main/*/*/*",
     "src/main/*/*",
-    "src/types.ts"
+    "src/types.ts",
+    "src/renderer/src/service/TerminalUIEngine.ts"
   ],
   "compilerOptions": {
     "composite": true,
+    "isolatedModules": true,
+    "strict": true,
+    "noEmit": true,
     "types": [
-      "electron-vite/node"
+      "electron-vite/node",
+      "jest",
     ]
   }
 }

@@ -1,4 +1,4 @@
-import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
+import { TerminalUIEngine } from './renderer/src/service/TerminalUIEngine'
 import { Server } from 'socket.io'
 import { z } from 'zod'
 

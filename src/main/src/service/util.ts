@@ -20,7 +20,10 @@ export const readJsonFile = (path: string): Promise<Cmd[]> => {
     })
 }
 
+export const parseVariables = (cmd: string) => {
 
+    return []
+}
 
 
 
