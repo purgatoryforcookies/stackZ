@@ -5,14 +5,14 @@
     align-items: center;
     flex-grow: 1;
     min-width: 25rem;
-    transition: all 0.3s ease-in-out;
+    transition: all 0.8s ease-in-out;
     position: relative;
     min-height: 15rem;
 }
 
 .minimized {
-    min-width: 10rem;
-    max-width: 20rem;
+    min-width: 5rem;
+    max-width: 15rem;
 }
 
 
@@ -81,7 +81,7 @@
 .body.hidden {
     width: 0;
     opacity: 0;
-    max-height: 2vh;
+    max-height: 0vh;
 }
 
 .muteButtonActive {

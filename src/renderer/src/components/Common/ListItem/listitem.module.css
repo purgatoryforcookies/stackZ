@@ -4,17 +4,38 @@
     padding: 0.2rem 0.7rem 0.2rem 0.9rem;
 }
 
+.env {
+    overflow: hidden;
+    display: flex;
+}
+
+
+.env>p {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
 .value {
     background-color: var(--primary-accent);
     color: var(--background);
     font-weight: 500;
     height: 100%;
     border-radius: 10px 3px 3px 10px;
-    max-width: 50%;
+    min-width: 10%;
+    max-width: 40%;
+
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     position: relative;
+    transition: all 0.8s ease-in-out;
+}
+
+.value.minimized {
+    opacity: 0;
+    max-width: 0;
 }
 
 .noHover:hover {
@@ -28,10 +49,12 @@
 .listItem {
     display: flex;
     justify-content: space-between;
-    margin: 0.2rem 0.4rem 0.2rem 0.2rem;
+    margin: 0.2rem 0rem 0.2rem 0.2rem;
     background-color: color-mix(in srgb, var(--background), #ffffff 10%);
     border-radius: 10px;
     gap: 1rem;
+    height: 1.6rem;
+    position: relative;
 }
 
 .listItem:hover {

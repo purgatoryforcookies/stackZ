@@ -1,11 +1,11 @@
-import { MouseEventHandler, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import NewEnvInput from '../NewEnvInput/NewEnvInput'
 import styles from './listitem.module.css'
 
 import { GoPlusCircle } from "react-icons/go";
 import { useClickWatcher } from '@renderer/hooks/useClickWatcher';
 import { baseSocket } from '@renderer/service/socket';
-
+import { BsDot } from "react-icons/bs";
 
 type ListItemProps = {
     editable?: boolean
@@ -16,11 +16,12 @@ type ListItemProps = {
     terminalId: number
     selection: string
     onHighlight: (key: string, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+    minimized?: boolean
 }
 
 
 
-function ListItem({ terminalId, onHighlight, editable = false, envkey, envvalue, orderId, selection, disabled = false }: ListItemProps) {
+function ListItem({ terminalId, onHighlight, editable = false, envkey, envvalue, minimized = false, orderId, selection, disabled = false }: ListItemProps) {
 
     const [newEnvOpen, setNewEnvOpen] = useState(false)
     const clickAwayRef = useRef<HTMLDivElement>(null)
@@ -51,13 +52,19 @@ function ListItem({ terminalId, onHighlight, editable = false, envkey, envvalue,
             onClick={(e) => onHighlight(envkey, e)}
             onContextMenu={handleClick}
         >
-            <div className={styles.env}>{envkey}</div>
+            <div className={styles.env}>
+                <p>{envkey}</p> {minimized && disabled ?
+                    <BsDot size={20} color='var(--primary-accent)'
+                        style={{ width: '2rem' }}
+                    /> : null}</div>
             <div
 
                 className={`${styles.value} 
                         ${selection === envkey ? styles.open : ''} 
                         ${editable ? styles.noHover : ''}
-                        ${disabled ? styles.disabled : ''}`}>
+                        ${disabled ? styles.disabled : ''}
+                        ${minimized ? styles.minimized : ''}
+                        `}>
                 {editable ?
                     <NewEnvInput
                         envKey={envkey}

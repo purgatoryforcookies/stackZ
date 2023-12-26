@@ -40,7 +40,14 @@ export const envFactory = (args: JsonEnv[] | undefined) => {
     return allenvs.sort((a, b) => a.order - b.order)
 }
 
+
+//TODO: this logic does not work as it is supposed to
+// problem with keys from differrent order sets having
+// same name. They get removed all is even one of them is 
+// in the disabled list. 
 export const mapEnvs = (obj: ENVs[]) => {
+
+    console.log(obj)
 
     const all = obj.map(item => item.pairs)
     const disabled = obj.map(item => item.disabled).flat()
@@ -57,6 +64,10 @@ export const mapEnvs = (obj: ENVs[]) => {
     return reduced
 }
 
+
+export const haveThesameElements = <T>(arr1: T[], arr2: T[]) => {
+    return arr1.every(e => arr2.includes((e)))
+}
 
 
 

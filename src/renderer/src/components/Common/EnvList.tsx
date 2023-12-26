@@ -77,7 +77,9 @@ function EnvList({ data, onSelection, selectedKey, terminalId, editable = false,
                         editable={editable}
                         orderId={data.order}
                         disabled={data.disabled.includes(key)}
-                        key={key} />
+                        key={key}
+                        minimized={minimized}
+                    />
 
                 )) : null}
                 {editable ?

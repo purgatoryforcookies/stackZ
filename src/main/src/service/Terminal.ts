@@ -1,6 +1,6 @@
 import { Cmd, ENVs, EnvironmentEditProps, EnvironmentMuteProps, SocketServer } from "../../../types"
 import { spawn, IPty } from 'node-pty'
-import { envFactory, mapEnvs } from "./util"
+import { envFactory, haveThesameElements, mapEnvs } from "./util"
 
 
 
@@ -24,7 +24,6 @@ export class Terminal {
         this.shell = process.platform === 'win32' ? "powershell.exe" : "bash"
         this.ptyProcess = null
         this.isRunning = false
-
     }
 
     start() {
@@ -34,6 +33,7 @@ export class Terminal {
             cwd: process.env.HOME,
             env: mapEnvs(this.envs),
             useConpty: process.platform === "win32" ? false : true
+
         })
         this.isRunning = true
 
@@ -45,7 +45,13 @@ export class Terminal {
 
         })
         this.ping()
-        this.test()
+        this.run(this.cmd)
+    }
+
+    run(cmd: string) {
+        this.write(cmd)
+        this.prompt()
+
     }
 
     stop() {
@@ -75,6 +81,7 @@ export class Terminal {
     write(data: string) {
         this.ptyProcess?.write(data)
     }
+
     prompt() {
         this.ptyProcess?.write(`\r`)
     }
@@ -105,7 +112,7 @@ export class Terminal {
         if (target) {
 
             if (!args.key) {
-                if (Object.keys(target.pairs).length === target.disabled.length) {
+                if (haveThesameElements(Object.keys(target.pairs), target.disabled)) {
                     target.disabled = []
                 } else {
                     target.disabled.push(...Object.keys(target.pairs))

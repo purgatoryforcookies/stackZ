@@ -1,6 +1,4 @@
 .edit {
-    display: flex;
-    align-items: center;
     max-width: 10rem;
     justify-content: flex-end;
     height: 1.2rem;
@@ -18,7 +16,7 @@
     padding: 0.2rem 0.4rem;
     height: 1rem;
     position: relative;
-    top: 1px;
+    bottom: 2px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -30,10 +28,6 @@
 }
 
 
-
-
 .secondaryColors {
     color: var(--primary);
-
-
 }
