@@ -5,8 +5,16 @@
     align-items: center;
     flex-grow: 1;
     min-width: 25rem;
-
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    min-height: 15rem;
 }
+
+.minimized {
+    min-width: 10rem;
+    max-width: 20rem;
+}
+
 
 .highlighted {
     background-color: color-mix(in srgb, var(--background), #ffffff 10%);
@@ -60,18 +68,35 @@
 .body {
     margin: 2rem 1rem 3rem 1rem;
     padding-left: 1rem;
-    max-height: 40vh;
+    max-height: 30vh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    max-width: 30rem;
     font-size: 0.9rem;
     width: 100%;
     padding: 0.3rem 0;
+    transition: all 0.3s ease-in-out;
+}
 
+.body.hidden {
+    width: 0;
+    opacity: 0;
+    max-height: 2vh;
 }
 
 .muteButtonActive {
     background-color: color-mix(in srgb, var(--background), #ffffff 20%);
     color: color-mix(in srgb, var(--background), #ffffff 90%);
+}
+
+.variablecount {
+    color: color-mix(in srgb, var(--background), #ffffff 40%);
+    font-size: 1.4rem;
+    margin-left: 0.5rem;
+    position: absolute;
+    top: 50%;
+}
+
+.variablecount.hidden {
+    opacity: 0;
 }

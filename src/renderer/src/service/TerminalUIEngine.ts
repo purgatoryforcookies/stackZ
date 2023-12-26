@@ -11,8 +11,7 @@ export class TerminalUIEngine {
             cursor: '#f7571c',
 
         },
-        cursorBlink: true,
-        rows: 13
+        cursorBlink: true
     });
     private socket: Socket;
     private mounted = false

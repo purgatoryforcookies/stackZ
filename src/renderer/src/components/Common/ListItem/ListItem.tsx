@@ -5,7 +5,7 @@ import styles from './listitem.module.css'
 import { GoPlusCircle } from "react-icons/go";
 import { useClickWatcher } from '@renderer/hooks/useClickWatcher';
 import { baseSocket } from '@renderer/service/socket';
-import { env } from 'process';
+
 
 type ListItemProps = {
     editable?: boolean

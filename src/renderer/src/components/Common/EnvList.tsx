@@ -2,6 +2,7 @@ import { baseSocket } from '@renderer/service/socket';
 import { Status } from '../DetailHeader/DetailHeader';
 import styles from './envlist.module.css'
 import ListItem from './ListItem/ListItem';
+import { useState } from 'react';
 
 
 type EnvListProps = {
@@ -17,6 +18,8 @@ type EnvListProps = {
 
 function EnvList({ data, onSelection, selectedKey, terminalId, editable = false, className = '' }: EnvListProps) {
 
+    const [minimized, setMinimized] = useState<boolean>(true)
+    const [hidden, setHidden] = useState<boolean>(false)
 
     const handleClik = (key: string, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         if ((e.target as HTMLElement).nodeName === 'INPUT') return
@@ -27,15 +30,33 @@ function EnvList({ data, onSelection, selectedKey, terminalId, editable = false,
         baseSocket.emit('environmentMute', { id: terminalId, orderId: data.order })
     }
 
-    console.log(data)
+    const handleMinimize = () => {
+        if (!minimized) {
+            setMinimized(true)
+        }
+        if (minimized && !hidden) {
+            setHidden(true)
+        }
+        if (minimized && hidden) {
+            setHidden(false)
+            setMinimized(false)
+        }
+    }
+
     return (
 
-        <div className={`${styles.wrapper} ${styles[className]}`}>
+        <div className={`${styles.wrapper} 
+        ${styles[className]} 
+        ${minimized ? styles.minimized : ''}`}>
             <div className={styles.header}>
                 <span>{data.title}</span>
                 <div className={styles.listActions}>
                     <ul>
-                        <li>Minimize</li>
+                        <li
+                            onClick={handleMinimize}
+                            className={`${minimized
+                                ? styles.muteButtonActive : ''}`}
+                        >Minimize</li>
                         <li
                             onClick={handleMute}
                             className={`${(Object.keys(data.pairs).length === data.disabled.length)
@@ -44,7 +65,8 @@ function EnvList({ data, onSelection, selectedKey, terminalId, editable = false,
                     </ul>
                 </div>
             </div>
-            <div className={styles.body}>
+            <div className={`${styles.variablecount} ${!hidden ? styles.hidden : ''}`}>{(Object.keys(data.pairs).length)} variables</div>
+            <div className={`${styles.body} ${hidden ? styles.hidden : ''}`}>
                 {data.pairs ? Object.keys(data.pairs).map((key: string) => (
                     <ListItem
                         terminalId={terminalId}

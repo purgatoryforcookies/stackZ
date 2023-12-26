@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import styles from './terminalui.module.css'
 import { ExtendedCmd } from 'src/types'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
-import { baseSocket } from '@renderer/service/socket'
 
 
 
