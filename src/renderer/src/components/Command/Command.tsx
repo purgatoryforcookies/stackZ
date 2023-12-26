@@ -2,7 +2,7 @@ import { EnginedCmd, TerminalInvokes } from '../../../../types'
 import styles from './command.module.css'
 import { useEffect, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
-import { CiAlignCenterH } from "react-icons/ci";
+import { BsChevronRight } from "react-icons/bs";
 
 type CommandProps = {
     data: EnginedCmd
@@ -34,13 +34,13 @@ function Command({ data, handleClick, selected }: CommandProps) {
     return (
         <div className={`${styles.commandItem} ${selected === data.id ? styles.selected : ''}`} >
             <div className={styles.status}>
-                {status ? <span className={styles.loader}></span> : <CiAlignCenterH size={25} />}
+                {status ? <span className={styles.loader}></span> : <BsChevronRight size={15} />}
             </div>
             <div className={styles.code}
                 onClick={() => handleClick(data.id, TerminalInvokes.CONN)}>
                 {data.command.cmd}
             </div>
-            <div className={styles.invoke} onClick={() => handleState()}>
+            <div className={styles.invoke} onClick={handleState}>
                 {status ? "Stop" : "Start"}
             </div>
         </div>

@@ -1,0 +1,45 @@
+.env,
+.value,
+.newListPlaceholder {
+    padding: 0.2rem 0.7rem 0.2rem 0.9rem;
+}
+
+.value {
+    background-color: var(--primary-accent);
+    color: var(--background);
+    font-weight: 500;
+    height: 100%;
+    border-radius: 10px 3px 3px 10px;
+    max-width: 50%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: relative;
+}
+
+.noHover:hover {
+    cursor: default;
+}
+
+.value.open {
+    background-color: var(--secondary-accent);
+}
+
+.listItem {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.2rem 0.4rem 0.2rem 0.2rem;
+    background-color: color-mix(in srgb, var(--background), #ffffff 10%);
+    border-radius: 10px;
+    gap: 1rem;
+}
+
+.listItem:hover {
+    cursor: pointer;
+}
+
+.newListPlaceholder {
+    justify-content: center;
+    align-items: center;
+    /* height: 1.5rem; */
+}

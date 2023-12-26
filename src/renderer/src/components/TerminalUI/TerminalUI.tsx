@@ -1,6 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from './terminalui.module.css'
 import { ExtendedCmd } from 'src/types'
+import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
+import { baseSocket } from '@renderer/service/socket'
 
 
 
@@ -13,39 +15,25 @@ type TerminalUIProps = {
 function TerminalUI({ engines, toAttach }: TerminalUIProps) {
 
   const terminalRef = useRef(null)
+  const [term, setTerm] = useState<TerminalUIEngine | null>(null)
 
   useEffect(() => {
 
-    if (!toAttach) return
+    if (!toAttach) {
+      term?.detach()
+      return
+    }
 
     if (terminalRef.current) {
       const eng = engines.get(toAttach)?.engine
       if (!eng) return
-
+      setTerm(eng)
       eng.attachTo(terminalRef.current)
     }
 
+
   }, [toAttach])
 
-  useEffect(() => {
-    if (!toAttach) return
-
-    const handleResize = () => {
-      if (terminalRef.current) {
-        const eng = engines.get(toAttach)?.engine
-        if (!eng) return
-
-        eng.resize()
-      }
-    }
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-
-  }, [toAttach]);
 
   return (
     <div className={styles.terminal} ref={terminalRef}></div>

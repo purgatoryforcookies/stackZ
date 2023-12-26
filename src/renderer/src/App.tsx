@@ -7,12 +7,13 @@ import { TerminalUIEngine } from './service/TerminalUIEngine'
 import { SOCKET_HOST } from './service/socket'
 import Nav from './components/Nav/Nav'
 import { Resizable } from 're-resizable'
+import Placeholder from './components/Common/Placeholder'
 
 
 function App(): JSX.Element {
 
   const [terminals, setTerminals] = useState<ExtendedCmd | null>(null)
-  const [selected, setSelected] = useState<number | null>(1)
+  const [selected, setSelected] = useState<number | null>(null)
   const [paletteWidth, setPaletteWidth] = useState<string>()
 
   useEffect(() => {
@@ -41,14 +42,33 @@ function App(): JSX.Element {
     }
     fetchPaletteWidth()
 
-
   }, [])
 
+  useEffect(() => {
+
+    const handleResize = () => {
+      if (selected) {
+        terminals?.get(selected)?.engine.resize()
+      }
+    }
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+
+  }, [selected]);
+
+
   const handleSelection = (id: number, method = TerminalInvokes.CONN) => {
+
 
     switch (method) {
 
       case TerminalInvokes.CONN:
+        if (selected === id) {
+          setSelected(null)
+          return
+        }
         setSelected(id)
         break
       case TerminalInvokes.START:
@@ -63,16 +83,16 @@ function App(): JSX.Element {
     <div className='app'>
       <Nav />
 
-      {paletteWidth ? <div className="content">
+      {paletteWidth ? <div className="main">
 
         <Resizable
           defaultSize={{
             width: paletteWidth,
-            height: '100%',
+            height: '100%'
           }}
           className='sidebar'
           enable={{ right: true }}
-          minWidth={300}
+          minWidth={190}
           maxWidth={900}
           onResize={() => {
             if (!terminals || !selected) return
@@ -87,9 +107,9 @@ function App(): JSX.Element {
 
 
         <div className="container">
-          {selected ? <DetailHeader selected={selected} engines={terminals} /> : "Loading..."}
+          {selected ? <DetailHeader selected={selected} engines={terminals} /> : <Placeholder message='Select from palette to get started' />}
 
-          {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : "Loading..."}
+          {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
         </div>
 
       </div>

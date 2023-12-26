@@ -12,12 +12,14 @@ export class TerminalUIEngine {
 
         },
         cursorBlink: true,
+        rows: 13
     });
     private socket: Socket;
     private mounted = false
     private id: number
     private host: string
     private fitAddon: FitAddon
+    private hostdiv: HTMLElement
 
     constructor(id: number, host: string) {
         this.fitAddon = new FitAddon();
@@ -34,7 +36,6 @@ export class TerminalUIEngine {
     }
     resize() {
         this.fitAddon.fit()
-        console.log("resized")
     }
 
     async startListening() {
@@ -57,7 +58,8 @@ export class TerminalUIEngine {
     }
 
     ping() {
-        this.socket.emit("hello")
+        console.log("sengin ping")
+        this.socket.emit("state")
     }
 
     sendInput(input: string) {
@@ -74,11 +76,11 @@ export class TerminalUIEngine {
 
     attachTo(element: HTMLElement) {
         if (!this.terminal) return
-
-        if (element.hasChildNodes()) element.innerHTML = ''
-        this.terminal.open(element);
+        this.hostdiv = element
+        if (this.hostdiv.hasChildNodes()) element.innerHTML = ''
+        this.terminal.open(this.hostdiv);
         this.mounted = true
-        this.fitAddon.fit()
+        this.resize()
 
     }
 
@@ -87,10 +89,10 @@ export class TerminalUIEngine {
     }
 
     detach() {
-
-        this.terminal.dispose()
-        this.socket.off('output')
-        this.socket.off('input')
+        this.hostdiv.innerHTML = ''
+        // this.terminal.dispose()
+        // this.socket.off('output')
+        // this.socket.off('input')
         this.mounted = false
 
     }

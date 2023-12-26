@@ -34,20 +34,25 @@ export class Palette {
             const remoteTerminalID = Number(client.handshake.query.id)
             const localCmd = this.commands.find(item => item.id === remoteTerminalID)
             if (!localCmd) {
-                client.emit('error', { message: 'Are you even a terminal?' })
+                // Non terminal clients have differrent kind of listeners
+                // They mostly ask for specific terminals state.
+                client.on('state', (arg) => {
+                    this.terminals.get(arg)?.ping()
+                })
+                client.on('environmentEdit', (arg) => {
+                    this.terminals.get(arg.id)?.editVariable(arg)
+                })
                 return
             }
+            client.emit('hello')
             const existing = this.terminals.get(remoteTerminalID)
             if (!existing) {
                 this.terminals.set(remoteTerminalID, new Terminal(localCmd, client.id, this.server))
-
                 return
             }
             existing.ping()
 
-        })
-        this.server.on("hello", (client) => {
-            client.emit("hello")
+
         })
     }
 

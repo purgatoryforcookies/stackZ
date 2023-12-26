@@ -1,100 +1,48 @@
 .main {
     padding: 1rem;
-    height: 100%;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-
-    width: 100%;
-
+    overflow: auto;
 
 }
 
 .container {
     display: flex;
-    flex-grow: 1;
-}
-
-.level {
-    /* border: 1px solid white; */
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-
-}
-
-.level:last-child {
-    background-color: color-mix(in srgb, var(--background), #ffffff 10%);
-    border-radius: 10px 10px 0 0px;
-}
-
-.title {
-    height: 2rem;
-    text-align: center;
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    width: 80%;
-    border-bottom: 1px solid white;
-
-}
-
-.body {
-    margin: 2rem 1rem 3rem 1rem;
-    padding-left: 1rem;
-    max-height: 30rem;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-}
-
-.listItem {
-    display: flex;
-    justify-content: space-between;
-    margin: 0.2rem 0.4rem 0.2rem 0.2rem;
-    width: 28rem;
+    overflow: auto;
+    max-width: 100%;
     gap: 1rem;
 }
 
+.footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 5rem;
+    margin-top: 1rem;
+}
 
-.listItem {
+
+.command {
+    display: flex;
+    align-items: center;
     background-color: color-mix(in srgb, var(--background), #ffffff 10%);
-    border-radius: 10px;
-    position: relative;
+    border-radius: 3px;
+    opacity: 1;
+    transition: 0.3s opacity;
+    height: 3rem;
+    padding: 1rem;
 
 }
 
-.env {
-    padding: 0.1rem;
-    padding-left: 1rem;
+.hidden {
+    opacity: 0;
 }
 
-.value {
+.highlightedEnv {
     background-color: var(--primary-accent);
     color: var(--background);
     font-weight: 500;
-    padding: 0.2rem 0.7rem 0.2rem 0.6rem;
     border-radius: 10px 3px 3px 10px;
-    width: 35%;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    transition: 0.5s width;
-}
-
-.value:hover {
-    cursor: pointer;
-    max-width: unset;
     width: 100%;
-
-}
-
-.footer {
-    padding: 1rem;
-    background-color: color-mix(in srgb, var(--background), #ffffff 10%);
-    border-radius: 10px 0 10px 10px
+    height: 2rem;
+    padding: 0.2rem 0.7rem 0.2rem 0.9rem;
+    transition: 0.2s all;
 }

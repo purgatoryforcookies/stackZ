@@ -1,0 +1,72 @@
+.wrapper {
+    max-width: 30rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    min-width: 25rem;
+
+}
+
+.highlighted {
+    background-color: color-mix(in srgb, var(--background), #ffffff 10%);
+    border-radius: 10px 10px 0 0px;
+}
+
+.header {
+    height: 4rem;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.4rem;
+
+}
+
+.header span {
+    width: 80%;
+    border-bottom: 1px solid white;
+    padding-bottom: 0.3rem;
+}
+
+.listActions {
+    width: 100%;
+}
+
+.listActions ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    color: color-mix(in srgb, var(--background), #ffffff 40%);
+    font-size: 0.8rem;
+
+}
+
+.listActions ul li {
+    border: 1px solid color-mix(in srgb, var(--background), #ffffff 40%);
+    padding: 0.2rem 0.5rem;
+    margin: 0.2rem;
+    border-radius: 1rem;
+}
+
+.listActions ul li:hover {
+    cursor: pointer;
+    background-color: color-mix(in srgb, var(--background), #ffffff 10%);
+    color: color-mix(in srgb, var(--background), #ffffff 80%);
+}
+
+.body {
+    margin: 2rem 1rem 3rem 1rem;
+    padding-left: 1rem;
+    max-height: 40vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    max-width: 30rem;
+    font-size: 0.9rem;
+    width: 100%;
+    padding: 0.3rem 0;
+
+}

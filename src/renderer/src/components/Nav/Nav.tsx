@@ -1,3 +1,4 @@
+import Settings from '../Common/Settings/Settings'
 import styles from './nav.module.css'
 
 function Nav() {
@@ -6,9 +7,7 @@ function Nav() {
 
             <h3>Command Palette</h3>
             <span>
-                <p>
-                    Settings
-                </p>
+                <Settings />
             </span>
 
         </div>
