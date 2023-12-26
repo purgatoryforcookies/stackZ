@@ -1,7 +1,7 @@
 .env,
 .value,
 .newListPlaceholder {
-    padding: 0.2rem 0.7rem 0.2rem 0.9rem;
+    padding: 0.2rem 0.4rem 0.2rem 0.9rem;
 }
 
 .env {
@@ -32,7 +32,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     position: relative;
-    transition: all 0.8s ease-in-out;
+    transition: all 0.4s ease-in-out;
 }
 
 .value.minimized {
