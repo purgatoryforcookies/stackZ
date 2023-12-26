@@ -1,23 +1,14 @@
 :root {
 
-  --background: #1e1717;
-  --primary: #fefeff;
-  --secondary: rgb(42, 41, 41);
-  --primary-accent: #eec52a;
-  --secondary-accent: #f7571c;
-
-
-
-  /* --primary: black;
-  --secondary: grey;
-  --tertiary: blue; */
+  --background: hsl(0, 14%, 10%);
+  --primary: hsl(240, 100%, 100%);
+  --secondary: hsl(0, 1%, 16%);
+  --primary-accent: hsl(47, 85%, 55%);
+  --secondary-accent: hsl(16, 93%, 54%);
 }
 
 html {
   font-size: 14px;
-  /* overflow-x: hidden; */
-  /* max-width: 95%; */
-  /* position: absolute; */
 }
 
 

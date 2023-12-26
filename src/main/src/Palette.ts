@@ -42,6 +42,9 @@ export class Palette {
                 client.on('environmentEdit', (arg) => {
                     this.terminals.get(arg.id)?.editVariable(arg)
                 })
+                client.on('environmentMute', (arg) => {
+                    this.terminals.get(arg.id)?.muteVariable(arg)
+                })
                 return
             }
             client.emit('hello')

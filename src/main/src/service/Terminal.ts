@@ -1,6 +1,6 @@
-import { Cmd, ENVs, EnvironmentEditProps, SocketServer } from "../../../types"
+import { Cmd, ENVs, EnvironmentEditProps, EnvironmentMuteProps, SocketServer } from "../../../types"
 import { spawn, IPty } from 'node-pty'
-import { envFactory } from "./util"
+import { envFactory, mapEnvs } from "./util"
 
 
 
@@ -13,7 +13,7 @@ export class Terminal {
     ptyProcess: IPty | null
     tester: any
     isRunning: boolean
-    envs: ENVs[] | undefined
+    envs: ENVs[]
 
     constructor(cmd: Cmd, socketId: string, server: SocketServer) {
         this.cmdId = cmd.id
@@ -32,7 +32,7 @@ export class Terminal {
         this.ptyProcess = spawn(this.shell, [], {
             name: `Palette ${this.cmdId}`,
             cwd: process.env.HOME,
-            env: { ...process.env },
+            env: mapEnvs(this.envs),
             useConpty: process.platform === "win32" ? false : true
         })
         this.isRunning = true
@@ -81,7 +81,7 @@ export class Terminal {
 
     test() {
         this.tester = setInterval(() => {
-            this.write(`echo "hello from ${this.cmdId}"`)
+            this.write(`echo "hello from ${this.cmdId}" $Env:variable1`)
             this.prompt()
             this.server.emit('test')
         }, 1000)
@@ -91,10 +91,36 @@ export class Terminal {
         if (!args.key) return
         if (args.key.trim().length == 0) return
         const target = this.envs?.find(list => list.order == args.orderId)
-        console.log(typeof target?.pairs)
         if (target) {
             target.pairs[args.key] = args.value
         }
+        this.ping()
+    }
+
+    muteVariable(args: EnvironmentMuteProps) {
+
+        if (args.key && args.key.trim().length == 0) return
+        const target = this.envs?.find(list => list.order == args.orderId)
+
+        if (target) {
+
+            if (!args.key) {
+                if (Object.keys(target.pairs).length === target.disabled.length) {
+                    target.disabled = []
+                } else {
+                    target.disabled.push(...Object.keys(target.pairs))
+                }
+
+            }
+            else if (target.disabled.includes(args.key)) {
+                target.disabled = target.disabled.filter(item => item !== args.key)
+            }
+            else {
+                target.disabled.push(args.key)
+            }
+
+        }
+
         this.ping()
     }
 

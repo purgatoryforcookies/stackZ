@@ -23,7 +23,8 @@ export const CmdJsonSchema = z.array(
 
 
 export type Cmd = z.infer<typeof CmdSchema>
-export type ENVs = z.infer<typeof jsonVariables>
+export type JsonEnv = z.infer<typeof jsonVariables>
+export type ENVs = JsonEnv & { disabled: string[] }
 export type EnginedCmd = Cmd & { engine: TerminalUIEngine }
 export type ExtendedCmd = Map<number, EnginedCmd>
 
@@ -42,3 +43,5 @@ export type EnvironmentEditProps = {
     enabled: boolean
     orderId: number
 }
+
+export type EnvironmentMuteProps = Pick<EnvironmentEditProps, 'orderId' | 'key'>

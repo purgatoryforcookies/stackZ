@@ -21,7 +21,7 @@
     cursor: default;
 }
 
-.value.open {
+.value.open:not(.disabled) {
     background-color: var(--secondary-accent);
 }
 
@@ -41,5 +41,9 @@
 .newListPlaceholder {
     justify-content: center;
     align-items: center;
-    /* height: 1.5rem; */
+}
+
+.disabled {
+    background-color: color-mix(in srgb, var(--primary-accent), #0c0c0c 50%);
+    pointer-events: none;
 }

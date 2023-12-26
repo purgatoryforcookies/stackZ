@@ -70,3 +70,8 @@
     padding: 0.3rem 0;
 
 }
+
+.muteButtonActive {
+    background-color: color-mix(in srgb, var(--background), #ffffff 20%);
+    color: color-mix(in srgb, var(--background), #ffffff 90%);
+}

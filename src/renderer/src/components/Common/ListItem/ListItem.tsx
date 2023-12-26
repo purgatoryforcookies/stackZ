@@ -1,14 +1,17 @@
-import { useRef, useState } from 'react';
+import { MouseEventHandler, useRef, useState } from 'react';
 import NewEnvInput from '../NewEnvInput/NewEnvInput'
 import styles from './listitem.module.css'
 
 import { GoPlusCircle } from "react-icons/go";
 import { useClickWatcher } from '@renderer/hooks/useClickWatcher';
+import { baseSocket } from '@renderer/service/socket';
+import { env } from 'process';
 
 type ListItemProps = {
     editable?: boolean
     envkey?: string
     envvalue?: string
+    disabled?: boolean
     orderId: number
     terminalId: number
     selection: string
@@ -17,7 +20,7 @@ type ListItemProps = {
 
 
 
-function ListItem({ terminalId, onHighlight, editable = false, envkey, envvalue, orderId, selection }: ListItemProps) {
+function ListItem({ terminalId, onHighlight, editable = false, envkey, envvalue, orderId, selection, disabled = false }: ListItemProps) {
 
     const [newEnvOpen, setNewEnvOpen] = useState(false)
     const clickAwayRef = useRef<HTMLDivElement>(null)
@@ -38,18 +41,29 @@ function ListItem({ terminalId, onHighlight, editable = false, envkey, envvalue,
         </div>
     )
 
-
-
+    const handleClick = () => {
+        baseSocket.emit('environmentMute', { id: terminalId, key: envkey, orderId })
+    }
 
     return (
-        <div className={styles.listItem} onClick={(e) => onHighlight(envkey, e)}>
+        <div
+            className={`${styles.listItem}`}
+            onClick={(e) => onHighlight(envkey, e)}
+            onContextMenu={handleClick}
+        >
             <div className={styles.env}>{envkey}</div>
             <div
+
                 className={`${styles.value} 
                         ${selection === envkey ? styles.open : ''} 
-                        ${editable ? styles.noHover : ''}`}>
+                        ${editable ? styles.noHover : ''}
+                        ${disabled ? styles.disabled : ''}`}>
                 {editable ?
-                    <NewEnvInput envKey={envkey} envvalue={envvalue} terminalId={terminalId} orderId={orderId} />
+                    <NewEnvInput
+                        envKey={envkey}
+                        envvalue={envvalue}
+                        terminalId={terminalId}
+                        orderId={orderId} />
                     : envvalue}
             </div>
 

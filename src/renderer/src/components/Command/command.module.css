@@ -2,7 +2,7 @@
     display: grid;
     grid-template-columns: 2rem 1fr 4rem;
     grid-template-rows: 1.4rem;
-    grid-column-gap: 0px;
+    grid-column-gap: 0.5rem;
     grid-row-gap: 0px;
 
     transition: all 0.6s;
@@ -55,15 +55,15 @@
 }
 
 .loader {
-    width: 23px;
-    height: 23px;
-    border: 2px dotted var(--primary);
-    border-style: solid solid dotted dotted;
+    width: 20px;
+    height: 20px;
+    outline: 2px dotted var(--primary);
+    outline-style: solid solid dotted dotted;
     border-radius: 50%;
     display: inline-block;
     position: relative;
     box-sizing: border-box;
-    animation: rotation 3s linear infinite;
+    animation: rotation 4s linear infinite;
 }
 
 .loader::after {
@@ -75,12 +75,12 @@
     top: 0;
     bottom: 0;
     margin: auto;
-    border: 1.8px dotted var(--secondary-accent);
-    border-style: solid solid dotted;
-    width: 14px;
-    height: 14px;
+    outline: 2px dotted var(--secondary-accent);
+    outline-style: solid solid dotted;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    animation: rotationBack 1.4s linear infinite;
+    animation: rotationBack 2s linear infinite;
     transform-origin: center center;
 }
 

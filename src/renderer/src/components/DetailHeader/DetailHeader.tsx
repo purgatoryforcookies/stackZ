@@ -9,14 +9,15 @@ type DetailHeaderProps = {
     engines: ExtendedCmd | null
 }
 
-type Status = {
+export type Status = {
     id: number
     isRunning: boolean
     env: [
         {
             title: string,
             pairs: Record<string, string>,
-            order: number
+            order: number,
+            disabled: string[]
         }
     ],
     cmd: string
@@ -54,14 +55,13 @@ function DetailHeader({ selected, engines }: DetailHeaderProps) {
                 {status?.env ? status.env.map((record) => (
 
                     <EnvList
-                        title={record.title}
-                        pairs={record.pairs}
+                        data={record}
                         key={record.title}
                         onSelection={handleHighligt}
                         selectedKey={highlightedEnv?.[0]}
                         editable={record.title === 'Variables'}
                         terminalId={selected}
-                        orderId={record.order}
+
                     />
 
                 )) : null}
