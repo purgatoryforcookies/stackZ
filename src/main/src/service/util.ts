@@ -41,26 +41,17 @@ export const envFactory = (args: JsonEnv[] | undefined) => {
 }
 
 
-//TODO: this logic does not work as it is supposed to
-// problem with keys from differrent order sets having
-// same name. They get removed all is even one of them is 
-// in the disabled list. 
 export const mapEnvs = (obj: ENVs[]) => {
 
-    console.log(obj)
+    const reduced: Record<string, string | undefined> = {}
+    obj.forEach(envSet => {
+        Object.keys(envSet.pairs).forEach(key => {
+            if (envSet.disabled.includes(key)) return
+            reduced[key] = envSet.pairs[key]
 
-    const all = obj.map(item => item.pairs)
-    const disabled = obj.map(item => item.disabled).flat()
 
-    const reduced = {}
-
-    all.forEach(obj => {
-        Object.keys(obj).forEach(key => {
-            if (disabled.includes(key)) return
-            reduced[key] = obj[key]
         })
     })
-
     return reduced
 }
 

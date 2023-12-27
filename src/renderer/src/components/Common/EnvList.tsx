@@ -3,6 +3,7 @@ import { Status } from '../DetailHeader/DetailHeader';
 import styles from './envlist.module.css'
 import ListItem from './ListItem/ListItem';
 import { useState } from 'react';
+import { BsDot } from 'react-icons/bs';
 
 
 type EnvListProps = {
@@ -55,17 +56,28 @@ function EnvList({ data, onSelection, selectedKey, terminalId, editable = false,
                         <li
                             onClick={handleMinimize}
                             className={`${minimized
-                                ? styles.muteButtonActive : ''}`}
-                        >Minimize</li>
+                                ? styles.muteButtonActive : ''}`}>
+                            Minimize
+                        </li>
                         <li
                             onClick={handleMute}
                             className={`${(Object.keys(data.pairs).length === data.disabled.length)
-                                ? styles.muteButtonActive : ''}`}
-                        >Disable</li>
+                                ? styles.muteButtonActive : ''}`}>
+                            Disable
+                        </li>
                     </ul>
                 </div>
             </div>
-            <div className={`${styles.variablecount} ${!hidden ? styles.hidden : ''}`}>{(Object.keys(data.pairs).length)} variables</div>
+            <div className={`${styles.variablecount} ${!hidden ? styles.hidden : ''}`}>
+                <span>
+
+                    {(Object.keys(data.pairs).length)} variables
+                </span>
+                <span>
+                    {data.disabled.length > 0 ? <BsDot size={20} color='var(--primary-accent)' className={styles.dot} /> : null}
+                    {data.disabled.length} disabled
+                </span>
+            </div>
             <div className={`${styles.body} ${hidden ? styles.hidden : ''}`}>
                 {data.pairs ? Object.keys(data.pairs).map((key: string) => (
                     <ListItem

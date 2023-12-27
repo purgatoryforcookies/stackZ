@@ -1,23 +1,24 @@
 .env,
 .value,
 .newListPlaceholder {
-    padding: 0 0.3rem 0 0.8rem;
+    padding: 0.2rem 0.3rem 0 0.8rem;
     height: 1.7rem;
-    display: flex;
+
     align-items: center;
 }
 
 .env {
     overflow: hidden;
-    width: 100%;
 }
 
+.env.minimized {
+    display: flex;
+}
 
 .env>p {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    max-width: 95%;
 
 }
 
@@ -30,7 +31,7 @@
     border-radius: 10px 3px 3px 10px;
     min-width: 10%;
     max-width: 40%;
-
+    padding-right: 0.6rem;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

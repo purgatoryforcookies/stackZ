@@ -52,7 +52,7 @@ function ListItem({ terminalId, onHighlight, editable = false, envkey, envvalue,
             onClick={(e) => onHighlight(envkey, e)}
             onContextMenu={handleClick}
         >
-            <div className={styles.env}>
+            <div className={`${styles.env} ${minimized ? styles.minimized : ''}`}>
                 <p>{envkey}</p>
 
                 {minimized && disabled ?
