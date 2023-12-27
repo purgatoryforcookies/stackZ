@@ -1,13 +1,15 @@
 .env,
 .value,
 .newListPlaceholder {
-    padding: 0.2rem 0.4rem 0.2rem 0.9rem;
+    padding: 0 0.3rem 0 0.8rem;
+    height: 1.7rem;
+    display: flex;
+    align-items: center;
 }
 
 .env {
     overflow: hidden;
-    display: flex;
-
+    width: 100%;
 }
 
 
@@ -15,6 +17,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    max-width: 95%;
 
 }
 
@@ -37,8 +40,9 @@
 
 .value.minimized {
     opacity: 0;
-    max-width: 0;
-
+    min-width: 0;
+    max-width: 0rem;
+    right: -2rem;
 }
 
 .noHover:hover {
@@ -55,8 +59,12 @@
     margin: 0.2rem 0rem 0.2rem 0.2rem;
     background-color: color-mix(in srgb, var(--background), #ffffff 10%);
     border-radius: 10px;
-    height: 1.6rem;
     position: relative;
+}
+
+.dot {
+    position: absolute;
+    right: 0.3rem;
 }
 
 .listItem:hover {

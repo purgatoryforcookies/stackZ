@@ -53,10 +53,13 @@ function ListItem({ terminalId, onHighlight, editable = false, envkey, envvalue,
             onContextMenu={handleClick}
         >
             <div className={styles.env}>
-                <p>{envkey}</p> {minimized && disabled ?
-                    <BsDot size={20} color='var(--primary-accent)'
-                        style={{ width: '2rem' }}
-                    /> : null}</div>
+                <p>{envkey}</p>
+
+                {minimized && disabled ?
+                    <BsDot size={25} color='var(--primary-accent)'
+                        className={styles.dot}
+                    /> : null}
+            </div>
             <div
 
                 className={`${styles.value} 

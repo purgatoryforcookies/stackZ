@@ -18,10 +18,10 @@ palette.startServer()
 function createWindow(): void {
 
   // dev setup to open screen on 2nd monitor
-  let displays = electron.screen.getAllDisplays()
-  let externalDisplay = displays.find((display) => {
-    return display.bounds.x !== 0 || display.bounds.y !== 0
-  })
+  // let displays = electron.screen.getAllDisplays()
+  // let externalDisplay = displays.find((display) => {
+  //   return display.bounds.x !== 0 || display.bounds.y !== 0
+  // })
 
 
   const mainWindow = new BrowserWindow({
@@ -34,8 +34,8 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     },
-    x: externalDisplay!.bounds.x + 50, //DEV
-    y: externalDisplay!.bounds.y + 50 //DEV
+    // x: externalDisplay!.bounds.x + 50, //DEV
+    // y: externalDisplay!.bounds.y + 50 //DEV
 
   })
 
