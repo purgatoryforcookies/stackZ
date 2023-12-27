@@ -1,7 +1,7 @@
 .env,
 .value,
 .newListPlaceholder {
-    padding: 0.2rem 0.3rem 0 0.8rem;
+    padding: 0.2rem 0.3rem 0.2rem 0.8rem;
     height: 1.7rem;
 
     align-items: center;
@@ -30,7 +30,7 @@
     height: 100%;
     border-radius: 10px 3px 3px 10px;
     min-width: 10%;
-    max-width: 40%;
+    max-width: 50%;
     padding-right: 0.6rem;
     overflow: hidden;
     white-space: nowrap;
@@ -41,9 +41,9 @@
 
 .value.minimized {
     opacity: 0;
-    min-width: 0;
+    min-width: unset;
     max-width: 0rem;
-    right: -2rem;
+    right: -1rem;
 }
 
 .noHover:hover {

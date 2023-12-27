@@ -14,7 +14,7 @@ type CommandProps = {
 
 function Command({ data, handleClick, selected }: CommandProps) {
 
-    const [expanded, setExpanded] = useState<boolean>(true)
+    const [expanded, setExpanded] = useState<boolean>(false)
     const [ping, setPing] = useState<Status>()
 
     useEffect(() => {
@@ -58,7 +58,7 @@ function Command({ data, handleClick, selected }: CommandProps) {
             </div>
             {expanded ? <div className={styles.expandedMenu}>
                 <div className={styles.expandedMenuRow}>
-                    <p>CWD:</p>
+                    <p>cwd:</p>
                     <p>{ping?.cwd}</p>
                 </div>
             </div> : null}

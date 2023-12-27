@@ -3,8 +3,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 15rem;
-
     transition: max-width 0.4s ease-in-out;
     position: relative;
     min-height: 15rem;
@@ -12,6 +10,7 @@
 
 .wrapper.minimized {
     max-width: 15rem;
+    min-width: 10rem;
 }
 
 
@@ -21,7 +20,7 @@
 }
 
 .header {
-    height: 4rem;
+    min-height: 4rem;
     text-align: center;
     display: flex;
     justify-content: center;
@@ -29,7 +28,6 @@
     flex-direction: column;
     width: 100%;
     gap: 0.4rem;
-
 }
 
 .header span {
@@ -65,7 +63,7 @@
 }
 
 .body {
-    margin: 2rem 1rem 3rem 1rem;
+    margin: 2rem 1rem 1rem 1rem;
     padding-left: 1rem;
     max-height: 30vh;
     overflow-y: auto;
