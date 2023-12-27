@@ -2,7 +2,8 @@ import { EnginedCmd, TerminalInvokes } from '../../../../types'
 import styles from './command.module.css'
 import { useEffect, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
-import { BsChevronRight } from "react-icons/bs";
+import { BsChevronDown, BsChevronRight } from "react-icons/bs";
+import { Status } from '../DetailHeader/DetailHeader';
 
 type CommandProps = {
     data: EnginedCmd
@@ -13,36 +14,54 @@ type CommandProps = {
 
 function Command({ data, handleClick, selected }: CommandProps) {
 
-    const [status, setStatus] = useState<boolean>(false)
+    const [expanded, setExpanded] = useState<boolean>(true)
+    const [ping, setPing] = useState<Status>()
 
     useEffect(() => {
         baseSocket.on("terminalState", (d) => {
             if (d.id !== data.id) return
-            setStatus(d.isRunning)
+            setPing(d)
         })
 
     }, [])
 
     const handleState = async () => {
-        if (status) {
-            console.log(await window.api.stopTerminal(data.id))
+        if (ping?.isRunning) {
+            window.api.stopTerminal(data.id)
             return
         }
-        console.log(await window.api.startTerminal(data.id))
+        window.api.startTerminal(data.id)
+    }
+
+    const ListIcon = (props: any) => {
+        if (expanded) {
+            return <BsChevronDown {...props} />
+        }
+        return <BsChevronRight {...props} />
     }
 
     return (
-        <div className={`${styles.commandItem} ${selected === data.id ? styles.selected : ''}`} >
+        <div className={`
+        ${styles.commandItem} 
+        ${selected === data.id ? styles.selected : ''}
+        ${expanded ? styles.expanded : ''}
+        `} >
             <div className={styles.status}>
-                {status ? <span className={styles.loader}></span> : <BsChevronRight size={15} />}
+                {ping?.isRunning ? <span className={styles.loader}></span> : <ListIcon size={15} onClick={() => setExpanded(!expanded)} className={styles.dropDown} />}
             </div>
             <div className={styles.code}
                 onClick={() => handleClick(data.id, TerminalInvokes.CONN)}>
                 {data.command.cmd}
             </div>
             <div className={styles.invoke} onClick={handleState}>
-                {status ? "Stop" : "Start"}
+                {ping?.isRunning ? "Stop" : "Start"}
             </div>
+            {expanded ? <div className={styles.expandedMenu}>
+                <div className={styles.expandedMenuRow}>
+                    <p>CWD:</p>
+                    <p>{ping?.cwd}</p>
+                </div>
+            </div> : null}
         </div>
     )
 }

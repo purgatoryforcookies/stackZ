@@ -20,7 +20,8 @@ export type Status = {
             disabled: string[]
         }
     ],
-    cmd: string
+    cmd: string,
+    cwd: string
 }
 
 

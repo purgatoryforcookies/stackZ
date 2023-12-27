@@ -14,6 +14,7 @@ export class Terminal {
     tester: any
     isRunning: boolean
     envs: ENVs[]
+    cwd: string | undefined
 
     constructor(cmd: Cmd, socketId: string, server: SocketServer) {
         this.cmdId = cmd.id
@@ -24,13 +25,14 @@ export class Terminal {
         this.shell = process.platform === 'win32' ? "powershell.exe" : "bash"
         this.ptyProcess = null
         this.isRunning = false
+        this.cwd = cmd.command.cwd
     }
 
     start() {
 
         this.ptyProcess = spawn(this.shell, [], {
             name: `Palette ${this.cmdId}`,
-            cwd: process.env.HOME,
+            cwd: this.cwd ?? process.env.HOME,
             env: mapEnvs(this.envs),
             useConpty: process.platform === "win32" ? false : true
 
@@ -69,8 +71,11 @@ export class Terminal {
 
     getState() {
         return {
-            id: this.cmdId, isRunning: this.isRunning, env: this.envs,
-            cmd: this.cmd
+            id: this.cmdId,
+            isRunning: this.isRunning,
+            env: this.envs,
+            cmd: this.cmd,
+            cwd: this.cwd ?? process.env.HOME
         }
     }
 
