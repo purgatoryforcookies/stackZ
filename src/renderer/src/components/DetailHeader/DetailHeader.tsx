@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import styles from './detailheader.module.css'
 import { baseSocket } from '@renderer/service/socket'
 import { ExtendedCmd } from 'src/types'
-import EnvList from '../Common/EnvList'
+import EnvList from '../Common/EnvList/EnvList'
 
 type DetailHeaderProps = {
     selected: number

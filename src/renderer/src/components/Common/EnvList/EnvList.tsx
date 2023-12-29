@@ -1,7 +1,7 @@
 import { baseSocket } from '@renderer/service/socket';
-import { Status } from '../DetailHeader/DetailHeader';
+import { Status } from '../../DetailHeader/DetailHeader';
 import styles from './envlist.module.css'
-import ListItem from './ListItem/ListItem';
+import ListItem from '../ListItem/ListItem';
 import { useState } from 'react';
 import { BsDot } from 'react-icons/bs';
 
