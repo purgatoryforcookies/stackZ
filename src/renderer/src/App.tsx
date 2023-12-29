@@ -2,7 +2,7 @@ import TerminalUI from './components/TerminalUI/TerminalUI'
 import Palette from './components/Palette/Palette'
 import DetailHeader from './components/DetailHeader/DetailHeader'
 import { useEffect, useState } from 'react'
-import { ExtendedCmd, TerminalInvokes } from '../../types'
+import { ExtendedCmd, SelectionEvents } from '../../types'
 import { TerminalUIEngine } from './service/TerminalUIEngine'
 import { SOCKET_HOST } from './service/socket'
 import Nav from './components/Nav/Nav'
@@ -15,6 +15,7 @@ function App(): JSX.Element {
   const [terminals, setTerminals] = useState<ExtendedCmd | null>(null)
   const [selected, setSelected] = useState<number | null>(null)
   const [paletteWidth, setPaletteWidth] = useState<string>()
+  const [editMode, setEditMode] = useState<boolean>(false)
 
   useEffect(() => {
 
@@ -59,20 +60,24 @@ function App(): JSX.Element {
   }, [selected]);
 
 
-  const handleSelection = (id: number, method = TerminalInvokes.CONN) => {
+  const handleSelection = (id: number, method = SelectionEvents.CONN) => {
 
 
     switch (method) {
 
-      case TerminalInvokes.CONN:
+      case SelectionEvents.CONN:
         if (selected === id) {
           setSelected(null)
           return
         }
         setSelected(id)
         break
-      case TerminalInvokes.START:
+      case SelectionEvents.START:
         window.api.startTerminal(id)
+        break
+      case SelectionEvents.EXPAND:
+        setEditMode(!editMode)
+        console.log(editMode)
         break
       default:
         break
@@ -91,15 +96,17 @@ function App(): JSX.Element {
             height: '100%'
           }}
           className='sidebar'
-          enable={{ right: true }}
-          minWidth={190}
+          enable={{ right: editMode ? false : true }}
+          minWidth={editMode ? 800 : 190}
           maxWidth={900}
           onResize={() => {
-            if (!terminals || !selected) return
+            if (!terminals || !selected || editMode) return
             terminals?.get(selected)?.engine.resize()
           }}
-          onResizeStop={(__, _, ref) => window.store
-            .set('paletteWidth', ref.style.width)}>
+          onResizeStop={(__, _, ref) => {
+            if (editMode) return
+            window.store.set('paletteWidth', ref.style.width)
+          }}>
           {terminals ?
             <Palette data={terminals} onClick={handleSelection} selected={selected} />
             : "Loading..."}

@@ -31,10 +31,12 @@ export type ExtendedCmd = Map<number, EnginedCmd>
 
 export type SocketServer = Server
 
-export enum TerminalInvokes {
+export enum SelectionEvents {
     START = "START",
     CONN = "CONNECT",
-    STOP = "STOP"
+    STOP = "STOP",
+    EXPAND = "EXPAND"
+
 }
 
 export type EnvironmentEditProps = {
@@ -46,3 +48,4 @@ export type EnvironmentEditProps = {
 }
 
 export type EnvironmentMuteProps = Pick<EnvironmentEditProps, 'orderId' | 'key'>
+export type UpdateCwdProps = Pick<EnvironmentEditProps, 'id' | 'value'>

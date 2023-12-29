@@ -45,6 +45,9 @@ export class Palette {
                 client.on('environmentMute', (arg) => {
                     this.terminals.get(arg.id)?.muteVariable(arg)
                 })
+                client.on('changeCwd', (arg) => {
+                    this.terminals.get(arg.id)?.updateCwd(arg)
+                })
                 return
             }
             client.emit('hello')

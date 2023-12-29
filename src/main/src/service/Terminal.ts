@@ -1,4 +1,4 @@
-import { Cmd, ENVs, EnvironmentEditProps, EnvironmentMuteProps, SocketServer } from "../../../types"
+import { Cmd, ENVs, EnvironmentEditProps, EnvironmentMuteProps, SocketServer, UpdateCwdProps } from "../../../types"
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from "./util"
 
@@ -136,4 +136,20 @@ export class Terminal {
         this.ping()
     }
 
+    updateCwd(args: UpdateCwdProps) {
+
+        const w = process.platform === "win32" ? true : false
+        const separator = w ? '\\' : '/'
+
+        let idx = 0
+        for (let i = 0; i < args.value.length; i++) {
+            if (args.value[i] == separator) {
+                idx = i
+            }
+
+        }
+
+        this.cwd = args.value.substring(0, idx)
+        this.ping()
+    }
 }

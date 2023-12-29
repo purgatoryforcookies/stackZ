@@ -6,25 +6,48 @@
     grid-row-gap: 0px;
 
     transition: all 0.3s;
-    border-radius: 4px 15px 15px 4px;
+    border-radius: 4px 10px 10px 4px;
     padding: 0.4rem;
 
 }
 
 .commandItem.expanded {
-    grid-template-rows: 1.4rem 10rem;
+    grid-template-rows: 1.4rem 4rem;
 }
 
 .expandedMenu {
     grid-area: 2 / 1 / 2 / 4;
-    padding: 1.3rem;
+    padding: 1rem 4rem;
     width: 100%;
+
 }
 
 .expandedMenuRow {
     display: flex;
     gap: 1rem;
-    align-items: center;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+}
+
+.changeBtn {
+    padding: 0.2rem 0.5rem;
+    background-color: var(--primary);
+    color: var(--secondary);
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    transition: 0.3s all;
+}
+
+.changeBtn:hover {
+    cursor: pointer;
+    background-color: var(--primary-accent);
+    outline: 1px solid var(--secondary);
 }
 
 .selected {
@@ -61,12 +84,11 @@
     background-color: var(--primary);
     color: var(--secondary-accent);
     font-weight: 600;
-    letter-spacing: 0.05rem;
     font-size: 0.9rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 20px;
+    border-radius: 8px;
     transition: scale 0.2s;
 }
 

@@ -1,10 +1,10 @@
-import { ExtendedCmd, TerminalInvokes } from 'src/types'
+import { ExtendedCmd, SelectionEvents } from 'src/types'
 import Command from '../Command/Command'
 import styles from './palette.module.css'
 
 type PaletteProps = {
     data: ExtendedCmd
-    onClick: (id: number, method?: TerminalInvokes) => void
+    onClick: (id: number, method?: SelectionEvents) => void
     selected: number | null
 }
 
