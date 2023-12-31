@@ -77,7 +77,6 @@ function App(): JSX.Element {
         break
       case SelectionEvents.EXPAND:
         setEditMode(!editMode)
-        console.log(editMode)
         break
       default:
         break
@@ -97,7 +96,7 @@ function App(): JSX.Element {
           }}
           className='sidebar'
           enable={{ right: editMode ? false : true }}
-          minWidth={editMode ? 800 : 190}
+          minWidth={editMode ? 600 : 190}
           maxWidth={900}
           onResize={() => {
             if (!terminals || !selected || editMode) return

@@ -29,6 +29,7 @@ function createWindow(): void {
     height: 900,
     show: false,
     autoHideMenuBar: false,
+
     ...(process.platform === 'linux' ? {} : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -43,10 +44,12 @@ function createWindow(): void {
     mainWindow.show()
     // dev setup to not focus on it on save
     mainWindow.blur()
+
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
+
     return { action: 'deny' }
   })
 

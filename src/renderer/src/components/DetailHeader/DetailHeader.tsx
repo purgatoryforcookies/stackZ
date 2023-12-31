@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from './detailheader.module.css'
 import { baseSocket } from '@renderer/service/socket'
 import { ExtendedCmd } from 'src/types'
 import EnvList from '../Common/EnvList/EnvList'
+import NewEnvList from '../Common/NewEnvList/NewEnvList'
 
 type DetailHeaderProps = {
     selected: number
@@ -30,6 +31,7 @@ function DetailHeader({ selected, engines }: DetailHeaderProps) {
 
     const [status, setStatus] = useState<Status | null>(null)
     const [highlightedEnv, setHighlightedEnv] = useState<string[] | null>(null)
+    const bodyRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         baseSocket.on("terminalState", (d) => {
@@ -48,10 +50,16 @@ function DetailHeader({ selected, engines }: DetailHeaderProps) {
         setHighlightedEnv(e)
     }
 
+    const scroll = () => {
+        setTimeout(() => {
+            bodyRef.current!.scroll({ left: 500, behavior: 'smooth' })
+        }, 290);
+    }
+
 
     return (
-        <div className={styles.main}>
-            <div className={styles.container}>
+        <div className={styles.main} >
+            <div className={styles.container} ref={bodyRef}>
 
                 {status?.env ? status.env.map((record) => (
 
@@ -60,12 +68,11 @@ function DetailHeader({ selected, engines }: DetailHeaderProps) {
                         key={record.title}
                         onSelection={handleHighligt}
                         selectedKey={highlightedEnv?.[0]}
-                        editable={record.title === 'Variables'}
                         terminalId={selected}
-
                     />
 
                 )) : null}
+                <NewEnvList scroll={scroll} />
 
             </div>
 
@@ -74,7 +81,15 @@ function DetailHeader({ selected, engines }: DetailHeaderProps) {
                     {highlightedEnv ? <>{highlightedEnv[0]}={highlightedEnv[1]} </> : null}
                 </div>
                 <div className={`${styles.command} ${status ? '' : styles.hidden}`} >
-                    {status?.cmd}
+                    <p>
+                        {status?.cmd}
+
+                    </p>
+
+                    <p>
+                        @
+                        {status?.cwd}
+                    </p>
                 </div>
             </div>
 

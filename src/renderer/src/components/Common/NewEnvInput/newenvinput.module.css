@@ -1,5 +1,5 @@
 .edit {
-    max-width: 10rem;
+    max-width: 15rem;
     justify-content: flex-end;
     height: 1.2rem;
 }
@@ -16,7 +16,6 @@
     padding: 0.2rem 0.4rem;
     height: 1rem;
     position: relative;
-    bottom: 2px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

@@ -9,15 +9,17 @@ type NewEnvInputProps = {
     orderId: number
     terminalId: number
     style?: 'key' | 'value'
+    onClose?: () => void
 
 }
 
 
-function NewEnvInput({ envKey, envvalue, terminalId, orderId, style = 'value' }: NewEnvInputProps) {
+function NewEnvInput({ envKey, envvalue, terminalId, orderId, style = 'value', onClose }: NewEnvInputProps) {
 
 
 
     const handleEdits = (key: string | undefined, value: string, orderId: number, enabled = true) => {
+        console.log('editev3ent')
         if (!key) {
             if (!value) return
             baseSocket.emit('environmentEdit',
@@ -31,14 +33,14 @@ function NewEnvInput({ envKey, envvalue, terminalId, orderId, style = 'value' }:
         }
 
         baseSocket.emit('environmentEdit', { id: terminalId, key, value, enabled, orderId })
-
+        if (onClose) onClose()
     }
 
     return (
         <div className={styles.edit}>
             <FiEdit2 size={13} />
             <input
-                autoFocus={Boolean(!envKey)}
+                autoFocus={true}
                 type='text'
                 className={`${styles.editField} ${style === 'key' ? styles.secondaryColors : ''}`}
                 onBlur={(e) => handleEdits(envKey, e.target.value, orderId)}

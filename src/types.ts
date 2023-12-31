@@ -49,3 +49,5 @@ export type EnvironmentEditProps = {
 
 export type EnvironmentMuteProps = Pick<EnvironmentEditProps, 'orderId' | 'key'>
 export type UpdateCwdProps = Pick<EnvironmentEditProps, 'id' | 'value'>
+export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'id' | 'orderId'>
+export type AddEnvListProps = { id: number, title: string }

@@ -4,6 +4,7 @@ import styles from './envlist.module.css'
 import ListItem from '../ListItem/ListItem';
 import { useState } from 'react';
 import { BsDot } from 'react-icons/bs';
+import { AiOutlineDelete } from "react-icons/ai";
 
 
 type EnvListProps = {
@@ -11,16 +12,16 @@ type EnvListProps = {
     className?: 'highlighted' | ''
     onSelection: (e: string[]) => void
     selectedKey?: string,
-    editable?: boolean
     terminalId: number
 }
 
 
 
-function EnvList({ data, onSelection, selectedKey, terminalId, editable = false, className = '' }: EnvListProps) {
+function EnvList({ data, onSelection, selectedKey, terminalId, className = '' }: EnvListProps) {
 
-    const [minimized, setMinimized] = useState<boolean>(true)
+    const [minimized, setMinimized] = useState<boolean>(false)
     const [hidden, setHidden] = useState<boolean>(false)
+    const [editMode, setEditMode] = useState<boolean>(false)
 
     const handleClik = (key: string, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         if ((e.target as HTMLElement).nodeName === 'INPUT') return
@@ -44,13 +45,22 @@ function EnvList({ data, onSelection, selectedKey, terminalId, editable = false,
         }
     }
 
+    const handleDelete = () => {
+        baseSocket.emit('environmentDelete', { id: terminalId, orderId: data.order })
+    }
+
+
     return (
 
         <div className={`${styles.wrapper} 
-        ${styles[className]} 
-        ${minimized ? styles.minimized : ''}`}>
+        ${className ? styles[className] : ''} 
+        ${minimized ? styles.minimized : ''}
+        ${hidden ? styles.hidden : ''}`}>
             <div className={styles.header}>
-                <span>{data.title}</span>
+                <div className={styles.title}>
+                    <span>{data.title !== '' ? data.title : "Unnamed"}</span>
+                </div>
+
                 <div className={styles.listActions}>
                     <ul>
                         <li
@@ -65,6 +75,20 @@ function EnvList({ data, onSelection, selectedKey, terminalId, editable = false,
                                 ? styles.muteButtonActive : ''}`}>
                             Disable
                         </li>
+                        {!minimized && !hidden ?
+                            <>
+                                <li
+                                    onClick={() => setEditMode(!editMode)}
+                                    className={editMode ? styles.muteButtonActive : ''}>
+                                    Edit
+                                </li>
+                                {editMode ? <li
+                                    onClick={handleDelete}
+                                    className={`${styles.excludedButton} ${styles.removeBtn}`}
+                                >
+                                    <AiOutlineDelete size={18} />
+                                </li> : null}
+                            </> : null}
                     </ul>
                 </div>
             </div>
@@ -78,7 +102,7 @@ function EnvList({ data, onSelection, selectedKey, terminalId, editable = false,
                     {data.disabled.length} disabled
                 </span>
             </div>
-            <div className={`${styles.body} ${hidden ? styles.hidden : ''}`}>
+            <div className={`${styles.body} ${hidden ? styles.hidden : ''} `}>
                 {data.pairs ? Object.keys(data.pairs).map((key: string) => (
                     <ListItem
                         terminalId={terminalId}
@@ -86,7 +110,7 @@ function EnvList({ data, onSelection, selectedKey, terminalId, editable = false,
                         selection={selectedKey || ''}
                         envkey={key}
                         envvalue={data.pairs[key]}
-                        editable={editable}
+                        editable={editMode}
                         orderId={data.order}
                         disabled={data.disabled.includes(key)}
                         key={key}
@@ -94,7 +118,7 @@ function EnvList({ data, onSelection, selectedKey, terminalId, editable = false,
                     />
 
                 )) : null}
-                {editable ?
+                {editMode ?
                     <ListItem
                         terminalId={terminalId}
                         onHighlight={handleClik}

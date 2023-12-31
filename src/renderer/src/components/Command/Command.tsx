@@ -1,6 +1,6 @@
 import { EnginedCmd, SelectionEvents } from '../../../../types'
 import styles from './command.module.css'
-import { ChangeEventHandler, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
 import { BsChevronDown, BsChevronRight } from "react-icons/bs";
 import { Status } from '../DetailHeader/DetailHeader';

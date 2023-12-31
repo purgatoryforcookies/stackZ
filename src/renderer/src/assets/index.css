@@ -5,6 +5,7 @@
   --secondary: hsl(0, 1%, 16%);
   --primary-accent: hsl(47, 85%, 55%);
   --secondary-accent: hsl(16, 93%, 54%);
+  --red: hsl(0, 74%, 48%);
 }
 
 html {

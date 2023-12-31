@@ -9,9 +9,13 @@
     "src/types.ts",
     "src/renderer/src/service/TerminalUIEngine.ts"
   ],
+  "exclude": [
+    "**/*.test.ts",
+  ],
   "compilerOptions": {
     "composite": true,
     "isolatedModules": true,
+    "strictPropertyInitialization": false,
     "strict": true,
     "noEmit": true,
     "types": [

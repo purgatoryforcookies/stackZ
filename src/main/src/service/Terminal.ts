@@ -1,4 +1,4 @@
-import { Cmd, ENVs, EnvironmentEditProps, EnvironmentMuteProps, SocketServer, UpdateCwdProps } from "../../../types"
+import { AddEnvListProps, Cmd, ENVs, EnvironmentEditProps, EnvironmentMuteProps, RemoveEnvListProps, SocketServer, UpdateCwdProps } from "../../../types"
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from "./util"
 
@@ -152,4 +152,32 @@ export class Terminal {
         this.cwd = args.value.substring(0, idx)
         this.ping()
     }
+
+    addEnvList(args: AddEnvListProps) {
+        if (this.envs.some(env => env.title === args.title)) {
+            args.title += " (1)"
+        }
+
+        const newEnv: ENVs = {
+            pairs: {},
+            title: args.title,
+            order: Math.max(...this.envs.map(env => env.order)) + 1,
+            disabled: []
+        }
+        console.log(newEnv)
+
+        this.envs.push(newEnv)
+        this.ping()
+    }
+
+    removeEnvList(args: RemoveEnvListProps) {
+
+        this.envs = this.envs.filter(env => env.order != args.orderId)
+
+        for (let i = 0; i < this.envs.length; i++) {
+            this.envs[i].order = i
+        }
+        this.ping()
+    }
+
 }

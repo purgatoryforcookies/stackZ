@@ -35,7 +35,7 @@ function ListItem({ terminalId, onHighlight, editable = false, envkey, envvalue,
             ref={clickAwayRef}
         >
             {newEnvOpen ?
-                <NewEnvInput terminalId={terminalId} style='key' orderId={orderId} />
+                <NewEnvInput terminalId={terminalId} style='key' orderId={orderId} onClose={() => setNewEnvOpen(false)} />
                 :
 
                 <GoPlusCircle color='var(--primary)' size={16} />}

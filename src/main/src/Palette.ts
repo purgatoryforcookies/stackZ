@@ -48,6 +48,12 @@ export class Palette {
                 client.on('changeCwd', (arg) => {
                     this.terminals.get(arg.id)?.updateCwd(arg)
                 })
+                client.on('environmentList', (arg) => {
+                    this.terminals.get(arg.id)?.addEnvList(arg)
+                })
+                client.on('environmentDelete', (arg) => {
+                    this.terminals.get(arg.id)?.removeEnvList(arg)
+                })
                 return
             }
             client.emit('hello')
