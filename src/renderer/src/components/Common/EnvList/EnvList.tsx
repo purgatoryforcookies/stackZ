@@ -1,10 +1,10 @@
 import { baseSocket } from '@renderer/service/socket';
 import { Status } from '../../DetailHeader/DetailHeader';
 import styles from './envlist.module.css'
-import ListItem from '../ListItem/ListItem';
 import { useState } from 'react';
 import { BsDot } from 'react-icons/bs';
 import { AiOutlineDelete } from "react-icons/ai";
+import Record from '@renderer/components/Common/ListItem/ListItem';
 
 
 type EnvListProps = {
@@ -23,9 +23,10 @@ function EnvList({ data, onSelection, selectedKey, terminalId, className = '' }:
     const [hidden, setHidden] = useState<boolean>(false)
     const [editMode, setEditMode] = useState<boolean>(false)
 
-    const handleClik = (key: string, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const handleClik = (key: string | undefined, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         if ((e.target as HTMLElement).nodeName === 'INPUT') return
-        onSelection([key, data.pairs[key]])
+
+        onSelection([key ?? '', key ? data.pairs[key] : ''])
     }
 
     const handleMute = () => {
@@ -104,29 +105,33 @@ function EnvList({ data, onSelection, selectedKey, terminalId, className = '' }:
             </div>
             <div className={`${styles.body} ${hidden ? styles.hidden : ''} `}>
                 {data.pairs ? Object.keys(data.pairs).map((key: string) => (
-                    <ListItem
+
+
+                    <Record
+                        newRecord={false}
+                        editMode={editMode}
                         terminalId={terminalId}
-                        onHighlight={handleClik}
-                        selection={selectedKey || ''}
-                        envkey={key}
-                        envvalue={data.pairs[key]}
-                        editable={editMode}
                         orderId={data.order}
-                        disabled={data.disabled.includes(key)}
-                        key={key}
                         minimized={minimized}
-                    />
+                        keyv={key}
+                        key={key}
+                        muted={data.disabled.includes(key)}
+                        value={data.pairs[key]}
+                        onClick={handleClik} />
+
+
 
                 )) : null}
                 {editMode ?
-                    <ListItem
+                    <Record
+                        newRecord={true}
                         terminalId={terminalId}
-                        onHighlight={handleClik}
-                        selection={selectedKey || ''}
                         orderId={data.order}
-                    /> : null}
-
-
+                        minimized={minimized}
+                        onClick={() => { }}
+                        editMode={editMode}
+                    />
+                    : null}
             </div>
         </div>
 

@@ -52,7 +52,7 @@ function DetailHeader({ selected, engines }: DetailHeaderProps) {
 
     const scroll = () => {
         setTimeout(() => {
-            bodyRef.current!.scroll({ left: 500, behavior: 'smooth' })
+            bodyRef.current!.scroll({ left: bodyRef.current!.scrollWidth, behavior: 'smooth' })
         }, 290);
     }
 

@@ -1,25 +1,21 @@
 .wrapper {
-    max-width: 30rem;
-    min-width: 25rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     transition: all 0.3s ease-in-out;
     position: relative;
     min-height: 15rem;
+    padding-bottom: 1rem;
 }
 
 .wrapper.minimized {
     max-width: 20rem;
-    min-width: 20rem;
+    min-width: unset;
 }
 
 .wrapper.hidden {
     max-width: 10rem;
-    min-width: 10rem;
 }
-
-
 
 .highlighted {
     background-color: color-mix(in srgb, var(--background), #ffffff 10%);
@@ -35,6 +31,8 @@
     flex-direction: column;
     width: 100%;
     gap: 0.4rem;
+    padding: 1rem 0;
+
 }
 
 
@@ -85,7 +83,6 @@
 }
 
 .body {
-    margin: 1rem;
     max-height: 30vh;
     overflow-y: auto;
     overflow-x: hidden;
@@ -132,4 +129,5 @@
 
 .variablecount.hidden {
     opacity: 0;
+    z-index: -1;
 }

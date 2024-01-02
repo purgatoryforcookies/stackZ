@@ -45,6 +45,7 @@ function NewEnvInput({ envKey, envvalue, terminalId, orderId, style = 'value', o
                 className={`${styles.editField} ${style === 'key' ? styles.secondaryColors : ''}`}
                 onBlur={(e) => handleEdits(envKey, e.target.value, orderId)}
                 defaultValue={envvalue}
+                disabled
             ></input>
         </div>
     )

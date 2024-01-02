@@ -41,7 +41,8 @@ export enum SelectionEvents {
 
 export type EnvironmentEditProps = {
     id: number
-    key: string | undefined
+    key: string
+    previousKey: string | undefined
     value: string
     enabled: boolean
     orderId: number

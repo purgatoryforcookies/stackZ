@@ -1,84 +1,142 @@
-import { useRef, useState } from 'react';
-import NewEnvInput from '../NewEnvInput/NewEnvInput'
 import styles from './listitem.module.css'
+import { GoPlusCircle } from 'react-icons/go'
+import { useRef, useState } from 'react'
+import { useClickWatcher } from '@renderer/hooks/useClickWatcher'
+import { baseSocket } from '@renderer/service/socket'
+import { BsDot } from 'react-icons/bs'
 
-import { GoPlusCircle } from "react-icons/go";
-import { useClickWatcher } from '@renderer/hooks/useClickWatcher';
-import { baseSocket } from '@renderer/service/socket';
-import { BsDot } from "react-icons/bs";
 
 type ListItemProps = {
-    editable?: boolean
-    envkey?: string
-    envvalue?: string
-    disabled?: boolean
-    orderId: number
-    terminalId: number
-    selection: string
-    onHighlight: (key: string, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
-    minimized?: boolean
+    newRecord: boolean,
+    terminalId: number,
+    orderId: number,
+    minimized: boolean,
+
+}
+
+interface RecordProps extends ListItemProps {
+    keyv?: string,
+    value?: string,
+    onClick: (key: string | undefined, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
+    editMode: boolean,
+    muted?: boolean,
 }
 
 
+type FieldProps = {
+    value?: string,
+    disabled: boolean,
+    onChange: (value: string) => void,
+    onBlur: () => void,
+    className: 'primary' | 'secondary',
+    placeholder?: string
+    muted?: boolean
+}
 
-function ListItem({ terminalId, onHighlight, editable = false, envkey, envvalue, minimized = false, orderId, selection, disabled = false }: ListItemProps) {
 
-    const [newEnvOpen, setNewEnvOpen] = useState(false)
-    const clickAwayRef = useRef<HTMLDivElement>(null)
+const Field = ({ value, disabled, onChange, onBlur, className, placeholder, muted = false }: FieldProps) => {
 
-    const { } = useClickWatcher(clickAwayRef, setNewEnvOpen)
-
-
-    if (!envkey) return (
-        <div className={`${styles.listItem} ${styles.newListPlaceholder}`}
-            onClick={() => setNewEnvOpen(true)}
-            ref={clickAwayRef}
-        >
-            {newEnvOpen ?
-                <NewEnvInput terminalId={terminalId} style='key' orderId={orderId} onClose={() => setNewEnvOpen(false)} />
-                :
-
-                <GoPlusCircle color='var(--primary)' size={16} />}
-        </div>
+    if (disabled) return (
+        <p className={`${styles.field} ${styles[className]} ${muted ? styles.muted : ''}`}>{value}</p>
     )
-
-    const handleClick = () => {
-        baseSocket.emit('environmentMute', { id: terminalId, key: envkey, orderId })
-    }
 
     return (
-        <div
-            className={`${styles.listItem}`}
-            onClick={(e) => onHighlight(envkey, e)}
-            onContextMenu={handleClick}
-        >
-            <div className={`${styles.env} ${minimized ? styles.minimized : ''}`}>
-                <p>{envkey}</p>
-
-                {minimized && disabled ?
-                    <BsDot size={25} color='var(--primary-accent)'
-                        className={styles.dot}
-                    /> : null}
-            </div>
-            <div
-
-                className={`${styles.value} 
-                        ${selection === envkey ? styles.open : ''} 
-                        ${editable ? styles.noHover : ''}
-                        ${disabled ? styles.disabled : ''}
-                        ${minimized ? styles.minimized : ''}
-                        `}>
-                {editable ?
-                    <NewEnvInput
-                        envKey={envkey}
-                        envvalue={envvalue}
-                        terminalId={terminalId}
-                        orderId={orderId} />
-                    : envvalue}
-            </div>
-
-        </div>
+        <input
+            autoFocus={true}
+            type='text'
+            className={`${styles.field} ${styles[className]} ${muted ? styles.muted : ''}`}
+            onChange={(e) => onChange(e.target.value)}
+            onBlur={onBlur}
+            defaultValue={value}
+            size={Math.min(value?.length || 30, 50)}
+            placeholder={placeholder}
+        ></input>
     )
 }
 
-export default ListItem
+const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId, minimized, muted }: RecordProps) => {
+
+    const [newRecordOpen, setNewRecordOpen] = useState(false)
+    const [keyValue, setKeyValue] = useState<string | undefined>(keyv)
+    const [keyPreviousValue] = useState<string | undefined>(keyv)
+    const [valueValue, setValueValue] = useState<string | undefined>(value)
+    const clickAwayRef = useRef<HTMLDivElement>(null)
+
+    const { } = useClickWatcher(clickAwayRef, setNewRecordOpen)
+
+    const handleClick = () => {
+        if (editMode) return
+        baseSocket.emit('environmentMute', { id: terminalId, key: keyValue, orderId })
+    }
+
+    const handleEdits = () => {
+
+        if (!keyValue) return
+
+        baseSocket.emit('environmentEdit',
+            {
+                id: terminalId,
+                key: keyValue,
+                previousKey: keyPreviousValue,
+                value: valueValue,
+                orderId,
+                enabled: true
+            })
+    }
+
+
+
+    return (
+        <div className={`
+        ${styles.recordRow}
+        ${editMode ? styles.editMode : ''}
+        ${minimized ? styles.minimized : ''}
+        ${newRecord && !newRecordOpen ? styles.newRecord : ''}
+        `}
+            ref={clickAwayRef}
+            onClick={(e) => onClick(keyValue, e)}
+            onContextMenu={handleClick}>
+
+            {newRecord && !newRecordOpen ? <GoPlusCircle
+                size={20}
+                color='var(--primary)'
+                onClick={() => setNewRecordOpen(!newRecordOpen)}
+                className={styles.addButton}
+            /> :
+                <>
+                    <div className={`${styles.key} ${minimized ? styles.minimized : ''}`}>
+                        <Field
+                            value={keyv}
+                            disabled={!editMode}
+                            onChange={setKeyValue}
+                            onBlur={handleEdits}
+                            className='primary'
+                            placeholder='KEY' />
+                    </div>
+                    {!minimized ? <div className={styles.value} >
+                        <Field
+                            value={value}
+                            disabled={!editMode}
+                            onChange={setValueValue}
+                            onBlur={handleEdits}
+                            muted={muted}
+                            className='secondary'
+                            placeholder='VALUE' />
+                    </div> : muted ?
+                        <BsDot size={20} color='var(--primary-accent)'
+                            className={styles.dot}
+                        /> : null}
+                </>
+            }
+
+        </div>
+    )
+
+
+}
+
+
+
+export default Record
+
+

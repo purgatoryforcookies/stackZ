@@ -100,11 +100,14 @@ export class Terminal {
     }
 
     editVariable(args: EnvironmentEditProps) {
-        if (!args.key) return
         if (args.key.trim().length == 0) return
         const target = this.envs?.find(list => list.order == args.orderId)
         if (target) {
+            if (args.previousKey) {
+                delete target.pairs[args.previousKey]
+            }
             target.pairs[args.key] = args.value
+            target.pairs = Object.fromEntries(Object.entries(target.pairs).sort())
         }
         this.ping()
     }
@@ -164,7 +167,6 @@ export class Terminal {
             order: Math.max(...this.envs.map(env => env.order)) + 1,
             disabled: []
         }
-        console.log(newEnv)
 
         this.envs.push(newEnv)
         this.ping()
