@@ -67,7 +67,6 @@ function DetailHeader({ selected, engines }: DetailHeaderProps) {
                         data={record}
                         key={record.title}
                         onSelection={handleHighligt}
-                        selectedKey={highlightedEnv?.[0]}
                         terminalId={selected}
                     />
 

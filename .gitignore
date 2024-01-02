@@ -4,3 +4,4 @@ out
 *.log*
 commands.json
 .env
+commands_save.json

@@ -1,7 +1,7 @@
 import { Cmd, SocketServer } from "../../types";
 import { Terminal } from "./service/Terminal";
 import { readJsonFile } from "./service/util";
-
+import { writeFile } from "fs";
 
 export class Palette {
     commands: Cmd[]
@@ -25,6 +25,30 @@ export class Palette {
         } catch (error) {
             console.log(error)
         }
+
+    }
+
+    save(onExport = false) {
+
+        const obj = onExport ? JSON.parse(JSON.stringify(this.commands)) : this.commands
+
+        obj.forEach(command => {
+            const terminal = this.terminals.get(command.id)
+            if (terminal) {
+                command = terminal.settings
+            }
+            if (command.command.env && onExport) {
+                // Redacting OS envs onExport
+                command.command.env[0].pairs = {}
+            }
+        })
+
+        const filename = onExport ? 'commands_exported.json' : 'commands_save.json'
+
+        writeFile(filename, JSON.stringify(this.commands), (error) => {
+            if (error) throw error;
+        });
+
     }
 
     startServer(port = 3000) {
@@ -41,18 +65,23 @@ export class Palette {
                 })
                 client.on('environmentEdit', (arg) => {
                     this.terminals.get(arg.id)?.editVariable(arg)
+                    this.save()
                 })
                 client.on('environmentMute', (arg) => {
                     this.terminals.get(arg.id)?.muteVariable(arg)
+                    this.save()
                 })
                 client.on('changeCwd', (arg) => {
                     this.terminals.get(arg.id)?.updateCwd(arg)
+                    this.save()
                 })
                 client.on('environmentList', (arg) => {
                     this.terminals.get(arg.id)?.addEnvList(arg)
+                    this.save()
                 })
                 client.on('environmentDelete', (arg) => {
                     this.terminals.get(arg.id)?.removeEnvList(arg)
+                    this.save()
                 })
                 return
             }

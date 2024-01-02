@@ -1,39 +1,43 @@
-import { AddEnvListProps, Cmd, ENVs, EnvironmentEditProps, EnvironmentMuteProps, RemoveEnvListProps, SocketServer, UpdateCwdProps } from "../../../types"
+import {
+    AddEnvListProps,
+    Cmd,
+    ENVs,
+    EnvironmentEditProps,
+    EnvironmentMuteProps,
+    RemoveEnvListProps,
+    SocketServer,
+    UpdateCwdProps
+} from "../../../types"
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from "./util"
 
 
 
 export class Terminal {
-    cmdId: number
+    settings: Cmd
     socketId: string
     server: SocketServer
-    cmd: string
     shell: string
     ptyProcess: IPty | null
     tester: any
     isRunning: boolean
-    envs: ENVs[]
-    cwd: string | undefined
 
     constructor(cmd: Cmd, socketId: string, server: SocketServer) {
-        this.cmdId = cmd.id
-        this.cmd = cmd.command.cmd
-        this.envs = envFactory(cmd.command.env)
+        this.settings = cmd
+        this.settings.command.env = envFactory(this.settings.command.env)
         this.socketId = socketId
         this.server = server
         this.shell = process.platform === 'win32' ? "powershell.exe" : "bash"
         this.ptyProcess = null
         this.isRunning = false
-        this.cwd = cmd.command.cwd
     }
 
     start() {
 
         this.ptyProcess = spawn(this.shell, [], {
-            name: `Palette ${this.cmdId}`,
-            cwd: this.cwd ?? process.env.HOME,
-            env: mapEnvs(this.envs),
+            name: `Palette ${this.settings.id}`,
+            cwd: this.settings.command.cwd ?? process.env.HOME,
+            env: mapEnvs(this.settings.command.env as ENVs[]),
             useConpty: process.platform === "win32" ? false : true
 
         })
@@ -47,7 +51,7 @@ export class Terminal {
 
         })
         this.ping()
-        this.run(this.cmd)
+        this.run(this.settings.command.cmd)
     }
 
     run(cmd: string) {
@@ -58,7 +62,7 @@ export class Terminal {
 
     stop() {
         if (!this.ptyProcess) return
-        console.log("Killing", this.cmdId)
+        console.log("Killing", this.settings.id)
         this.ptyProcess.kill()
         this.isRunning = false
         this.ping()
@@ -71,11 +75,11 @@ export class Terminal {
 
     getState() {
         return {
-            id: this.cmdId,
+            id: this.settings.id,
             isRunning: this.isRunning,
-            env: this.envs,
-            cmd: this.cmd,
-            cwd: this.cwd ?? process.env.HOME
+            env: this.settings.command.env,
+            cmd: this.settings.command.cmd,
+            cwd: this.settings.command.cwd ?? process.env.HOME
         }
     }
 
@@ -93,7 +97,7 @@ export class Terminal {
 
     test() {
         this.tester = setInterval(() => {
-            this.write(`echo "hello from ${this.cmdId}" $Env:variable1`)
+            this.write(`echo "hello from ${this.settings.id}" $Env:variable1`)
             this.prompt()
             this.server.emit('test')
         }, 1000)
@@ -101,7 +105,7 @@ export class Terminal {
 
     editVariable(args: EnvironmentEditProps) {
         if (args.key.trim().length == 0) return
-        const target = this.envs?.find(list => list.order == args.orderId)
+        const target = this.settings.command.env?.find(list => list.order == args.orderId)
         if (target) {
             if (args.previousKey) {
                 delete target.pairs[args.previousKey]
@@ -115,7 +119,7 @@ export class Terminal {
     muteVariable(args: EnvironmentMuteProps) {
 
         if (args.key && args.key.trim().length == 0) return
-        const target = this.envs?.find(list => list.order == args.orderId)
+        const target = this.settings.command.env?.find(list => list.order == args.orderId)
 
         if (target) {
 
@@ -152,32 +156,32 @@ export class Terminal {
 
         }
 
-        this.cwd = args.value.substring(0, idx)
+        this.settings.command.cwd = args.value.substring(0, idx)
         this.ping()
     }
 
     addEnvList(args: AddEnvListProps) {
-        if (this.envs.some(env => env.title === args.title)) {
+        if (this.settings.command.env!.some(env => env.title === args.title)) {
             args.title += " (1)"
         }
 
         const newEnv: ENVs = {
             pairs: {},
             title: args.title,
-            order: Math.max(...this.envs.map(env => env.order)) + 1,
+            order: Math.max(...this.settings.command.env!.map(env => env.order)) + 1,
             disabled: []
         }
 
-        this.envs.push(newEnv)
+        this.settings.command.env!.push(newEnv)
         this.ping()
     }
 
     removeEnvList(args: RemoveEnvListProps) {
 
-        this.envs = this.envs.filter(env => env.order != args.orderId)
+        this.settings.command.env = this.settings.command.env!.filter(env => env.order != args.orderId)
 
-        for (let i = 0; i < this.envs.length; i++) {
-            this.envs[i].order = i
+        for (let i = 0; i < this.settings.command.env.length; i++) {
+            this.settings.command.env[i].order = i
         }
         this.ping()
     }

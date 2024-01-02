@@ -5,7 +5,8 @@ import { z } from 'zod'
 const jsonVariables = z.object({
     pairs: z.record(z.string().min(1), z.string().optional()),
     title: z.string().min(1),
-    order: z.number()
+    order: z.number(),
+    disabled: z.array(z.string())
 })
 
 
@@ -52,3 +53,4 @@ export type EnvironmentMuteProps = Pick<EnvironmentEditProps, 'orderId' | 'key'>
 export type UpdateCwdProps = Pick<EnvironmentEditProps, 'id' | 'value'>
 export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'id' | 'orderId'>
 export type AddEnvListProps = { id: number, title: string }
+

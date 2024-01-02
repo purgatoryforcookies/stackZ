@@ -28,9 +28,9 @@ function Settings() {
 
         }
 
-        document.addEventListener("keydown", keypresse, false);
+        document.addEventListener("keydown", keypresse);
         return () => {
-            document.removeEventListener("keydown", keypresse, false);
+            document.removeEventListener("keydown", keypresse);
         }
 
     }, [])
@@ -47,13 +47,22 @@ function Settings() {
             >
                 <List sx={{ backgroundColor: 'var(--background)', height: '100%', color: 'var(--primary)', padding: '1rem' }}>
 
-                    <ListItem disablePadding >
+                    <ListItem  >
                         <ListItemButton>
                             <ListItemText primary={'1'} sx={{ padding: '0 1rem 0 0' }} />
                             <ListItemIcon>
                                 <TbReload size={20} color='var(--primary)' />
                             </ListItemIcon>
                             <ListItemText primary={'Reload command.json'} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem  >
+                        <ListItemButton onClick={() => window.api.save()}>
+                            <ListItemText primary={'2'} sx={{ padding: '0 1rem 0 0' }} />
+                            <ListItemIcon>
+                                <TbReload size={20} color='var(--primary)' />
+                            </ListItemIcon>
+                            <ListItemText primary={'Save'} />
                         </ListItemButton>
                     </ListItem>
                 </List>

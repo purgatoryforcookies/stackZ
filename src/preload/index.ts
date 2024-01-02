@@ -7,7 +7,8 @@ const api = {
   getCommands: (): Promise<Cmd[]> => ipcRenderer.invoke('getCommands'),
   startTerminal: (id: number): Promise<boolean> => ipcRenderer.invoke('toggleTerminal', id, true),
   stopTerminal: (id: number): Promise<boolean> => ipcRenderer.invoke('toggleTerminal', id, false),
-  killAll: (): Promise<boolean> => ipcRenderer.invoke('killAll')
+  killAll: (): Promise<boolean> => ipcRenderer.invoke('killAll'),
+  save: (): Promise<void> => ipcRenderer.invoke('save')
 }
 
 const store = {

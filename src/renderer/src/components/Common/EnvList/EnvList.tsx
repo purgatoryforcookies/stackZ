@@ -11,13 +11,12 @@ type EnvListProps = {
     data: Status['env'][0]
     className?: 'highlighted' | ''
     onSelection: (e: string[]) => void
-    selectedKey?: string,
     terminalId: number
 }
 
 
 
-function EnvList({ data, onSelection, selectedKey, terminalId, className = '' }: EnvListProps) {
+function EnvList({ data, onSelection, terminalId, className = '' }: EnvListProps) {
 
     const [minimized, setMinimized] = useState<boolean>(false)
     const [hidden, setHidden] = useState<boolean>(false)
