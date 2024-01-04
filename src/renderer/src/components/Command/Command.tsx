@@ -9,6 +9,7 @@ type CommandProps = {
     data: EnginedCmd
     handleClick: (id: number, method?: SelectionEvents) => void
     selected: number | null
+    onRemove: (cmd: EnginedCmd) => void
 }
 
 
@@ -49,6 +50,7 @@ function Command({ data, handleClick, selected }: CommandProps) {
         setExpanded(!expanded)
         handleClick(data.id, SelectionEvents.EXPAND)
     }
+
 
     return (
         <div className={`

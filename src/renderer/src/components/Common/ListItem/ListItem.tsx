@@ -34,7 +34,7 @@ type FieldProps = {
 }
 
 
-const Field = ({ value, disabled, onChange, onBlur, className, placeholder, muted = false }: FieldProps) => {
+export const Field = ({ value, disabled, onChange, onBlur, className, placeholder, muted = false }: FieldProps) => {
 
     if (disabled) return (
         <p className={`${styles.field} ${styles[className]} ${muted ? styles.muted : ''}`}>{value}</p>

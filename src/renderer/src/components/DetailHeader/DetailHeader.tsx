@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import styles from './detailheader.module.css'
 import { baseSocket } from '@renderer/service/socket'
-import { ExtendedCmd } from 'src/types'
+import { EnginedCmd } from 'src/types'
 import EnvList from '../Common/EnvList/EnvList'
 import NewEnvList from '../Common/NewEnvList/NewEnvList'
 
 type DetailHeaderProps = {
-    selected: number
-    engines: ExtendedCmd | null
+    engine: EnginedCmd
 }
 
 export type Status = {
@@ -27,7 +26,7 @@ export type Status = {
 
 
 
-function DetailHeader({ selected, engines }: DetailHeaderProps) {
+function DetailHeader({ engine }: DetailHeaderProps) {
 
     const [status, setStatus] = useState<Status | null>(null)
     const [highlightedEnv, setHighlightedEnv] = useState<string[] | null>(null)
@@ -35,12 +34,12 @@ function DetailHeader({ selected, engines }: DetailHeaderProps) {
 
     useEffect(() => {
         baseSocket.on("terminalState", (d) => {
-            if (d.id !== engines?.get(selected)?.id) return
+            if (d.id !== engine.id) return
             setStatus(d)
         })
-        baseSocket.emit('state', selected)
+        baseSocket.emit('state', engine.id)
 
-    }, [selected])
+    }, [engine])
 
     const handleHighligt = (e: string[]) => {
         if (e[0] === highlightedEnv?.[0]) {
@@ -67,7 +66,7 @@ function DetailHeader({ selected, engines }: DetailHeaderProps) {
                         data={record}
                         key={record.title}
                         onSelection={handleHighligt}
-                        terminalId={selected}
+                        terminalId={engine.id}
                     />
 
                 )) : null}

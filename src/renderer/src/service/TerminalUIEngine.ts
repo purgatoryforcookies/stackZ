@@ -35,6 +35,7 @@ export class TerminalUIEngine {
     }
     resize() {
         this.fitAddon.fit()
+        return this
     }
 
     async startListening() {
@@ -89,11 +90,14 @@ export class TerminalUIEngine {
 
     detach() {
         this.hostdiv.innerHTML = ''
-        // this.terminal.dispose()
-        // this.socket.off('output')
-        // this.socket.off('input')
         this.mounted = false
+    }
 
+    dispose() {
+        this.terminal.dispose()
+        this.socket.off('hello')
+        this.socket.off('error')
+        this.socket.disconnect()
     }
 
 }

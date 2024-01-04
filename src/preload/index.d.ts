@@ -1,4 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
+import { Cmd } from 'src/types'
 
 declare global {
   interface Window {
@@ -8,7 +9,8 @@ declare global {
       startTerminal: (id: number) => Promise<boolean>,
       stopTerminal: (id: number) => Promise<boolean>,
       killAll: () => Promise<void>,
-      save: () => Promise<void>
+      save: () => Promise<void>,
+      createCommand: (cmd: string) => Promise<Cmd>
     },
     store: {
       get: (key: string) => Promise<string>

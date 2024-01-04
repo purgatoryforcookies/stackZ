@@ -2,7 +2,7 @@ import TerminalUI from './components/TerminalUI/TerminalUI'
 import Palette from './components/Palette/Palette'
 import DetailHeader from './components/DetailHeader/DetailHeader'
 import { useEffect, useState } from 'react'
-import { ExtendedCmd, SelectionEvents } from '../../types'
+import { Cmd, EnginedCmd, ExtendedCmd, SelectionEvents } from '../../types'
 import { TerminalUIEngine } from './service/TerminalUIEngine'
 import { SOCKET_HOST } from './service/socket'
 import Nav from './components/Nav/Nav'
@@ -12,27 +12,31 @@ import Placeholder from './components/Common/Placeholder'
 
 function App(): JSX.Element {
 
-  const [terminals, setTerminals] = useState<ExtendedCmd | null>(null)
+  const [terminals, setTerminals] = useState<ExtendedCmd>(new Map<number, EnginedCmd>())
   const [selected, setSelected] = useState<number | null>(null)
   const [paletteWidth, setPaletteWidth] = useState<string>()
   const [editMode, setEditMode] = useState<boolean>(false)
 
+
+
+
   useEffect(() => {
 
     const fetchTerminals = async () => {
-      const data = await window.api.getCommands().then((data) => data)
-      const newTerminals: ExtendedCmd = new Map()
+      const data = await window.api.getCommands()
 
       data.forEach((cmd) => {
         const engine = new TerminalUIEngine(cmd.id, SOCKET_HOST)
         engine.startListening()
-        newTerminals.set(cmd.id, {
+
+        terminals.set(cmd.id, {
           ...cmd,
           engine: engine
         })
       })
-      setTerminals(newTerminals)
+      setTerminals(terminals)
     }
+
     fetchTerminals()
 
     const fetchPaletteWidth = async () => {
@@ -62,7 +66,6 @@ function App(): JSX.Element {
 
   const handleSelection = (id: number, method = SelectionEvents.CONN) => {
 
-
     switch (method) {
 
       case SelectionEvents.CONN:
@@ -81,6 +84,21 @@ function App(): JSX.Element {
       default:
         break
     }
+  }
+
+
+  const modifyTerminals = async (cmd: Cmd, remove = false) => {
+    if (terminals?.has(cmd.id)) return
+    const engine = new TerminalUIEngine(cmd.id, SOCKET_HOST)
+    engine.startListening()
+
+    const newTerminals = new Map(terminals)
+
+    newTerminals.set(cmd.id, {
+      ...cmd,
+      engine: engine
+    })
+    setTerminals(newTerminals)
   }
 
   return (
@@ -107,13 +125,13 @@ function App(): JSX.Element {
             window.store.set('paletteWidth', ref.style.width)
           }}>
           {terminals ?
-            <Palette data={terminals} onClick={handleSelection} selected={selected} />
+            <Palette data={terminals} onClick={handleSelection} selected={selected} onModify={modifyTerminals} />
             : "Loading..."}
         </Resizable>
 
 
         <div className="container">
-          {selected ? <DetailHeader selected={selected} engines={terminals} /> : <Placeholder message='Select from palette to get started' />}
+          {selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />}
 
           {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
         </div>

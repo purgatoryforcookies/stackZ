@@ -30,7 +30,7 @@ export class Palette {
 
     save(onExport = false) {
 
-        const obj = onExport ? JSON.parse(JSON.stringify(this.commands)) : this.commands
+        const obj: Cmd[] = onExport ? JSON.parse(JSON.stringify(this.commands)) : this.commands
 
         obj.forEach(command => {
             const terminal = this.terminals.get(command.id)
@@ -99,6 +99,18 @@ export class Palette {
 
     get() {
         return this.commands
+    }
+
+    createCommand(cmd: string) {
+        const newOne: Cmd = {
+            id: Math.max(...this.commands.map(cmd => cmd.id)) + 1,
+            command: {
+                cmd: cmd
+            }
+        }
+        console.log(newOne)
+        this.commands.push(newOne)
+        return newOne
     }
 
     startTerminal(id: number) {

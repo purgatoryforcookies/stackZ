@@ -153,7 +153,6 @@ export class Terminal {
             if (args.value[i] == separator) {
                 idx = i
             }
-
         }
 
         this.settings.command.cwd = args.value.substring(0, idx)
