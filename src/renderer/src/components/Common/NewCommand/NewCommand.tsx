@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { FormEvent, useRef, useState } from 'react'
 import styles from './newcommand.module.css'
 import { GoPlusCircle } from 'react-icons/go'
 import { Field } from '../ListItem/ListItem'
@@ -22,16 +22,13 @@ function NewCommand({ afterAdd }: NewCommandProps) {
     }
 
 
-    const handleSave = async () => {
+    const handleSave = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
         if (command.length === 0) return
         const newCommand = await window.api.createCommand(command)
-        console.log(newCommand)
         setOpen(false)
         setCommand('')
-
         afterAdd(newCommand)
-
-
     }
 
 
@@ -40,14 +37,16 @@ function NewCommand({ afterAdd }: NewCommandProps) {
         <div className={styles.main} onClick={handleClick} ref={reff}>
             {!open ? <GoPlusCircle size={20} className={styles.dot} />
                 : <div className={`${styles.new}`}>
+                    <form onSubmit={handleSave}>
 
-                    <Field
-                        placeholder='Command'
-                        disabled={false}
-                        onChange={setCommand}
-                        className='primary'
-                        onBlur={handleSave}
-                    />
+                        <Field
+                            placeholder='Command'
+                            disabled={false}
+                            onChange={setCommand}
+                            className='primary'
+                            onBlur={handleSave}
+                        />
+                    </form>
 
                 </div>}
         </div>

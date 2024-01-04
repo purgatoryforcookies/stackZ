@@ -1,4 +1,4 @@
-import electron, { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
@@ -6,9 +6,9 @@ import { socketServer } from './src/service/CommandService'
 import { Palette } from './src/Palette'
 import { store } from './src/service/Store'
 
-// const savedCommandsPath = path.join(__dirname, './commands.json')
+// const savedCommandsPath = path.join(__dirname, './commands_save.json')
 
-const savedCommandsPath = './commands.json'
+const savedCommandsPath = './commands_save.json'
 
 
 
@@ -18,10 +18,10 @@ palette.startServer()
 function createWindow(): void {
 
   // dev setup to open screen on 2nd monitor
-  let displays = electron.screen.getAllDisplays()
-  let externalDisplay = displays.find((display) => {
-    return display.bounds.x !== 0 || display.bounds.y !== 0
-  })
+  // let displays = electron.screen.getAllDisplays()
+  // let externalDisplay = displays.find((display) => {
+  //   return display.bounds.x !== 0 || display.bounds.y !== 0
+  // })
 
 
   const mainWindow = new BrowserWindow({
@@ -35,8 +35,8 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     },
-    x: externalDisplay!.bounds.x + 50, //DEV
-    y: externalDisplay!.bounds.y + 50 //DEV
+    // x: externalDisplay!.bounds.x + 50, //DEV
+    // y: externalDisplay!.bounds.y + 50 //DEV
 
   })
 

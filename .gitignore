@@ -5,3 +5,4 @@ out
 commands.json
 .env
 commands_save.json
+commands_backup.json

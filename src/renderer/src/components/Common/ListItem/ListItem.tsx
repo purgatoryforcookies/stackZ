@@ -27,7 +27,7 @@ type FieldProps = {
     value?: string,
     disabled: boolean,
     onChange: (value: string) => void,
-    onBlur: () => void,
+    onBlur: (e?) => void,
     className: 'primary' | 'secondary',
     placeholder?: string
     muted?: boolean

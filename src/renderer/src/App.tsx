@@ -87,7 +87,7 @@ function App(): JSX.Element {
   }
 
 
-  const modifyTerminals = async (cmd: Cmd, remove = false) => {
+  const modifyTerminals = async (cmd: Cmd) => {
     if (terminals?.has(cmd.id)) return
     const engine = new TerminalUIEngine(cmd.id, SOCKET_HOST)
     engine.startListening()

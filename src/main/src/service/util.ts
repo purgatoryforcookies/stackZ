@@ -1,4 +1,4 @@
-import { readFile } from "fs";
+import { readFile, writeFileSync, existsSync } from "fs";
 import { Cmd, CmdJsonSchema, ENVs, JsonEnv } from "../../../types";
 
 
@@ -6,8 +6,15 @@ export const readJsonFile = (path: string): Promise<Cmd[]> => {
 
     return new Promise((res, rej) => {
 
-        readFile(path, 'utf-8', (err, data) => {
-            if (err) rej({ message: "could not read json file" })
+        if (!existsSync(path)) {
+            createJsonFileTemplate(path)
+        }
+
+
+        readFile(path, 'utf-8', async (err, data) => {
+            if (err) {
+                rej({ message: `No json file found, tried to create. Failed. Path: ${path}` })
+            }
             try {
                 const file = CmdJsonSchema.parse(JSON.parse(data))
                 res(file)
@@ -19,6 +26,21 @@ export const readJsonFile = (path: string): Promise<Cmd[]> => {
         })
     })
 }
+
+const createJsonFileTemplate = (path: string) => {
+
+    const template: Cmd[] = [{
+        id: 1,
+        command: {
+            cmd: 'echo hello'
+        }
+    }]
+
+    writeFileSync(path, JSON.stringify(template))
+
+}
+
+
 
 export const parseVariables = () => {
 

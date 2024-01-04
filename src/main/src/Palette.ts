@@ -108,8 +108,8 @@ export class Palette {
                 cmd: cmd
             }
         }
-        console.log(newOne)
         this.commands.push(newOne)
+        this.save()
         return newOne
     }
 
