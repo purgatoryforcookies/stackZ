@@ -5,9 +5,6 @@ import { useEffect, useState } from 'react'
 import { Cmd, EnginedCmd, ExtendedCmd, SelectionEvents } from '../../types'
 import { TerminalUIEngine } from './service/TerminalUIEngine'
 import { SOCKET_HOST } from './service/socket'
-import Nav from './components/Nav/Nav'
-import { Resizable } from 're-resizable'
-import Placeholder from './components/Common/Placeholder'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from './@/ui/resizable'
 
 
@@ -16,7 +13,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from './@/ui/res
 function App(): JSX.Element {
 
   const [terminals, setTerminals] = useState<ExtendedCmd>(new Map<number, EnginedCmd>())
-  const [selected, setSelected] = useState<number | null>(1)
+  const [selected, setSelected] = useState<number | null>(null)
   const [paletteWidth, setPaletteWidth] = useState<string>()
   const [editMode, setEditMode] = useState<boolean>(false)
 
@@ -38,6 +35,7 @@ function App(): JSX.Element {
         })
       })
       setTerminals(terminals)
+      setSelected(1)
     }
 
     fetchTerminals()
@@ -72,10 +70,6 @@ function App(): JSX.Element {
     switch (method) {
 
       case SelectionEvents.CONN:
-        if (selected === id) {
-          setSelected(null)
-          return
-        }
         setSelected(id)
         break
       case SelectionEvents.START:
@@ -123,11 +117,10 @@ function App(): JSX.Element {
         </div>
 
 
-        <div className="h-full">
+        <div className="h-full overflow-auto pb-60">
           {terminals ?
             <Palette data={terminals} onClick={handleSelection} selected={selected} onModify={modifyTerminals} />
             : "Loading..."}
-
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

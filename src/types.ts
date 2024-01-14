@@ -41,6 +41,12 @@ export enum SelectionEvents {
 
 }
 
+export type Status = {
+    cmd: Cmd,
+    isRunning: boolean,
+    cwd: string | undefined
+}
+
 export type EnvironmentEditProps = {
     id: number
     key: string

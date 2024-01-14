@@ -1,4 +1,4 @@
-import { Cmd, SocketServer } from "../../types";
+import { Cmd, SocketServer, UpdateCwdProps } from "../../types";
 import { Terminal } from "./service/Terminal";
 import { readJsonFile } from "./service/util";
 import { writeFile } from "fs";
@@ -71,10 +71,6 @@ export class Palette {
                     this.terminals.get(arg.id)?.muteVariable(arg)
                     this.save()
                 })
-                client.on('changeCwd', (arg) => {
-                    this.terminals.get(arg.id)?.updateCwd(arg)
-                    this.save()
-                })
                 client.on('environmentList', (arg) => {
                     this.terminals.get(arg.id)?.addEnvList(arg)
                     this.save()
@@ -85,7 +81,13 @@ export class Palette {
                 })
                 return
             }
+
             client.emit('hello')
+            client.on('changeCwd', (arg: UpdateCwdProps) => {
+                console.log(`Changing cwd! new Cwd: ${arg.value}`)
+                this.terminals.get(arg.id)?.updateCwd(arg.value)
+                this.save()
+            })
             const existing = this.terminals.get(remoteTerminalID)
             if (!existing) {
                 this.terminals.set(remoteTerminalID, new Terminal(localCmd, client.id, this.server))
@@ -94,7 +96,9 @@ export class Palette {
             existing.ping()
 
 
+
         })
+
     }
 
     get() {
@@ -106,7 +110,8 @@ export class Palette {
             id: Math.max(...this.commands.map(cmd => cmd.id)) + 1,
             title: title,
             command: {
-                cmd: 'echo Hello World!'
+                cmd: 'echo Hello World!',
+                cwd: process.env.HOME
             }
         }
         this.commands.push(newOne)

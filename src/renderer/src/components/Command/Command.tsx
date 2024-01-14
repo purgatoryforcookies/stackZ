@@ -1,10 +1,8 @@
-import { EnginedCmd, SelectionEvents } from '../../../../types'
-import { useEffect, useRef, useState } from 'react'
+import { EnginedCmd, SelectionEvents, Status } from '../../../../types'
+import { useEffect, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
-import { BsChevronDown, BsChevronRight } from "react-icons/bs";
-import { Status } from '../DetailHeader/DetailHeader';
-import { Toggle } from '@renderer/@/ui/toggle';
-
+import { Button } from '@renderer/@/ui/button';
+import { ReloadIcon } from '@radix-ui/react-icons';
 
 
 type CommandProps = {
@@ -17,16 +15,19 @@ type CommandProps = {
 
 function Command({ data, handleClick, selected }: CommandProps) {
 
-    const [ping, setPing] = useState<Status>()
-    const pathRef = useRef<HTMLInputElement | null>(null)
+    const [ping, setPing] = useState<Status>({
+        cmd: data,
+        isRunning: false,
+        cwd: data.command.cwd
+    })
 
     useEffect(() => {
-        baseSocket.on("terminalState", (d) => {
-            if (d.id !== data.id) return
+        baseSocket.on("terminalState", (d: Status) => {
+            if (d.cmd.id !== data.id) return
             setPing(d)
         })
-    }, [])
-
+        baseSocket.emit('state', data.id)
+    }, [selected])
 
     const handleState = async () => {
         if (ping?.isRunning) {
@@ -37,19 +38,17 @@ function Command({ data, handleClick, selected }: CommandProps) {
     }
 
 
-
     return (
         <div className={`
             p-1
             ${(selected === data.id) ? 'bg-black' : ''}`}>
-
             <div className={`m-2 overflow-hidden rounded-s-md
-                    hover:cursor-pointer hover:bg-background hover:bg-opacity-10
+                    hover:cursor-pointer
                     `}
                 onClick={() => handleClick(data.id, SelectionEvents.CONN)}>
                 <div className='pl-4 text-base bg-black10 flex justify-between pr-5'>
-                    <span>
-                        C://Users/max/documents/projects/Koodausprojekteja
+                    <span className='truncate' dir='rtl'>
+                        {ping.cwd}
                     </span>
                     {ping?.isRunning && <span className='text-primary brightness-75'>Running</span>}
                 </div>
@@ -57,19 +56,28 @@ function Command({ data, handleClick, selected }: CommandProps) {
                 flex justify-between
                 ${(selected === data.id) ? 'bg-terminalBlack ' : 'bg-background mix-blend-screen '}`}>
                     <div className='flex flex-col pl-3 p-1 text-sm'>
-                        <span>command: aws sso login</span>
+                        <span>command: {ping.cmd.command.cmd}</span>
                         <span>shell: powershell.exe</span>
-                        <span>palettes: 5 {"(3 active)"}</span>
-                        <span>notes: sso login</span>
+                        <span>palettes: {ping.cmd.command.env?.length} {"(3 active)"}</span>
+                        <span>notes: {ping.cmd.title}</span>
                     </div>
 
-                    <div className='flex'>
+                    <div className='flex items-center pr-10'>
+                        <div>
+                            <Button variant={'ghost'} onClick={handleState}>
+                                {ping?.isRunning ? <>
+                                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                                    Running...
+                                </> : 'Start'
+                                }
+                            </Button>
 
+                        </div>
                     </div>
 
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

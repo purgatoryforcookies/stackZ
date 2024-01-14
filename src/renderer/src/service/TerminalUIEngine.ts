@@ -19,12 +19,14 @@ export class TerminalUIEngine {
     private host: string
     private fitAddon: FitAddon
     private hostdiv: HTMLElement
+    private buffer: string
 
     constructor(id: number, host: string) {
         this.fitAddon = new FitAddon();
         this.id = id
         this.host = host
         this.terminal.loadAddon(this.fitAddon)
+        this.buffer = ''
     }
 
     isMounted() {
@@ -43,22 +45,55 @@ export class TerminalUIEngine {
             query: { id: this.id }
         })
 
-        this.terminal.onData(data => this.sendInput(data))
         this.socket.on("output", (data: string) => this.write(data))
 
         this.socket.on('hello', () => {
-            this.terminal.write(`Terminal connected - ${this.socket.id}`)
+            this.write(`Terminal connected - ${this.socket.id}`)
             this.prompt()
         })
 
         this.socket.on('error', (err) => {
-            this.terminal.write(`Error - ${this.socket.id} - ${err.message}`)
+            this.write(`Error - ${this.socket.id} - ${err.message}`)
             this.prompt()
         })
+
+        this.terminal.onKey((data) => {
+
+            switch (data.domEvent.key) {
+                case 'Enter': {
+                    this.changeWorkindDirectoryMaybe(this.buffer)
+                    this.buffer = ''
+                    this.write('\n\r')
+                    break
+                }
+                case 'Backspace': {
+                    if (this.buffer.length === 0) break
+                    this.buffer = this.buffer.slice(0, -1)
+                    this.write('\b \b')
+                    break
+                }
+                case 'ArrowDown': break
+                case 'ArrowUp': break
+                case 'ArrowLeft': break
+                case 'ArrowRight': break
+                default: {
+                    this.buffer += data.key
+                    this.write(data.key);
+                }
+            }
+        })
+        this.terminal.attachCustomKeyEventHandler((e) => {
+            console.log(e)
+            if (e.code === 'KeyV' && e.ctrlKey) {
+                this.pasteClipBoardMaybe()
+                return false
+            }
+            return true
+        })
+
     }
 
     ping() {
-        console.log("sengin ping")
         this.socket.emit("state")
     }
 
@@ -66,8 +101,8 @@ export class TerminalUIEngine {
         this.socket.emit('input', input)
     }
 
-    write(text: string) {
-        this.terminal.write(text)
+    write(char: string) {
+        this.terminal.write(char)
     }
 
     prompt() {
@@ -102,6 +137,19 @@ export class TerminalUIEngine {
         this.socket.off('error')
         this.socket.disconnect()
         this.mounted = false
+    }
+
+    changeWorkindDirectoryMaybe(command: string) {
+        if (command.slice(0, 3) === 'cwd') {
+            this.socket.emit("changeCwd", { id: this.id, value: command.slice(3) })
+        }
+    }
+
+    async pasteClipBoardMaybe() {
+        const clip = await navigator.clipboard.readText()
+        if (this.buffer.includes(clip)) return
+        this.buffer += clip
+        this.write(clip)
     }
 
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import styles from './detailheader.module.css'
 import { baseSocket } from '@renderer/service/socket'
-import { EnginedCmd } from 'src/types'
+import { EnginedCmd, Status } from 'src/types'
 import EnvList from '../Common/EnvList/EnvList'
 import NewEnvList from '../Common/NewEnvList/NewEnvList'
 
@@ -9,20 +9,6 @@ type DetailHeaderProps = {
     engine: EnginedCmd
 }
 
-export type Status = {
-    id: number
-    isRunning: boolean
-    env: [
-        {
-            title: string,
-            pairs: Record<string, string>,
-            order: number,
-            disabled: string[]
-        }
-    ],
-    cmd: string,
-    cwd: string
-}
 
 
 
@@ -60,7 +46,7 @@ function DetailHeader({ engine }: DetailHeaderProps) {
         <div className={styles.main} >
             <div className={styles.container} ref={bodyRef}>
 
-                {status?.env ? status.env.map((record) => (
+                {status?.cmd.command.env ? status.cmd.command.env.map((record) => (
 
                     <EnvList
                         data={record}
@@ -82,7 +68,7 @@ function DetailHeader({ engine }: DetailHeaderProps) {
                     <p>@{status?.cwd}</p>
                     <div className={styles.terminalLook}>
                         <p>
-                            {status?.cmd}
+                            {status?.cmd?.command.cmd}
                         </p>
                     </div>
                 </div>

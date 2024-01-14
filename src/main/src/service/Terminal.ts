@@ -6,6 +6,7 @@ import {
     EnvironmentMuteProps,
     RemoveEnvListProps,
     SocketServer,
+    Status,
     UpdateCwdProps
 } from "../../../types"
 import { spawn, IPty } from 'node-pty'
@@ -74,12 +75,10 @@ export class Terminal {
         this.server.emit('terminalState', this.getState())
     }
 
-    getState() {
+    getState(): Status {
         return {
-            id: this.settings.id,
+            cmd: this.settings,
             isRunning: this.isRunning,
-            env: this.settings.command.env,
-            cmd: this.settings.command.cmd,
             cwd: this.settings.command.cwd ?? process.env.HOME
         }
     }
@@ -144,19 +143,18 @@ export class Terminal {
         this.ping()
     }
 
-    updateCwd(args: UpdateCwdProps) {
-
+    updateCwd(value: string) {
         const w = process.platform === "win32" ? true : false
         const separator = w ? '\\' : '/'
 
         let idx = 0
-        for (let i = 0; i < args.value.length; i++) {
-            if (args.value[i] == separator) {
+        for (let i = 0; i < value.length; i++) {
+            if (value[i] == separator) {
                 idx = i
             }
         }
 
-        this.settings.command.cwd = args.value.substring(0, idx)
+        this.settings.command.cwd = value.substring(0, idx)
         this.ping()
     }
 
