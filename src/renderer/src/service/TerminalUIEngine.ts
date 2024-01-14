@@ -7,9 +7,8 @@ import 'xterm/css/xterm.css';
 export class TerminalUIEngine {
     private terminal = new Terminal({
         theme: {
-            background: '#1e1717',
             cursor: '#f7571c',
-
+            background: "var(--terminalBlack)"
         },
         cursorBlink: true,
 
@@ -36,7 +35,6 @@ export class TerminalUIEngine {
     }
     resize() {
         this.fitAddon.fit()
-        console.log(this.fitAddon.proposeDimensions())
         return this
     }
 
@@ -77,7 +75,10 @@ export class TerminalUIEngine {
     }
 
     attachTo(element: HTMLElement) {
-        if (!this.terminal) return
+        if (!this.terminal) {
+            this.mounted = false
+            return
+        }
         this.hostdiv = element
         if (this.hostdiv.hasChildNodes()) element.innerHTML = ''
         this.terminal.open(this.hostdiv);
@@ -100,6 +101,7 @@ export class TerminalUIEngine {
         this.socket.off('hello')
         this.socket.off('error')
         this.socket.disconnect()
+        this.mounted = false
     }
 
 }

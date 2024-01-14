@@ -1,16 +1,28 @@
-/* :root {
+#root {
 
-    --background: #1d1616;
+    /* --background: #1d1616;
     --primary: #ffffff;
     --secondary: #292828;
     --primary-accent: #eec42b;
     --secondary-accent: #f7571d;
+    --red: hsl(0, 74%, 48%); */
+    height: 100vh;
+}
+
+/* :root {
+    --background: hsl(0, 14%, 10%);
+    --primary: hsl(0, 1%, 86%);
+    --secondary: #292828;
+    --primary-accent: hsl(47, 85%, 55%);
+    --secondary-accent: #f7571d;
     --red: hsl(0, 74%, 48%);
-  }
-   */
+} */
+
+
 html {
     font-size: 14px;
     /* background-color: #1d1616; */
+    height: 100vh;
 }
 
 
@@ -28,13 +40,14 @@ body {
         sans-serif;
     /* color: var(--primary); */
     /* background-color: var(--background); */
+    /* height: 100vh; */
 }
 
-* {
+/* * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-}
+} */
 
 .app {
     display: flex;

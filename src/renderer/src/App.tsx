@@ -105,28 +105,33 @@ function App(): JSX.Element {
   }
 
   return (
-    <div className='bg-violet-900'>
+
+    <ResizablePanelGroup
+      direction="horizontal"
+      className="rounded-lg h-full bg-background text-primary"
+    >
+      <ResizablePanel defaultSize={25}>
+        <div className="h-full">
+          {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
+        </div>
+      </ResizablePanel>
+      <ResizableHandle className='bg-black' />
+      <ResizablePanel defaultSize={20} maxSize={50} minSize={1} className='bg-foreground'>
+
+        <div className='h-10 flex justify-center'>
+          <span className='font-semibold text-lg'>Terminals</span>
+        </div>
 
 
+        <div className="h-full">
+          {terminals ?
+            <Palette data={terminals} onClick={handleSelection} selected={selected} onModify={modifyTerminals} />
+            : "Loading..."}
 
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="min-h-[200px] max-w-md rounded-lg border bg-violet-900"
-      >
-        <ResizablePanel defaultSize={25}>
-          <div className="flex h-full items-center justify-center p-6">
-            <span className="font-semibold">Sidebar</span>
-          </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={75}>
-          <div className="flex h-full items-center justify-center p-6">
-            <span className="font-semibold">Content</span>
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+        </div>
+      </ResizablePanel>
+    </ResizablePanelGroup>
 
-    </div>
   )
 }
 

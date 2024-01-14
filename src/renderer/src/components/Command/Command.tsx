@@ -1,9 +1,11 @@
 import { EnginedCmd, SelectionEvents } from '../../../../types'
-import styles from './command.module.css'
 import { useEffect, useRef, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
 import { BsChevronDown, BsChevronRight } from "react-icons/bs";
 import { Status } from '../DetailHeader/DetailHeader';
+import { Toggle } from '@renderer/@/ui/toggle';
+
+
 
 type CommandProps = {
     data: EnginedCmd
@@ -15,7 +17,6 @@ type CommandProps = {
 
 function Command({ data, handleClick, selected }: CommandProps) {
 
-    const [expanded, setExpanded] = useState<boolean>(false)
     const [ping, setPing] = useState<Status>()
     const pathRef = useRef<HTMLInputElement | null>(null)
 
@@ -35,48 +36,39 @@ function Command({ data, handleClick, selected }: CommandProps) {
         window.api.startTerminal(data.id)
     }
 
-    const ListIcon = (props: any) => {
-        if (expanded) {
-            return <BsChevronDown {...props} />
-        }
-        return <BsChevronRight {...props} />
-    }
-
-    const handleCwdChange = (e) => {
-        baseSocket.emit("changeCwd", { id: data.id, value: e.target.files[0].path })
-    }
-
-    const handleExpand = () => {
-        setExpanded(!expanded)
-        handleClick(data.id, SelectionEvents.EXPAND)
-    }
 
 
     return (
         <div className={`
-        ${styles.commandItem} 
-        ${selected === data.id ? styles.selected : ''}
-        ${expanded ? styles.expanded : ''}
-        `} >
-            <div className={styles.status}>
-                {ping?.isRunning ? <span className={styles.loader}></span> : <ListIcon size={15} onClick={handleExpand} className={styles.dropDown} />}
-            </div>
-            <div className={styles.code}
+            p-1
+            ${(selected === data.id) ? 'bg-black' : ''}`}>
+
+            <div className={`m-2 overflow-hidden rounded-s-md
+                    hover:cursor-pointer hover:bg-background hover:bg-opacity-10
+                    `}
                 onClick={() => handleClick(data.id, SelectionEvents.CONN)}>
-                {data.title}
-            </div>
-            <div className={styles.invoke} onClick={handleState}>
-                {ping?.isRunning ? "Stop" : "Start"}
-            </div>
-            {expanded ? <div className={styles.expandedMenu} >
-                <div className={styles.expandedMenuRow}>
-                    <p>cwd:</p>
-                    <p className={styles.longString}>{ping?.cwd}</p>
-                    <div onClick={() => pathRef.current!.click()} className={styles.changeBtn}>Change</div>
-                    {/* @ts-ignore */}
-                    <input type="file" style={{ display: 'none' }} ref={pathRef} onChange={handleCwdChange} webkitdirectory="" />
+                <div className='pl-4 text-base bg-black10 flex justify-between pr-5'>
+                    <span>
+                        C://Users/max/documents/projects/Koodausprojekteja
+                    </span>
+                    {ping?.isRunning && <span className='text-primary brightness-75'>Running</span>}
                 </div>
-            </div> : null}
+                <div className={` 
+                flex justify-between
+                ${(selected === data.id) ? 'bg-terminalBlack ' : 'bg-background mix-blend-screen '}`}>
+                    <div className='flex flex-col pl-3 p-1 text-sm'>
+                        <span>command: aws sso login</span>
+                        <span>shell: powershell.exe</span>
+                        <span>palettes: 5 {"(3 active)"}</span>
+                        <span>notes: sso login</span>
+                    </div>
+
+                    <div className='flex'>
+
+                    </div>
+
+                </div>
+            </div>
         </div>
     )
 }
