@@ -24,16 +24,22 @@
 
 .command {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
     background-color: color-mix(in srgb, var(--background), #ffffff 10%);
     border-radius: 3px;
     opacity: 1;
     transition: 0.3s opacity;
-    height: 3rem;
-    padding: 1rem 2rem;
+    padding: 0.5rem;
+    gap: 1rem;
 
+}
 
+.terminalLook {
+    font-size: medium;
+    font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+    width: 100%;
+    display: inline-block;
 }
 
 .hidden {

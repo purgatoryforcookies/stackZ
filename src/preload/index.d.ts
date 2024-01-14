@@ -10,7 +10,7 @@ declare global {
       stopTerminal: (id: number) => Promise<boolean>,
       killAll: () => Promise<void>,
       save: () => Promise<void>,
-      createCommand: (cmd: string) => Promise<Cmd>
+      createCommand: (title: string) => Promise<Cmd>
     },
     store: {
       get: (key: string) => Promise<string>

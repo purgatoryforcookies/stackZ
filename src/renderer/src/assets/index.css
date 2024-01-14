@@ -1,10 +1,10 @@
 :root {
 
-  --background: hsl(0, 14%, 10%);
-  --primary: hsl(240, 100%, 100%);
-  --secondary: hsl(0, 1%, 16%);
-  --primary-accent: hsl(47, 85%, 55%);
-  --secondary-accent: hsl(16, 93%, 54%);
+  --background: #1d1616;
+  --primary: #ffffff;
+  --secondary: #292828;
+  --primary-accent: #eec42b;
+  --secondary-accent: #f7571d;
   --red: hsl(0, 74%, 48%);
 }
 

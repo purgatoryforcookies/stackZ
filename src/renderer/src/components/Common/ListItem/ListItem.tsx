@@ -1,6 +1,6 @@
 import styles from './listitem.module.css'
 import { GoPlusCircle } from 'react-icons/go'
-import { useRef, useState } from 'react'
+import { FormEvent, useRef, useState } from 'react'
 import { useClickWatcher } from '@renderer/hooks/useClickWatcher'
 import { baseSocket } from '@renderer/service/socket'
 import { BsDot } from 'react-icons/bs'
@@ -17,7 +17,7 @@ type ListItemProps = {
 interface RecordProps extends ListItemProps {
     keyv?: string,
     value?: string,
-    onClick: (key: string | undefined, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
+    onClick: (key: string | undefined, e) => void,
     editMode: boolean,
     muted?: boolean,
 }
@@ -27,14 +27,13 @@ type FieldProps = {
     value?: string,
     disabled: boolean,
     onChange: (value: string) => void,
-    onBlur: (e?) => void,
     className: 'primary' | 'secondary',
     placeholder?: string
     muted?: boolean
 }
 
 
-export const Field = ({ value, disabled, onChange, onBlur, className, placeholder, muted = false }: FieldProps) => {
+export const Field = ({ value, disabled, onChange, className, placeholder, muted = false }: FieldProps) => {
 
     if (disabled) return (
         <p className={`${styles.field} ${styles[className]} ${muted ? styles.muted : ''}`}>{value}</p>
@@ -42,11 +41,10 @@ export const Field = ({ value, disabled, onChange, onBlur, className, placeholde
 
     return (
         <input
-            autoFocus={true}
+            autoFocus={className === 'primary'}
             type='text'
             className={`${styles.field} ${styles[className]} ${muted ? styles.muted : ''}`}
             onChange={(e) => onChange(e.target.value)}
-            onBlur={onBlur}
             defaultValue={value}
             size={Math.min(value?.length || 30, 50)}
             placeholder={placeholder}
@@ -69,8 +67,8 @@ const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId
         baseSocket.emit('environmentMute', { id: terminalId, key: keyValue, orderId })
     }
 
-    const handleEdits = () => {
-
+    const handleEdits = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
         if (!keyValue) return
 
         baseSocket.emit('environmentEdit',
@@ -82,6 +80,9 @@ const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId
                 orderId,
                 enabled: true
             })
+
+        setNewRecordOpen(false)
+
     }
 
 
@@ -95,7 +96,9 @@ const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId
         `}
             ref={clickAwayRef}
             onClick={(e) => onClick(keyValue, e)}
-            onContextMenu={handleClick}>
+            onContextMenu={handleClick}
+
+        >
 
             {newRecord && !newRecordOpen ? <GoPlusCircle
                 size={20}
@@ -103,30 +106,36 @@ const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId
                 onClick={() => setNewRecordOpen(!newRecordOpen)}
                 className={styles.addButton}
             /> :
+
                 <>
+
                     <div className={`${styles.key} ${minimized ? styles.minimized : ''}`}>
-                        <Field
-                            value={keyv}
-                            disabled={!editMode}
-                            onChange={setKeyValue}
-                            onBlur={handleEdits}
-                            className='primary'
-                            placeholder='KEY' />
+                        <form onSubmit={handleEdits}>
+                            <Field
+                                value={keyv}
+                                disabled={!editMode}
+                                onChange={setKeyValue}
+                                className='primary'
+                                placeholder='KEY' />
+                        </form>
                     </div>
+
                     {!minimized ? <div className={styles.value} >
-                        <Field
-                            value={value}
-                            disabled={!editMode}
-                            onChange={setValueValue}
-                            onBlur={handleEdits}
-                            muted={muted}
-                            className='secondary'
-                            placeholder='VALUE' />
+                        <form onSubmit={handleEdits}>
+                            <Field
+                                value={value}
+                                disabled={!editMode}
+                                onChange={setValueValue}
+                                muted={muted}
+                                className='secondary'
+                                placeholder='VALUE' />
+                        </form>
                     </div> : muted ?
                         <BsDot size={20} color='var(--primary-accent)'
                             className={styles.dot}
                         /> : null}
                 </>
+
             }
 
         </div>

@@ -31,6 +31,7 @@ const createJsonFileTemplate = (path: string) => {
 
     const template: Cmd[] = [{
         id: 1,
+        title: "test",
         command: {
             cmd: 'echo hello'
         }
@@ -49,6 +50,7 @@ export const parseVariables = () => {
 
 export const envFactory = (args: JsonEnv[] | undefined) => {
 
+
     const hostEnv: ENVs = {
         title: "OS Environment",
         pairs: process.env as Record<string, string>,
@@ -57,7 +59,11 @@ export const envFactory = (args: JsonEnv[] | undefined) => {
     }
     if (!args) return [hostEnv]
 
-    const allenvs = (args.map((obj) => ({ ...obj, disabled: [] })) as ENVs[]).concat(hostEnv)
+    let allenvs = (args.map((obj) => ({ ...obj, disabled: [] })) as ENVs[])
+
+    if (args.findIndex(item => item.title === 'OS Environment') === -1) {
+        allenvs = allenvs.concat(hostEnv)
+    }
 
     return allenvs.sort((a, b) => a.order - b.order)
 }

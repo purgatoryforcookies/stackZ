@@ -12,7 +12,7 @@ type NewCommandProps = {
 function NewCommand({ afterAdd }: NewCommandProps) {
 
     const [open, setOpen] = useState(false)
-    const [command, setCommand] = useState<string>('')
+    const [title, setTitle] = useState<string>('')
     const reff = useRef(null)
     const { } = useClickWatcher(reff, setOpen)
 
@@ -24,10 +24,10 @@ function NewCommand({ afterAdd }: NewCommandProps) {
 
     const handleSave = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (command.length === 0) return
-        const newCommand = await window.api.createCommand(command)
+        if (title.length === 0) return
+        const newCommand = await window.api.createCommand(title)
         setOpen(false)
-        setCommand('')
+        setTitle('')
         afterAdd(newCommand)
     }
 
@@ -40,11 +40,10 @@ function NewCommand({ afterAdd }: NewCommandProps) {
                     <form onSubmit={handleSave}>
 
                         <Field
-                            placeholder='Command'
+                            placeholder='Title'
                             disabled={false}
-                            onChange={setCommand}
+                            onChange={setTitle}
                             className='primary'
-                            onBlur={handleSave}
                         />
                     </form>
 

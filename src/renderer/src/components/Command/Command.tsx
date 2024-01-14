@@ -63,7 +63,7 @@ function Command({ data, handleClick, selected }: CommandProps) {
             </div>
             <div className={styles.code}
                 onClick={() => handleClick(data.id, SelectionEvents.CONN)}>
-                {data.command.cmd}
+                {data.title}
             </div>
             <div className={styles.invoke} onClick={handleState}>
                 {ping?.isRunning ? "Stop" : "Start"}
@@ -71,7 +71,7 @@ function Command({ data, handleClick, selected }: CommandProps) {
             {expanded ? <div className={styles.expandedMenu} >
                 <div className={styles.expandedMenuRow}>
                     <p>cwd:</p>
-                    <p>{ping?.cwd}</p>
+                    <p className={styles.longString}>{ping?.cwd}</p>
                     <div onClick={() => pathRef.current!.click()} className={styles.changeBtn}>Change</div>
                     {/* @ts-ignore */}
                     <input type="file" style={{ display: 'none' }} ref={pathRef} onChange={handleCwdChange} webkitdirectory="" />

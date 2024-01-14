@@ -63,7 +63,8 @@ export class Terminal {
     stop() {
         if (!this.ptyProcess) return
         console.log("Killing", this.settings.id)
-        this.ptyProcess.kill()
+        const code = process.platform === 'win32' ? undefined : 'SIGINT'
+        this.ptyProcess.kill(code)
         this.isRunning = false
         this.ping()
         clearInterval(this.tester)

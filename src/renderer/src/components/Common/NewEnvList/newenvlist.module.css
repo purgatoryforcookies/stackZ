@@ -47,6 +47,10 @@
 }
 
 .new>form>input {
+    outline: none;
+}
+
+.new>form>input {
     color: var(--primary);
     width: 90%;
     background-color: #1d1d1d00;

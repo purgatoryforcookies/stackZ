@@ -12,6 +12,7 @@ const jsonVariables = z.object({
 
 export const CmdSchema = z.object({
     id: z.number(),
+    title: z.string(),
     command: z.object({
         cmd: z.string(),
         env: z.array(jsonVariables).optional(),

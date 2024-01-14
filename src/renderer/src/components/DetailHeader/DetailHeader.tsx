@@ -79,15 +79,12 @@ function DetailHeader({ engine }: DetailHeaderProps) {
                     {highlightedEnv ? <>{highlightedEnv[0]}={highlightedEnv[1]} </> : null}
                 </div>
                 <div className={`${styles.command} ${status ? '' : styles.hidden}`} >
-                    <p>
-                        {status?.cmd}
-
-                    </p>
-
-                    <p>
-                        @
-                        {status?.cwd}
-                    </p>
+                    <p>@{status?.cwd}</p>
+                    <div className={styles.terminalLook}>
+                        <p>
+                            {status?.cmd}
+                        </p>
+                    </div>
                 </div>
             </div>
 

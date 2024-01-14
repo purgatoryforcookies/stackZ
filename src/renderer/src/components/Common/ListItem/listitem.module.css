@@ -3,14 +3,13 @@
     background-color: color-mix(in srgb, var(--background), #ffffff 10%);
     border-radius: 10px;
 
-    max-width: 25rem;
+    max-width: 30rem;
     min-width: 20rem;
 
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 0.5rem;
-    transition: all 0.3s ease-in-out;
     height: 100%;
 
 }
@@ -21,8 +20,8 @@
 }
 
 .recordRow.editMode {
-    max-width: 35rem;
-    min-width: 35rem;
+    max-width: 40rem;
+    min-width: 40rem;
 }
 
 .recordRow.minimized {

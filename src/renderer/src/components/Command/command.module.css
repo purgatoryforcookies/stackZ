@@ -29,11 +29,16 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
 
+.longString {
+    max-width: 100%;
+    overflow: auto;
 }
 
 .changeBtn {
     padding: 0.2rem 0.5rem;
+    height: 1.8rem;
     background-color: var(--primary);
     color: var(--secondary);
     display: flex;

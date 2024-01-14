@@ -43,7 +43,7 @@ export class Palette {
             }
         })
 
-        const filename = onExport ? 'commands_exported.json' : 'commands_save.json'
+        const filename = onExport ? 'commands_exported.json' : 'commands.json'
 
         writeFile(filename, JSON.stringify(this.commands), (error) => {
             if (error) throw error;
@@ -101,11 +101,12 @@ export class Palette {
         return this.commands
     }
 
-    createCommand(cmd: string) {
+    createCommand(title: string) {
         const newOne: Cmd = {
             id: Math.max(...this.commands.map(cmd => cmd.id)) + 1,
+            title: title,
             command: {
-                cmd: cmd
+                cmd: 'echo Hello World!'
             }
         }
         this.commands.push(newOne)
