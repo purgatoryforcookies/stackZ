@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import styles from './terminalui.module.css'
 import { ExtendedCmd } from 'src/types'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
@@ -35,9 +34,7 @@ function TerminalUI({ engines, toAttach }: TerminalUIProps) {
 
 
   return (
-    <div className={styles.terminal} ref={terminalRef}></div>
-
-
+    <div ref={terminalRef} style={{ height: '100%' }} />
   )
 }
 

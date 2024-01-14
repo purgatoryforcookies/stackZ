@@ -8,12 +8,15 @@ import { SOCKET_HOST } from './service/socket'
 import Nav from './components/Nav/Nav'
 import { Resizable } from 're-resizable'
 import Placeholder from './components/Common/Placeholder'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from './@/ui/resizable'
+
+
 
 
 function App(): JSX.Element {
 
   const [terminals, setTerminals] = useState<ExtendedCmd>(new Map<number, EnginedCmd>())
-  const [selected, setSelected] = useState<number | null>(null)
+  const [selected, setSelected] = useState<number | null>(1)
   const [paletteWidth, setPaletteWidth] = useState<string>()
   const [editMode, setEditMode] = useState<boolean>(false)
 
@@ -102,42 +105,27 @@ function App(): JSX.Element {
   }
 
   return (
-    <div className='app'>
-      <Nav />
-
-      {paletteWidth ? <div className="main">
-
-        <Resizable
-          defaultSize={{
-            width: paletteWidth,
-            height: '100%'
-          }}
-          className='sidebar'
-          enable={{ right: editMode ? false : true }}
-          minWidth={editMode ? 600 : 190}
-          maxWidth={900}
-          onResize={() => {
-            if (!terminals || !selected || editMode) return
-            terminals?.get(selected)?.engine.resize()
-          }}
-          onResizeStop={(__, _, ref) => {
-            if (editMode) return
-            window.store.set('paletteWidth', ref.style.width)
-          }}>
-          {terminals ?
-            <Palette data={terminals} onClick={handleSelection} selected={selected} onModify={modifyTerminals} />
-            : "Loading..."}
-        </Resizable>
+    <div className='bg-violet-900'>
 
 
-        <div className="container">
-          {selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />}
 
-          {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
-        </div>
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="min-h-[200px] max-w-md rounded-lg border bg-violet-900"
+      >
+        <ResizablePanel defaultSize={25}>
+          <div className="flex h-full items-center justify-center p-6">
+            <span className="font-semibold">Sidebar</span>
+          </div>
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={75}>
+          <div className="flex h-full items-center justify-center p-6">
+            <span className="font-semibold">Content</span>
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
 
-      </div>
-        : "Loading..."}
     </div>
   )
 }

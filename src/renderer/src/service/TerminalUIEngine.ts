@@ -11,7 +11,8 @@ export class TerminalUIEngine {
             cursor: '#f7571c',
 
         },
-        cursorBlink: true
+        cursorBlink: true,
+
     });
     private socket: Socket;
     private mounted = false
@@ -35,6 +36,7 @@ export class TerminalUIEngine {
     }
     resize() {
         this.fitAddon.fit()
+        console.log(this.fitAddon.proposeDimensions())
         return this
     }
 
