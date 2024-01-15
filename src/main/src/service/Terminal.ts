@@ -7,10 +7,12 @@ import {
     RemoveEnvListProps,
     SocketServer,
     Status,
-    UpdateCwdProps
 } from "../../../types"
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from "./util"
+import path from "path"
+import { DataMiddleWare } from "./DataMiddleWare"
+
 
 
 
@@ -22,55 +24,71 @@ export class Terminal {
     ptyProcess: IPty | null
     tester: any
     isRunning: boolean
+    win: boolean
+    middleware: DataMiddleWare
+    buffer: string[]
 
     constructor(cmd: Cmd, socketId: string, server: SocketServer) {
         this.settings = cmd
         this.settings.command.env = envFactory(this.settings.command.env)
         this.socketId = socketId
         this.server = server
-        this.shell = process.platform === 'win32' ? "powershell.exe" : "bash"
+        this.win = process.platform === 'win32' ? true : false
+        this.shell = this.win ? "powershell.exe" : "bash"
         this.ptyProcess = null
         this.isRunning = false
+        this.middleware = new DataMiddleWare(10)
+        this.buffer = []
     }
 
     start() {
 
-        this.ptyProcess = spawn(this.shell, [], {
-            name: `Palette ${this.settings.id}`,
-            cwd: this.settings.command.cwd ?? process.env.HOME,
-            env: mapEnvs(this.settings.command.env as ENVs[]),
-            useConpty: process.platform === "win32" ? false : true
+        try {
+            this.ptyProcess = spawn(this.shell, [], {
+                name: `Palette ${this.settings.id}`,
+                cwd: this.settings.command.cwd,
+                env: mapEnvs(this.settings.command.env as ENVs[]),
+                useConpty: this.win ? false : true
 
-        })
-        this.isRunning = true
+            })
+            this.isRunning = true
 
-        this.ptyProcess.onData((data) => {
-            this.sendToClient(data)
-        })
-        this.ptyProcess.onExit((data) => {
-            this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? "No signal"} \r\n$ `)
+            this.ptyProcess.onData((data) => {
+                console.log(data.split("+"))
+                // if (this.buffer.join() === 'cd') {
+                //     this.middleware.parseCwd(data, this.updateCwd.bind(this))
+                // }
 
-        })
-        this.ping()
-        this.run(this.settings.command.cmd)
+                this.sendToClient(data)
+            })
+            this.ptyProcess.onExit((data) => {
+                this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? "No signal"} \r\n$ `)
+
+            })
+            this.ping()
+            this.run(this.settings.command.cmd)
+        }
+        catch (e) {
+            this.sendToClient(`Error starting terminal.\n\rIs current working directory a valid path? \n\rCwd is: ${this.settings.command.cwd}\n\r$ `)
+        }
+
+
     }
 
     run(cmd: string) {
         this.write(cmd)
         this.prompt()
-
     }
 
     stop() {
         if (!this.ptyProcess) return
         console.log("Killing", this.settings.id)
-        const code = process.platform === 'win32' ? undefined : 'SIGINT'
+        const code = this.win ? undefined : 'SIGINT'
         this.ptyProcess.kill(code)
         this.isRunning = false
         this.ping()
-        clearInterval(this.tester)
-
     }
+
     ping() {
         this.server.emit('terminalState', this.getState())
     }
@@ -85,6 +103,12 @@ export class Terminal {
 
     sendToClient(data: string) {
         this.server.to(this.socketId).emit("output", data)
+    }
+
+    writeFromClient(data: string) {
+        if (data.length === 0) return
+
+        this.write(data)
     }
 
     write(data: string) {
@@ -144,17 +168,7 @@ export class Terminal {
     }
 
     updateCwd(value: string) {
-        const w = process.platform === "win32" ? true : false
-        const separator = w ? '\\' : '/'
-
-        let idx = 0
-        for (let i = 0; i < value.length; i++) {
-            if (value[i] == separator) {
-                idx = i
-            }
-        }
-
-        this.settings.command.cwd = value.substring(0, idx)
+        this.settings.command.cwd = path.normalize(value.trim())
         this.ping()
     }
 

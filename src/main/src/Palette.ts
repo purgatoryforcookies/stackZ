@@ -88,14 +88,15 @@ export class Palette {
                 this.terminals.get(arg.id)?.updateCwd(arg.value)
                 this.save()
             })
+            client.on('input', (arg: { id: number, value: string }) => {
+                this.terminals.get(arg.id)?.writeFromClient(arg.value)
+            })
             const existing = this.terminals.get(remoteTerminalID)
             if (!existing) {
                 this.terminals.set(remoteTerminalID, new Terminal(localCmd, client.id, this.server))
                 return
             }
             existing.ping()
-
-
 
         })
 
@@ -132,6 +133,7 @@ export class Palette {
         const terminal = this.terminals.get(id)
         if (!terminal) return false
         terminal.stop()
+        this.save()
         return true
     }
 
@@ -139,6 +141,7 @@ export class Palette {
         this.terminals.forEach((terminal) => {
             terminal.stop()
         })
+        this.save()
     }
 
 }

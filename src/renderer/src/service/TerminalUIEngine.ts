@@ -1,4 +1,5 @@
 import { Socket, io } from 'socket.io-client';
+import { Status } from 'src/types';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import 'xterm/css/xterm.css';
@@ -20,6 +21,7 @@ export class TerminalUIEngine {
     private fitAddon: FitAddon
     private hostdiv: HTMLElement
     private buffer: string
+    private isRunning: boolean
 
     constructor(id: number, host: string) {
         this.fitAddon = new FitAddon();
@@ -27,6 +29,7 @@ export class TerminalUIEngine {
         this.host = host
         this.terminal.loadAddon(this.fitAddon)
         this.buffer = ''
+        this.isRunning = false
     }
 
     isMounted() {
@@ -46,6 +49,10 @@ export class TerminalUIEngine {
         })
 
         this.socket.on("output", (data: string) => this.write(data))
+        this.socket.on("terminalState", (data: Status) => {
+            if (data.cmd.id !== this.id) return
+            this.isRunning = data.isRunning
+        })
 
         this.socket.on('hello', () => {
             this.write(`Terminal connected - ${this.socket.id}`)
@@ -58,32 +65,10 @@ export class TerminalUIEngine {
         })
 
         this.terminal.onKey((data) => {
-
-            switch (data.domEvent.key) {
-                case 'Enter': {
-                    this.changeWorkindDirectoryMaybe(this.buffer)
-                    this.buffer = ''
-                    this.write('\n\r')
-                    break
-                }
-                case 'Backspace': {
-                    if (this.buffer.length === 0) break
-                    this.buffer = this.buffer.slice(0, -1)
-                    this.write('\b \b')
-                    break
-                }
-                case 'ArrowDown': break
-                case 'ArrowUp': break
-                case 'ArrowLeft': break
-                case 'ArrowRight': break
-                default: {
-                    this.buffer += data.key
-                    this.write(data.key);
-                }
-            }
+            if (!this.isRunning) return
+            this.sendInput(data.key)
         })
         this.terminal.attachCustomKeyEventHandler((e) => {
-            console.log(e)
             if (e.code === 'KeyV' && e.ctrlKey) {
                 this.pasteClipBoardMaybe()
                 return false
@@ -98,7 +83,7 @@ export class TerminalUIEngine {
     }
 
     sendInput(input: string) {
-        this.socket.emit('input', input)
+        this.socket.emit('input', { id: this.id, value: input })
     }
 
     write(char: string) {
@@ -106,6 +91,7 @@ export class TerminalUIEngine {
     }
 
     prompt() {
+        this.sendInput(this.buffer)
         this.terminal.write(`\r\n$ `)
     }
 
@@ -139,17 +125,13 @@ export class TerminalUIEngine {
         this.mounted = false
     }
 
-    changeWorkindDirectoryMaybe(command: string) {
-        if (command.slice(0, 3) === 'cwd') {
-            this.socket.emit("changeCwd", { id: this.id, value: command.slice(3) })
-        }
-    }
 
     async pasteClipBoardMaybe() {
         const clip = await navigator.clipboard.readText()
         if (this.buffer.includes(clip)) return
         this.buffer += clip
         this.write(clip)
+        if (this.isRunning) this.sendInput(clip)
     }
 
 }
