@@ -6,6 +6,7 @@ import { Cmd, EnginedCmd, ExtendedCmd, SelectionEvents } from '../../types'
 import { TerminalUIEngine } from './service/TerminalUIEngine'
 import { SOCKET_HOST } from './service/socket'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from './@/ui/resizable'
+import Placeholder from './components/Common/Placeholder'
 
 
 
@@ -99,28 +100,37 @@ function App(): JSX.Element {
   }
 
   return (
-
     <ResizablePanelGroup
-      direction="horizontal"
+      direction="vertical"
       className="rounded-lg h-full bg-background text-primary"
     >
-      <ResizablePanel defaultSize={25}>
-        <div className="h-full">
-          {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
-        </div>
+
+      <ResizablePanel defaultSize={50}>
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel defaultSize={25}>
+            <div className="h-full">
+              {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
+            </div>
+          </ResizablePanel>
+          <ResizableHandle />
+          <ResizablePanel defaultSize={20} maxSize={50} minSize={1} className='bg-foreground'>
+            <div className='h-10 flex justify-center'>
+              <span className='font-semibold text-lg'>Terminals</span>
+            </div>
+
+
+            <div className="h-full overflow-auto pb-60">
+              {terminals ?
+                <Palette data={terminals} onClick={handleSelection} selected={selected} onModify={modifyTerminals} />
+                : "Loading..."}
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </ResizablePanel>
-      <ResizableHandle className='bg-black' />
-      <ResizablePanel defaultSize={20} maxSize={50} minSize={1} className='bg-foreground'>
-
-        <div className='h-10 flex justify-center'>
-          <span className='font-semibold text-lg'>Terminals</span>
-        </div>
-
-
-        <div className="h-full overflow-auto pb-60">
-          {terminals ?
-            <Palette data={terminals} onClick={handleSelection} selected={selected} onModify={modifyTerminals} />
-            : "Loading..."}
+      <ResizableHandle dir='ltr' />
+      <ResizablePanel defaultSize={20} minSize={1} maxSize={50}>
+        <div className="flex h-[200px] items-center justify-center p-6">
+          {terminals && selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />}
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>
@@ -129,3 +139,30 @@ function App(): JSX.Element {
 }
 
 export default App
+
+
+{/* <ResizablePanelGroup
+direction="horizontal"
+className="rounded-lg h-full bg-background text-primary"
+>
+<ResizablePanel defaultSize={25}>
+  <div className="h-full">
+    {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
+  </div>
+</ResizablePanel>
+<ResizableHandle className='bg-black' />
+<ResizablePanel defaultSize={20} maxSize={50} minSize={1} className='bg-foreground'>
+
+  <div className='h-10 flex justify-center'>
+    <span className='font-semibold text-lg'>Terminals</span>
+  </div>
+
+
+  <div className="h-full overflow-auto pb-60">
+    {terminals ?
+      <Palette data={terminals} onClick={handleSelection} selected={selected} onModify={modifyTerminals} />
+      : "Loading..."}
+  </div>
+</ResizablePanel>
+
+</ResizablePanelGroup> */}

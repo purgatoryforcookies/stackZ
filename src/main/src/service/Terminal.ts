@@ -54,11 +54,6 @@ export class Terminal {
             this.isRunning = true
 
             this.ptyProcess.onData((data) => {
-                console.log(data.split("+"))
-                // if (this.buffer.join() === 'cd') {
-                //     this.middleware.parseCwd(data, this.updateCwd.bind(this))
-                // }
-
                 this.sendToClient(data)
             })
             this.ptyProcess.onExit((data) => {
@@ -169,6 +164,11 @@ export class Terminal {
 
     updateCwd(value: string) {
         this.settings.command.cwd = path.normalize(value.trim())
+        this.ping()
+    }
+
+    updateCommand(value: string) {
+        this.settings.command.cmd = value.trim()
         this.ping()
     }
 

@@ -88,6 +88,11 @@ export class Palette {
                 this.terminals.get(arg.id)?.updateCwd(arg.value)
                 this.save()
             })
+            client.on('changeCommand', (arg: { id: number, value: string }) => {
+                console.log(`Changing cwd! new Cwd: ${arg.value}`)
+                this.terminals.get(arg.id)?.updateCommand(arg.value)
+                this.save()
+            })
             client.on('input', (arg: { id: number, value: string }) => {
                 this.terminals.get(arg.id)?.writeFromClient(arg.value)
             })

@@ -65,8 +65,32 @@ export class TerminalUIEngine {
         })
 
         this.terminal.onKey((data) => {
-            if (!this.isRunning) return
             this.sendInput(data.key)
+
+            if (this.isRunning) return
+            switch (data.domEvent.key) {
+                case 'Enter': {
+                    this.changeSettingsMaybe(this.buffer)
+                    this.sendInput(this.buffer)
+                    this.prompt()
+                    this.buffer = ''
+                    break
+                }
+                case 'Backspace': {
+                    if (this.buffer.length === 0) break
+                    this.buffer = this.buffer.slice(0, -1)
+                    this.write('\b \b')
+                    break
+                }
+                case 'ArrowDown': break
+                case 'ArrowUp': break
+                case 'ArrowLeft': break
+                case 'ArrowRight': break
+                default: {
+                    this.buffer += data.key
+                    this.write(data.key);
+                }
+            }
         })
         this.terminal.attachCustomKeyEventHandler((e) => {
             if (e.code === 'KeyV' && e.ctrlKey) {
@@ -125,6 +149,14 @@ export class TerminalUIEngine {
         this.mounted = false
     }
 
+    changeSettingsMaybe(command: string) {
+        if (command.slice(0, 2) === 'cd') {
+            this.socket.emit("changeCwd", { id: this.id, value: command.slice(2) })
+        }
+        else {
+            this.socket.emit("changeCommand", { id: this.id, value: command })
+        }
+    }
 
     async pasteClipBoardMaybe() {
         const clip = await navigator.clipboard.readText()
