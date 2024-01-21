@@ -4,7 +4,7 @@ import NewCommand from '../Common/NewCommand/NewCommand'
 
 type PaletteProps = {
     data: ExtendedCmd
-    onClick: (id: number, method?: SelectionEvents) => void
+    onClick: (id: number, method?: SelectionEvents, cb?: (...args: any) => void,) => void
     selected: number | null
     onModify: (cmd: Cmd) => void
 }

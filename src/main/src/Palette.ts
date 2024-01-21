@@ -1,3 +1,4 @@
+import { ITerminalDimensions } from "xterm-addon-fit";
 import { Cmd, SocketServer, UpdateCwdProps } from "../../types";
 import { Terminal } from "./service/Terminal";
 import { readJsonFile } from "./service/util";
@@ -93,8 +94,15 @@ export class Palette {
                 this.terminals.get(arg.id)?.updateCommand(arg.value)
                 this.save()
             })
+            client.on('changeShell', (arg: { id: number, value: string }) => {
+                this.terminals.get(arg.id)?.changeShell(arg.value)
+                this.save()
+            })
             client.on('input', (arg: { id: number, value: string }) => {
                 this.terminals.get(arg.id)?.writeFromClient(arg.value)
+            })
+            client.on('resize', (arg: { id: number, value: ITerminalDimensions }) => {
+                this.terminals.get(arg.id)?.resize(arg.value)
             })
             const existing = this.terminals.get(remoteTerminalID)
             if (!existing) {

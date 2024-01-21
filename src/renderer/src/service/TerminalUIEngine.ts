@@ -9,10 +9,8 @@ export class TerminalUIEngine {
     private terminal = new Terminal({
         theme: {
             cursor: '#f7571c',
-            background: "var(--terminalBlack)"
         },
         cursorBlink: true,
-
     });
     private socket: Socket;
     private mounted = false
@@ -44,11 +42,17 @@ export class TerminalUIEngine {
     }
 
     async startListening() {
+
         this.socket = io(this.host, {
             query: { id: this.id }
         })
 
-        this.socket.on("output", (data: string) => this.write(data))
+        this.socket.on("output", (data: string, callback) => {
+            this.write(data)
+            callback(this.fitAddon.proposeDimensions())
+
+        })
+
         this.socket.on("terminalState", (data: Status) => {
             if (data.cmd.id !== this.id) return
             this.isRunning = data.isRunning
@@ -153,9 +157,14 @@ export class TerminalUIEngine {
         if (command.slice(0, 2) === 'cd') {
             this.socket.emit("changeCwd", { id: this.id, value: command.slice(2) })
         }
+        if (command.slice(0, 5) === 'shell') {
+            this.socket.emit("changeShell", { id: this.id, value: command.slice(5) })
+        }
         else {
             this.socket.emit("changeCommand", { id: this.id, value: command })
         }
+
+
     }
 
     async pasteClipBoardMaybe() {

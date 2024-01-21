@@ -15,6 +15,7 @@ export const CmdSchema = z.object({
     title: z.string(),
     command: z.object({
         cmd: z.string(),
+        shell: z.string().optional(),
         env: z.array(jsonVariables).optional(),
         cwd: z.string().optional()
     })

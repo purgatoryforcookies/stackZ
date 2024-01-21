@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import styles from './detailheader.module.css'
 import { baseSocket } from '@renderer/service/socket'
 import { EnginedCmd, Status } from 'src/types'
-import EnvList from '../Common/EnvList/EnvList'
-import NewEnvList from '../Common/NewEnvList/NewEnvList'
+import EnvList from '../Common/EnvList'
+import NewEnvList from '../Common/NewEnvList'
 
 type DetailHeaderProps = {
     engine: EnginedCmd
@@ -19,8 +18,8 @@ function DetailHeader({ engine }: DetailHeaderProps) {
     const bodyRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        baseSocket.on("terminalState", (d) => {
-            if (d.id !== engine.id) return
+        baseSocket.on("terminalState", (d: Status) => {
+            if (d.cmd.id !== engine.id) return
             setStatus(d)
         })
         baseSocket.emit('state', engine.id)
@@ -35,6 +34,7 @@ function DetailHeader({ engine }: DetailHeaderProps) {
         setHighlightedEnv(e)
     }
 
+
     const scroll = () => {
         setTimeout(() => {
             bodyRef.current!.scroll({ left: bodyRef.current!.scrollWidth, behavior: 'smooth' })
@@ -43,8 +43,8 @@ function DetailHeader({ engine }: DetailHeaderProps) {
 
 
     return (
-        <div className={styles.main} >
-            <div className={styles.container} ref={bodyRef}>
+        <div className='overflow-y-auto overflox-x-hidden' >
+            <div className='flex gap-8' ref={bodyRef}>
 
                 {status?.cmd.command.env ? status.cmd.command.env.map((record) => (
 
@@ -59,21 +59,6 @@ function DetailHeader({ engine }: DetailHeaderProps) {
                 <NewEnvList scroll={scroll} />
 
             </div>
-
-            <div className={styles.footer}>
-                <div className={`${styles.highlightedEnv} ${!highlightedEnv ? styles.hidden : ''}`}>
-                    {highlightedEnv ? <>{highlightedEnv[0]}={highlightedEnv[1]} </> : null}
-                </div>
-                <div className={`${styles.command} ${status ? '' : styles.hidden}`} >
-                    <p>@{status?.cwd}</p>
-                    <div className={styles.terminalLook}>
-                        <p>
-                            {status?.cmd?.command.cmd}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
         </div>
     )
 }

@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react';
-import styles from './newenvlist.module.css'
 import { IoAddCircleOutline } from "react-icons/io5";
 import { useClickWatcher } from '@renderer/hooks/useClickWatcher';
 import { baseSocket } from '@renderer/service/socket';
+import { Input } from '@renderer/@/ui/input';
+import { Button } from '@renderer/@/ui/button';
 
 
 type NewEnvListProps = {
@@ -37,21 +38,16 @@ function NewEnvList({ scroll }: NewEnvListProps) {
 
 
     return (
-        <div className={styles.main}>
-            <div className={`${styles.addArea} ${expanded ? styles.active : ''}`} onClick={handle} ref={clickAwayRef}>
-                {expanded ?
-                    <div className={styles.new}>
-                        <form onSubmit={handleAdd} onReset={() => { setExpanded(false), setTitle('') }}>
-                            <input autoFocus={true} value={title} type="text" placeholder='Name' onChange={(e) => setTitle(e.target.value)} />
-                            <div className={styles.actions}>
-                                <button type='reset'>Cancel</button>
-                                <button type='submit'>Add</button>
-                            </div>
-                        </form>
+        <div className='h-10 min-w-32 flex justify-center ' ref={clickAwayRef}>
+            {expanded ?
+                <form onSubmit={handleAdd} className='flex flex-col gap-5 ' onReset={() => { setExpanded(false), setTitle('') }}>
+                    <Input placeholder='Name' value={title} type='text' onChange={(e) => setTitle(e.target.value)} />
+                    <div className='flex justify-center gap-3 pr-5'>
+                        <Button type='reset' variant={'ghost'} size={'sm'} className='hover:bg-secondary'>Cancel</Button>
+                        <Button type='submit' variant={'outline'} size={'sm'}>Add</Button>
                     </div>
-                    : <IoAddCircleOutline size={30} />}
-            </div>
-
+                </form>
+                : <IoAddCircleOutline size={30} onClick={handle} className='hover:cursor-pointer hover:text-primary-foreground text-primary' />}
         </div>
     )
 }

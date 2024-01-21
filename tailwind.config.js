@@ -2,16 +2,12 @@
 module.exports = {
   darkMode: ["class"],
   content: [
-    './**/*.html', './src/renderer/**/*.{js,jsx,ts,tsx,vue}'
+    './**/*.html', './src/renderer/**/*.{js,jsx,ts,tsx,vue}',
   ],
   prefix: "",
   theme: {
     container: {
       center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
     },
     extend: {
       colors: {
@@ -20,12 +16,10 @@ module.exports = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        terminalBlack: "hsl(var(--terminalBlack))",
-        black10: "hsl(var(--black-100))",
-        black20: "hsl(var(--black-200))",
+        terminalHeader: "hsl(0, 0%, 4%)",
         primary: {
           DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          foreground: "hsl(var(--primary-foreground))"
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

@@ -7,6 +7,8 @@ import { TerminalUIEngine } from './service/TerminalUIEngine'
 import { SOCKET_HOST } from './service/socket'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from './@/ui/resizable'
 import Placeholder from './components/Common/Placeholder'
+import Settings from './components/Common/Settings'
+import { CommandMenu } from './components/Common/CommandMenu'
 
 
 
@@ -17,9 +19,9 @@ function App(): JSX.Element {
   const [selected, setSelected] = useState<number | null>(null)
   const [paletteWidth, setPaletteWidth] = useState<string>()
   const [editMode, setEditMode] = useState<boolean>(false)
-
-
-
+  const [theme, setTheme] = useState<string>('forrest')
+  const [headerVisible, setHeaderVisible] = useState<boolean>(true)
+  const [paletteVisible, setPaletteVisible] = useState<boolean>(true)
 
   useEffect(() => {
 
@@ -51,30 +53,50 @@ function App(): JSX.Element {
 
   }, [])
 
+
+  const handleResize = () => {
+    if (selected) {
+      terminals?.get(selected)?.engine.resize()
+    }
+  }
+  const handleShortCuts = (e: KeyboardEvent) => {
+    switch (e.key) {
+      case 'x':
+        if (!e.altKey) return
+        setHeaderVisible(!headerVisible)
+        break
+      case 'z':
+        if (!e.altKey) return
+        setPaletteVisible(!paletteVisible)
+        break
+      default:
+        break
+    }
+  }
+
   useEffect(() => {
 
-    const handleResize = () => {
-      if (selected) {
-        terminals?.get(selected)?.engine.resize()
-      }
-    }
     window.addEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleShortCuts, true)
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleShortCuts, true)
     };
 
-  }, [selected]);
+  }, [selected, headerVisible, paletteVisible]);
 
-
-  const handleSelection = (id: number, method = SelectionEvents.CONN) => {
+  //TODO: add more options and maybe make a hook or separate file?
+  const handleSelection = (id: number, method = SelectionEvents.CONN, cb?: (...args: any) => void) => {
 
     switch (method) {
 
       case SelectionEvents.CONN:
+        if (cb) cb()
         setSelected(id)
         break
       case SelectionEvents.START:
         window.api.startTerminal(id)
+        if (cb) cb()
         break
       case SelectionEvents.EXPAND:
         setEditMode(!editMode)
@@ -102,35 +124,39 @@ function App(): JSX.Element {
   return (
     <ResizablePanelGroup
       direction="vertical"
-      className="rounded-lg h-full bg-background text-primary"
+      className="h-full bg-background text-primary-foreground"
+      data-theme={theme}
+      onLayout={handleResize}
     >
-
-      <ResizablePanel defaultSize={50}>
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={25}>
-            <div className="h-full">
+      <CommandMenu terminals={terminals} dispatch={handleSelection} />
+      <ResizablePanel >
+        <ResizablePanelGroup direction="horizontal" onLayout={handleResize} >
+          <ResizablePanel >
+            <div className="w-full h-full">
               {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
             </div>
           </ResizablePanel>
           <ResizableHandle />
-          <ResizablePanel defaultSize={20} maxSize={50} minSize={1} className='bg-foreground'>
-            <div className='h-10 flex justify-center'>
+          <ResizablePanel defaultSize={20} maxSize={50} minSize={1} hidden={!paletteVisible} className='text-secondary-foreground'>
+            <div className='h-10 flex justify-center items-center'>
               <span className='font-semibold text-lg'>Terminals</span>
+              <div className='absolute right-5'>
+                <Settings setTheme={setTheme} theme={theme} />
+              </div>
             </div>
 
-
-            <div className="h-full overflow-auto pb-60">
+            <div className="h-full overflow-auto pb-60 ">
               {terminals ?
                 <Palette data={terminals} onClick={handleSelection} selected={selected} onModify={modifyTerminals} />
                 : "Loading..."}
             </div>
           </ResizablePanel>
-        </ResizablePanelGroup>
+        </ResizablePanelGroup >
       </ResizablePanel>
       <ResizableHandle dir='ltr' />
-      <ResizablePanel defaultSize={20} minSize={1} maxSize={50}>
-        <div className="flex h-[200px] items-center justify-center p-6">
-          {terminals && selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />}
+      <ResizablePanel defaultSize={20} minSize={5} maxSize={45} hidden={!headerVisible}>
+        <div className="h-full pl-6">
+          {selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />}
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>
@@ -139,30 +165,3 @@ function App(): JSX.Element {
 }
 
 export default App
-
-
-{/* <ResizablePanelGroup
-direction="horizontal"
-className="rounded-lg h-full bg-background text-primary"
->
-<ResizablePanel defaultSize={25}>
-  <div className="h-full">
-    {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
-  </div>
-</ResizablePanel>
-<ResizableHandle className='bg-black' />
-<ResizablePanel defaultSize={20} maxSize={50} minSize={1} className='bg-foreground'>
-
-  <div className='h-10 flex justify-center'>
-    <span className='font-semibold text-lg'>Terminals</span>
-  </div>
-
-
-  <div className="h-full overflow-auto pb-60">
-    {terminals ?
-      <Palette data={terminals} onClick={handleSelection} selected={selected} onModify={modifyTerminals} />
-      : "Loading..."}
-  </div>
-</ResizablePanel>
-
-</ResizablePanelGroup> */}

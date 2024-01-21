@@ -34,7 +34,7 @@ function TerminalUI({ engines, toAttach }: TerminalUIProps) {
 
 
   return (
-    <div ref={terminalRef} style={{ height: '100%' }} />
+    <div ref={terminalRef} className='h-full' />
   )
 }
 

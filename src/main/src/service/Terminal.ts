@@ -12,6 +12,7 @@ import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from "./util"
 import path from "path"
 import { DataMiddleWare } from "./DataMiddleWare"
+import { ITerminalDimensions } from "xterm-addon-fit"
 
 
 
@@ -20,7 +21,6 @@ export class Terminal {
     settings: Cmd
     socketId: string
     server: SocketServer
-    shell: string
     ptyProcess: IPty | null
     tester: any
     isRunning: boolean
@@ -28,27 +28,38 @@ export class Terminal {
     middleware: DataMiddleWare
     buffer: string[]
 
+
     constructor(cmd: Cmd, socketId: string, server: SocketServer) {
         this.settings = cmd
         this.settings.command.env = envFactory(this.settings.command.env)
         this.socketId = socketId
         this.server = server
         this.win = process.platform === 'win32' ? true : false
-        this.shell = this.win ? "powershell.exe" : "bash"
+        this.settings.command.shell = this.chooseShell(cmd.command.shell)
         this.ptyProcess = null
         this.isRunning = false
         this.middleware = new DataMiddleWare(10)
         this.buffer = []
+
+    }
+
+    chooseShell(shell: string | undefined) {
+        if (shell) return shell.trim()
+        if (this.win) return "powershell.exe"
+        return "bash"
+
     }
 
     start() {
 
         try {
-            this.ptyProcess = spawn(this.shell, [], {
+
+            this.ptyProcess = spawn(this.settings.command.shell!, [], {
                 name: `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as ENVs[]),
-                useConpty: this.win ? false : true
+                useConpty: this.win ? false : true,
+
 
             })
             this.isRunning = true
@@ -62,6 +73,7 @@ export class Terminal {
             })
             this.ping()
             this.run(this.settings.command.cmd)
+            this.test()
         }
         catch (e) {
             this.sendToClient(`Error starting terminal.\n\rIs current working directory a valid path? \n\rCwd is: ${this.settings.command.cwd}\n\r$ `)
@@ -73,6 +85,15 @@ export class Terminal {
     run(cmd: string) {
         this.write(cmd)
         this.prompt()
+    }
+
+    resize(dims: ITerminalDimensions) {
+        if (!dims) return
+        try {
+            this.ptyProcess?.resize(dims.cols, dims.rows)
+        } catch {
+            // On stop, the pty process is not existing anymore but yet here we are...
+        }
     }
 
     stop() {
@@ -97,12 +118,22 @@ export class Terminal {
     }
 
     sendToClient(data: string) {
-        this.server.to(this.socketId).emit("output", data)
+        this.server.timeout(400).to(this.socketId).emit("output", data, (err, resp: ITerminalDimensions) => {
+            if (this.ptyProcess) {
+
+                try {
+                    this.ptyProcess.resize(resp[0].cols, resp[0].rows)
+
+                } catch {
+                    // On stop, the pty process is not existing anymore but yet here we are...
+                }
+
+            }
+        })
     }
 
-    writeFromClient(data: string) {
+    writeFromClient(data: string,) {
         if (data.length === 0) return
-
         this.write(data)
     }
 
@@ -116,7 +147,7 @@ export class Terminal {
 
     test() {
         this.tester = setInterval(() => {
-            this.write(`echo "hello from ${this.settings.id}" $Env:variable1`)
+            this.write(`echo "hello from ${this.settings.id} this is a logn command to see lorem lipsum how this works with big lines lorem lipsum whomever lipsum meow meow" $Env:variable1`)
             this.prompt()
             this.server.emit('test')
         }, 1000)
@@ -195,6 +226,11 @@ export class Terminal {
         for (let i = 0; i < this.settings.command.env.length; i++) {
             this.settings.command.env[i].order = i
         }
+        this.ping()
+    }
+
+    changeShell(newShell: string | undefined) {
+        this.settings.command.shell = this.chooseShell(newShell)
         this.ping()
     }
 
