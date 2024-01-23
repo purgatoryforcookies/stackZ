@@ -42,9 +42,7 @@ function Command({ data, handleClick, selected }: CommandProps) {
         <div className={`
             p-1
             ${(selected === data.id) ? 'bg-black text-primary-foreground' : ''}`}>
-            <div className={`m-2 overflow-hidden rounded-md
-                    hover:cursor-pointer
-                    `}
+            <div className='m-2 overflow-hidden rounded-md hover:cursor-pointer'
                 onClick={() => handleClick(data.id, SelectionEvents.CONN)}>
                 <div className='pl-4 text-secondary-foreground bg-muted flex justify-between pr-5 '>
                     <span className='truncate' dir='rtl'>

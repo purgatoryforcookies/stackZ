@@ -11,6 +11,7 @@ export class TerminalUIEngine {
             cursor: '#f7571c',
         },
         cursorBlink: true,
+        rightClickSelectsWord: false
     });
     private socket: Socket;
     private mounted = false
@@ -104,6 +105,7 @@ export class TerminalUIEngine {
             return true
         })
 
+
     }
 
     ping() {
@@ -154,11 +156,14 @@ export class TerminalUIEngine {
     }
 
     changeSettingsMaybe(command: string) {
+
         if (command.slice(0, 2) === 'cd') {
             this.socket.emit("changeCwd", { id: this.id, value: command.slice(2) })
+            return
         }
         if (command.slice(0, 5) === 'shell') {
             this.socket.emit("changeShell", { id: this.id, value: command.slice(5) })
+            return
         }
         else {
             this.socket.emit("changeCommand", { id: this.id, value: command })

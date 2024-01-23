@@ -90,11 +90,12 @@ export class Palette {
                 this.save()
             })
             client.on('changeCommand', (arg: { id: number, value: string }) => {
-                console.log(`Changing cwd! new Cwd: ${arg.value}`)
+                console.log(`Changing command! new CMD: ${arg.value}`)
                 this.terminals.get(arg.id)?.updateCommand(arg.value)
                 this.save()
             })
             client.on('changeShell', (arg: { id: number, value: string }) => {
+                console.log(`Changing shell! new shell: ${arg.value}`)
                 this.terminals.get(arg.id)?.changeShell(arg.value)
                 this.save()
             })

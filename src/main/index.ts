@@ -112,7 +112,7 @@ ipcMain.handle('killAll', () => {
 })
 
 ipcMain.handle('getStore', (_, key) => {
-  return store.get(key, '300px')
+  return store.get(key)
 })
 
 ipcMain.handle('setStore', (_, key, value) => {

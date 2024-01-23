@@ -13,7 +13,7 @@ type NewEnvListProps = {
 
 function NewEnvList({ scroll }: NewEnvListProps) {
 
-    const [expanded, setExpanded] = useState<boolean>(false)
+    const [expanded, setExpanded] = useState<boolean>(true)
     const [title, setTitle] = useState<string>('')
     const clickAwayRef = useRef<HTMLDivElement>(null)
 
@@ -38,14 +38,12 @@ function NewEnvList({ scroll }: NewEnvListProps) {
 
 
     return (
-        <div className='h-10 min-w-32 flex justify-center ' ref={clickAwayRef}>
+        <div className='absolute right-12 bottom-12 ' ref={clickAwayRef}>
             {expanded ?
-                <form onSubmit={handleAdd} className='flex flex-col gap-5 ' onReset={() => { setExpanded(false), setTitle('') }}>
-                    <Input placeholder='Name' value={title} type='text' onChange={(e) => setTitle(e.target.value)} />
-                    <div className='flex justify-center gap-3 pr-5'>
-                        <Button type='reset' variant={'ghost'} size={'sm'} className='hover:bg-secondary'>Cancel</Button>
-                        <Button type='submit' variant={'outline'} size={'sm'}>Add</Button>
-                    </div>
+                <form onSubmit={handleAdd} className='flex items-center gap-5' onReset={() => { setExpanded(false), setTitle('') }}>
+                    <Input placeholder='Name' value={title} type='text' onChange={(e) => setTitle(e.target.value)} autoFocus />
+                    <Button type='submit' variant={'ghost'} size={'sm'} className='hover:bg-primary'>Add</Button>
+                    <Button type='reset' variant={'destructive'} size={'sm'} >Cancel</Button>
                 </form>
                 : <IoAddCircleOutline size={30} onClick={handle} className='hover:cursor-pointer hover:text-primary-foreground text-primary' />}
         </div>

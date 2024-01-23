@@ -29,15 +29,16 @@ type FieldProps = {
     variant: 'primary' | 'secondary',
     placeholder?: string
     muted?: boolean
+    minimized?: boolean
 }
 
 
-export const Field = ({ value, disabled, onChange, variant, placeholder }: FieldProps) => {
+export const Field = ({ value, disabled, onChange, variant, placeholder, minimized }: FieldProps) => {
 
-    const style = `rounded-l-full py-[0.15rem] 
+    const style = `rounded-full py-1
     ${variant === 'primary' ?
-            'pr-2 text-secondary-foreground' :
-            ' pl-3 pr-2 bg-primary truncate text-secondary'}`
+            `pr-2 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}` :
+            ' pl-3 pr-3 bg-primary truncate text-secondary'}`
 
 
     if (disabled) return (
@@ -48,12 +49,12 @@ export const Field = ({ value, disabled, onChange, variant, placeholder }: Field
 
     return (
         <input
-            autoFocus={variant === 'primary'}
+            // autoFocus={variant === 'primary'}
             type='text'
-            className={style}
+            className={`${style} px-3`}
             onChange={(e) => onChange(e.target.value)}
             defaultValue={value}
-            size={Math.min(value?.length || 30, 50)}
+            // size={Math.min(value?.length || 30, 50)}
             placeholder={placeholder}
         ></input>
     )
@@ -113,16 +114,18 @@ const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId
                 size={20}
                 color='var(--primary)'
                 onClick={() => setNewRecordOpen(!newRecordOpen)}
-                className=''
+                className='flex justify-center items-center w-full mt-2 hover:cursor-pointer'
             /> :
                 <form onSubmit={handleEdits}
-                    className='flex font-semibold justify-between bg-muted hover:cursor-pointer pl-3 rounded-l-full'>
+                    className='flex font-semibold justify-between bg-muted hover:cursor-pointer pl-3 rounded-full'>
                     <Field
                         value={keyv}
                         disabled={!editMode}
                         onChange={setKeyValue}
                         variant='primary'
-                        placeholder='KEY' />
+                        placeholder='KEY'
+                        minimized={minimized} />
+
                     {!minimized ?
                         <Field
                             value={value}

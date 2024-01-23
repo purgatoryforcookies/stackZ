@@ -43,21 +43,20 @@ function DetailHeader({ engine }: DetailHeaderProps) {
 
 
     return (
-        <div className='overflow-y-auto overflox-x-hidden' >
-            <div className='flex gap-8' ref={bodyRef}>
 
+        <div className='h-full'>
+            <div className='flex gap-8 pb-20 h-full overflow-auto' ref={bodyRef}>
                 {status?.cmd.command.env ? status.cmd.command.env.map((record) => (
-
                     <EnvList
                         data={record}
                         key={record.title}
                         onSelection={handleHighligt}
                         terminalId={engine.id}
                     />
-
                 )) : null}
+            </div>
+            <div className='py-2 px-4 flex relative items-center justify-between'>
                 <NewEnvList scroll={scroll} />
-
             </div>
         </div>
     )

@@ -17,7 +17,10 @@ function App(): JSX.Element {
 
   const [terminals, setTerminals] = useState<ExtendedCmd>(new Map<number, EnginedCmd>())
   const [selected, setSelected] = useState<number | null>(null)
-  const [paletteWidth, setPaletteWidth] = useState<string>()
+  const [paletteWidths, setPaletteWidths] = useState({
+    palette1: 30,
+    palette2: 30
+  })
   const [editMode, setEditMode] = useState<boolean>(false)
   const [theme, setTheme] = useState<string>('forrest')
   const [headerVisible, setHeaderVisible] = useState<boolean>(true)
@@ -44,9 +47,9 @@ function App(): JSX.Element {
     fetchTerminals()
 
     const fetchPaletteWidth = async () => {
-      const width = await window.store.get('paletteWidth')
-      if (!width) setPaletteWidth('300px')
-      else setPaletteWidth(width)
+      const width = await window.store.get('paletteWidths')
+      if (!width) setPaletteWidths({ palette1: 30, palette2: 30 })
+      else setPaletteWidths(JSON.parse(width))
 
     }
     fetchPaletteWidth()
@@ -54,7 +57,7 @@ function App(): JSX.Element {
   }, [])
 
 
-  const handleResize = () => {
+  const handleResize = (e) => {
     if (selected) {
       terminals?.get(selected)?.engine.resize()
     }
@@ -121,6 +124,7 @@ function App(): JSX.Element {
     setTerminals(newTerminals)
   }
 
+
   return (
     <ResizablePanelGroup
       direction="vertical"
@@ -130,14 +134,16 @@ function App(): JSX.Element {
     >
       <CommandMenu terminals={terminals} dispatch={handleSelection} />
       <ResizablePanel >
-        <ResizablePanelGroup direction="horizontal" onLayout={handleResize} >
+        <ResizablePanelGroup
+          direction="horizontal"
+          onLayout={handleResize}>
           <ResizablePanel >
             <div className="w-full h-full">
               {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
             </div>
           </ResizablePanel>
           <ResizableHandle />
-          <ResizablePanel defaultSize={20} maxSize={50} minSize={1} hidden={!paletteVisible} className='text-secondary-foreground'>
+          <ResizablePanel defaultSize={paletteWidths.palette1} hidden={!paletteVisible} className='text-secondary-foreground'>
             <div className='h-10 flex justify-center items-center'>
               <span className='font-semibold text-lg'>Terminals</span>
               <div className='absolute right-5'>
@@ -153,11 +159,13 @@ function App(): JSX.Element {
           </ResizablePanel>
         </ResizablePanelGroup >
       </ResizablePanel>
-      <ResizableHandle dir='ltr' />
-      <ResizablePanel defaultSize={20} minSize={5} maxSize={45} hidden={!headerVisible}>
-        <div className="h-full pl-6">
+      <ResizableHandle />
+      <ResizablePanel defaultSize={paletteWidths.palette2} hidden={!headerVisible}>
+        <div className='h-full'>
+
           {selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />}
         </div>
+
       </ResizablePanel>
     </ResizablePanelGroup>
 
