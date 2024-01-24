@@ -13,7 +13,7 @@ function Palette({ data, onClick, selected, onModify }: PaletteProps) {
 
 
     return (
-        <div>
+        <div className=''>
             {Array.from(data.values()).map((cmd) => {
                 return <Command key={cmd.id} data={cmd} handleClick={onClick} selected={selected} onRemove={onModify} />
             })}

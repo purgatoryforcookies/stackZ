@@ -8,7 +8,7 @@ import { useEffect, useState } from "react"
 
 type SettingsProps = {
     setTheme: (name: string) => void,
-    theme: string
+    theme: string | undefined
 }
 
 function Settings({ setTheme, theme }: SettingsProps) {
@@ -37,19 +37,23 @@ function Settings({ setTheme, theme }: SettingsProps) {
     }, [open]);
 
 
-
+    useEffect(() => {
+        if (!theme) return
+        window.store.set('theme', theme)
+    }, [theme])
+    useEffect(() => {
+        window.store.get('theme').then((t) => {
+            setTheme(t)
+        })
+    })
 
 
     return (
-        <Sheet open={open} >
-            {/* <SheetTrigger asChild>
-                <Button variant="ghost" size={'sm'} >Settings</Button>
-            </SheetTrigger> */}
+        <Sheet open={open} onOpenChange={setOpen}>
             <SheetContent className="w-[30vw] sm:max-w-none " >
                 <SheetHeader className="text-primary">
                     <SheetTitle>Settings</SheetTitle>
                     <SheetDescription>
-
                     </SheetDescription>
                 </SheetHeader>
                 <div className="py-8 bg-background">

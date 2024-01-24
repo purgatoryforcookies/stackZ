@@ -2,7 +2,7 @@ import TerminalUI from './components/TerminalUI/TerminalUI'
 import Palette from './components/Palette/Palette'
 import DetailHeader from './components/DetailHeader/DetailHeader'
 import { useEffect, useState } from 'react'
-import { Cmd, EnginedCmd, ExtendedCmd, SelectionEvents } from '../../types'
+import { Cmd, EnginedCmd, ExtendedCmd, Panels, SelectionEvents, StoreType } from '../../types'
 import { TerminalUIEngine } from './service/TerminalUIEngine'
 import { SOCKET_HOST } from './service/socket'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from './@/ui/resizable'
@@ -12,17 +12,13 @@ import { CommandMenu } from './components/Common/CommandMenu'
 
 
 
-
 function App(): JSX.Element {
 
   const [terminals, setTerminals] = useState<ExtendedCmd>(new Map<number, EnginedCmd>())
   const [selected, setSelected] = useState<number | null>(null)
-  const [paletteWidths, setPaletteWidths] = useState({
-    palette1: 30,
-    palette2: 30
-  })
+  const [paletteWidths, setPaletteWidths] = useState<StoreType['paletteWidths'] | undefined>()
   const [editMode, setEditMode] = useState<boolean>(false)
-  const [theme, setTheme] = useState<string>('forrest')
+  const [theme, setTheme] = useState<string | undefined>()
   const [headerVisible, setHeaderVisible] = useState<boolean>(true)
   const [paletteVisible, setPaletteVisible] = useState<boolean>(true)
 
@@ -43,25 +39,18 @@ function App(): JSX.Element {
       setTerminals(terminals)
       setSelected(1)
     }
-
-    fetchTerminals()
-
     const fetchPaletteWidth = async () => {
       const width = await window.store.get('paletteWidths')
-      if (!width) setPaletteWidths({ palette1: 30, palette2: 30 })
-      else setPaletteWidths(JSON.parse(width))
-
+      setPaletteWidths(JSON.parse(width))
     }
+
     fetchPaletteWidth()
+    fetchTerminals()
 
   }, [])
 
 
-  const handleResize = (e) => {
-    if (selected) {
-      terminals?.get(selected)?.engine.resize()
-    }
-  }
+
   const handleShortCuts = (e: KeyboardEvent) => {
     switch (e.key) {
       case 'x':
@@ -79,14 +68,12 @@ function App(): JSX.Element {
 
   useEffect(() => {
 
-    window.addEventListener('resize', handleResize);
     window.addEventListener('keydown', handleShortCuts, true)
     return () => {
-      window.removeEventListener('resize', handleResize);
       window.removeEventListener('keydown', handleShortCuts, true)
     };
 
-  }, [selected, headerVisible, paletteVisible]);
+  }, [headerVisible, paletteVisible]);
 
   //TODO: add more options and maybe make a hook or separate file?
   const handleSelection = (id: number, method = SelectionEvents.CONN, cb?: (...args: any) => void) => {
@@ -124,49 +111,59 @@ function App(): JSX.Element {
     setTerminals(newTerminals)
   }
 
+  const handleResize = async (e: number[], source: Panels) => {
+
+    if (selected) terminals?.get(selected)?.engine.resize()
+    if (!paletteWidths) return
+    const newWidths = { ...paletteWidths }
+    if (source === Panels.Terminals) newWidths.palette1 = e[1]
+    else newWidths.palette2 = e[1]
+    await window.store.set('paletteWidths', JSON.stringify(newWidths))
+  }
+
 
   return (
     <ResizablePanelGroup
       direction="vertical"
       className="h-full bg-background text-primary-foreground"
       data-theme={theme}
-      onLayout={handleResize}
-    >
+      onLayout={(e) => handleResize(e, Panels.Details)}>
       <CommandMenu terminals={terminals} dispatch={handleSelection} />
+      <Settings setTheme={setTheme} theme={theme} />
       <ResizablePanel >
         <ResizablePanelGroup
           direction="horizontal"
-          onLayout={handleResize}>
+          onLayout={(e) => handleResize(e, Panels.Terminals)}>
           <ResizablePanel >
-            <div className="w-full h-full">
-              {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
-            </div>
+            {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
           </ResizablePanel>
           <ResizableHandle />
-          <ResizablePanel defaultSize={paletteWidths.palette1} hidden={!paletteVisible} className='text-secondary-foreground'>
+          {paletteWidths ? <ResizablePanel
+            defaultSize={paletteWidths.palette1}
+            hidden={!paletteVisible}
+            maxSize={99}
+            minSize={5}
+            id='palette1'
+            className='text-secondary-foreground'>
             <div className='h-10 flex justify-center items-center'>
-              <span className='font-semibold text-lg'>Terminals</span>
-              <div className='absolute right-5'>
-                <Settings setTheme={setTheme} theme={theme} />
-              </div>
+              <span className='font-semibold text-lg'>
+                Terminals
+              </span>
             </div>
 
-            <div className="h-full overflow-auto pb-60 ">
+            <div className="h-full overflow-auto pb-60">
               {terminals ?
                 <Palette data={terminals} onClick={handleSelection} selected={selected} onModify={modifyTerminals} />
                 : "Loading..."}
             </div>
-          </ResizablePanel>
-        </ResizablePanelGroup >
+          </ResizablePanel> : null}
+        </ResizablePanelGroup>
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel defaultSize={paletteWidths.palette2} hidden={!headerVisible}>
-        <div className='h-full'>
-
-          {selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />}
-        </div>
-
+      {paletteWidths ? <ResizablePanel defaultSize={paletteWidths.palette2} hidden={!headerVisible}>
+        {selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />}
       </ResizablePanel>
+        : null}
     </ResizablePanelGroup>
 
   )

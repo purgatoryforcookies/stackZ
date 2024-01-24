@@ -62,3 +62,17 @@ export type UpdateCwdProps = Pick<EnvironmentEditProps, 'id' | 'value'>
 export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'id' | 'orderId'>
 export type AddEnvListProps = { id: number, title: string }
 
+
+export enum Panels {
+    Details,
+    Terminals
+}
+
+export type StoreType = {
+    paletteWidths: {
+        palette1: number
+        palette2: number
+    },
+    theme: string
+
+}

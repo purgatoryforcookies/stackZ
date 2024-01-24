@@ -116,7 +116,7 @@ ipcMain.handle('getStore', (_, key) => {
 })
 
 ipcMain.handle('setStore', (_, key, value) => {
-  return store.set(key, value)
+  store.set(key, value)
 })
 
 ipcMain.handle('save', () => {
