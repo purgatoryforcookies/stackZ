@@ -40,7 +40,7 @@ function NewEnvList({ scroll }: NewEnvListProps) {
     return (
         <div className='absolute right-12 bottom-12 ' ref={clickAwayRef}>
             {expanded ?
-                <form onSubmit={handleAdd} className='flex items-center gap-5' onReset={() => { setExpanded(false), setTitle('') }}>
+                <form onSubmit={handleAdd} className='flex items-center gap-5 bg-background' onReset={() => { setExpanded(false), setTitle('') }}>
                     <Input placeholder='Name' value={title} type='text' onChange={(e) => setTitle(e.target.value)} autoFocus />
                     <Button type='submit' variant={'ghost'} size={'sm'} className='hover:bg-primary'>Add</Button>
                     <Button type='reset' variant={'destructive'} size={'sm'} >Cancel</Button>

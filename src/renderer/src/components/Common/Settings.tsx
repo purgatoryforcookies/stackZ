@@ -2,9 +2,10 @@ import { Button } from "@renderer/@/ui/button"
 import { Input } from "@renderer/@/ui/input"
 import { Label } from "@renderer/@/ui/label"
 import { RadioGroup, RadioGroupItem } from "@renderer/@/ui/radio-group"
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose } from "@renderer/@/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose } from "@renderer/@/ui/sheet"
 import ColorSquare from "./ColorSquare"
 import { useEffect, useState } from "react"
+import { ArrowDownIcon, ArrowUpIcon, EnvelopeOpenIcon } from "@radix-ui/react-icons"
 
 type SettingsProps = {
     setTheme: (name: string) => void,
@@ -103,6 +104,19 @@ function Settings({ setTheme, theme }: SettingsProps) {
                                 </div>
                             </RadioGroup>
                         </div>
+                    </div>
+                </div>
+
+                <div className="py-8 bg-background">
+                    <div className="flex items-center gap-4">
+                        <h1 className="text-primary">Commands.json</h1>
+                        <Button variant={'outline'} >
+                            <ArrowUpIcon className="mr-2 h-4 w-4" />
+                            Export</Button>
+                        <Button variant={'outline'} >
+                            <ArrowDownIcon className="mr-2 h-4 w-4" />
+                            Import
+                        </Button>
                     </div>
                 </div>
                 <SheetFooter>

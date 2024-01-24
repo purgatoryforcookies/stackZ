@@ -160,7 +160,11 @@ function App(): JSX.Element {
         </ResizablePanelGroup>
       </ResizablePanel>
       <ResizableHandle />
-      {paletteWidths ? <ResizablePanel defaultSize={paletteWidths.palette2} hidden={!headerVisible}>
+      {paletteWidths ? <ResizablePanel
+        defaultSize={paletteWidths.palette2}
+        hidden={!headerVisible}
+        maxSize={99}
+        minSize={5}>
         {selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />}
       </ResizablePanel>
         : null}

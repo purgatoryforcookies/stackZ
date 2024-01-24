@@ -4,6 +4,7 @@ import Record from '@renderer/components/Common/ListItem';
 import { Separator } from '@renderer/@/ui/separator';
 import { ToggleGroup, ToggleGroupItem } from '@renderer/@/ui/toggle-group';
 import { TrashIcon } from '@radix-ui/react-icons';
+import { Badge } from '@renderer/@/ui/badge';
 
 
 type EnvListProps = {
@@ -62,22 +63,23 @@ function EnvList({ data, onSelection, terminalId }: EnvListProps) {
         `}>
             <h1 className='text-center text-foreground'>{data.title}</h1>
             <Separator className="my-2" />
-            <ToggleGroup type="multiple" size='sm' variant='outline' className='my-3 text-foreground relative'>
-                <ToggleGroupItem value="Minimize" aria-label="Toggle minimize" onClick={handleMinimize}>
+            <div className='flex gap-1 justify-center' >
+
+                <Badge variant={'outline'} className='hover:cursor-pointer hover:bg-accent' aria-label="Toggle minimize" onClick={handleMinimize}>
                     Minimize
-                </ToggleGroupItem>
-                <ToggleGroupItem value="Mute" aria-label="Toggle mute" onClick={handleMute}>
+                </Badge>
+                <Badge variant={'outline'} className='hover:cursor-pointer hover:bg-accent' aria-label="Toggle mute" onClick={handleMute}>
                     Mute
-                </ToggleGroupItem>
+                </Badge>
                 {!minimized ?
                     <>
-                        <ToggleGroupItem value="Edit" aria-label="Toggle edit" onClick={() => setEditMode(!editMode)}>
+                        <Badge variant={'outline'} className='hover:cursor-pointer hover:bg-accent' aria-label="Toggle edit" onClick={() => setEditMode(!editMode)}>
                             Edit
-                        </ToggleGroupItem >
+                        </Badge >
                         {editMode ? <TrashIcon className='w-5 h-5 relative left-2 rounded-full hover:text-red-800 hover:cursor-pointer' onClick={handleDelete} /> : null}
                     </> : null}
 
-            </ToggleGroup>
+            </div>
             {hidden ?
                 <div className='flex flex-col justify-center items-center pt-10 text-white/40'>
                     <h2 className='text-2xl'>{Object.keys(data.pairs).length} <span className='text-base'>variables</span></h2>
