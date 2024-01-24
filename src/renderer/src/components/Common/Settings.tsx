@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@renderer/@/ui/radio-group"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose } from "@renderer/@/ui/sheet"
 import ColorSquare from "./ColorSquare"
 import { useEffect, useState } from "react"
-import { ArrowDownIcon, ArrowUpIcon, EnvelopeOpenIcon } from "@radix-ui/react-icons"
+import { ArrowDownIcon, ArrowUpIcon } from "@radix-ui/react-icons"
 
 type SettingsProps = {
     setTheme: (name: string) => void,

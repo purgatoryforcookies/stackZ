@@ -118,7 +118,7 @@ export class Terminal {
     }
 
     sendToClient(data: string) {
-        this.server.timeout(400).to(this.socketId).emit("output", data, (err, resp: ITerminalDimensions) => {
+        this.server.timeout(400).to(this.socketId).emit("output", data, (_, resp: ITerminalDimensions) => {
             if (this.ptyProcess) {
 
                 try {

@@ -2,7 +2,6 @@ import { GoPlusCircle } from 'react-icons/go'
 import { FormEvent, useRef, useState } from 'react'
 import { useClickWatcher } from '@renderer/hooks/useClickWatcher'
 import { baseSocket } from '@renderer/service/socket'
-import { BsDot } from 'react-icons/bs'
 
 
 type ListItemProps = {

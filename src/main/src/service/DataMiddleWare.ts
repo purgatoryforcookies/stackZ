@@ -1,4 +1,3 @@
-import path from "path"
 import Anser from 'anser';
 
 export class DataMiddleWare {

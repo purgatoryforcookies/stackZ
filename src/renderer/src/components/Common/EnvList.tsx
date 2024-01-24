@@ -2,7 +2,6 @@ import { baseSocket } from '@renderer/service/socket';
 import { useState } from 'react';
 import Record from '@renderer/components/Common/ListItem';
 import { Separator } from '@renderer/@/ui/separator';
-import { ToggleGroup, ToggleGroupItem } from '@renderer/@/ui/toggle-group';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { Badge } from '@renderer/@/ui/badge';
 
