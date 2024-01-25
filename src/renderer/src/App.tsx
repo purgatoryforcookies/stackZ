@@ -5,10 +5,12 @@ import { useEffect, useState } from 'react'
 import { Cmd, EnginedCmd, ExtendedCmd, Panels, SelectionEvents, StoreType } from '../../types'
 import { TerminalUIEngine } from './service/TerminalUIEngine'
 import { SOCKET_HOST } from './service/socket'
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from './@/ui/resizable'
+
 import Placeholder from './components/Common/Placeholder'
 import Settings from './components/Common/Settings'
 import { CommandMenu } from './components/Common/CommandMenu'
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './@/ui/resizable'
+
 
 
 
@@ -21,6 +23,7 @@ function App(): JSX.Element {
   const [theme, setTheme] = useState<string | undefined>()
   const [headerVisible, setHeaderVisible] = useState<boolean>(true)
   const [paletteVisible, setPaletteVisible] = useState<boolean>(true)
+
 
   useEffect(() => {
 
@@ -46,7 +49,6 @@ function App(): JSX.Element {
 
     fetchPaletteWidth()
     fetchTerminals()
-
   }, [])
 
 
@@ -128,7 +130,7 @@ function App(): JSX.Element {
       className="h-full bg-background text-primary-foreground"
       data-theme={theme}
       onLayout={(e) => handleResize(e, Panels.Details)}>
-      <CommandMenu terminals={terminals} dispatch={handleSelection} />
+      <CommandMenu terminals={terminals} dispatch={handleSelection} theme={theme} />
       <Settings setTheme={setTheme} theme={theme} />
       <ResizablePanel >
         <ResizablePanelGroup
@@ -169,7 +171,6 @@ function App(): JSX.Element {
       </ResizablePanel>
         : null}
     </ResizablePanelGroup>
-
   )
 }
 

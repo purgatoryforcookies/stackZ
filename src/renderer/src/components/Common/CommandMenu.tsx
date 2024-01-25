@@ -5,11 +5,12 @@ import { ComponentNoneIcon } from "@radix-ui/react-icons"
 
 type CommandMenuProps = {
     terminals: ExtendedCmd
-    dispatch: (id: number, method: SelectionEvents, cb?: (...args: any) => void) => void
+    dispatch: (id: number, method: SelectionEvents, cb?: (...args: any) => void) => void,
+    theme: string | undefined
 }
 
 
-export function CommandMenu({ terminals, dispatch }: CommandMenuProps) {
+export function CommandMenu({ terminals, dispatch, theme }: CommandMenuProps) {
     const [open, setOpen] = useState(false)
 
 
@@ -27,7 +28,7 @@ export function CommandMenu({ terminals, dispatch }: CommandMenuProps) {
 
     //TODO: Finish these options
     return (
-        <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandDialog open={open} onOpenChange={setOpen} data-theme={theme}>
             <CommandInput placeholder="Type a command or search..." />
             <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
@@ -39,7 +40,7 @@ export function CommandMenu({ terminals, dispatch }: CommandMenuProps) {
                     <CommandItem>Start</CommandItem>
                     <CommandItem>Stop</CommandItem>
                 </CommandGroup>
-                <CommandGroup heading="Terminals">
+                <CommandGroup heading="Terminals" >
                     {terminals ? [...terminals.values()].map(term => {
                         return <CommandItem key={term.id} onSelect={() => {
 

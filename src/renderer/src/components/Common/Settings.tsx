@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import ColorSquare from "./ColorSquare"
 import { useEffect, useState } from "react"
 import { ArrowDownIcon, ArrowUpIcon } from "@radix-ui/react-icons"
+import KillSignal from "./KillSignal"
 
 type SettingsProps = {
     setTheme: (name: string) => void,
@@ -50,15 +51,15 @@ function Settings({ setTheme, theme }: SettingsProps) {
 
 
     return (
-        <Sheet open={open} onOpenChange={setOpen}>
-            <SheetContent className="w-[30vw] sm:max-w-none " >
+        <Sheet open={open} onOpenChange={setOpen} >
+            <SheetContent className="w-[30vw] sm:max-w-none " data-theme={theme} >
                 <SheetHeader className="text-primary">
                     <SheetTitle>Settings</SheetTitle>
                     <SheetDescription>
                     </SheetDescription>
                 </SheetHeader>
                 <div className="py-8 bg-background">
-                    <h1 className="text-primary">General</h1>
+                    <h1 className="text-primary-foreground">General</h1>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="shell" className="text-right">
@@ -71,6 +72,12 @@ function Settings({ setTheme, theme }: SettingsProps) {
                                 Default CWD
                             </Label>
                             <Input id="cwd" placeholder="path..." className="col-span-3" />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="cwd" className="text-right">
+                                Kill signal
+                            </Label>
+                            <KillSignal />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4 py-5">
                             <Label htmlFor="theme" className="text-right">
@@ -109,7 +116,7 @@ function Settings({ setTheme, theme }: SettingsProps) {
 
                 <div className="py-8 bg-background">
                     <div className="flex items-center gap-4">
-                        <h1 className="text-primary">Commands.json</h1>
+                        <h1 className="primary-foreground">Commands.json</h1>
                         <Button variant={'outline'} >
                             <ArrowUpIcon className="mr-2 h-4 w-4" />
                             Export</Button>

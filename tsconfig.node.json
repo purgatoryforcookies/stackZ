@@ -7,7 +7,6 @@
     "src/main/*/*/*",
     "src/main/*/*",
     "src/types.ts",
-    "src/renderer/src/service/TerminalUIEngine.ts"
   ],
   "exclude": [
     "**/*.test.ts",
