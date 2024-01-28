@@ -144,7 +144,7 @@ function App(): JSX.Element {
       className="h-full bg-background text-primary-foreground"
       data-theme={theme}
       onLayout={(e) => handleResize(e, Panels.Details)}>
-      {/* <CommandMenu terminals={terminals} dispatch={handleSelection} theme={theme} /> */}
+      <CommandMenu stack={stack} dispatch={handleSelection} theme={theme} />
       <Settings setTheme={setTheme} theme={theme} />
       <ResizablePanel >
         <ResizablePanelGroup
@@ -168,7 +168,7 @@ function App(): JSX.Element {
             </div>
             <div className="h-full overflow-auto pb-60">
               {stack ?
-                <Palette data={stack} onClick={handleSelection} terminalId={selectedTerminal} onModify={modifyTerminals} />
+                <Palette data={stack} onClick={handleSelection} stackId={selectedStack} terminalId={selectedTerminal} onModify={modifyTerminals} />
                 : "Loading..."}
             </div>
           </ResizablePanel> : null}

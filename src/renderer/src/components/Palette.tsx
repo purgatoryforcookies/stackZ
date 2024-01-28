@@ -8,23 +8,22 @@ type PaletteProps = {
     data: Map<number, PaletteStack>
     onClick: (terminalId: number, stackId: number, method?: SelectionEvents, cb?: (...args: any) => void,) => void
     onModify: (cmd: Cmd) => void,
-    terminalId: number
+    terminalId: number,
+    stackId: number
 }
 
-function Palette({ data, onClick, onModify, terminalId }: PaletteProps) {
+function Palette({ data, onClick, onModify, terminalId, stackId }: PaletteProps) {
 
-    const [selected, setSelected] = useState<number>(1)
     const [palette, setPalette] = useState<Cmd[]>()
 
 
     useEffect(() => {
 
-        const filtered = data.get(selected)?.palette
+        const filtered = data.get(stackId)?.palette
         if (!filtered) setPalette(undefined)
         setPalette(filtered)
-        onClick(selected, 1, SelectionEvents.CONN)
 
-    }, [selected])
+    }, [stackId])
 
     return (
         <div className=''>
@@ -33,8 +32,8 @@ function Palette({ data, onClick, onModify, terminalId }: PaletteProps) {
                 {data && Array.from(data.values()).map((stack) => {
                     return <Badge
                         key={stack.id}
-                        onClick={() => setSelected(stack.id)}
-                        variant={selected === stack.id ? 'default' : 'outline'}
+                        onClick={() => onClick(stack.id, 1, SelectionEvents.CONN)}
+                        variant={stackId === stack.id ? 'default' : 'outline'}
                         className={`hover:bg-foreground hover:text-background hover:cursor-pointer`}>
                         {stack.stackName}
                     </Badge>
@@ -43,7 +42,7 @@ function Palette({ data, onClick, onModify, terminalId }: PaletteProps) {
 
             {palette ? palette.map((cmd) => {
                 if (!cmd?.id) return null
-                return <Command key={cmd.id} data={cmd} hostStack={selected} handleClick={onClick} selected={terminalId} onRemove={onModify} />
+                return <Command key={cmd.id} data={cmd} hostStack={stackId} handleClick={onClick} selected={terminalId} onRemove={onModify} />
             }) : null}
             <NewCommand afterAdd={onModify} />
         </div >

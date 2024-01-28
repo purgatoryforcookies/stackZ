@@ -1,19 +1,20 @@
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut } from "@renderer/@/ui/command"
 import { useEffect, useState } from "react"
-import { ExtendedCmd, SelectionEvents } from "../../../../types"
-import { ComponentNoneIcon } from "@radix-ui/react-icons"
+import { PaletteStack, SelectionEvents } from "../../../../types"
+import { ButtonIcon, ComponentNoneIcon, GlobeIcon, LayersIcon, ListBulletIcon } from "@radix-ui/react-icons"
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@renderer/@/ui/tooltip"
 
 type CommandMenuProps = {
-    terminals: ExtendedCmd
-    dispatch: (id: number, method: SelectionEvents, cb?: (...args: any) => void) => void,
+    stack: Map<number, PaletteStack> | undefined
+    dispatch: (stackId: number, terminalId: number, method: SelectionEvents, cb?: (...args: any) => void) => void,
     theme: string | undefined
 }
 
 
-export function CommandMenu({ terminals, dispatch, theme }: CommandMenuProps) {
+export function CommandMenu({ stack, dispatch, theme }: CommandMenuProps) {
+
+
     const [open, setOpen] = useState(false)
-
-
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -33,30 +34,77 @@ export function CommandMenu({ terminals, dispatch, theme }: CommandMenuProps) {
             <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup heading="Suggestions">
-                    <CommandItem>Hide/show env explorer</CommandItem>
-                    <CommandItem>Hide/show palette</CommandItem>
-                    <CommandItem>*terminal</CommandItem>
-                    <CommandItem>*environment</CommandItem>
-                    <CommandItem>Start</CommandItem>
-                    <CommandItem>Stop</CommandItem>
+                    <CommandItem>Hide/show env explorer
+                        <CommandShortcut>Alt+X</CommandShortcut>
+                    </CommandItem>
+                    <CommandItem>Hide/show palette
+                        <CommandShortcut>Alt+Z</CommandShortcut>
+                    </CommandItem>
                 </CommandGroup>
-                <CommandGroup heading="Terminals" >
-                    {terminals ? [...terminals.values()].map(term => {
-                        return <CommandItem key={term.id} onSelect={() => {
+                <CommandGroup heading="New">
+                    <CommandItem>Terminal</CommandItem>
+                    <CommandItem>Environment</CommandItem>
+                </CommandGroup>
+                <CommandGroup heading="Stacks" >
+                    {stack ? [...stack.values()].map(stack => {
+                        return <CommandItem key={stack.id}
+                            className="flex gap-5"
+                            value={stack.id + stack.stackName}
+                            onSelect={() => {
 
-                            dispatch(term.id, SelectionEvents.CONN, () => {
-                                setOpen(false)
-                            })
-                        }}>
-                            <ComponentNoneIcon className="mr-2 h-4 w-4" />
-                            <div className="flex flex-col">
-                                <span>#{term.id}: {term.title}</span>
-                                <span>{term.command.cmd} @ {term.command.cwd}</span>
+                                dispatch(stack.id, 1, SelectionEvents.CONN, () => {
+                                    setOpen(false)
+                                })
+                            }}>
+                            <span>{stack.palette?.length ?? 0}x</span>
+                            <LayersIcon className="mr-2 h-4 w-4" />
+                            <div className="flex justify-between w-full">
+                                <span>#{stack.id}: {stack.stackName}</span>
+
+                                {(stack.env?.length && stack.env.length > 0) ?
+                                    <TooltipProvider>
+                                        <Tooltip >
+                                            <TooltipTrigger><GlobeIcon /></TooltipTrigger>
+
+                                            <TooltipContent side={'left'}>
+                                                <p>Has global environments</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                    : null}
 
                             </div>
-                            <CommandShortcut>⌘P</CommandShortcut>
+
 
                         </CommandItem>
+
+                    }) : null}
+                </CommandGroup>
+                <CommandGroup heading="Terminals" >
+                    {stack ? [...stack.values()].map(stack => {
+                        if (!stack.palette) return null
+                        return stack.palette.map(cmd => {
+
+                            return <CommandItem key={String(stack.id) + String(cmd.id)}
+                                className="flex gap-5"
+                                value={cmd.title + cmd.command.cmd + cmd.command.cwd + stack.stackName}
+                                onSelect={() => {
+                                    dispatch(stack.id, cmd.id, SelectionEvents.CONN, () => {
+                                        setOpen(false)
+                                    })
+                                }}>
+                                <ButtonIcon className="mr-2 h-4 w-4" />
+                                <div className="flex flex-col">
+                                    <span>#{cmd.id}: {cmd.title}</span>
+                                    <div className="flex flex-col">
+                                        <span>{cmd.command.cmd}</span>
+                                        <span>@{cmd.command.cwd}</span>
+                                        <span>stack: #{stack.id} - {stack.stackName}</span>
+                                    </div>
+                                </div>
+                            </CommandItem>
+                        })
+
 
                     }) : null}
                 </CommandGroup>
