@@ -1,8 +1,8 @@
 import TerminalUI from './components/TerminalUI/TerminalUI'
-import Palette from './components/Palette/Palette'
+import Palette from './components/Palette'
 import DetailHeader from './components/DetailHeader/DetailHeader'
 import { useEffect, useState } from 'react'
-import { Cmd, EnginedCmd, ExtendedCmd, Panels, SelectionEvents, StoreType } from '../../types'
+import { Cmd, EnginedCmd, ExtendedCmd, PaletteStack, Panels, SelectionEvents, StoreType } from '../../types'
 import { TerminalUIEngine } from './service/TerminalUIEngine'
 import { SOCKET_HOST } from './service/socket'
 
@@ -10,14 +10,17 @@ import Placeholder from './components/Common/Placeholder'
 import Settings from './components/Common/Settings'
 import { CommandMenu } from './components/Common/CommandMenu'
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './@/ui/resizable'
+import { set } from 'zod'
 
 
 
 
 function App(): JSX.Element {
 
-  const [terminals, setTerminals] = useState<ExtendedCmd>(new Map<number, EnginedCmd>())
-  const [selected, setSelected] = useState<number | null>(null)
+  const [stack, setStack] = useState<PaletteStack[]>()
+  const [terminals, setTerminals] = useState<Map<number, Map<number, TerminalUIEngine>>>()
+  const [selectedStack, setSelectedStack] = useState<number>(1)
+  const [selectedTerminal, setSelectedTerminal] = useState<number>(1)
   const [paletteWidths, setPaletteWidths] = useState<StoreType['paletteWidths'] | undefined>()
   const [editMode, setEditMode] = useState<boolean>(false)
   const [theme, setTheme] = useState<string | undefined>()
@@ -28,20 +31,26 @@ function App(): JSX.Element {
   useEffect(() => {
 
     const fetchTerminals = async () => {
-      const data = await window.api.getCommands()
+      const data: PaletteStack[] = await window.api.getStack()
+      setStack(data)
 
-      data.forEach((cmd) => {
-        const engine = new TerminalUIEngine(cmd.id, SOCKET_HOST)
-        engine.startListening()
+      const newTerminals = new Map<number, Map<number, TerminalUIEngine>>()
 
-        terminals.set(cmd.id, {
-          ...cmd,
-          engine: engine
+      data.forEach((stack) => {
+        if (!stack.palette) return
+        newTerminals.set(stack.id, new Map<number, TerminalUIEngine>())
+        stack.palette.forEach((cmd) => {
+          if (!cmd) return
+          const s = newTerminals.get(stack.id)
+          if (!s) return
+          const engine = new TerminalUIEngine(stack.id, cmd.id, SOCKET_HOST)
+          engine.startListening()
+          s.set(cmd.id, engine)
         })
       })
-      setTerminals(terminals)
-      setSelected(1)
+      setTerminals(newTerminals)
     }
+
     const fetchPaletteWidth = async () => {
       const width = await window.store.get('paletteWidths')
       setPaletteWidths(JSON.parse(width))
@@ -78,16 +87,17 @@ function App(): JSX.Element {
   }, [headerVisible, paletteVisible]);
 
   //TODO: add more options and maybe make a hook or separate file?
-  const handleSelection = (id: number, method = SelectionEvents.CONN, cb?: (...args: any) => void) => {
+  const handleSelection = (stack: number, terminal: number, method = SelectionEvents.CONN, cb?: (...args: any) => void) => {
 
     switch (method) {
 
       case SelectionEvents.CONN:
+        setSelectedStack(stack)
+        setSelectedTerminal(terminal)
         if (cb) cb()
-        setSelected(id)
         break
       case SelectionEvents.START:
-        window.api.startTerminal(id)
+        window.api.startTerminal(stack, terminal)
         if (cb) cb()
         break
       case SelectionEvents.EXPAND:
@@ -100,27 +110,27 @@ function App(): JSX.Element {
 
 
   const modifyTerminals = async (cmd: Cmd) => {
-    if (terminals?.has(cmd.id)) return
-    const engine = new TerminalUIEngine(cmd.id, SOCKET_HOST)
-    engine.startListening()
+    // if (terminals?.has(cmd.id)) return
+    // const engine = new TerminalUIEngine(cmd.id, SOCKET_HOST)
+    // engine.startListening()
 
-    const newTerminals = new Map(terminals)
+    // const newTerminals = new Map(terminals)
 
-    newTerminals.set(cmd.id, {
-      ...cmd,
-      engine: engine
-    })
-    setTerminals(newTerminals)
+    // newTerminals.set(cmd.id, {
+    //   ...cmd,
+    //   engine: engine
+    // })
+    // setTerminals(newTerminals)
   }
 
   const handleResize = async (e: number[], source: Panels) => {
 
-    if (selected) terminals?.get(selected)?.engine.resize()
-    if (!paletteWidths) return
-    const newWidths = { ...paletteWidths }
-    if (source === Panels.Terminals) newWidths.palette1 = e[1]
-    else newWidths.palette2 = e[1]
-    await window.store.set('paletteWidths', JSON.stringify(newWidths))
+    // if (selected) terminals?.get(selected)?.engine.resize()
+    // if (!paletteWidths) return
+    // const newWidths = { ...paletteWidths }
+    // if (source === Panels.Terminals) newWidths.palette1 = e[1]
+    // else newWidths.palette2 = e[1]
+    // await window.store.set('paletteWidths', JSON.stringify(newWidths))
   }
 
 
@@ -130,14 +140,14 @@ function App(): JSX.Element {
       className="h-full bg-background text-primary-foreground"
       data-theme={theme}
       onLayout={(e) => handleResize(e, Panels.Details)}>
-      <CommandMenu terminals={terminals} dispatch={handleSelection} theme={theme} />
+      {/* <CommandMenu terminals={terminals} dispatch={handleSelection} theme={theme} /> */}
       <Settings setTheme={setTheme} theme={theme} />
       <ResizablePanel >
         <ResizablePanelGroup
           direction="horizontal"
           onLayout={(e) => handleResize(e, Panels.Terminals)}>
           <ResizablePanel >
-            {terminals ? <TerminalUI toAttach={selected} engines={terminals} /> : null}
+            {terminals ? <TerminalUI engine={terminals?.get(selectedStack)?.get(selectedTerminal)} /> : null}
           </ResizablePanel>
           <ResizableHandle />
           {paletteWidths ? <ResizablePanel
@@ -152,10 +162,9 @@ function App(): JSX.Element {
                 Terminals
               </span>
             </div>
-
             <div className="h-full overflow-auto pb-60">
-              {terminals ?
-                <Palette data={terminals} onClick={handleSelection} selected={selected} onModify={modifyTerminals} />
+              {stack ?
+                <Palette data={stack} onClick={handleSelection} terminalId={selectedTerminal} stackId={selectedStack} onModify={modifyTerminals} />
                 : "Loading..."}
             </div>
           </ResizablePanel> : null}
@@ -167,7 +176,7 @@ function App(): JSX.Element {
         hidden={!headerVisible}
         maxSize={99}
         minSize={5}>
-        {selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />}
+        {/* {selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />} */}
       </ResizablePanel>
         : null}
     </ResizablePanelGroup>

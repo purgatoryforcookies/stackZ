@@ -9,7 +9,7 @@ import {
     Status,
 } from "../../../types"
 import { spawn, IPty } from 'node-pty'
-import { envFactory, haveThesameElements, mapEnvs } from "./util"
+import { envFactory, haveThesameElements, mandatoryFactory, mapEnvs } from "./util"
 import path from "path"
 import { DataMiddleWare } from "./DataMiddleWare"
 import { ITerminalDimensions } from "xterm-addon-fit"

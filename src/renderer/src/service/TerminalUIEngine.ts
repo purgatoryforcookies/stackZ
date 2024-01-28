@@ -15,16 +15,18 @@ export class TerminalUIEngine {
     });
     private socket: Socket;
     private mounted = false
-    private id: number
     private host: string
+    private stackId: number
+    private terminalId: number
     private fitAddon: FitAddon
     private hostdiv: HTMLElement
     private buffer: string
     private isRunning: boolean
 
-    constructor(id: number, host: string) {
+    constructor(stackId: number, terminalId: number, host: string) {
         this.fitAddon = new FitAddon();
-        this.id = id
+        this.stackId = stackId
+        this.terminalId = terminalId
         this.host = host
         this.terminal.loadAddon(this.fitAddon)
         this.buffer = ''
@@ -34,9 +36,7 @@ export class TerminalUIEngine {
     isMounted() {
         return this.mounted
     }
-    getId() {
-        return this.id
-    }
+
     resize() {
         this.fitAddon.fit()
         return this
@@ -44,10 +44,12 @@ export class TerminalUIEngine {
 
     async startListening() {
 
-        this.socket = io(this.host, {
-            query: { id: this.id }
-        })
+        console.log("Beginning to listen")
 
+        this.socket = io(this.host, {
+            query: { stack: this.stackId, id: this.terminalId }
+        })
+        console.log(this.socket.active)
         this.socket.on("output", (data: string, callback) => {
             this.write(data)
             callback(this.fitAddon.proposeDimensions())
@@ -55,7 +57,7 @@ export class TerminalUIEngine {
         })
 
         this.socket.on("terminalState", (data: Status) => {
-            if (data.cmd.id !== this.id) return
+            if (data.cmd?.id !== this.terminalId) return
             this.isRunning = data.isRunning
         })
 
@@ -105,7 +107,6 @@ export class TerminalUIEngine {
             return true
         })
 
-
     }
 
     ping() {
@@ -113,7 +114,7 @@ export class TerminalUIEngine {
     }
 
     sendInput(input: string) {
-        this.socket.emit('input', { id: this.id, value: input })
+        this.socket.emit('input', { stack: this.stackId, terminal: this.terminalId, value: input })
     }
 
     write(char: string) {
@@ -135,7 +136,7 @@ export class TerminalUIEngine {
         this.terminal.open(this.hostdiv);
         this.mounted = true
         this.resize()
-
+        return this
     }
 
     clear() {
@@ -158,15 +159,15 @@ export class TerminalUIEngine {
     changeSettingsMaybe(command: string) {
 
         if (command.slice(0, 2) === 'cd') {
-            this.socket.emit("changeCwd", { id: this.id, value: command.slice(2) })
+            this.socket.emit("changeCwd", { stack: this.stackId, terminal: this.terminalId, value: command.slice(2) })
             return
         }
         if (command.slice(0, 5) === 'shell') {
-            this.socket.emit("changeShell", { id: this.id, value: command.slice(5) })
+            this.socket.emit("changeShell", { stack: this.stackId, terminal: this.terminalId, value: command.slice(5) })
             return
         }
         else {
-            this.socket.emit("changeCommand", { id: this.id, value: command })
+            this.socket.emit("changeCommand", { stack: this.stackId, terminal: this.terminalId, value: command })
         }
 
 

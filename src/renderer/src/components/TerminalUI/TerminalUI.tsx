@@ -1,36 +1,32 @@
 import { useEffect, useRef, useState } from 'react'
-import { ExtendedCmd } from 'src/types'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 
-
 type TerminalUIProps = {
-  engines: ExtendedCmd,
-  toAttach: number | null
+  engine: TerminalUIEngine | undefined,
 }
 
 
-function TerminalUI({ engines, toAttach }: TerminalUIProps) {
+function TerminalUI({ engine }: TerminalUIProps) {
 
   const terminalRef = useRef(null)
   const [term, setTerm] = useState<TerminalUIEngine | null>(null)
 
   useEffect(() => {
 
-    if (!toAttach) {
+    if (!engine) {
       term?.detach()
       return
     }
 
     if (terminalRef.current) {
-      const eng = engines.get(toAttach)?.engine
-      if (!eng) return
-      setTerm(eng)
-      eng.attachTo(terminalRef.current)
+      if (!engine) return
+      setTerm(engine)
+      engine.attachTo(terminalRef.current)?.ping()
     }
 
 
-  }, [toAttach])
+  }, [engine])
 
 
   return (
