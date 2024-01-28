@@ -82,6 +82,7 @@ export enum SelectionEvents {
 }
 
 export type Status = {
+    stackId: number,
     cmd: Cmd,
     isRunning: boolean,
     cwd: string | undefined

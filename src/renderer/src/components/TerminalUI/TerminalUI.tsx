@@ -14,17 +14,13 @@ function TerminalUI({ engine }: TerminalUIProps) {
 
   useEffect(() => {
 
-    if (!engine) {
-      term?.detach()
-      return
-    }
+    term?.detach()
 
     if (terminalRef.current) {
       if (!engine) return
       setTerm(engine)
-      engine.attachTo(terminalRef.current)?.ping()
+      engine.attachTo(terminalRef.current)
     }
-
 
   }, [engine])
 

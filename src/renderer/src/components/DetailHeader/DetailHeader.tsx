@@ -5,26 +5,30 @@ import EnvList from '../Common/EnvList'
 import NewEnvList from '../Common/NewEnvList'
 
 type DetailHeaderProps = {
-    engine: EnginedCmd
+    stackId: number
+    terminalId: number
 }
 
 
 
 
-function DetailHeader({ engine }: DetailHeaderProps) {
+function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
 
     const [status, setStatus] = useState<Status | null>(null)
     const [highlightedEnv, setHighlightedEnv] = useState<string[] | null>(null)
     const bodyRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        baseSocket.on("terminalState", (d: Status) => {
-            if (d.cmd.id !== engine.id) return
+        baseSocket.on("terminalState", (d: Exclude<Status, undefined>) => {
+            console.log(d)
+            if ((stackId !== d.stackId) || (terminalId !== d.cmd.id)) return
             setStatus(d)
         })
-        baseSocket.emit('state', engine.id)
+        baseSocket.emit('state', { stack: stackId, terminal: terminalId })
 
-    }, [engine])
+        if (status && status.stackId !== stackId) setStatus(null)
+
+    }, [stackId, terminalId])
 
     const handleHighligt = (e: string[]) => {
         if (e[0] === highlightedEnv?.[0]) {
@@ -51,7 +55,7 @@ function DetailHeader({ engine }: DetailHeaderProps) {
                         data={record}
                         key={record.title}
                         onSelection={handleHighligt}
-                        terminalId={engine.id}
+                        terminalId={terminalId}
                     />
                 )) : null}
             </div>

@@ -44,12 +44,9 @@ export class TerminalUIEngine {
 
     async startListening() {
 
-        console.log("Beginning to listen")
-
         this.socket = io(this.host, {
             query: { stack: this.stackId, id: this.terminalId }
         })
-        console.log(this.socket.active)
         this.socket.on("output", (data: string, callback) => {
             this.write(data)
             callback(this.fitAddon.proposeDimensions())

@@ -1,5 +1,5 @@
 import { readFile, writeFileSync, existsSync } from "fs";
-import { Cmd, CmdSchema, ENVs, JsonEnv } from "../../../types";
+import { ENVs, JsonEnv } from "../../../types";
 import { ZodTypeAny, z } from "zod";
 
 
@@ -61,12 +61,12 @@ export const envFactory = (args: JsonEnv[] | undefined) => {
 }
 
 
-export const mandatoryFactory = (loose: Cmd) => {
+// export const mandatoryFactory = (loose: Cmd) => {
 
-    CmdSchema
+//     CmdSchema
 
 
-}
+// }
 
 
 export const mapEnvs = (obj: ENVs[]) => {

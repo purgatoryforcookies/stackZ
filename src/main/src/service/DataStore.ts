@@ -1,5 +1,4 @@
 import { ZodTypeAny } from "zod";
-import { PaletteStack } from "../../../types";
 import { readJsonFile } from "./util";
 
 
@@ -36,9 +35,9 @@ export class DataStore {
 
     }
 
-    sync(structure: PaletteStack[]) {
+    // sync(structure: PaletteStack[]) {
 
-    }
+    // }
 
 
 }

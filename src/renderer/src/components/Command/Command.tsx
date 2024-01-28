@@ -17,20 +17,18 @@ type CommandProps = {
 function Command({ data, hostStack, handleClick, selected }: CommandProps) {
 
     const [ping, setPing] = useState<Status>({
+        stackId: hostStack,
         cmd: data,
         isRunning: false,
         cwd: data.command.cwd
     })
 
-    // console.log(data)
-
     useEffect(() => {
         baseSocket.on("terminalState", (d: Exclude<Status, undefined>) => {
-            console.log(d)
-            if (d.cmd?.id !== data.id) return
+            if ((hostStack !== d.stackId) || (data.id !== d.cmd.id)) return
             setPing(d)
         })
-        baseSocket.emit('state', data.id)
+        baseSocket.emit('state', { stack: hostStack, terminal: data.id })
     }, [selected])
 
     const handleState = async () => {
@@ -40,7 +38,6 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
         }
         window.api.startTerminal(hostStack, data.id)
     }
-
 
     return (
         <div className={`
@@ -59,9 +56,9 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                 ${(selected === data.id) ? '' : 'bg-background'}`}>
                     <div className='flex flex-col pl-3 p-1 text-sm'>
                         <span>command: {data.command.cmd}</span>
-                        <span>shell: {data.command.shell}</span>
-                        {/* <span>palettes: {ping.cmd.command.env?.length} {"(3 active)"}</span>
-                        <span>notes: {ping.cmd.title}</span> */}
+                        <span>shell: {ping.cmd.command.shell ?? data.command.shell}</span>
+                        <span>palettes: {ping.cmd.command.env?.length} {"(3 active)"}</span>
+                        <span>notes: {ping.cmd.title}</span>
                     </div>
 
                     <div className='flex items-center pr-10'>

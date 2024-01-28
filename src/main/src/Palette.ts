@@ -1,6 +1,7 @@
 import { ITerminalDimensions } from "xterm-addon-fit";
 import { Cmd, PaletteStack, UpdateCwdProps } from "../../types";
 import { Terminal } from "./service/Terminal";
+import { Server } from "socket.io";
 
 export class Palette {
     settings: PaletteStack
@@ -9,6 +10,17 @@ export class Palette {
     constructor(settings: PaletteStack) {
         this.settings = settings
         this.terminals = new Map<number, Terminal>()
+
+    }
+
+    initTerminal(socketId: string, server: Server, remoteTerminalID: number) {
+        const terminal = this.settings.palette?.find(palette => palette.id === remoteTerminalID)
+        if (terminal) {
+            const newTerminal = new Terminal(this.settings.id, terminal, socketId, server)
+            this.terminals
+                .set(terminal.id, newTerminal)
+            newTerminal.ping()
+        }
 
     }
 
@@ -75,7 +87,7 @@ export class Palette {
 
     // }
 
-    ping() {
+    pingAll() {
         this.terminals.forEach(term => term.ping())
     }
 

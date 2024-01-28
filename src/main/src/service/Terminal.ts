@@ -9,7 +9,7 @@ import {
     Status,
 } from "../../../types"
 import { spawn, IPty } from 'node-pty'
-import { envFactory, haveThesameElements, mandatoryFactory, mapEnvs } from "./util"
+import { envFactory, haveThesameElements, mapEnvs } from "./util"
 import path from "path"
 import { DataMiddleWare } from "./DataMiddleWare"
 import { ITerminalDimensions } from "xterm-addon-fit"
@@ -20,6 +20,7 @@ import { ITerminalDimensions } from "xterm-addon-fit"
 export class Terminal {
     settings: Cmd
     socketId: string
+    stackId: number
     server: SocketServer
     ptyProcess: IPty | null
     tester: any
@@ -29,10 +30,11 @@ export class Terminal {
     buffer: string[]
 
 
-    constructor(cmd: Cmd, socketId: string, server: SocketServer) {
+    constructor(stackId: number, cmd: Cmd, socketId: string, server: SocketServer) {
         this.settings = cmd
         this.settings.command.env = envFactory(this.settings.command.env)
         this.socketId = socketId
+        this.stackId = stackId
         this.server = server
         this.win = process.platform === 'win32' ? true : false
         this.settings.command.shell = this.chooseShell(cmd.command.shell)
@@ -111,6 +113,7 @@ export class Terminal {
 
     getState(): Status {
         return {
+            stackId: this.stackId,
             cmd: this.settings,
             isRunning: this.isRunning,
             cwd: this.settings.command.cwd ?? process.env.HOME

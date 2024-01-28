@@ -10,14 +10,13 @@ import Placeholder from './components/Common/Placeholder'
 import Settings from './components/Common/Settings'
 import { CommandMenu } from './components/Common/CommandMenu'
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './@/ui/resizable'
-import { set } from 'zod'
 
 
 
 
 function App(): JSX.Element {
 
-  const [stack, setStack] = useState<PaletteStack[]>()
+  const [stack, setStack] = useState<Map<number, PaletteStack>>()
   const [terminals, setTerminals] = useState<Map<number, Map<number, TerminalUIEngine>>>()
   const [selectedStack, setSelectedStack] = useState<number>(1)
   const [selectedTerminal, setSelectedTerminal] = useState<number>(1)
@@ -32,7 +31,12 @@ function App(): JSX.Element {
 
     const fetchTerminals = async () => {
       const data: PaletteStack[] = await window.api.getStack()
-      setStack(data)
+      const newStack = new Map<number, PaletteStack>()
+      data.forEach((stack) => {
+        newStack.set(stack.id, stack)
+      })
+      setStack(newStack)
+
 
       const newTerminals = new Map<number, Map<number, TerminalUIEngine>>()
 
@@ -87,17 +91,17 @@ function App(): JSX.Element {
   }, [headerVisible, paletteVisible]);
 
   //TODO: add more options and maybe make a hook or separate file?
-  const handleSelection = (stack: number, terminal: number, method = SelectionEvents.CONN, cb?: (...args: any) => void) => {
+  const handleSelection = (stackId: number, terminalId: number, method = SelectionEvents.CONN, cb?: (...args: any) => void) => {
 
     switch (method) {
 
       case SelectionEvents.CONN:
-        setSelectedStack(stack)
-        setSelectedTerminal(terminal)
+        setSelectedStack(stackId)
+        setSelectedTerminal(terminalId)
         if (cb) cb()
         break
       case SelectionEvents.START:
-        window.api.startTerminal(stack, terminal)
+        window.api.startTerminal(stackId, terminalId)
         if (cb) cb()
         break
       case SelectionEvents.EXPAND:
@@ -147,7 +151,7 @@ function App(): JSX.Element {
           direction="horizontal"
           onLayout={(e) => handleResize(e, Panels.Terminals)}>
           <ResizablePanel >
-            {terminals ? <TerminalUI engine={terminals?.get(selectedStack)?.get(selectedTerminal)} /> : null}
+            {terminals ? <TerminalUI engine={terminals.get(selectedStack)?.get(selectedTerminal)} /> : null}
           </ResizablePanel>
           <ResizableHandle />
           {paletteWidths ? <ResizablePanel
@@ -164,7 +168,7 @@ function App(): JSX.Element {
             </div>
             <div className="h-full overflow-auto pb-60">
               {stack ?
-                <Palette data={stack} onClick={handleSelection} terminalId={selectedTerminal} stackId={selectedStack} onModify={modifyTerminals} />
+                <Palette data={stack} onClick={handleSelection} terminalId={selectedTerminal} onModify={modifyTerminals} />
                 : "Loading..."}
             </div>
           </ResizablePanel> : null}
@@ -176,7 +180,7 @@ function App(): JSX.Element {
         hidden={!headerVisible}
         maxSize={99}
         minSize={5}>
-        {/* {selected ? <DetailHeader engine={terminals.get(selected)!} /> : <Placeholder message='Select from palette to get started' />} */}
+        {stack ? <DetailHeader stackId={selectedStack} terminalId={selectedTerminal} /> : <Placeholder message='Select from palette to get started' />}
       </ResizablePanel>
         : null}
     </ResizablePanelGroup>

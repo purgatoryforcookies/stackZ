@@ -53,16 +53,16 @@ export class Stack {
             const stackId = Number(client.handshake.query.stack)
             const remoteTerminalID = Number(client.handshake.query.id)
             const palette = this.palettes.get(stackId)
-
             // If there is no palette for the client, it is not a palette
             // then utility listeners are registered
             if (!palette) {
-                client.on('state', (arg: number) => {
-                    this.palettes.get(arg)?.ping()
+                client.on('state', (arg: { stack: number, terminal: number }) => {
+                    this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.ping()
                 })
 
                 return
             }
+            client.join(String(stackId))
             client.on('changeCwd', (arg: UpdateCwdProps) => {
                 console.log(`Changing cwd! new Cwd: ${arg.value}`)
                 // this.palettes.get(arg.id)?.updateCwd(arg.value)
@@ -85,10 +85,9 @@ export class Stack {
             client.on('resize', (arg: { stack: number, terminal: number, value: ITerminalDimensions }) => {
                 // this.palettes.get(arg.id)?.
             })
-
-
-
             client.emit('hello')
+
+            palette.initTerminal(client.id, this.server, remoteTerminalID)
 
         })
     }
@@ -99,6 +98,7 @@ export class Stack {
     }
 
     startTerminal(stack: number, terminal: number) {
+        console.log(`Starting ${stack} -> ${terminal}`)
         this.palettes.get(stack)?.terminals.get(terminal)?.start()
     }
     stopTerminal(stack: number, terminal: number) {
