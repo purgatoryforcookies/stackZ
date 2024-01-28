@@ -174,7 +174,11 @@ function App(): JSX.Element {
             </div>
             <div className="h-full overflow-auto pb-60">
               {stack ?
-                <Palette data={stack} onClick={handleSelection} stackId={selectedStack} terminalId={selectedTerminal} onModify={addTerminal} />
+                <Palette data={stack}
+                  onClick={handleSelection}
+                  stackId={selectedStack}
+                  terminalId={selectedTerminal}
+                  onModify={addTerminal} />
                 : "Loading..."}
             </div>
           </ResizablePanel> : null}
@@ -186,7 +190,8 @@ function App(): JSX.Element {
         hidden={!headerVisible}
         maxSize={99}
         minSize={5}>
-        {stack ? <DetailHeader stackId={selectedStack} terminalId={selectedTerminal} /> : <Placeholder message='Select from palette to get started' />}
+        {stack ? <DetailHeader stackId={selectedStack} terminalId={selectedTerminal} />
+          : <Placeholder message='Select from palette to get started' />}
       </ResizablePanel>
         : null}
     </ResizablePanelGroup>

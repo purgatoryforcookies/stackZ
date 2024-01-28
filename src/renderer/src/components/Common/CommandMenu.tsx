@@ -1,7 +1,7 @@
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut } from "@renderer/@/ui/command"
 import { useEffect, useState } from "react"
 import { PaletteStack, SelectionEvents } from "../../../../types"
-import { ButtonIcon, ComponentNoneIcon, GlobeIcon, LayersIcon, ListBulletIcon } from "@radix-ui/react-icons"
+import { ButtonIcon, GlobeIcon, LayersIcon } from "@radix-ui/react-icons"
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@renderer/@/ui/tooltip"
 
 type CommandMenuProps = {

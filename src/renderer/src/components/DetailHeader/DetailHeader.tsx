@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
-import { EnginedCmd, Status } from 'src/types'
+import { Status } from 'src/types'
 import EnvList from '../Common/EnvList'
 import NewEnvList from '../Common/NewEnvList'
 

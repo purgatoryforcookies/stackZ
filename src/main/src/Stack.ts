@@ -101,7 +101,7 @@ export class Stack {
                 // this.palettes.get(arg.id)?.writeFromClient(arg.value)
             })
             client.on('resize', (arg: { stack: number, terminal: number, value: ITerminalDimensions }) => {
-                // this.palettes.get(arg.id)?.
+                this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.resize(arg.value)
             })
             client.emit('hello')
 

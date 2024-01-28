@@ -3,31 +3,31 @@ import { Server } from 'socket.io'
 import { z } from 'zod'
 
 
-const temp = z.array(z.object({
-    id: z.number().default(1),
-    stackName: z.string().default('First'),
-    env: z.array(z.object({
-        pairs: z.record(z.string().min(1), z.string().optional()),
-        title: z.string().min(1).default('Default'),
-        order: z.number().default(1),
-        disabled: z.array(z.string())
-    })),
-    palette: z.array(z.object({
-        id: z.number().default(1),
-        title: z.string().default('First command'),
-        command: z.object({
-            cmd: z.string().default('Echo Hello'),
-            shell: z.string().optional(),
-            env: z.array(z.object({
-                pairs: z.record(z.string().min(1), z.string().optional()),
-                title: z.string().min(1).default('Default'),
-                order: z.number().default(1),
-                disabled: z.array(z.string())
-            })).optional(),
-            cwd: z.string().optional()
-        })
-    }))
-}))
+// const temp = z.array(z.object({
+//     id: z.number().default(1),
+//     stackName: z.string().default('First'),
+//     env: z.array(z.object({
+//         pairs: z.record(z.string().min(1), z.string().optional()),
+//         title: z.string().min(1).default('Default'),
+//         order: z.number().default(1),
+//         disabled: z.array(z.string())
+//     })),
+//     palette: z.array(z.object({
+//         id: z.number().default(1),
+//         title: z.string().default('First command'),
+//         command: z.object({
+//             cmd: z.string().default('Echo Hello'),
+//             shell: z.string().optional(),
+//             env: z.array(z.object({
+//                 pairs: z.record(z.string().min(1), z.string().optional()),
+//                 title: z.string().min(1).default('Default'),
+//                 order: z.number().default(1),
+//                 disabled: z.array(z.string())
+//             })).optional(),
+//             cwd: z.string().optional()
+//         })
+//     }))
+// }))
 
 
 const env = z.object({
