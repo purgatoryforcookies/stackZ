@@ -2,7 +2,7 @@ import TerminalUI from './components/TerminalUI/TerminalUI'
 import Palette from './components/Palette'
 import DetailHeader from './components/DetailHeader/DetailHeader'
 import { useEffect, useState } from 'react'
-import { Cmd, EnginedCmd, ExtendedCmd, PaletteStack, Panels, SelectionEvents, StoreType } from '../../types'
+import { Cmd, PaletteStack, Panels, SelectionEvents, StoreType } from '../../types'
 import { TerminalUIEngine } from './service/TerminalUIEngine'
 import { SOCKET_HOST } from './service/socket'
 
@@ -135,12 +135,12 @@ function App(): JSX.Element {
 
   const handleResize = async (e: number[], source: Panels) => {
 
-    // if (selected) terminals?.get(selected)?.engine.resize()
-    // if (!paletteWidths) return
-    // const newWidths = { ...paletteWidths }
-    // if (source === Panels.Terminals) newWidths.palette1 = e[1]
-    // else newWidths.palette2 = e[1]
-    // await window.store.set('paletteWidths', JSON.stringify(newWidths))
+    terminals?.get(selectedStack)?.get(selectedTerminal)?.resize()
+    if (!paletteWidths) return
+    const newWidths = { ...paletteWidths }
+    if (source === Panels.Terminals) newWidths.palette1 = e[1]
+    else newWidths.palette2 = e[1]
+    await window.store.set('paletteWidths', JSON.stringify(newWidths))
   }
 
 
