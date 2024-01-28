@@ -1,43 +1,32 @@
 import { useEffect, useRef, useState } from 'react'
-import styles from './terminalui.module.css'
-import { ExtendedCmd } from 'src/types'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 
-
 type TerminalUIProps = {
-  engines: ExtendedCmd,
-  toAttach: number | null
+  engine: TerminalUIEngine | undefined,
 }
 
 
-function TerminalUI({ engines, toAttach }: TerminalUIProps) {
+function TerminalUI({ engine }: TerminalUIProps) {
 
   const terminalRef = useRef(null)
   const [term, setTerm] = useState<TerminalUIEngine | null>(null)
 
   useEffect(() => {
 
-    if (!toAttach) {
-      term?.detach()
-      return
-    }
+    term?.detach()
 
     if (terminalRef.current) {
-      const eng = engines.get(toAttach)?.engine
-      if (!eng) return
-      setTerm(eng)
-      eng.attachTo(terminalRef.current)
+      if (!engine) return
+      setTerm(engine)
+      engine.attachTo(terminalRef.current)
     }
 
-
-  }, [toAttach])
+  }, [engine])
 
 
   return (
-    <div className={styles.terminal} ref={terminalRef}></div>
-
-
+    <div ref={terminalRef} className='h-full' />
   )
 }
 

@@ -1,83 +1,82 @@
-import { EnginedCmd, SelectionEvents } from '../../../../types'
-import styles from './command.module.css'
-import { useEffect, useRef, useState } from 'react'
+import { Cmd, EnginedCmd, SelectionEvents, Status } from '../../../../types'
+import { useEffect, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
-import { BsChevronDown, BsChevronRight } from "react-icons/bs";
-import { Status } from '../DetailHeader/DetailHeader';
+import { Button } from '@renderer/@/ui/button';
+import { ReloadIcon } from '@radix-ui/react-icons';
+
 
 type CommandProps = {
-    data: EnginedCmd
-    handleClick: (id: number, method?: SelectionEvents) => void
+    data: Exclude<Cmd, undefined>
+    hostStack: number
+    handleClick: (stackId: number, terminalId: number, method?: SelectionEvents, cb?: (...args: any) => void,) => void
     selected: number | null
-    onRemove: (cmd: EnginedCmd) => void
+    onRemove?: (cmd: EnginedCmd) => void
 }
 
 
-function Command({ data, handleClick, selected }: CommandProps) {
+function Command({ data, hostStack, handleClick, selected }: CommandProps) {
 
-    const [expanded, setExpanded] = useState<boolean>(false)
-    const [ping, setPing] = useState<Status>()
-    const pathRef = useRef<HTMLInputElement | null>(null)
+    const [ping, setPing] = useState<Status>({
+        stackId: hostStack,
+        cmd: data,
+        isRunning: false,
+        cwd: data.command.cwd
+    })
 
     useEffect(() => {
-        baseSocket.on("terminalState", (d) => {
-            if (d.id !== data.id) return
+        baseSocket.on("terminalState", (d: Exclude<Status, undefined>) => {
+            if ((hostStack !== d.stackId) || (data.id !== d.cmd.id)) return
             setPing(d)
         })
-    }, [])
-
+        baseSocket.emit('state', { stack: hostStack, terminal: data.id })
+    }, [selected])
 
     const handleState = async () => {
         if (ping?.isRunning) {
-            window.api.stopTerminal(data.id)
+            window.api.stopTerminal(hostStack, data.id)
             return
         }
-        window.api.startTerminal(data.id)
+        window.api.startTerminal(hostStack, data.id)
     }
-
-    const ListIcon = (props: any) => {
-        if (expanded) {
-            return <BsChevronDown {...props} />
-        }
-        return <BsChevronRight {...props} />
-    }
-
-    const handleCwdChange = (e) => {
-        baseSocket.emit("changeCwd", { id: data.id, value: e.target.files[0].path })
-    }
-
-    const handleExpand = () => {
-        setExpanded(!expanded)
-        handleClick(data.id, SelectionEvents.EXPAND)
-    }
-
 
     return (
         <div className={`
-        ${styles.commandItem} 
-        ${selected === data.id ? styles.selected : ''}
-        ${expanded ? styles.expanded : ''}
-        `} >
-            <div className={styles.status}>
-                {ping?.isRunning ? <span className={styles.loader}></span> : <ListIcon size={15} onClick={handleExpand} className={styles.dropDown} />}
-            </div>
-            <div className={styles.code}
-                onClick={() => handleClick(data.id, SelectionEvents.CONN)}>
-                {data.title}
-            </div>
-            <div className={styles.invoke} onClick={handleState}>
-                {ping?.isRunning ? "Stop" : "Start"}
-            </div>
-            {expanded ? <div className={styles.expandedMenu} >
-                <div className={styles.expandedMenuRow}>
-                    <p>cwd:</p>
-                    <p className={styles.longString}>{ping?.cwd}</p>
-                    <div onClick={() => pathRef.current!.click()} className={styles.changeBtn}>Change</div>
-                    {/* @ts-ignore */}
-                    <input type="file" style={{ display: 'none' }} ref={pathRef} onChange={handleCwdChange} webkitdirectory="" />
+            p-1
+            ${(selected === data.id) ? 'bg-black text-primary-foreground' : ''}`}>
+            <div className='m-2 overflow-hidden rounded-md hover:cursor-pointer'
+                onClick={() => handleClick(hostStack, data.id, SelectionEvents.CONN)}>
+                <div className='pl-4 text-secondary-foreground bg-muted flex justify-between pr-5 '>
+                    <span className='truncate' dir='rtl'>
+                        {ping.cwd}
+                    </span>
+                    {ping?.isRunning && <span className='text-primary-foreground font-bold brightness-75'>Running</span>}
                 </div>
-            </div> : null}
-        </div>
+                <div className={` 
+                flex justify-between bg-terminalHeader text-secondary-foreground
+                ${(selected === data.id) ? '' : 'bg-background'}`}>
+                    <div className='flex flex-col pl-3 p-1 text-sm'>
+                        <span>command: {data.command.cmd}</span>
+                        <span>shell: {ping.cmd.command.shell ?? data.command.shell}</span>
+                        <span>palettes: {ping.cmd.command.env?.length} {"(3 active)"}</span>
+                        <span>notes: {ping.cmd.title}</span>
+                    </div>
+
+                    <div className='flex items-center pr-10'>
+                        <div>
+                            <Button variant={'ghost'} className='text-secondary-foreground' onClick={handleState}>
+                                {ping?.isRunning ? <>
+                                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                                    Running...
+                                </> : 'Start'
+                                }
+                            </Button>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div >
     )
 }
 

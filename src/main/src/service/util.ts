@@ -1,22 +1,22 @@
 import { readFile, writeFileSync, existsSync } from "fs";
-import { Cmd, CmdJsonSchema, ENVs, JsonEnv } from "../../../types";
+import { ENVs, JsonEnv } from "../../../types";
+import { ZodTypeAny, z } from "zod";
 
 
-export const readJsonFile = (path: string): Promise<Cmd[]> => {
+export const readJsonFile = <T extends z.ZodTypeAny>(path: string, schema: T): Promise<z.infer<T>> => {
 
     return new Promise((res, rej) => {
 
         if (!existsSync(path)) {
-            createJsonFileTemplate(path)
+            createJsonFileTemplate(path, schema)
         }
-
 
         readFile(path, 'utf-8', async (err, data) => {
             if (err) {
                 rej({ message: `No json file found, tried to create. Failed. Path: ${path}` })
             }
             try {
-                const file = CmdJsonSchema.parse(JSON.parse(data))
+                const file = schema.parse(JSON.parse(data))
                 res(file)
 
             } catch (error) {
@@ -27,20 +27,12 @@ export const readJsonFile = (path: string): Promise<Cmd[]> => {
     })
 }
 
-const createJsonFileTemplate = (path: string) => {
+const createJsonFileTemplate = (path: string, schema: ZodTypeAny) => {
 
-    const template: Cmd[] = [{
-        id: 1,
-        title: "test",
-        command: {
-            cmd: 'echo hello'
-        }
-    }]
-
+    const template = schema.parse([{}])
     writeFileSync(path, JSON.stringify(template))
 
 }
-
 
 
 export const parseVariables = () => {
@@ -67,6 +59,14 @@ export const envFactory = (args: JsonEnv[] | undefined) => {
 
     return allenvs.sort((a, b) => a.order - b.order)
 }
+
+
+// export const mandatoryFactory = (loose: Cmd) => {
+
+//     CmdSchema
+
+
+// }
 
 
 export const mapEnvs = (obj: ENVs[]) => {

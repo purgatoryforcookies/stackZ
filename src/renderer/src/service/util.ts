@@ -1,0 +1,39 @@
+import { SelectionEvents } from "src/types";
+
+
+
+/**
+ *
+ * The governor is responsible for orchestrating terminals from
+ * different stacks.
+ *
+ * Check the selectionEvents for more.
+ *
+ * A callback function can be provided, which will be called
+ * after each event.
+ *
+ *
+ */
+// export const governor = (stack: number,
+//     terminal: number,
+//     method = SelectionEvents.CONN, cb?: (...args: any) => void) => {
+
+
+//         switch (method) {
+
+//             case SelectionEvents.CONN:
+//               if (cb) cb()
+//               setSelected(id)
+//               break
+//             case SelectionEvents.START:
+//               window.api.startTerminal(id)
+//               if (cb) cb()
+//               break
+//             case SelectionEvents.EXPAND:
+//               setEditMode(!editMode)
+//               break
+//             default:
+//               break
+//           }
+
+// }

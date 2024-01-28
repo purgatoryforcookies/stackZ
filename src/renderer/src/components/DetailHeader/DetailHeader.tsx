@@ -1,45 +1,33 @@
 import { useEffect, useRef, useState } from 'react'
-import styles from './detailheader.module.css'
 import { baseSocket } from '@renderer/service/socket'
-import { EnginedCmd } from 'src/types'
-import EnvList from '../Common/EnvList/EnvList'
-import NewEnvList from '../Common/NewEnvList/NewEnvList'
+import { EnginedCmd, Status } from 'src/types'
+import EnvList from '../Common/EnvList'
+import NewEnvList from '../Common/NewEnvList'
 
 type DetailHeaderProps = {
-    engine: EnginedCmd
-}
-
-export type Status = {
-    id: number
-    isRunning: boolean
-    env: [
-        {
-            title: string,
-            pairs: Record<string, string>,
-            order: number,
-            disabled: string[]
-        }
-    ],
-    cmd: string,
-    cwd: string
+    stackId: number
+    terminalId: number
 }
 
 
 
-function DetailHeader({ engine }: DetailHeaderProps) {
+
+function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
 
     const [status, setStatus] = useState<Status | null>(null)
     const [highlightedEnv, setHighlightedEnv] = useState<string[] | null>(null)
     const bodyRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        baseSocket.on("terminalState", (d) => {
-            if (d.id !== engine.id) return
+        baseSocket.on("terminalState", (d: Exclude<Status, undefined>) => {
+            if ((stackId !== d.stackId) || (terminalId !== d.cmd.id)) return
             setStatus(d)
         })
-        baseSocket.emit('state', engine.id)
+        baseSocket.emit('state', { stack: stackId, terminal: terminalId })
 
-    }, [engine])
+        if (status && status.stackId !== stackId) setStatus(null)
+
+    }, [stackId, terminalId])
 
     const handleHighligt = (e: string[]) => {
         if (e[0] === highlightedEnv?.[0]) {
@@ -49,6 +37,7 @@ function DetailHeader({ engine }: DetailHeaderProps) {
         setHighlightedEnv(e)
     }
 
+
     const scroll = () => {
         setTimeout(() => {
             bodyRef.current!.scroll({ left: bodyRef.current!.scrollWidth, behavior: 'smooth' })
@@ -57,37 +46,21 @@ function DetailHeader({ engine }: DetailHeaderProps) {
 
 
     return (
-        <div className={styles.main} >
-            <div className={styles.container} ref={bodyRef}>
 
-                {status?.env ? status.env.map((record) => (
-
+        <div className='h-full px-5'>
+            <div className='flex gap-8 pb-20 h-full overflow-auto' ref={bodyRef}>
+                {status?.cmd.command.env ? status.cmd.command.env.map((record) => (
                     <EnvList
                         data={record}
                         key={record.title}
                         onSelection={handleHighligt}
-                        terminalId={engine.id}
+                        terminalId={terminalId}
                     />
-
                 )) : null}
+            </div>
+            <div className='py-2 px-4 flex relative items-center justify-between'>
                 <NewEnvList scroll={scroll} />
-
             </div>
-
-            <div className={styles.footer}>
-                <div className={`${styles.highlightedEnv} ${!highlightedEnv ? styles.hidden : ''}`}>
-                    {highlightedEnv ? <>{highlightedEnv[0]}={highlightedEnv[1]} </> : null}
-                </div>
-                <div className={`${styles.command} ${status ? '' : styles.hidden}`} >
-                    <p>@{status?.cwd}</p>
-                    <div className={styles.terminalLook}>
-                        <p>
-                            {status?.cmd}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
         </div>
     )
 }

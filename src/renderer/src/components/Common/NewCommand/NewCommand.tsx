@@ -1,7 +1,7 @@
 import { FormEvent, useRef, useState } from 'react'
 import styles from './newcommand.module.css'
 import { GoPlusCircle } from 'react-icons/go'
-import { Field } from '../ListItem/ListItem'
+import { Field } from '../ListItem'
 import { useClickWatcher } from '@renderer/hooks/useClickWatcher'
 import { Cmd } from 'src/types'
 
@@ -34,8 +34,8 @@ function NewCommand({ afterAdd }: NewCommandProps) {
 
 
     return (
-        <div className={styles.main} onClick={handleClick} ref={reff}>
-            {!open ? <GoPlusCircle size={20} className={styles.dot} />
+        <div className='flex justify-center' onClick={handleClick} ref={reff}>
+            {!open ? <GoPlusCircle size={22} className='hover:cursor-pointer hover:text-primary-foreground text-primary' />
                 : <div className={`${styles.new}`}>
                     <form onSubmit={handleSave}>
 
@@ -43,7 +43,7 @@ function NewCommand({ afterAdd }: NewCommandProps) {
                             placeholder='Title'
                             disabled={false}
                             onChange={setTitle}
-                            className='primary'
+                            variant='primary'
                         />
                     </form>
 

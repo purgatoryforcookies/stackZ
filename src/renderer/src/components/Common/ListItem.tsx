@@ -1,9 +1,7 @@
-import styles from './listitem.module.css'
 import { GoPlusCircle } from 'react-icons/go'
 import { FormEvent, useRef, useState } from 'react'
 import { useClickWatcher } from '@renderer/hooks/useClickWatcher'
 import { baseSocket } from '@renderer/service/socket'
-import { BsDot } from 'react-icons/bs'
 
 
 type ListItemProps = {
@@ -27,31 +25,50 @@ type FieldProps = {
     value?: string,
     disabled: boolean,
     onChange: (value: string) => void,
-    className: 'primary' | 'secondary',
+    variant: 'primary' | 'secondary',
     placeholder?: string
     muted?: boolean
+    minimized?: boolean
 }
 
 
-export const Field = ({ value, disabled, onChange, className, placeholder, muted = false }: FieldProps) => {
+export const Field = ({ value, disabled, onChange, variant, placeholder, minimized }: FieldProps) => {
+
+    const style = `rounded-full py-1
+    ${variant === 'primary' ?
+            `pr-2 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}` :
+            ' pl-3 pr-3 bg-primary truncate text-secondary'}`
+
 
     if (disabled) return (
-        <p className={`${styles.field} ${styles[className]} ${muted ? styles.muted : ''}`}>{value}</p>
+        <p className={style}>
+            {value}
+        </p>
     )
 
     return (
         <input
-            autoFocus={className === 'primary'}
+            // autoFocus={variant === 'primary'}
             type='text'
-            className={`${styles.field} ${styles[className]} ${muted ? styles.muted : ''}`}
+            className={`${style} px-3`}
             onChange={(e) => onChange(e.target.value)}
             defaultValue={value}
-            size={Math.min(value?.length || 30, 50)}
+            // size={Math.min(value?.length || 30, 50)}
             placeholder={placeholder}
         ></input>
     )
 }
 
+/**
+ * Component shows key-value pair in a single row.
+ * Can edit and create new records.
+ * 
+ * Sends changes to server.
+ * 
+ * @param {boolean} editMode - Fields become input fields to enable editing
+ * @param {boolean} newRecord - Renders a new empty record
+ * @param {string} minimized - Renders without value field
+ */
 const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId, minimized, muted }: RecordProps) => {
 
     const [newRecordOpen, setNewRecordOpen] = useState(false)
@@ -88,56 +105,37 @@ const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId
 
 
     return (
-        <div className={`
-        ${styles.recordRow}
-        ${editMode ? styles.editMode : ''}
-        ${minimized ? styles.minimized : ''}
-        ${newRecord && !newRecordOpen ? styles.newRecord : ''}
-        `}
+        <div className={`text-sm ${muted ? 'brightness-50' : ''}`}
             ref={clickAwayRef}
             onClick={(e) => onClick(keyValue, e)}
-            onContextMenu={handleClick}
-
-        >
-
+            onContextMenu={handleClick}>
             {newRecord && !newRecordOpen ? <GoPlusCircle
                 size={20}
                 color='var(--primary)'
                 onClick={() => setNewRecordOpen(!newRecordOpen)}
-                className={styles.addButton}
+                className='flex justify-center items-center w-full mt-2 hover:cursor-pointer'
             /> :
+                <form onSubmit={handleEdits}
+                    className='flex font-semibold justify-between bg-muted hover:cursor-pointer pl-3 rounded-full'>
+                    <Field
+                        value={keyv}
+                        disabled={!editMode}
+                        onChange={setKeyValue}
+                        variant='primary'
+                        placeholder='KEY'
+                        minimized={minimized} />
 
-                <>
-
-                    <div className={`${styles.key} ${minimized ? styles.minimized : ''}`}>
-                        <form onSubmit={handleEdits}>
-                            <Field
-                                value={keyv}
-                                disabled={!editMode}
-                                onChange={setKeyValue}
-                                className='primary'
-                                placeholder='KEY' />
-                        </form>
-                    </div>
-
-                    {!minimized ? <div className={styles.value} >
-                        <form onSubmit={handleEdits}>
-                            <Field
-                                value={value}
-                                disabled={!editMode}
-                                onChange={setValueValue}
-                                muted={muted}
-                                className='secondary'
-                                placeholder='VALUE' />
-                        </form>
-                    </div> : muted ?
-                        <BsDot size={20} color='var(--primary-accent)'
-                            className={styles.dot}
-                        /> : null}
-                </>
-
+                    {!minimized ?
+                        <Field
+                            value={value}
+                            disabled={!editMode}
+                            onChange={setValueValue}
+                            muted={muted}
+                            variant='secondary'
+                            placeholder='VALUE' />
+                        : null}
+                </form>
             }
-
         </div>
     )
 

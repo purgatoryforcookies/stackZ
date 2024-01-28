@@ -1,14 +1,22 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { Cmd } from '../types'
+import { Cmd, PaletteStack } from '../types'
 
 // Custom APIs for renderer
 const api = {
-  getCommands: (): Promise<Cmd[]> => ipcRenderer.invoke('getCommands'),
-  startTerminal: (id: number): Promise<boolean> => ipcRenderer.invoke('toggleTerminal', id, true),
-  stopTerminal: (id: number): Promise<boolean> => ipcRenderer.invoke('toggleTerminal', id, false),
+  getStack: (id?: number):
+    Promise<PaletteStack[] | PaletteStack> => ipcRenderer.invoke('getStack', id),
+
+  startTerminal: (stack: number, terminal: number):
+    Promise<boolean> => ipcRenderer.invoke('toggleTerminal', stack, terminal, true),
+
+  stopTerminal: (stack: number, terminal: number):
+    Promise<boolean> => ipcRenderer.invoke('toggleTerminal', stack, terminal, false),
+
   killAll: (): Promise<boolean> => ipcRenderer.invoke('killAll'),
+
   save: (): Promise<void> => ipcRenderer.invoke('save'),
+
   createCommand: (title: string): Promise<Cmd> => ipcRenderer.invoke('createCommand', title)
 }
 

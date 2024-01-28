@@ -6,86 +6,138 @@ import {
     EnvironmentMuteProps,
     RemoveEnvListProps,
     SocketServer,
-    UpdateCwdProps
+    Status,
 } from "../../../types"
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from "./util"
+import path from "path"
+import { DataMiddleWare } from "./DataMiddleWare"
+import { ITerminalDimensions } from "xterm-addon-fit"
+
 
 
 
 export class Terminal {
     settings: Cmd
     socketId: string
+    stackId: number
     server: SocketServer
-    shell: string
     ptyProcess: IPty | null
     tester: any
     isRunning: boolean
+    win: boolean
+    middleware: DataMiddleWare
+    buffer: string[]
 
-    constructor(cmd: Cmd, socketId: string, server: SocketServer) {
+
+    constructor(stackId: number, cmd: Cmd, socketId: string, server: SocketServer) {
         this.settings = cmd
         this.settings.command.env = envFactory(this.settings.command.env)
         this.socketId = socketId
+        this.stackId = stackId
         this.server = server
-        this.shell = process.platform === 'win32' ? "powershell.exe" : "bash"
+        this.win = process.platform === 'win32' ? true : false
+        this.settings.command.shell = this.chooseShell(cmd.command.shell)
         this.ptyProcess = null
         this.isRunning = false
+        this.middleware = new DataMiddleWare(10)
+        this.buffer = []
+
+    }
+
+    chooseShell(shell: string | undefined) {
+        if (shell) return shell.trim()
+        if (this.win) return "powershell.exe"
+        return "bash"
+
     }
 
     start() {
 
-        this.ptyProcess = spawn(this.shell, [], {
-            name: `Palette ${this.settings.id}`,
-            cwd: this.settings.command.cwd ?? process.env.HOME,
-            env: mapEnvs(this.settings.command.env as ENVs[]),
-            useConpty: process.platform === "win32" ? false : true
+        try {
 
-        })
-        this.isRunning = true
+            this.ptyProcess = spawn(this.settings.command.shell!, [], {
+                name: `Palette ${this.settings.id}`,
+                cwd: this.settings.command.cwd,
+                env: mapEnvs(this.settings.command.env as ENVs[]),
+                useConpty: this.win ? false : true,
 
-        this.ptyProcess.onData((data) => {
-            this.sendToClient(data)
-        })
-        this.ptyProcess.onExit((data) => {
-            this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? "No signal"} \r\n$ `)
 
-        })
-        this.ping()
-        this.run(this.settings.command.cmd)
+            })
+            this.isRunning = true
+
+            this.ptyProcess.onData((data) => {
+                this.sendToClient(data)
+            })
+            this.ptyProcess.onExit((data) => {
+                this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? "No signal"} \r\n$ `)
+
+            })
+            this.ping()
+            this.run(this.settings.command.cmd)
+            this.test()
+        }
+        catch (e) {
+            this.sendToClient(`Error starting terminal.\n\rIs current working directory a valid path? \n\rCwd is: ${this.settings.command.cwd}\n\r$ `)
+        }
+
+
     }
 
     run(cmd: string) {
         this.write(cmd)
         this.prompt()
+    }
 
+    resize(dims: ITerminalDimensions) {
+        if (!dims) return
+        try {
+            this.ptyProcess?.resize(dims.cols, dims.rows)
+        } catch {
+            // On stop, the pty process is not existing anymore but yet here we are...
+        }
     }
 
     stop() {
         if (!this.ptyProcess) return
         console.log("Killing", this.settings.id)
-        const code = process.platform === 'win32' ? undefined : 'SIGINT'
+        const code = this.win ? undefined : 'SIGINT'
         this.ptyProcess.kill(code)
         this.isRunning = false
         this.ping()
-        clearInterval(this.tester)
-
     }
+
     ping() {
         this.server.emit('terminalState', this.getState())
     }
 
-    getState() {
+    getState(): Status {
         return {
-            id: this.settings.id,
+            stackId: this.stackId,
+            cmd: this.settings,
             isRunning: this.isRunning,
-            env: this.settings.command.env,
-            cmd: this.settings.command.cmd,
             cwd: this.settings.command.cwd ?? process.env.HOME
         }
     }
 
     sendToClient(data: string) {
-        this.server.to(this.socketId).emit("output", data)
+        this.server.timeout(400).to(this.socketId).emit("output", data, (_, resp: ITerminalDimensions) => {
+            if (this.ptyProcess) {
+
+                try {
+                    this.ptyProcess.resize(resp[0].cols, resp[0].rows)
+
+                } catch {
+                    // On stop, the pty process is not existing anymore but yet here we are...
+                }
+
+            }
+        })
+    }
+
+    writeFromClient(data: string,) {
+        if (data.length === 0) return
+        this.write(data)
     }
 
     write(data: string) {
@@ -98,7 +150,7 @@ export class Terminal {
 
     test() {
         this.tester = setInterval(() => {
-            this.write(`echo "hello from ${this.settings.id}" $Env:variable1`)
+            this.write(`echo "hello from ${this.settings.id} this is a logn command to see lorem lipsum how this works with big lines lorem lipsum whomever lipsum meow meow" $Env:variable1`)
             this.prompt()
             this.server.emit('test')
         }, 1000)
@@ -144,19 +196,13 @@ export class Terminal {
         this.ping()
     }
 
-    updateCwd(args: UpdateCwdProps) {
+    updateCwd(value: string) {
+        this.settings.command.cwd = path.normalize(value.trim())
+        this.ping()
+    }
 
-        const w = process.platform === "win32" ? true : false
-        const separator = w ? '\\' : '/'
-
-        let idx = 0
-        for (let i = 0; i < args.value.length; i++) {
-            if (args.value[i] == separator) {
-                idx = i
-            }
-        }
-
-        this.settings.command.cwd = args.value.substring(0, idx)
+    updateCommand(value: string) {
+        this.settings.command.cmd = value.trim()
         this.ping()
     }
 
@@ -183,6 +229,11 @@ export class Terminal {
         for (let i = 0; i < this.settings.command.env.length; i++) {
             this.settings.command.env[i].order = i
         }
+        this.ping()
+    }
+
+    changeShell(newShell: string | undefined) {
+        this.settings.command.shell = this.chooseShell(newShell)
         this.ping()
     }
 

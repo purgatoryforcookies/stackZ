@@ -1,19 +1,16 @@
 import electron, { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-
 import { socketServer } from './src/service/CommandService'
-import { Palette } from './src/Palette'
 import { store } from './src/service/Store'
+import { Stack } from './src/Stack'
+import { StackJsonSchema } from '../types'
 
 // const savedCommandsPath = path.join(__dirname, './commands_save.json')
 
-const savedCommandsPath = './commands.json'
+const savedCommandsPath = './stacks.json'
+const stack = new Stack(savedCommandsPath, socketServer, StackJsonSchema)
 
-
-
-const palette = new Palette(savedCommandsPath, socketServer)
-palette.startServer()
 
 function createWindow(): void {
 
@@ -65,10 +62,11 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
-
+  await stack.load()
+  stack.init().startServer()
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
@@ -94,35 +92,35 @@ app.on('window-all-closed', () => {
   }
 })
 
-ipcMain.handle('getCommands', () => {
-  return palette.get()
+ipcMain.handle('getStack', (_, id?: number) => {
+  return stack.get(id)
 })
 
-ipcMain.handle('toggleTerminal', (_, id: number, state: boolean) => {
+ipcMain.handle('toggleTerminal', (_, stackId: number, terminalID: number, state: boolean) => {
   if (state) {
-    return palette.startTerminal(id)
+    return stack.startTerminal(stackId, terminalID)
   }
   else {
-    return palette.stopTerminal(id)
+    return stack.stopTerminal(stackId, terminalID)
   }
 })
 
 ipcMain.handle('killAll', () => {
-  return palette.killAll()
+  // return palette.killAll()
 })
 
 ipcMain.handle('getStore', (_, key) => {
-  return store.get(key, '300px')
+  return store.get(key)
 })
 
 ipcMain.handle('setStore', (_, key, value) => {
-  return store.set(key, value)
+  store.set(key, value)
 })
 
 ipcMain.handle('save', () => {
-  return palette.save()
+  // return palette.save()
 })
 
 ipcMain.handle('createCommand', (_, title) => {
-  return palette.createCommand(title)
+  // return palette.createCommand(title)
 })
