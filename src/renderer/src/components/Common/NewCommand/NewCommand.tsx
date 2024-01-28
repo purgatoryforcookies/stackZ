@@ -7,9 +7,10 @@ import { Cmd } from 'src/types'
 
 type NewCommandProps = {
     afterAdd: (cmd: Cmd) => void
+    stackId: number
 }
 
-function NewCommand({ afterAdd }: NewCommandProps) {
+function NewCommand({ afterAdd, stackId }: NewCommandProps) {
 
     const [open, setOpen] = useState(false)
     const [title, setTitle] = useState<string>('')
@@ -25,7 +26,7 @@ function NewCommand({ afterAdd }: NewCommandProps) {
     const handleSave = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (title.length === 0) return
-        const newCommand = await window.api.createCommand(title)
+        const newCommand = await window.api.createCommand(title, stackId)
         setOpen(false)
         setTitle('')
         afterAdd(newCommand)

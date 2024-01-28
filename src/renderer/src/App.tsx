@@ -113,18 +113,24 @@ function App(): JSX.Element {
   }
 
 
-  const modifyTerminals = async (cmd: Cmd) => {
-    // if (terminals?.has(cmd.id)) return
-    // const engine = new TerminalUIEngine(cmd.id, SOCKET_HOST)
-    // engine.startListening()
+  const addTerminal = async (cmd: Cmd) => {
+    if (terminals?.get(selectedStack)?.has(cmd.id)) return
 
-    // const newTerminals = new Map(terminals)
+    const newStack = new Map(stack)
+    const selected = newStack.get(selectedStack)
+    if (!selected) return
+    if (!selected.palette) selected.palette = []
+    selected.palette.push(cmd)
 
-    // newTerminals.set(cmd.id, {
-    //   ...cmd,
-    //   engine: engine
-    // })
-    // setTerminals(newTerminals)
+    const newTerminals = new Map(terminals)
+    const stacks = newTerminals.get(selectedStack)
+    if (!stacks) return
+    const engine = new TerminalUIEngine(selectedStack, cmd.id, SOCKET_HOST)
+    engine.startListening()
+    stacks.set(cmd.id, engine)
+
+    setStack(newStack)
+    setTerminals(newTerminals)
   }
 
   const handleResize = async (e: number[], source: Panels) => {
@@ -168,7 +174,7 @@ function App(): JSX.Element {
             </div>
             <div className="h-full overflow-auto pb-60">
               {stack ?
-                <Palette data={stack} onClick={handleSelection} stackId={selectedStack} terminalId={selectedTerminal} onModify={modifyTerminals} />
+                <Palette data={stack} onClick={handleSelection} stackId={selectedStack} terminalId={selectedTerminal} onModify={addTerminal} />
                 : "Loading..."}
             </div>
           </ResizablePanel> : null}

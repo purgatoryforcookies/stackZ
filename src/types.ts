@@ -89,18 +89,24 @@ export type Status = {
 }
 
 export type EnvironmentEditProps = {
-    id: number
+    stack: number
+    terminal: number
+    order: number
     key: string
-    previousKey: string | undefined
+    previousKey?: string
     value: string
     enabled: boolean
-    orderId: number
 }
 
-export type EnvironmentMuteProps = Pick<EnvironmentEditProps, 'orderId' | 'key'>
-export type UpdateCwdProps = Pick<EnvironmentEditProps, 'id' | 'value'>
-export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'id' | 'orderId'>
-export type AddEnvListProps = { id: number, title: string }
+export type UtilityProps = {
+    stack: number,
+    terminal: number,
+    order: number,
+    value?: string
+}
+export type UpdateCwdProps = Pick<EnvironmentEditProps, 'order' | 'value'>
+export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'terminal' | 'order'>
+// export type AddEnvListProps =
 
 
 export enum Panels {

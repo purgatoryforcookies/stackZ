@@ -13,14 +13,14 @@ type EnvListProps = {
         order: number;
         disabled: string[];
     }
-    className?: 'highlighted' | ''
     onSelection: (e: string[]) => void
     terminalId: number
+    stackId: number
 }
 
 
 
-function EnvList({ data, onSelection, terminalId }: EnvListProps) {
+function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
 
     const [minimized, setMinimized] = useState<boolean>(false)
     const [hidden, setHidden] = useState<boolean>(false)
@@ -34,7 +34,7 @@ function EnvList({ data, onSelection, terminalId }: EnvListProps) {
     }
 
     const handleMute = () => {
-        baseSocket.emit('environmentMute', { id: terminalId, orderId: data.order })
+        baseSocket.emit('environmentMute', { stack: stackId, terminal: terminalId, order: data.order })
     }
 
     const handleMinimize = () => {
@@ -51,7 +51,8 @@ function EnvList({ data, onSelection, terminalId }: EnvListProps) {
     }
 
     const handleDelete = () => {
-        baseSocket.emit('environmentDelete', { id: terminalId, orderId: data.order })
+        baseSocket.emit('environmentDelete',
+            { stack: stackId, terminal: terminalId, order: data.order })
     }
 
 
@@ -64,18 +65,30 @@ function EnvList({ data, onSelection, terminalId }: EnvListProps) {
             <Separator className="my-2" />
             <div className='flex gap-1 justify-center' >
 
-                <Badge variant={'outline'} className='hover:cursor-pointer hover:bg-accent' aria-label="Toggle minimize" onClick={handleMinimize}>
+                <Badge variant={'outline'}
+                    className='hover:cursor-pointer hover:bg-accent'
+                    aria-label="Toggle minimize"
+
+                    onClick={handleMinimize}>
                     Minimize
                 </Badge>
-                <Badge variant={'outline'} className='hover:cursor-pointer hover:bg-accent' aria-label="Toggle mute" onClick={handleMute}>
+                <Badge variant={'outline'}
+                    className='hover:cursor-pointer hover:bg-accent'
+                    aria-label="Toggle mute"
+                    onClick={handleMute}>
                     Mute
                 </Badge>
                 {!minimized ?
                     <>
-                        <Badge variant={'outline'} className='hover:cursor-pointer hover:bg-accent' aria-label="Toggle edit" onClick={() => setEditMode(!editMode)}>
+                        <Badge variant={'outline'}
+                            className='hover:cursor-pointer hover:bg-accent'
+                            aria-label="Toggle edit"
+                            onClick={() => setEditMode(!editMode)}>
                             Edit
                         </Badge >
-                        {editMode ? <TrashIcon className='w-5 h-5 relative left-2 rounded-full hover:text-red-800 hover:cursor-pointer' onClick={handleDelete} /> : null}
+                        {editMode ? <TrashIcon
+                            className='w-5 h-5 relative left-2 rounded-full hover:text-red-800 hover:cursor-pointer'
+                            onClick={handleDelete} /> : null}
                     </> : null}
 
             </div>
@@ -92,6 +105,7 @@ function EnvList({ data, onSelection, terminalId }: EnvListProps) {
                             editMode={editMode}
                             terminalId={terminalId}
                             orderId={data.order}
+                            stackId={stackId}
                             minimized={minimized}
                             keyv={key}
                             key={key}
@@ -107,6 +121,7 @@ function EnvList({ data, onSelection, terminalId }: EnvListProps) {
                             newRecord={true}
                             terminalId={terminalId}
                             orderId={data.order}
+                            stackId={stackId}
                             minimized={minimized}
                             onClick={() => { }}
                             editMode={editMode}

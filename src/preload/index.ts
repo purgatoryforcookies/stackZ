@@ -17,7 +17,7 @@ const api = {
 
   save: (): Promise<void> => ipcRenderer.invoke('save'),
 
-  createCommand: (title: string): Promise<Cmd> => ipcRenderer.invoke('createCommand', title)
+  createCommand: (title: string, stackId: number): Promise<Cmd> => ipcRenderer.invoke('createCommand', title, stackId)
 }
 
 const store = {

@@ -44,7 +44,7 @@ function Palette({ data, onClick, onModify, terminalId, stackId }: PaletteProps)
                 if (!cmd?.id) return null
                 return <Command key={cmd.id} data={cmd} hostStack={stackId} handleClick={onClick} selected={terminalId} onRemove={onModify} />
             }) : null}
-            <NewCommand afterAdd={onModify} />
+            <NewCommand afterAdd={onModify} stackId={stackId} />
         </div >
     )
 }

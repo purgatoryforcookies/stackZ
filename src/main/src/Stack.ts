@@ -1,5 +1,5 @@
 import { ITerminalDimensions } from "xterm-addon-fit";
-import { PaletteStack, SocketServer, UpdateCwdProps } from "../../types";
+import { EnvironmentEditProps, PaletteStack, SocketServer, UpdateCwdProps, UtilityProps } from "../../types";
 import { Palette } from "./Palette";
 import { DataStore } from "./service/DataStore";
 import { ZodTypeAny } from "zod";
@@ -59,6 +59,24 @@ export class Stack {
                 client.on('state', (arg: { stack: number, terminal: number }) => {
                     this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.ping()
                 })
+                client.on('environmentEdit', (args: EnvironmentEditProps) => {
+                    this.palettes.get(args.stack)?.terminals.get(args.terminal)?.editVariable(args)
+                    // this.save()
+                })
+                client.on('environmentMute', (arg: UtilityProps) => {
+                    this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.muteVariable(arg)
+                    // this.save()
+                })
+                client.on('environmentList', (args: Omit<UtilityProps, 'order'>) => {
+                    if (!args.value) return
+                    this.palettes.get(args.stack)?.terminals.get(args.terminal)?.addEnvList(args.value)
+                    // this.save()
+                })
+                client.on('environmentDelete', (args: UtilityProps) => {
+                    this.palettes.get(args.stack)?.terminals.get(args.terminal)?.removeEnvList(args)
+                    // this.save()
+                })
+
 
                 return
             }
@@ -103,6 +121,11 @@ export class Stack {
     }
     stopTerminal(stack: number, terminal: number) {
         this.palettes.get(stack)?.terminals.get(terminal)?.stop()
+    }
+
+    createTerminal(title: string, stack: number) {
+
+        return this.palettes.get(stack)?.createCommand(title)
     }
 
     createPalette(name: string) {

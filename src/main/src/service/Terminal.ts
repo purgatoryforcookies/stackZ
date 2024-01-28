@@ -1,12 +1,10 @@
 import {
-    AddEnvListProps,
     Cmd,
     ENVs,
     EnvironmentEditProps,
-    EnvironmentMuteProps,
-    RemoveEnvListProps,
     SocketServer,
     Status,
+    UtilityProps,
 } from "../../../types"
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from "./util"
@@ -157,8 +155,9 @@ export class Terminal {
     }
 
     editVariable(args: EnvironmentEditProps) {
+
         if (args.key.trim().length == 0) return
-        const target = this.settings.command.env?.find(list => list.order == args.orderId)
+        const target = this.settings.command.env?.find(list => list.order === args.order)
         if (target) {
             if (args.previousKey) {
                 delete target.pairs[args.previousKey]
@@ -169,14 +168,14 @@ export class Terminal {
         this.ping()
     }
 
-    muteVariable(args: EnvironmentMuteProps) {
+    muteVariable(args: UtilityProps) {
 
-        if (args.key && args.key.trim().length == 0) return
-        const target = this.settings.command.env?.find(list => list.order == args.orderId)
+        if (args.value && args.value.trim().length == 0) return
+        const target = this.settings.command.env?.find(list => list.order == args.order)
 
         if (target) {
 
-            if (!args.key) {
+            if (!args.value) {
                 if (haveThesameElements(Object.keys(target.pairs), target.disabled)) {
                     target.disabled = []
                 } else {
@@ -184,11 +183,11 @@ export class Terminal {
                 }
 
             }
-            else if (target.disabled.includes(args.key)) {
-                target.disabled = target.disabled.filter(item => item !== args.key)
+            else if (target.disabled.includes(args.value)) {
+                target.disabled = target.disabled.filter(item => item !== args.value)
             }
             else {
-                target.disabled.push(args.key)
+                target.disabled.push(args.value)
             }
 
         }
@@ -206,14 +205,15 @@ export class Terminal {
         this.ping()
     }
 
-    addEnvList(args: AddEnvListProps) {
-        if (this.settings.command.env!.some(env => env.title === args.title)) {
-            args.title += " (1)"
+    addEnvList(value: string) {
+        if (!value) return
+        if (this.settings.command.env!.some(env => env.title === value)) {
+            value += " (1)"
         }
 
         const newEnv: ENVs = {
             pairs: {},
-            title: args.title,
+            title: value,
             order: Math.max(...this.settings.command.env!.map(env => env.order)) + 1,
             disabled: []
         }
@@ -222,9 +222,9 @@ export class Terminal {
         this.ping()
     }
 
-    removeEnvList(args: RemoveEnvListProps) {
+    removeEnvList(args: UtilityProps) {
 
-        this.settings.command.env = this.settings.command.env!.filter(env => env.order != args.orderId)
+        this.settings.command.env = this.settings.command.env!.filter(env => env.order != args.order)
 
         for (let i = 0; i < this.settings.command.env.length; i++) {
             this.settings.command.env[i].order = i

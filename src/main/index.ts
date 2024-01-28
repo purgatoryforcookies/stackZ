@@ -121,6 +121,6 @@ ipcMain.handle('save', () => {
   // return palette.save()
 })
 
-ipcMain.handle('createCommand', (_, title) => {
-  // return palette.createCommand(title)
+ipcMain.handle('createCommand', (_, title, stackId) => {
+  return stack.createTerminal(title, stackId)
 })

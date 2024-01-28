@@ -8,10 +8,12 @@ import { Button } from '@renderer/@/ui/button';
 
 type NewEnvListProps = {
     scroll: () => void
+    stackId: number
+    terminalId: number
 }
 
 
-function NewEnvList({ scroll }: NewEnvListProps) {
+function NewEnvList({ scroll, terminalId, stackId }: NewEnvListProps) {
 
     const [expanded, setExpanded] = useState<boolean>(true)
     const [title, setTitle] = useState<string>('')
@@ -31,7 +33,7 @@ function NewEnvList({ scroll }: NewEnvListProps) {
 
     const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        baseSocket.emit('environmentList', { id: 1, title: title })
+        baseSocket.emit('environmentList', { stack: stackId, terminal: terminalId, title: title })
         setTitle('')
         setExpanded(false)
     }

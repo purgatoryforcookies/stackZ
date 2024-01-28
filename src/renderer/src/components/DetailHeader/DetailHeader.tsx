@@ -55,11 +55,14 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
                         key={record.title}
                         onSelection={handleHighligt}
                         terminalId={terminalId}
+                        stackId={stackId}
                     />
                 )) : null}
             </div>
             <div className='py-2 px-4 flex relative items-center justify-between'>
-                <NewEnvList scroll={scroll} />
+                <NewEnvList scroll={scroll}
+                    terminalId={terminalId}
+                    stackId={stackId} />
             </div>
         </div>
     )
