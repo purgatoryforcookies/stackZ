@@ -12,7 +12,11 @@ const savedCommandsPath = './stacks.json'
 const stack = new Stack(savedCommandsPath, socketServer, StackJsonSchema)
 
 
-function createWindow(): void {
+async function createWindow(): Promise<void> {
+
+  await stack.load()
+  stack.init().startServer()
+
 
   // dev setup to open screen on 2nd monitor
   let displays = electron.screen.getAllDisplays()
@@ -38,6 +42,7 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
+
     mainWindow.show()
     // dev setup to not focus on it on save
     mainWindow.blur()
@@ -65,8 +70,6 @@ function createWindow(): void {
 app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
-  await stack.load()
-  stack.init().startServer()
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
@@ -104,6 +107,15 @@ ipcMain.handle('toggleTerminal', (_, stackId: number, terminalID: number, state:
     return stack.stopTerminal(stackId, terminalID)
   }
 })
+ipcMain.handle('toggleStack', (_, stackId: number, state: boolean) => {
+  if (state) {
+    return stack.startStack(stackId)
+  }
+  else {
+    return stack.stopStack(stackId)
+  }
+})
+
 
 ipcMain.handle('killAll', () => {
   // return palette.killAll()

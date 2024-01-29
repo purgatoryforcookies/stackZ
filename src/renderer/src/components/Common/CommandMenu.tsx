@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { PaletteStack, SelectionEvents } from "../../../../types"
 import { ButtonIcon, GlobeIcon, LayersIcon } from "@radix-ui/react-icons"
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@renderer/@/ui/tooltip"
+import { Separator } from "@renderer/@/ui/separator"
 
 type CommandMenuProps = {
     stack: Map<number, PaletteStack> | undefined
@@ -41,17 +42,18 @@ export function CommandMenu({ stack, dispatch, theme }: CommandMenuProps) {
                         <CommandShortcut>Alt+Z</CommandShortcut>
                     </CommandItem>
                 </CommandGroup>
+                <Separator />
                 <CommandGroup heading="New">
                     <CommandItem>Terminal</CommandItem>
                     <CommandItem>Environment</CommandItem>
                 </CommandGroup>
+                <Separator />
                 <CommandGroup heading="Stacks" >
                     {stack ? [...stack.values()].map(stack => {
                         return <CommandItem key={stack.id}
                             className="flex gap-5"
                             value={stack.id + stack.stackName}
                             onSelect={() => {
-
                                 dispatch(stack.id, 1, SelectionEvents.CONN, () => {
                                     setOpen(false)
                                 })
@@ -60,7 +62,6 @@ export function CommandMenu({ stack, dispatch, theme }: CommandMenuProps) {
                             <LayersIcon className="mr-2 h-4 w-4" />
                             <div className="flex justify-between w-full">
                                 <span>#{stack.id}: {stack.stackName}</span>
-
                                 {(stack.env?.length && stack.env.length > 0) ?
                                     <TooltipProvider>
                                         <Tooltip >
@@ -72,14 +73,11 @@ export function CommandMenu({ stack, dispatch, theme }: CommandMenuProps) {
                                         </Tooltip>
                                     </TooltipProvider>
                                     : null}
-
                             </div>
-
-
                         </CommandItem>
-
                     }) : null}
                 </CommandGroup>
+                <Separator />
                 <CommandGroup heading="Terminals" >
                     {stack ? [...stack.values()].map(stack => {
                         if (!stack.palette) return null

@@ -1,4 +1,4 @@
-import { Cmd, PaletteStack } from "../../types";
+import { Cmd, PaletteStack, StackStatus } from "../../types";
 import { Terminal } from "./service/Terminal";
 import { Server } from "socket.io";
 
@@ -15,12 +15,25 @@ export class Palette {
     initTerminal(socketId: string, server: Server, remoteTerminalID: number) {
         const terminal = this.settings.palette?.find(palette => palette.id === remoteTerminalID)
         if (terminal) {
+
             const newTerminal = new Terminal(this.settings.id, terminal, socketId, server)
             this.terminals
                 .set(terminal.id, newTerminal)
             newTerminal.ping()
         }
+    }
 
+    state(): StackStatus[] {
+
+        const state = [...this.terminals.values()].map(term => {
+            return {
+                id: term.settings.id,
+                running: term.isRunning
+            }
+
+        })
+
+        return state
     }
 
     pingAll() {
@@ -32,6 +45,7 @@ export class Palette {
     }
 
     createCommand(title: string) {
+
         const newId = this.settings.palette
             ? Math.max(...this.settings.palette.map(cmd => cmd.id)) + 1
             : 1

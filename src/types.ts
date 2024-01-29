@@ -88,6 +88,11 @@ export type Status = {
     cwd: string | undefined
 }
 
+export type StackStatus = {
+    running: boolean
+    id: number
+}
+
 export type EnvironmentEditProps = {
     stack: number
     terminal: number
@@ -106,7 +111,7 @@ export type UtilityProps = {
 }
 export type UpdateCwdProps = Pick<EnvironmentEditProps, 'order' | 'value'>
 export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'terminal' | 'order'>
-// export type AddEnvListProps =
+
 
 
 export enum Panels {
@@ -120,5 +125,4 @@ export type StoreType = {
         palette2: number
     },
     theme: string
-
 }

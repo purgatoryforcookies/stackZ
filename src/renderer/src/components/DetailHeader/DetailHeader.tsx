@@ -48,7 +48,7 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
     return (
 
         <div className='h-full px-5'>
-            <div className='flex gap-8 pb-20 h-full overflow-auto' ref={bodyRef}>
+            <div className='flex gap-8 pb-20 h-full overflow-auto pr-32' ref={bodyRef}>
                 {status?.cmd.command.env ? status.cmd.command.env.map((record) => (
                     <EnvList
                         data={record}

@@ -56,8 +56,17 @@ export class Stack {
             // If there is no palette for the client, it is not a palette
             // then utility listeners are registered
             if (!palette) {
-                client.on('state', (arg: { stack: number, terminal: number }) => {
+                client.on('state', (arg: { stack: number, terminal?: number }) => {
+                    if (!arg.terminal) {
+                        this.palettes.get(arg.stack)?.pingAll()
+                        return
+                    }
                     this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.ping()
+                })
+                client.on('stackState', (arg: { stack: number }, cb) => {
+                    console.log(`${arg.stack} is asking for state :()`)
+                    cb(this.palettes.get(arg.stack)?.state())
+
                 })
                 client.on('environmentEdit', (args: EnvironmentEditProps) => {
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.editVariable(args)
@@ -80,7 +89,6 @@ export class Stack {
 
                 return
             }
-            client.join(String(stackId))
             client.on('changeCwd', (arg: UpdateCwdProps) => {
                 console.log(`Changing cwd! new Cwd: ${arg.value}`)
                 // this.palettes.get(arg.id)?.updateCwd(arg.value)
@@ -113,6 +121,17 @@ export class Stack {
     get(id?: number) {
         if (id) return this.raw.find(r => r.id === id)
         return this.raw
+    }
+
+    startStack(stack: number) {
+        this.palettes.get(stack)?.terminals.forEach(term => {
+            term.start()
+        })
+    }
+    stopStack(stack: number) {
+        this.palettes.get(stack)?.terminals.forEach(term => {
+            term.stop()
+        })
     }
 
     startTerminal(stack: number, terminal: number) {

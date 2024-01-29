@@ -49,12 +49,10 @@ export const Field = ({ value, disabled, onChange, variant, placeholder, minimiz
 
     return (
         <input
-            // autoFocus={variant === 'primary'}
             type='text'
             className={`${style} px-3`}
             onChange={(e) => onChange(e.target.value)}
             defaultValue={value}
-            // size={Math.min(value?.length || 30, 50)}
             placeholder={placeholder}
         ></input>
     )

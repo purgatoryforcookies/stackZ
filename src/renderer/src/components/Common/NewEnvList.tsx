@@ -15,7 +15,7 @@ type NewEnvListProps = {
 
 function NewEnvList({ scroll, terminalId, stackId }: NewEnvListProps) {
 
-    const [expanded, setExpanded] = useState<boolean>(true)
+    const [expanded, setExpanded] = useState<boolean>(false)
     const [title, setTitle] = useState<string>('')
     const clickAwayRef = useRef<HTMLDivElement>(null)
 
@@ -26,28 +26,29 @@ function NewEnvList({ scroll, terminalId, stackId }: NewEnvListProps) {
     const handle = () => {
         if (!expanded) {
             setExpanded(true)
-            scroll()
+
         }
 
     }
 
     const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        baseSocket.emit('environmentList', { stack: stackId, terminal: terminalId, title: title })
+        baseSocket.emit('environmentList', { stack: stackId, terminal: terminalId, value: title })
         setTitle('')
         setExpanded(false)
+        scroll()
     }
 
 
     return (
         <div className='absolute right-12 bottom-12 ' ref={clickAwayRef}>
             {expanded ?
-                <form onSubmit={handleAdd} className='flex items-center gap-5 bg-background' onReset={() => { setExpanded(false), setTitle('') }}>
+                <form onSubmit={handleAdd} className='flex items-center gap-5 text-secondary-foreground' onReset={() => { setExpanded(false), setTitle('') }}>
                     <Input placeholder='Name' value={title} type='text' onChange={(e) => setTitle(e.target.value)} autoFocus />
-                    <Button type='submit' variant={'ghost'} size={'sm'} className='hover:bg-primary'>Add</Button>
+                    <Button type='submit' variant={'ghost'} size={'sm'} >Add</Button>
                     <Button type='reset' variant={'destructive'} size={'sm'} >Cancel</Button>
                 </form>
-                : <IoAddCircleOutline size={30} onClick={handle} className='hover:cursor-pointer hover:text-primary-foreground text-primary' />}
+                : <IoAddCircleOutline size={30} onClick={handle} className='hover:cursor-pointer hover:text-primary text-secondary-foreground' />}
         </div>
     )
 }

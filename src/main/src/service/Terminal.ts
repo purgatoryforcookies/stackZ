@@ -52,6 +52,10 @@ export class Terminal {
 
     start() {
 
+        if (this.isRunning) {
+            this.stop()
+        }
+
         try {
 
             this.ptyProcess = spawn(this.settings.command.shell!, [], {
@@ -59,8 +63,6 @@ export class Terminal {
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as ENVs[]),
                 useConpty: this.win ? false : true,
-
-
             })
             this.isRunning = true
 

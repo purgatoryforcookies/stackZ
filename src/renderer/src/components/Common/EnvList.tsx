@@ -58,36 +58,32 @@ function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
 
     return (
         <div className={`p-7 
-        ${minimized ? 'max-w-[19rem]' : 'max-w-[30rem]'}
-        
-        `}>
-            <h1 className='text-center text-foreground'>{data.title}</h1>
+        ${minimized ? 'max-w-[19rem]' : 'max-w-[30rem]'}`}>
+            <h1 className='text-center text-foreground text-nowrap'>{data.title}</h1>
             <Separator className="my-2" />
-            <div className='flex gap-1 justify-center' >
-
-                <Badge variant={'outline'}
-                    className='hover:cursor-pointer hover:bg-accent'
+            <div className='flex gap-1 justify-center mb-2' >
+                <Badge variant={minimized ? 'secondary' : 'outline'}
+                    className={`hover:cursor-pointer hover:bg-accent`}
                     aria-label="Toggle minimize"
-
                     onClick={handleMinimize}>
-                    Minimize
+                    {minimized ? hidden ? 'Show' : 'Hide' : 'Minimize'}
                 </Badge>
-                <Badge variant={'outline'}
-                    className='hover:cursor-pointer hover:bg-accent'
+                <Badge variant={data.disabled.length === Object.keys(data.pairs).length ? 'secondary' : 'outline'}
+                    className={`hover:cursor-pointer hover:bg-accent`}
                     aria-label="Toggle mute"
                     onClick={handleMute}>
                     Mute
                 </Badge>
                 {!minimized ?
                     <>
-                        <Badge variant={'outline'}
-                            className='hover:cursor-pointer hover:bg-accent'
+                        <Badge variant={editMode ? 'secondary' : 'outline'}
+                            className={`hover:cursor-pointer hover:bg-accent`}
                             aria-label="Toggle edit"
                             onClick={() => setEditMode(!editMode)}>
                             Edit
                         </Badge >
                         {editMode ? <TrashIcon
-                            className='w-5 h-5 relative left-2 rounded-full hover:text-red-800 hover:cursor-pointer'
+                            className='w-5 h-5 relative left-2 rounded-full text-white/50 hover:text-red-800 hover:cursor-pointer'
                             onClick={handleDelete} /> : null}
                     </> : null}
 
@@ -98,7 +94,7 @@ function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
                     <h3 className='text-lg'>{data.disabled.length} <span className='text-sm'>muted</span></h3>
                 </div>
                 :
-                <div className='flex flex-col gap-1 overflow-auto h-[100%] py-2'>
+                <div className='flex flex-col gap-1 overflow-auto h-[100%] '>
                     {data.pairs ? Object.keys(data.pairs).map((key: string) => (
                         <Record
                             newRecord={false}

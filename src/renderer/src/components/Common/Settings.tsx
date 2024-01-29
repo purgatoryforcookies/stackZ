@@ -53,13 +53,13 @@ function Settings({ setTheme, theme }: SettingsProps) {
     return (
         <Sheet open={open} onOpenChange={setOpen} >
             <SheetContent className="w-[30vw] sm:max-w-none " data-theme={theme} >
-                <SheetHeader className="text-primary">
+                <SheetHeader>
                     <SheetTitle>Settings</SheetTitle>
                     <SheetDescription>
                     </SheetDescription>
                 </SheetHeader>
-                <div className="py-8 bg-background">
-                    <h1 className="text-primary-foreground">General</h1>
+                <div className="py-8">
+                    <h1>General</h1>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="shell" className="text-right">
@@ -90,6 +90,11 @@ function Settings({ setTheme, theme }: SettingsProps) {
                                     <ColorSquare theme="dark" />
                                 </div>
                                 <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="aurora" id="r2" onClick={(e) => setTheme((e.target as HTMLInputElement).value)} />
+                                    <Label htmlFor="r2">Aurora</Label>
+                                    <ColorSquare theme="aurora" />
+                                </div>
+                                <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="north" id="r2" onClick={(e) => setTheme((e.target as HTMLInputElement).value)} />
                                     <Label htmlFor="r2">North</Label>
                                     <ColorSquare theme="north" />
@@ -114,9 +119,9 @@ function Settings({ setTheme, theme }: SettingsProps) {
                     </div>
                 </div>
 
-                <div className="py-8 bg-background">
+                <div className="py-8">
                     <div className="flex items-center gap-4">
-                        <h1 className="primary-foreground">Commands.json</h1>
+                        <h1>Commands.json</h1>
                         <Button variant={'outline'} >
                             <ArrowUpIcon className="mr-2 h-4 w-4" />
                             Export</Button>
