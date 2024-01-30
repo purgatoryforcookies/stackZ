@@ -1,4 +1,4 @@
-import { Cmd, PaletteStack, SelectionEvents, StackStatus, Status } from '../../../types'
+import { Cmd, PaletteStack, SelectionEvents, StackStatus } from '../../../types'
 import { useEffect, useState } from 'react'
 import { Badge } from '@renderer/@/ui/badge'
 import NewCommand from './Common/NewCommand'
@@ -18,49 +18,26 @@ type PaletteProps = {
 function Palette({ data, onClick, onModify, terminalId, stackId }: PaletteProps) {
 
     const [palette, setPalette] = useState<Cmd[]>()
-    const [stackState, setStackState] = useState<StackStatus[]>()
+    const [stackState, setStackState] = useState<StackStatus['state']>([])
 
 
     useEffect(() => {
 
-        baseSocket.emit('stackState', { stack: stackId }, (resp: StackStatus[]) => {
-            setStackState(resp)
+        baseSocket.on("stackState", (d: StackStatus) => {
+            if (d.stack !== stackId) return
+            setStackState(d.state)
         })
-        baseSocket.on('terminalState', (resp: Status) => {
-            if (resp.stackId !== stackId) return
-            if (!stackState) return
-            if (stackState.length === 0) return
+        baseSocket.emit('bigState', { stack: stackId })
 
-            const newStatus = [...stackState]
-
-            if (newStatus.some(term => term.id !== resp.cmd.id)) {
-                newStatus.push({ id: resp.cmd.id, running: resp.isRunning })
-
-            } else {
-                newStatus.map((term) => {
-                    if (term.id === resp.cmd.id) {
-                        return { ...term, running: resp.isRunning }
-                    }
-                    return term
-                })
-            }
-
-            setStackState(newStatus)
-            console.log(newStatus)
-        })
-
-
-    }, [])
+    }, [stackId, terminalId])
 
     const toggleStack = () => {
-
-        if (stackState?.some(term => term.running)) {
+        if (stackState.some(term => term.running)) {
             window.api.stopStack(stackId)
-            return
+        } else {
+            window.api.startStack(stackId)
         }
-
-        window.api.startStack(stackId)
-
+        baseSocket.emit('bigState', { stack: stackId })
     }
 
 
@@ -90,7 +67,7 @@ function Palette({ data, onClick, onModify, terminalId, stackId }: PaletteProps)
             </div>
             <div className='flex w-full justify-end pr-12'>
                 <Button variant={'link'} size={'sm'} onClick={toggleStack}>
-                    {stackState?.some(term => term.running) ? <>
+                    {stackState?.some(term => term.running === true) ? <>
                         <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                         Running...
                     </> : 'Start stack'

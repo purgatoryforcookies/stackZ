@@ -73,6 +73,8 @@ export class Terminal {
                 this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? "No signal"} \r\n$ `)
 
             })
+
+
             this.ping()
             this.run(this.settings.command.cmd)
             this.test()
@@ -100,10 +102,16 @@ export class Terminal {
 
     stop() {
         if (!this.ptyProcess) return
-        console.log("Killing", this.settings.id)
-        const code = this.win ? undefined : 'SIGINT'
-        this.ptyProcess.kill(code)
-        this.isRunning = false
+        try {
+            console.log("Killing", this.settings.id)
+            const code = this.win ? undefined : 'SIGINT'
+            this.ptyProcess.kill(code)
+            this.isRunning = false
+
+
+        } catch (error) {
+            console.log(`Failed to kill ${this.settings.id}`)
+        }
         this.ping()
     }
 
@@ -150,7 +158,7 @@ export class Terminal {
 
     test() {
         this.tester = setInterval(() => {
-            this.write(`echo "hello from ${this.settings.id} this is a logn command to see lorem lipsum how this works with big lines lorem lipsum whomever lipsum meow meow" $Env:variable1`)
+            this.write(`echo "hello from" break`)
             this.prompt()
             this.server.emit('test')
         }, 1000)

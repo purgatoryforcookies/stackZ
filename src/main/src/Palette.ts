@@ -1,15 +1,16 @@
-import { Cmd, PaletteStack, StackStatus } from "../../types";
+import { Cmd, PaletteStack } from "../../types";
 import { Terminal } from "./service/Terminal";
 import { Server } from "socket.io";
 
 export class Palette {
     settings: PaletteStack
     terminals: Map<number, Terminal>
+    server: Server
 
-    constructor(settings: PaletteStack) {
+    constructor(settings: PaletteStack, server: Server) {
         this.settings = settings
         this.terminals = new Map<number, Terminal>()
-
+        this.server = server
     }
 
     initTerminal(socketId: string, server: Server, remoteTerminalID: number) {
@@ -23,17 +24,22 @@ export class Palette {
         }
     }
 
-    state(): StackStatus[] {
+    pingState() {
 
+        // setInterval(() => {
         const state = [...this.terminals.values()].map(term => {
             return {
                 id: term.settings.id,
                 running: term.isRunning
             }
-
         })
+        if (state.length === 0) return
+        // return state
+        //     console.log(state)
+        this.server.emit('stackState', { stack: this.settings.id, state: state })
+        // }, 1500)
 
-        return state
+
     }
 
     pingAll() {

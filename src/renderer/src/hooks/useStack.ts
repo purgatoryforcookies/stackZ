@@ -37,8 +37,8 @@ export const useStack = (SOCKET_HOST: string) => {
                 s.set(cmd.id, engine)
             })
         })
-        setTerminals(newTerminals)
-        setStack(newStack)
+        setTerminals(() => newTerminals)
+        setStack(() => newStack)
         setLoading(false)
     }
 
@@ -68,11 +68,9 @@ export const useStack = (SOCKET_HOST: string) => {
 
 
     useEffect(() => {
-
-
+        // setTimeout(() => {
         fetchTerminals()
-
-
+        // }, 500);
     }, [])
 
 

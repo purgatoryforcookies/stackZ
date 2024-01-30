@@ -15,7 +15,7 @@ const stack = new Stack(savedCommandsPath, socketServer, StackJsonSchema)
 async function createWindow(): Promise<void> {
 
   await stack.load()
-  stack.init().startServer()
+  stack.init()?.startServer()
 
 
   // dev setup to open screen on 2nd monitor

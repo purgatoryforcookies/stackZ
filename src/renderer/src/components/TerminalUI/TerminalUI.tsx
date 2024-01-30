@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 
@@ -10,17 +10,17 @@ type TerminalUIProps = {
 function TerminalUI({ engine }: TerminalUIProps) {
 
   const terminalRef = useRef(null)
-  const [term, setTerm] = useState<TerminalUIEngine | null>(null)
+
 
   useEffect(() => {
 
-    term?.detach()
 
     if (terminalRef.current) {
       if (!engine) return
-      setTerm(engine)
       engine.attachTo(terminalRef.current)
     }
+
+
 
   }, [engine])
 

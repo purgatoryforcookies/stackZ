@@ -34,13 +34,13 @@ export class Stack {
     }
     init() {
         if (this.raw.length > 0) {
-            this.raw.forEach(palette => {
+            for (const palette of this.raw) {
                 if (this.palettes?.get(palette.id)) {
                     console.log(`Palette with ID ${palette.id} exists`)
                     return
                 }
-                this.palettes.set(palette.id, new Palette(palette))
-            })
+                this.palettes.set(palette.id, new Palette(palette, this.server))
+            }
         }
         return this
     }
@@ -63,10 +63,8 @@ export class Stack {
                     }
                     this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.ping()
                 })
-                client.on('stackState', (arg: { stack: number }, cb) => {
-                    console.log(`${arg.stack} is asking for state :()`)
-                    cb(this.palettes.get(arg.stack)?.state())
-
+                client.on('bigState', (arg: { stack: number }) => {
+                    this.palettes.get(arg.stack)?.pingState()
                 })
                 client.on('environmentEdit', (args: EnvironmentEditProps) => {
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.editVariable(args)

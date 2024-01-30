@@ -89,8 +89,11 @@ export type Status = {
 }
 
 export type StackStatus = {
-    running: boolean
-    id: number
+    stack: number,
+    state: {
+        running: boolean
+        id: number
+    }[]
 }
 
 export type EnvironmentEditProps = {

@@ -34,9 +34,10 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
     const handleState = async () => {
         if (ping?.isRunning) {
             window.api.stopTerminal(hostStack, data.id)
-            return
+        } else {
+            window.api.startTerminal(hostStack, data.id)
         }
-        window.api.startTerminal(hostStack, data.id)
+        baseSocket.emit('bigState', { stack: hostStack })
     }
 
     return (
@@ -49,7 +50,7 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                     <span className='truncate text-secondary-foreground ' dir='rtl'>
                         {ping.cwd}
                     </span>
-                    {ping?.isRunning && <span className='font-bold brightness-75'>Running</span>}
+                    {ping?.isRunning && <span className='font-bold brightness-75'></span>}
                 </div>
                 <div className={` 
                 flex justify-between bg-terminalHeader 

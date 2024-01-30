@@ -10,8 +10,6 @@ type DetailHeaderProps = {
 }
 
 
-
-
 function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
 
     const [status, setStatus] = useState<Status | null>(null)
@@ -21,6 +19,7 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
     useEffect(() => {
         baseSocket.on("terminalState", (d: Exclude<Status, undefined>) => {
             if ((stackId !== d.stackId) || (terminalId !== d.cmd.id)) return
+            console.log(d)
             setStatus(d)
         })
         baseSocket.emit('state', { stack: stackId, terminal: terminalId })

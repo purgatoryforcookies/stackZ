@@ -62,13 +62,13 @@ function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
             <h1 className='text-center text-foreground text-nowrap'>{data.title}</h1>
             <Separator className="my-2" />
             <div className='flex gap-1 justify-center mb-2' >
-                <Badge variant={minimized ? 'secondary' : 'outline'}
+                <Badge variant={'outline'}
                     className={`hover:cursor-pointer hover:bg-accent`}
                     aria-label="Toggle minimize"
                     onClick={handleMinimize}>
                     {minimized ? hidden ? 'Show' : 'Hide' : 'Minimize'}
                 </Badge>
-                <Badge variant={data.disabled.length === Object.keys(data.pairs).length ? 'secondary' : 'outline'}
+                <Badge variant={data.disabled.length === Object.keys(data.pairs).length ? 'default' : 'outline'}
                     className={`hover:cursor-pointer hover:bg-accent`}
                     aria-label="Toggle mute"
                     onClick={handleMute}>
@@ -76,7 +76,7 @@ function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
                 </Badge>
                 {!minimized ?
                     <>
-                        <Badge variant={editMode ? 'secondary' : 'outline'}
+                        <Badge variant={editMode ? 'default' : 'outline'}
                             className={`hover:cursor-pointer hover:bg-accent`}
                             aria-label="Toggle edit"
                             onClick={() => setEditMode(!editMode)}>
