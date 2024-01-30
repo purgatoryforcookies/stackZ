@@ -1,8 +1,9 @@
 import { ITerminalDimensions } from "xterm-addon-fit";
-import { EnvironmentEditProps, PaletteStack, SocketServer, UpdateCwdProps, Utility2Props, UtilityProps } from "../../types";
+import { EnvironmentEditProps, PaletteStack, SocketServer, Utility2Props, UtilityProps } from "../../types";
 import { Palette } from "./Palette";
 import { DataStore } from "./service/DataStore";
 import { ZodTypeAny } from "zod";
+import { writeFile } from "fs";
 
 
 
@@ -42,6 +43,7 @@ export class Stack {
                 this.palettes.set(palette.id, new Palette(palette, this.server))
             }
         }
+        this.save()
         return this
     }
 
@@ -68,20 +70,20 @@ export class Stack {
                 })
                 client.on('environmentEdit', (args: EnvironmentEditProps) => {
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.editVariable(args)
-                    // this.save()
+                    this.save()
                 })
                 client.on('environmentMute', (arg: UtilityProps) => {
                     this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.muteVariable(arg)
-                    // this.save()
+                    this.save()
                 })
                 client.on('environmentList', (args: Omit<UtilityProps, 'order'>) => {
                     if (!args.value) return
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.addEnvList(args.value)
-                    // this.save()
+                    this.save()
                 })
                 client.on('environmentDelete', (args: UtilityProps) => {
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.removeEnvList(args)
-                    // this.save()
+                    this.save()
                 })
 
 
@@ -90,18 +92,17 @@ export class Stack {
             client.on('changeCwd', (arg: Utility2Props) => {
                 console.log(`Changing cwd! new Cwd: ${arg.value}`)
                 this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.updateCwd(arg.value)
-                // this.save()
+                this.save()
             })
             client.on('changeCommand', (arg: Utility2Props) => {
                 console.log(`Changing command! new CMD: ${arg.value}`)
                 this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.updateCommand(arg.value)
-
-                // this.save()
+                this.save()
             })
             client.on('changeShell', (arg: Utility2Props) => {
                 console.log(`Changing shell! new shell: ${arg.value}`)
                 this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.changeShell(arg.value)
-                // this.save()
+                this.save()
             })
             client.on('input', (arg: Utility2Props) => {
                 console.log(`Getting input from ${arg.stack}-${arg.terminal}`)
@@ -143,46 +144,44 @@ export class Stack {
     }
 
     createTerminal(title: string, stack: number) {
-
-        return this.palettes.get(stack)?.createCommand(title)
+        const newT = this.palettes.get(stack)?.createCommand(title)
+        this.save()
+        return newT
     }
 
-    createPalette(name: string) {
+    createStack(name: string) {
         const newOne: PaletteStack = {
             id: Math.max(...this.raw.map(palette => palette.id)) + 1,
             stackName: name
         }
         this.raw.push(newOne)
+        this.save()
         return newOne
     }
 
-    // save(onExport = false) {
+    save(onExport = false) {
 
 
-    //     const toModify: PaletteStack[] = onExport ? JSON.parse(JSON.stringify(this.raw)) : this.raw
+        const toModify: PaletteStack[] = onExport ? JSON.parse(JSON.stringify(this.raw)) : this.raw
 
-    //     toModify.forEach(palette => {
-    //         const p = this.palettes.get(palette.id)
-    //         if (p) {
-    //             palette = p.commands
-    //         }
-    //         if (command.command.env && onExport) {
-    //             // Redacting OS envs onExport
-    //             command.command.env[0].pairs = {}
-    //         }
-    //     })
+        toModify.forEach(palette => {
+            const p = this.palettes.get(palette.id)
+            if (p) {
+                palette = p.settings
+            }
+            if (p?.settings.env && onExport) {
+                // TODO omit os envs on export and not on save
 
-    // const filename = onExport ? 'commands_exported.json' : 'stacks.json'
+            }
+        })
 
-    // writeFile(filename, JSON.stringify(this.command), (error) => {
-    //     if (error) throw error;
-    // });
+        const filename = onExport ? 'commands_exported.json' : 'stacks.json'
 
-    // }
+        writeFile(filename, JSON.stringify(this.raw), (error) => {
+            if (error) throw error;
+        });
 
-
-
-
+    }
 
 }
 

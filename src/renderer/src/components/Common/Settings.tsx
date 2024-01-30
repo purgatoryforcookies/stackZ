@@ -4,18 +4,19 @@ import { Label } from "@renderer/@/ui/label"
 import { RadioGroup, RadioGroupItem } from "@renderer/@/ui/radio-group"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose } from "@renderer/@/ui/sheet"
 import ColorSquare from "./ColorSquare"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { ArrowDownIcon, ArrowUpIcon } from "@radix-ui/react-icons"
 import KillSignal from "./KillSignal"
+import { ThemeContext } from "@renderer/App"
 
 type SettingsProps = {
     setTheme: (name: string) => void,
-    theme: string | undefined
 }
 
-function Settings({ setTheme, theme }: SettingsProps) {
+function Settings({ setTheme }: SettingsProps) {
 
     const [open, setOpen] = useState<boolean>(false)
+    const theme = useContext(ThemeContext);
 
 
     const handleShortCuts = (e: KeyboardEvent) => {

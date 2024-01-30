@@ -77,7 +77,8 @@ export enum SelectionEvents {
     START = "START",
     CONN = "CONNECT",
     STOP = "STOP",
-    EXPAND = "EXPAND"
+    EXPAND = "EXPAND",
+    NEWSTACK = "NEWSTACK"
 
 }
 

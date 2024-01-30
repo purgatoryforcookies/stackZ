@@ -136,3 +136,7 @@ ipcMain.handle('save', () => {
 ipcMain.handle('createCommand', (_, title, stackId) => {
   return stack.createTerminal(title, stackId)
 })
+
+ipcMain.handle('createStack', (_, title) => {
+  return stack.createStack(title)
+})

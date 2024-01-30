@@ -1,18 +1,19 @@
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut } from "@renderer/@/ui/command"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { PaletteStack, SelectionEvents } from "../../../../types"
 import { ButtonIcon, GlobeIcon, LayersIcon } from "@radix-ui/react-icons"
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@renderer/@/ui/tooltip"
 import { Separator } from "@renderer/@/ui/separator"
+import { ThemeContext } from "@renderer/App"
 
 type CommandMenuProps = {
     stack: Map<number, PaletteStack> | undefined
-    dispatch: (stackId: number, terminalId: number, method: SelectionEvents, cb?: (...args: any) => void) => void,
-    theme: string | undefined
+    dispatch: (stackId: number, terminalId: number, method: SelectionEvents, cb?: (...args: any) => void) => void
 }
 
 
-export function CommandMenu({ stack, dispatch, theme }: CommandMenuProps) {
+export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
+    const theme = useContext(ThemeContext);
 
 
     const [open, setOpen] = useState(false)

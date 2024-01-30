@@ -7,6 +7,8 @@ import { Button } from '@renderer/@/ui/button'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { baseSocket } from '@renderer/service/socket'
 
+import { NewStack } from './Common/NewStack'
+
 type PaletteProps = {
     data: Map<number, PaletteStack>
     onClick: (terminalId: number, stackId: number, method?: SelectionEvents, cb?: (...args: any) => void,) => void
@@ -40,7 +42,6 @@ function Palette({ data, onClick, onModify, terminalId, stackId }: PaletteProps)
         baseSocket.emit('bigState', { stack: stackId })
     }
 
-
     useEffect(() => {
 
         const filtered = data.get(stackId)?.palette
@@ -63,7 +64,7 @@ function Palette({ data, onClick, onModify, terminalId, stackId }: PaletteProps)
                         {stack.stackName}
                     </Badge>
                 })}
-
+                <NewStack />
             </div>
             <div className='flex w-full justify-end pr-12'>
                 <Button variant={'link'} size={'sm'} onClick={toggleStack}>
