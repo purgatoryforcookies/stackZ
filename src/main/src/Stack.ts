@@ -1,5 +1,5 @@
 import { ITerminalDimensions } from "xterm-addon-fit";
-import { EnvironmentEditProps, PaletteStack, SocketServer, UpdateCwdProps, UtilityProps } from "../../types";
+import { EnvironmentEditProps, PaletteStack, SocketServer, UpdateCwdProps, Utility2Props, UtilityProps } from "../../types";
 import { Palette } from "./Palette";
 import { DataStore } from "./service/DataStore";
 import { ZodTypeAny } from "zod";
@@ -87,24 +87,26 @@ export class Stack {
 
                 return
             }
-            client.on('changeCwd', (arg: UpdateCwdProps) => {
+            client.on('changeCwd', (arg: Utility2Props) => {
                 console.log(`Changing cwd! new Cwd: ${arg.value}`)
-                // this.palettes.get(arg.id)?.updateCwd(arg.value)
+                this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.updateCwd(arg.value)
                 // this.save()
             })
-            client.on('changeCommand', (arg: { stack: number, terminal: number, value: string }) => {
+            client.on('changeCommand', (arg: Utility2Props) => {
                 console.log(`Changing command! new CMD: ${arg.value}`)
-                // this.palettes.get(arg.id)?.updateCommand(arg.value)
+                this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.updateCommand(arg.value)
+
                 // this.save()
             })
-            client.on('changeShell', (arg: { stack: number, terminal: number, value: string }) => {
+            client.on('changeShell', (arg: Utility2Props) => {
                 console.log(`Changing shell! new shell: ${arg.value}`)
-                // this.palettes.get(arg.id)?.changeShell(arg.value)
+                this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.changeShell(arg.value)
                 // this.save()
             })
-            client.on('input', (arg: { stack: number, terminal: number, value: string }) => {
+            client.on('input', (arg: Utility2Props) => {
                 console.log(`Getting input from ${arg.stack}-${arg.terminal}`)
-                // this.palettes.get(arg.id)?.writeFromClient(arg.value)
+                this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.writeFromClient(arg.value)
+
             })
             client.on('resize', (arg: { stack: number, terminal: number, value: ITerminalDimensions }) => {
                 this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.resize(arg.value)

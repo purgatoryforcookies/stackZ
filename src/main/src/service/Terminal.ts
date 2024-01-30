@@ -70,14 +70,18 @@ export class Terminal {
                 this.sendToClient(data)
             })
             this.ptyProcess.onExit((data) => {
-                this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? "No signal"} \r\n$ `)
+                this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? "No signal"}\r\n`)
+
+                const divider = Array(this.ptyProcess?.cols || 20).fill("-").join("")
+                this.sendToClient(`${divider}\r\n$ `)
+
 
             })
 
 
             this.ping()
             this.run(this.settings.command.cmd)
-            this.test()
+            // this.test()
         }
         catch (e) {
             this.sendToClient(`Error starting terminal.\n\rIs current working directory a valid path? \n\rCwd is: ${this.settings.command.cwd}\n\r$ `)

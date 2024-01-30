@@ -112,6 +112,13 @@ export type UtilityProps = {
     order: number,
     value?: string
 }
+export type Utility2Props = {
+    stack: number,
+    terminal: number,
+    value: string
+}
+
+
 export type UpdateCwdProps = Pick<EnvironmentEditProps, 'order' | 'value'>
 export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'terminal' | 'order'>
 

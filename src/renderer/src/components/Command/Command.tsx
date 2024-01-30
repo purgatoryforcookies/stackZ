@@ -56,7 +56,7 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                 flex justify-between bg-terminalHeader 
                 ${(selected === data.id) ? '' : 'bg-background'}`}>
                     <div className='flex flex-col pl-3 p-1 text-sm text-secondary-foreground'>
-                        <span>command: {data.command.cmd}</span>
+                        <span>command: {ping.cmd.command.cmd}</span>
                         <span>shell: {ping.cmd.command.shell ?? data.command.shell}</span>
                         <span>palettes: {ping.cmd.command.env?.length} {"(3 active)"}</span>
                         <span>notes: {ping.cmd.title}</span>
