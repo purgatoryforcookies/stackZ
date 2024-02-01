@@ -57,6 +57,8 @@ export class Stack {
             const palette = this.palettes.get(stackId)
             // If there is no palette for the client, it is not a palette
             // then utility listeners are registered
+
+
             if (!palette) {
                 client.on('state', (arg: { stack: number, terminal?: number }) => {
                     if (!arg.terminal) {

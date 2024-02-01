@@ -58,7 +58,7 @@ export class Terminal {
 
         try {
 
-            this.ptyProcess = spawn(this.settings.command.shell!, [], {
+            this.ptyProcess = spawn(this.settings.command.shell!, [this.settings.command.cmd], {
                 name: `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as ENVs[]),
@@ -70,18 +70,15 @@ export class Terminal {
                 this.sendToClient(data)
             })
             this.ptyProcess.onExit((data) => {
-                this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? "No signal"}\r\n`)
+                this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? ""}\r\n`)
 
                 const divider = Array(this.ptyProcess?.cols || 20).fill("-").join("")
                 this.sendToClient(`${divider}\r\n$ `)
-
+                this.isRunning = false
+                this.ping()
 
             })
-
-
             this.ping()
-            this.run(this.settings.command.cmd)
-            // this.test()
         }
         catch (e) {
             this.sendToClient(`Error starting terminal.\n\rIs current working directory a valid path? \n\rCwd is: ${this.settings.command.cwd}\n\r$ `)

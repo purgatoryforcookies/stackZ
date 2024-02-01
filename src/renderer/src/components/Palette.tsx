@@ -1,4 +1,4 @@
-import { Cmd, PaletteStack, SelectionEvents, StackStatus } from '../../../types'
+import { Cmd, PaletteStack, SelectionEvents, StackStatus, Status } from '../../../types'
 import { useEffect, useState } from 'react'
 import { Badge } from '@renderer/@/ui/badge'
 import NewCommand from './Dialogs/NewCommand'
@@ -8,6 +8,7 @@ import { ReloadIcon } from '@radix-ui/react-icons'
 import { baseSocket } from '@renderer/service/socket'
 
 import { NewStack } from './Dialogs/NewStack'
+import { toast } from 'sonner'
 
 type PaletteProps = {
     data: Map<number, PaletteStack>
@@ -30,6 +31,21 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
             if (d.stack !== stackId) return
             setStackState(d.state)
         })
+        baseSocket.on("terminalState", (d: Status) => {
+            if (d.stackId !== stackId) return
+            if (stackState.length === 0) return
+
+            const newStatus = [...stackState]
+            const index = newStatus.findIndex(term => term.id === d.cmd.id)
+            newStatus[index].running = d.isRunning
+            setStackState(newStatus)
+        })
+        // toast('info', {
+        //     description: "Terminal stopped",
+
+        // })
+
+
         baseSocket.emit('bigState', { stack: stackId })
 
     }, [stackId, terminalId])

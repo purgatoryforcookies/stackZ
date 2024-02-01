@@ -10,6 +10,7 @@ import { CommandMenu } from './components/Common/CommandMenu'
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './@/ui/resizable'
 import { useStack } from './hooks/useStack'
 import { createContext } from 'react';
+import { Toaster } from './@/ui/sonner'
 
 export const ThemeContext = createContext('aurora');
 
@@ -156,6 +157,7 @@ function App(): JSX.Element {
         </ResizablePanel>
           : null}
       </ResizablePanelGroup>
+      <Toaster data-theme={theme} />
     </ThemeContext.Provider>
   )
 }
