@@ -171,7 +171,6 @@ export class Stack {
             }
             if (p?.settings.env && onExport) {
                 // TODO omit os envs on export and not on save
-
             }
         })
 

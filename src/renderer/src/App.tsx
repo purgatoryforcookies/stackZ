@@ -29,6 +29,7 @@ function App(): JSX.Element {
     selectStack,
     selectTerminal,
     addTerminal,
+    addStack,
     selectedStack,
     selectedTerminal } = useStack(SOCKET_HOST)
 
@@ -130,13 +131,14 @@ function App(): JSX.Element {
                   Terminals
                 </span>
               </div>
-              <div className="h-full overflow-auto pb-60">
+              <div className="overflow-hidden h-full">
                 {stack && !loading ?
                   <Palette data={stack}
                     onClick={handleSelection}
                     stackId={selectedStack}
                     terminalId={selectedTerminal}
-                    onModify={addTerminal}
+                    onNewTerminal={addTerminal}
+                    onNewStack={addStack}
                   />
                   : "Loading..."}
               </div>

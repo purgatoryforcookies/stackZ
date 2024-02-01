@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { Cmd } from 'src/types'
+import { Cmd, PaletteStack } from 'src/types'
 
 declare global {
   interface Window {
@@ -13,7 +13,7 @@ declare global {
       createCommand: (title: string, stackId: number) => Promise<Cmd>,
       startStack: (stack: number) => Promise<void>,
       stopStack: (stack: number) => Promise<void>,
-      createStack: (title: string) => Promise<void>,
+      createStack: (title: string) => Promise<PaletteStack>,
     },
     store: {
       get: (key: string) => Promise<string>

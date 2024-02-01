@@ -1,23 +1,24 @@
 import { Cmd, PaletteStack, SelectionEvents, StackStatus } from '../../../types'
 import { useEffect, useState } from 'react'
 import { Badge } from '@renderer/@/ui/badge'
-import NewCommand from './Common/NewCommand'
+import NewCommand from './Dialogs/NewCommand'
 import Command from './Command/Command'
 import { Button } from '@renderer/@/ui/button'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { baseSocket } from '@renderer/service/socket'
 
-import { NewStack } from './Common/NewStack'
+import { NewStack } from './Dialogs/NewStack'
 
 type PaletteProps = {
     data: Map<number, PaletteStack>
     onClick: (terminalId: number, stackId: number, method?: SelectionEvents, cb?: (...args: any) => void,) => void
-    onModify: (cmd: Cmd) => void,
+    onNewTerminal: (cmd: Cmd) => void,
+    onNewStack: (st: PaletteStack) => void,
     terminalId: number,
     stackId: number
 }
 
-function Palette({ data, onClick, onModify, terminalId, stackId }: PaletteProps) {
+function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId }: PaletteProps) {
 
     const [palette, setPalette] = useState<Cmd[]>()
     const [stackState, setStackState] = useState<StackStatus['state']>([])
@@ -51,7 +52,7 @@ function Palette({ data, onClick, onModify, terminalId, stackId }: PaletteProps)
     }, [stackId, data])
 
     return (
-        <div className=''>
+        <div className='h-full flex flex-col'>
 
             <div className='flex gap-3 justify-center py-2'>
                 {data && Array.from(data.values()).map((stack) => {
@@ -64,7 +65,7 @@ function Palette({ data, onClick, onModify, terminalId, stackId }: PaletteProps)
                         {stack.stackName}
                     </Badge>
                 })}
-                <NewStack />
+                <NewStack set={onNewStack} />
             </div>
             <div className='flex w-full justify-end pr-12'>
                 <Button variant={'link'} size={'sm'} onClick={toggleStack}>
@@ -75,11 +76,15 @@ function Palette({ data, onClick, onModify, terminalId, stackId }: PaletteProps)
                     }
                 </Button>
             </div>
-            {palette ? palette.map((cmd) => {
-                if (!cmd?.id) return null
-                return <Command key={cmd.id} data={cmd} hostStack={stackId} handleClick={onClick} selected={terminalId} onRemove={onModify} />
-            }) : null}
-            <NewCommand afterAdd={onModify} stackId={stackId} />
+            <div className='overflow-auto pb-20'>
+                {palette ? palette.map((cmd) => {
+                    if (!cmd?.id) return null
+                    return <Command key={cmd.id} data={cmd} hostStack={stackId} handleClick={onClick} selected={terminalId} />
+                }) : null}
+                <div className='w-full flex justify-center'>
+                    <NewCommand afterAdd={onNewTerminal} stackId={stackId} />
+                </div>
+            </div>
         </div >
     )
 }

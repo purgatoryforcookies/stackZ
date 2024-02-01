@@ -1,4 +1,4 @@
-import { Cmd, EnginedCmd, SelectionEvents, Status } from '../../../../types'
+import { Cmd, SelectionEvents, Status } from '../../../../types'
 import { useEffect, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
 import { Button } from '@renderer/@/ui/button';
@@ -10,7 +10,6 @@ type CommandProps = {
     hostStack: number
     handleClick: (stackId: number, terminalId: number, method?: SelectionEvents, cb?: (...args: any) => void,) => void
     selected: number | null
-    onRemove?: (cmd: EnginedCmd) => void
 }
 
 
@@ -50,7 +49,7 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                     <span className='truncate text-secondary-foreground ' dir='rtl'>
                         {ping.cwd}
                     </span>
-                    {ping?.isRunning && <span className='font-bold brightness-75'></span>}
+                    {!ping?.isRunning && <span className='font-bold brightness-75'></span>}
                 </div>
                 <div className={` 
                 flex justify-between bg-terminalHeader 

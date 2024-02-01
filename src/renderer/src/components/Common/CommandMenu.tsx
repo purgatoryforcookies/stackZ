@@ -29,7 +29,7 @@ export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
         return () => document.removeEventListener("keydown", down)
     }, [])
 
-    //TODO: Finish these options
+
     return (
         <CommandDialog open={open} onOpenChange={setOpen} data-theme={theme}>
             <CommandInput placeholder="Type a command or search..." />
@@ -44,10 +44,10 @@ export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
                     </CommandItem>
                 </CommandGroup>
                 <Separator />
-                <CommandGroup heading="New">
+                {/* <CommandGroup heading="New">
                     <CommandItem>Terminal</CommandItem>
                     <CommandItem>Environment</CommandItem>
-                </CommandGroup>
+                </CommandGroup> */}
                 <Separator />
                 <CommandGroup heading="Stacks" >
                     {stack ? [...stack.values()].map(stack => {

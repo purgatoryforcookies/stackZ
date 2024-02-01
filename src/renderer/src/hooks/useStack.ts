@@ -13,18 +13,15 @@ export const useStack = (SOCKET_HOST: string) => {
     const [selectedTerminal, selectTerminal] = useState<number>(1)
 
     const fetchTerminals = async () => {
+
         setLoading(true)
-        const data: PaletteStack[] = await window.api.getStack()
+        const data = await window.api.getStack() as PaletteStack[]
         const newStack = new Map<number, PaletteStack>()
         data.forEach((stack) => {
             newStack.set(stack.id, stack)
         })
 
-
-
         const newTerminals = new Map<number, Map<number, TerminalUIEngine>>()
-
-
         data.forEach((stack) => {
             if (!stack.palette) return
             newTerminals.set(stack.id, new Map<number, TerminalUIEngine>())
@@ -40,6 +37,11 @@ export const useStack = (SOCKET_HOST: string) => {
         setTerminals(() => newTerminals)
         setStack(() => newStack)
         setLoading(false)
+    }
+    const addStack = (st: PaletteStack) => {
+        const newStack = new Map<number, PaletteStack>(stack)
+        newStack.set(st.id, st)
+        setStack(() => newStack)
     }
 
     const addTerminal = async (cmd: Cmd) => {
@@ -67,6 +69,8 @@ export const useStack = (SOCKET_HOST: string) => {
     }
 
 
+
+
     useEffect(() => {
         // setTimeout(() => {
         fetchTerminals()
@@ -81,8 +85,9 @@ export const useStack = (SOCKET_HOST: string) => {
         selectStack,
         selectTerminal,
         addTerminal,
+        addStack,
         selectedStack,
-        selectedTerminal
+        selectedTerminal,
     }
 
 

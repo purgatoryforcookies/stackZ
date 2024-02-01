@@ -22,7 +22,7 @@ function Settings({ setTheme }: SettingsProps) {
     const handleShortCuts = (e: KeyboardEvent) => {
 
         switch (e.key) {
-            case 'Escape':
+            case 'Home':
                 setOpen(!open)
                 break
             default:
@@ -66,13 +66,13 @@ function Settings({ setTheme }: SettingsProps) {
                             <Label htmlFor="shell" className="text-right">
                                 Default terminal
                             </Label>
-                            <Input id="shell" defaultValue="powershell.exe" className="col-span-3" />
+                            <Input id="shell" defaultValue="path..." className="col-span-3" disabled />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="cwd" className="text-right">
                                 Default CWD
                             </Label>
-                            <Input id="cwd" placeholder="path..." className="col-span-3" />
+                            <Input id="cwd" placeholder="path..." className="col-span-3" disabled />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="cwd" className="text-right">
@@ -123,10 +123,10 @@ function Settings({ setTheme }: SettingsProps) {
                 <div className="py-8">
                     <div className="flex items-center gap-4">
                         <h1>Commands.json</h1>
-                        <Button variant={'outline'} >
+                        <Button variant={'outline'} disabled>
                             <ArrowUpIcon className="mr-2 h-4 w-4" />
                             Export</Button>
-                        <Button variant={'outline'} >
+                        <Button variant={'outline'} disabled>
                             <ArrowDownIcon className="mr-2 h-4 w-4" />
                             Import
                         </Button>
@@ -134,7 +134,7 @@ function Settings({ setTheme }: SettingsProps) {
                 </div>
                 <SheetFooter>
                     <SheetClose asChild>
-                        <Button type="submit">Save changes</Button>
+                        <Button type="submit" disabled>Save changes</Button>
                     </SheetClose>
                 </SheetFooter>
             </SheetContent>

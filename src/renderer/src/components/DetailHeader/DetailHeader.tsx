@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
 import { Status } from 'src/types'
 import EnvList from '../Common/EnvList'
-import NewEnvList from '../Common/NewEnvList'
+import { NewEnvList } from '../Dialogs/NewEnvList'
 
 type DetailHeaderProps = {
     stackId: number
@@ -19,7 +19,6 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
     useEffect(() => {
         baseSocket.on("terminalState", (d: Exclude<Status, undefined>) => {
             if ((stackId !== d.stackId) || (terminalId !== d.cmd.id)) return
-            console.log(d)
             setStatus(d)
         })
         baseSocket.emit('state', { stack: stackId, terminal: terminalId })
@@ -57,12 +56,14 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
                         stackId={stackId}
                     />
                 )) : null}
+                <div className='p-11'>
+                    <NewEnvList scroll={scroll}
+                        terminalId={terminalId}
+                        stackId={stackId} />
+                </div>
+
             </div>
-            <div className='py-2 px-4 flex relative items-center justify-between'>
-                <NewEnvList scroll={scroll}
-                    terminalId={terminalId}
-                    stackId={stackId} />
-            </div>
+
         </div>
     )
 }
