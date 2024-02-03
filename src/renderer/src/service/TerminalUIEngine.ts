@@ -9,19 +9,21 @@ export class TerminalUIEngine {
     private terminal = new Terminal({
         theme: {
             cursor: '#f7571c',
+
         },
         cursorBlink: true,
         rightClickSelectsWord: false
     });
     private socket: Socket;
     private mounted = false
+    private isConnected = false
+    private isRunning = false
     private host: string
     private stackId: number
     private terminalId: number
     private fitAddon: FitAddon
     private hostdiv: HTMLElement
     private buffer: string
-    private isRunning: boolean
 
     constructor(stackId: number, terminalId: number, host: string) {
         this.fitAddon = new FitAddon();
@@ -30,11 +32,14 @@ export class TerminalUIEngine {
         this.host = host
         this.terminal.loadAddon(this.fitAddon)
         this.buffer = ''
-        this.isRunning = false
+
     }
 
     isMounted() {
         return this.mounted
+    }
+    isListening() {
+        return this.isConnected
     }
 
     resize() {
@@ -61,10 +66,13 @@ export class TerminalUIEngine {
         this.socket.on('hello', () => {
             this.write(`Terminal connected - ${this.socket.id}`)
             this.prompt()
+            this.isConnected = true
         })
 
         this.socket.on('error', (err) => {
             this.write(`Error - ${this.socket.id} - ${err.message}`)
+            this.prompt()
+            this.write(`--------------------------------------------------------------------------`)
             this.prompt()
         })
 
@@ -124,10 +132,6 @@ export class TerminalUIEngine {
     }
 
     attachTo(element: HTMLElement) {
-        if (!this.terminal) {
-            this.mounted = false
-            return
-        }
         this.hostdiv = element
         if (this.hostdiv.hasChildNodes()) element.innerHTML = ''
         this.terminal.open(this.hostdiv);
@@ -151,6 +155,7 @@ export class TerminalUIEngine {
         this.socket.off('error')
         this.socket.disconnect()
         this.mounted = false
+        this.isConnected = false
     }
 
     changeSettingsMaybe(command: string) {

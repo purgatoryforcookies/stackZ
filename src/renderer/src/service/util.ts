@@ -1,6 +1,3 @@
-import { SelectionEvents } from "src/types";
-
-
 
 /**
  *

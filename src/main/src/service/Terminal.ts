@@ -1,12 +1,10 @@
 import {
-    AddEnvListProps,
     Cmd,
     ENVs,
     EnvironmentEditProps,
-    EnvironmentMuteProps,
-    RemoveEnvListProps,
     SocketServer,
     Status,
+    UtilityProps,
 } from "../../../types"
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from "./util"
@@ -32,7 +30,7 @@ export class Terminal {
 
     constructor(stackId: number, cmd: Cmd, socketId: string, server: SocketServer) {
         this.settings = cmd
-        this.settings.command.env = envFactory(this.settings.command.env)
+        // this.settings.command.env = envFactory(this.settings.command.env)
         this.socketId = socketId
         this.stackId = stackId
         this.server = server
@@ -54,15 +52,17 @@ export class Terminal {
 
     start() {
 
+        if (this.isRunning) {
+            this.stop()
+        }
+
         try {
 
-            this.ptyProcess = spawn(this.settings.command.shell!, [], {
+            this.ptyProcess = spawn(this.settings.command.shell!, [this.settings.command.cmd], {
                 name: `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as ENVs[]),
-                useConpty: this.win ? false : true,
-
-
+                // useConpty: this.win ? false : true,
             })
             this.isRunning = true
 
@@ -70,12 +70,15 @@ export class Terminal {
                 this.sendToClient(data)
             })
             this.ptyProcess.onExit((data) => {
-                this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? "No signal"} \r\n$ `)
+                this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? ""}\r\n`)
+
+                const divider = Array(this.ptyProcess?.cols || 20).fill("-").join("")
+                this.sendToClient(`${divider}\r\n$ `)
+                this.isRunning = false
+                this.ping()
 
             })
             this.ping()
-            this.run(this.settings.command.cmd)
-            this.test()
         }
         catch (e) {
             this.sendToClient(`Error starting terminal.\n\rIs current working directory a valid path? \n\rCwd is: ${this.settings.command.cwd}\n\r$ `)
@@ -100,10 +103,16 @@ export class Terminal {
 
     stop() {
         if (!this.ptyProcess) return
-        console.log("Killing", this.settings.id)
-        const code = this.win ? undefined : 'SIGINT'
-        this.ptyProcess.kill(code)
-        this.isRunning = false
+        try {
+            console.log("Killing", this.settings.id)
+            const code = this.win ? undefined : 'SIGINT'
+            this.ptyProcess.kill(code)
+            this.isRunning = false
+
+
+        } catch (error) {
+            console.log(`Failed to kill ${this.settings.id}`)
+        }
         this.ping()
     }
 
@@ -150,15 +159,16 @@ export class Terminal {
 
     test() {
         this.tester = setInterval(() => {
-            this.write(`echo "hello from ${this.settings.id} this is a logn command to see lorem lipsum how this works with big lines lorem lipsum whomever lipsum meow meow" $Env:variable1`)
+            this.write(`echo "hello from" break`)
             this.prompt()
             this.server.emit('test')
         }, 1000)
     }
 
     editVariable(args: EnvironmentEditProps) {
+
         if (args.key.trim().length == 0) return
-        const target = this.settings.command.env?.find(list => list.order == args.orderId)
+        const target = this.settings.command.env?.find(list => list.order === args.order)
         if (target) {
             if (args.previousKey) {
                 delete target.pairs[args.previousKey]
@@ -169,14 +179,14 @@ export class Terminal {
         this.ping()
     }
 
-    muteVariable(args: EnvironmentMuteProps) {
+    muteVariable(args: UtilityProps) {
 
-        if (args.key && args.key.trim().length == 0) return
-        const target = this.settings.command.env?.find(list => list.order == args.orderId)
+        if (args.value && args.value.trim().length == 0) return
+        const target = this.settings.command.env?.find(list => list.order == args.order)
 
         if (target) {
 
-            if (!args.key) {
+            if (!args.value) {
                 if (haveThesameElements(Object.keys(target.pairs), target.disabled)) {
                     target.disabled = []
                 } else {
@@ -184,11 +194,11 @@ export class Terminal {
                 }
 
             }
-            else if (target.disabled.includes(args.key)) {
-                target.disabled = target.disabled.filter(item => item !== args.key)
+            else if (target.disabled.includes(args.value)) {
+                target.disabled = target.disabled.filter(item => item !== args.value)
             }
             else {
-                target.disabled.push(args.key)
+                target.disabled.push(args.value)
             }
 
         }
@@ -206,14 +216,15 @@ export class Terminal {
         this.ping()
     }
 
-    addEnvList(args: AddEnvListProps) {
-        if (this.settings.command.env!.some(env => env.title === args.title)) {
-            args.title += " (1)"
+    addEnvList(value: string) {
+        if (!value) return
+        if (this.settings.command.env!.some(env => env.title === value)) {
+            value += " (1)"
         }
 
         const newEnv: ENVs = {
             pairs: {},
-            title: args.title,
+            title: value,
             order: Math.max(...this.settings.command.env!.map(env => env.order)) + 1,
             disabled: []
         }
@@ -222,9 +233,9 @@ export class Terminal {
         this.ping()
     }
 
-    removeEnvList(args: RemoveEnvListProps) {
+    removeEnvList(args: UtilityProps) {
 
-        this.settings.command.env = this.settings.command.env!.filter(env => env.order != args.orderId)
+        this.settings.command.env = this.settings.command.env!.filter(env => env.order != args.order)
 
         for (let i = 0; i < this.settings.command.env.length; i++) {
             this.settings.command.env[i].order = i

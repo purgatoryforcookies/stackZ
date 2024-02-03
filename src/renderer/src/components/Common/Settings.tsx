@@ -4,24 +4,25 @@ import { Label } from "@renderer/@/ui/label"
 import { RadioGroup, RadioGroupItem } from "@renderer/@/ui/radio-group"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose } from "@renderer/@/ui/sheet"
 import ColorSquare from "./ColorSquare"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { ArrowDownIcon, ArrowUpIcon } from "@radix-ui/react-icons"
 import KillSignal from "./KillSignal"
+import { ThemeContext } from "@renderer/App"
 
 type SettingsProps = {
     setTheme: (name: string) => void,
-    theme: string | undefined
 }
 
-function Settings({ setTheme, theme }: SettingsProps) {
+function Settings({ setTheme }: SettingsProps) {
 
     const [open, setOpen] = useState<boolean>(false)
+    const theme = useContext(ThemeContext);
 
 
     const handleShortCuts = (e: KeyboardEvent) => {
 
         switch (e.key) {
-            case 'Escape':
+            case 'Home':
                 setOpen(!open)
                 break
             default:
@@ -53,25 +54,25 @@ function Settings({ setTheme, theme }: SettingsProps) {
     return (
         <Sheet open={open} onOpenChange={setOpen} >
             <SheetContent className="w-[30vw] sm:max-w-none " data-theme={theme} >
-                <SheetHeader className="text-primary">
+                <SheetHeader>
                     <SheetTitle>Settings</SheetTitle>
                     <SheetDescription>
                     </SheetDescription>
                 </SheetHeader>
-                <div className="py-8 bg-background">
-                    <h1 className="text-primary-foreground">General</h1>
+                <div className="py-8">
+                    <h1>General</h1>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="shell" className="text-right">
                                 Default terminal
                             </Label>
-                            <Input id="shell" defaultValue="powershell.exe" className="col-span-3" />
+                            <Input id="shell" defaultValue="path..." className="col-span-3" disabled />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="cwd" className="text-right">
                                 Default CWD
                             </Label>
-                            <Input id="cwd" placeholder="path..." className="col-span-3" />
+                            <Input id="cwd" placeholder="path..." className="col-span-3" disabled />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="cwd" className="text-right">
@@ -88,6 +89,11 @@ function Settings({ setTheme, theme }: SettingsProps) {
                                     <RadioGroupItem value="dark" id="r1" onClick={(e) => setTheme((e.target as HTMLInputElement).value)} />
                                     <Label htmlFor="r1">Dark</Label>
                                     <ColorSquare theme="dark" />
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="aurora" id="r2" onClick={(e) => setTheme((e.target as HTMLInputElement).value)} />
+                                    <Label htmlFor="r2">Aurora</Label>
+                                    <ColorSquare theme="aurora" />
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="north" id="r2" onClick={(e) => setTheme((e.target as HTMLInputElement).value)} />
@@ -114,13 +120,13 @@ function Settings({ setTheme, theme }: SettingsProps) {
                     </div>
                 </div>
 
-                <div className="py-8 bg-background">
+                <div className="py-8">
                     <div className="flex items-center gap-4">
-                        <h1 className="primary-foreground">Commands.json</h1>
-                        <Button variant={'outline'} >
+                        <h1>Commands.json</h1>
+                        <Button variant={'outline'} disabled>
                             <ArrowUpIcon className="mr-2 h-4 w-4" />
                             Export</Button>
-                        <Button variant={'outline'} >
+                        <Button variant={'outline'} disabled>
                             <ArrowDownIcon className="mr-2 h-4 w-4" />
                             Import
                         </Button>
@@ -128,7 +134,7 @@ function Settings({ setTheme, theme }: SettingsProps) {
                 </div>
                 <SheetFooter>
                     <SheetClose asChild>
-                        <Button type="submit">Save changes</Button>
+                        <Button type="submit" disabled>Save changes</Button>
                     </SheetClose>
                 </SheetFooter>
             </SheetContent>

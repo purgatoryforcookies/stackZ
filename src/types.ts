@@ -3,31 +3,31 @@ import { Server } from 'socket.io'
 import { z } from 'zod'
 
 
-const temp = z.array(z.object({
-    id: z.number().default(1),
-    stackName: z.string().default('First'),
-    env: z.array(z.object({
-        pairs: z.record(z.string().min(1), z.string().optional()),
-        title: z.string().min(1).default('Default'),
-        order: z.number().default(1),
-        disabled: z.array(z.string())
-    })),
-    palette: z.array(z.object({
-        id: z.number().default(1),
-        title: z.string().default('First command'),
-        command: z.object({
-            cmd: z.string().default('Echo Hello'),
-            shell: z.string().optional(),
-            env: z.array(z.object({
-                pairs: z.record(z.string().min(1), z.string().optional()),
-                title: z.string().min(1).default('Default'),
-                order: z.number().default(1),
-                disabled: z.array(z.string())
-            })).optional(),
-            cwd: z.string().optional()
-        })
-    }))
-}))
+// const temp = z.array(z.object({
+//     id: z.number().default(1),
+//     stackName: z.string().default('First'),
+//     env: z.array(z.object({
+//         pairs: z.record(z.string().min(1), z.string().optional()),
+//         title: z.string().min(1).default('Default'),
+//         order: z.number().default(1),
+//         disabled: z.array(z.string())
+//     })),
+//     palette: z.array(z.object({
+//         id: z.number().default(1),
+//         title: z.string().default('First command'),
+//         command: z.object({
+//             cmd: z.string().default('Echo Hello'),
+//             shell: z.string().optional(),
+//             env: z.array(z.object({
+//                 pairs: z.record(z.string().min(1), z.string().optional()),
+//                 title: z.string().min(1).default('Default'),
+//                 order: z.number().default(1),
+//                 disabled: z.array(z.string())
+//             })).optional(),
+//             cwd: z.string().optional()
+//         })
+//     }))
+// }))
 
 
 const env = z.object({
@@ -77,7 +77,8 @@ export enum SelectionEvents {
     START = "START",
     CONN = "CONNECT",
     STOP = "STOP",
-    EXPAND = "EXPAND"
+    EXPAND = "EXPAND",
+    NEWSTACK = "NEWSTACK"
 
 }
 
@@ -88,19 +89,40 @@ export type Status = {
     cwd: string | undefined
 }
 
-export type EnvironmentEditProps = {
-    id: number
-    key: string
-    previousKey: string | undefined
-    value: string
-    enabled: boolean
-    orderId: number
+export type StackStatus = {
+    stack: number,
+    state: {
+        running: boolean
+        id: number
+    }[]
 }
 
-export type EnvironmentMuteProps = Pick<EnvironmentEditProps, 'orderId' | 'key'>
-export type UpdateCwdProps = Pick<EnvironmentEditProps, 'id' | 'value'>
-export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'id' | 'orderId'>
-export type AddEnvListProps = { id: number, title: string }
+export type EnvironmentEditProps = {
+    stack: number
+    terminal: number
+    order: number
+    key: string
+    previousKey?: string
+    value: string
+    enabled: boolean
+}
+
+export type UtilityProps = {
+    stack: number,
+    terminal: number,
+    order: number,
+    value?: string
+}
+export type Utility2Props = {
+    stack: number,
+    terminal: number,
+    value: string
+}
+
+
+export type UpdateCwdProps = Pick<EnvironmentEditProps, 'order' | 'value'>
+export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'terminal' | 'order'>
+
 
 
 export enum Panels {
@@ -114,5 +136,4 @@ export type StoreType = {
         palette2: number
     },
     theme: string
-
 }

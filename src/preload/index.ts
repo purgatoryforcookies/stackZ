@@ -13,11 +13,20 @@ const api = {
   stopTerminal: (stack: number, terminal: number):
     Promise<boolean> => ipcRenderer.invoke('toggleTerminal', stack, terminal, false),
 
+  startStack: (stack: number) => ipcRenderer.invoke('toggleStack', stack, true),
+  stopStack: (stack: number) => ipcRenderer.invoke('toggleStack', stack, false),
+
   killAll: (): Promise<boolean> => ipcRenderer.invoke('killAll'),
 
   save: (): Promise<void> => ipcRenderer.invoke('save'),
 
-  createCommand: (title: string): Promise<Cmd> => ipcRenderer.invoke('createCommand', title)
+  createCommand: (title: string, stackId: number):
+    Promise<Cmd> => ipcRenderer.invoke('createCommand', title, stackId),
+
+  deleteCommand: (terminalId: number, stackId: number):
+    Promise<Cmd> => ipcRenderer.invoke('deleteCommand', terminalId, stackId),
+
+  createStack: (title: string) => ipcRenderer.invoke('createStack', title),
 }
 
 const store = {

@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
-import { EnginedCmd, Status } from 'src/types'
+import { Status } from 'src/types'
 import EnvList from '../Common/EnvList'
-import NewEnvList from '../Common/NewEnvList'
+import { NewEnvList } from '../Dialogs/NewEnvList'
 
 type DetailHeaderProps = {
     stackId: number
     terminalId: number
 }
-
-
 
 
 function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
@@ -48,19 +46,24 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
     return (
 
         <div className='h-full px-5'>
-            <div className='flex gap-8 pb-20 h-full overflow-auto' ref={bodyRef}>
+            <div className='flex gap-8 pb-20 h-full overflow-auto pr-32' ref={bodyRef}>
                 {status?.cmd.command.env ? status.cmd.command.env.map((record) => (
                     <EnvList
                         data={record}
                         key={record.title}
                         onSelection={handleHighligt}
                         terminalId={terminalId}
+                        stackId={stackId}
                     />
                 )) : null}
+                <div className='p-11'>
+                    <NewEnvList scroll={scroll}
+                        terminalId={terminalId}
+                        stackId={stackId} />
+                </div>
+
             </div>
-            <div className='py-2 px-4 flex relative items-center justify-between'>
-                <NewEnvList scroll={scroll} />
-            </div>
+
         </div>
     )
 }

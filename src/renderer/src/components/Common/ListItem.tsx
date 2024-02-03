@@ -9,6 +9,7 @@ type ListItemProps = {
     terminalId: number,
     orderId: number,
     minimized: boolean,
+    stackId: number,
 
 }
 
@@ -48,12 +49,10 @@ export const Field = ({ value, disabled, onChange, variant, placeholder, minimiz
 
     return (
         <input
-            // autoFocus={variant === 'primary'}
             type='text'
             className={`${style} px-3`}
             onChange={(e) => onChange(e.target.value)}
             defaultValue={value}
-            // size={Math.min(value?.length || 30, 50)}
             placeholder={placeholder}
         ></input>
     )
@@ -69,7 +68,7 @@ export const Field = ({ value, disabled, onChange, variant, placeholder, minimiz
  * @param {boolean} newRecord - Renders a new empty record
  * @param {string} minimized - Renders without value field
  */
-const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId, minimized, muted }: RecordProps) => {
+const Record = ({ terminalId, stackId, keyv, value, onClick, editMode, newRecord, orderId, minimized, muted }: RecordProps) => {
 
     const [newRecordOpen, setNewRecordOpen] = useState(false)
     const [keyValue, setKeyValue] = useState<string | undefined>(keyv)
@@ -81,20 +80,22 @@ const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId
 
     const handleClick = () => {
         if (editMode) return
-        baseSocket.emit('environmentMute', { id: terminalId, key: keyValue, orderId })
+        baseSocket.emit('environmentMute', { stack: stackId, terminal: terminalId, value: keyValue, order: orderId })
     }
 
     const handleEdits = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (!keyValue) return
 
+        if (!keyValue) return
+        if (newRecordOpen && (!keyValue || !valueValue)) return
         baseSocket.emit('environmentEdit',
             {
-                id: terminalId,
+                stack: stackId,
+                terminal: terminalId,
+                order: orderId,
                 key: keyValue,
                 previousKey: keyPreviousValue,
                 value: valueValue,
-                orderId,
                 enabled: true
             })
 
@@ -115,7 +116,7 @@ const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId
                 onClick={() => setNewRecordOpen(!newRecordOpen)}
                 className='flex justify-center items-center w-full mt-2 hover:cursor-pointer'
             /> :
-                <form onSubmit={handleEdits}
+                <form onSubmit={handleEdits} onBlur={handleEdits}
                     className='flex font-semibold justify-between bg-muted hover:cursor-pointer pl-3 rounded-full'>
                     <Field
                         value={keyv}
@@ -134,6 +135,7 @@ const Record = ({ terminalId, keyv, value, onClick, editMode, newRecord, orderId
                             variant='secondary'
                             placeholder='VALUE' />
                         : null}
+                    <button hidden>hello</button>
                 </form>
             }
         </div>
