@@ -30,7 +30,7 @@ export class Terminal {
 
     constructor(stackId: number, cmd: Cmd, socketId: string, server: SocketServer) {
         this.settings = cmd
-        this.settings.command.env = envFactory(this.settings.command.env)
+        // this.settings.command.env = envFactory(this.settings.command.env)
         this.socketId = socketId
         this.stackId = stackId
         this.server = server
@@ -62,7 +62,7 @@ export class Terminal {
                 name: `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as ENVs[]),
-                useConpty: this.win ? false : true,
+                // useConpty: this.win ? false : true,
             })
             this.isRunning = true
 

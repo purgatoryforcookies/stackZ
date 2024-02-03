@@ -2,7 +2,8 @@ import { Cmd, SelectionEvents, Status } from '../../../../types'
 import { useEffect, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
 import { Button } from '@renderer/@/ui/button';
-import { ReloadIcon } from '@radix-ui/react-icons';
+import { Cross2Icon, ReloadIcon } from '@radix-ui/react-icons';
+
 
 
 type CommandProps = {
@@ -30,7 +31,12 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
         baseSocket.emit('state', { stack: hostStack, terminal: data.id })
     }, [selected, hostStack, data])
 
-    const handleState = async () => {
+    const handleState = async (delRecord = false) => {
+        if (delRecord) {
+            window.api.deleteCommand(hostStack, data.id)
+            return
+        }
+
         if (ping?.isRunning) {
             window.api.stopTerminal(hostStack, data.id)
         } else {
@@ -49,7 +55,11 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                     <span className='truncate text-secondary-foreground ' dir='rtl'>
                         {ping.cwd}
                     </span>
-                    {!ping?.isRunning && <span className='font-bold brightness-75'></span>}
+                    <span className='flex items-center '>
+                        <Cross2Icon className='h-4 w-4 text-secondary-foreground hover:scale-125'
+                            onClick={() => handleState(true)}
+                        />
+                    </span>
                 </div>
                 <div className={` 
                 flex justify-between bg-terminalHeader 
@@ -63,17 +73,15 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
 
                     <div className='flex items-center pr-10'>
                         <div>
-                            <Button variant={'ghost'} onClick={handleState}>
+                            <Button variant={'ghost'} onClick={() => handleState()}>
                                 {ping?.isRunning ? <>
                                     <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                                     Running...
                                 </> : 'Start'
                                 }
                             </Button>
-
                         </div>
                     </div>
-
                 </div>
             </div>
         </div >

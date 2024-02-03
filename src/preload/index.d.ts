@@ -14,6 +14,7 @@ declare global {
       startStack: (stack: number) => Promise<void>,
       stopStack: (stack: number) => Promise<void>,
       createStack: (title: string) => Promise<PaletteStack>,
+      deleteCommand: (terminalId: number, stackId: number) => Promise<void>
     },
     store: {
       get: (key: string) => Promise<string>

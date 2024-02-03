@@ -9,6 +9,7 @@ export class TerminalUIEngine {
     private terminal = new Terminal({
         theme: {
             cursor: '#f7571c',
+
         },
         cursorBlink: true,
         rightClickSelectsWord: false

@@ -24,22 +24,23 @@ export class Palette {
         }
     }
 
+    deleteTerminal(terminalId: number) {
+        console.log(`Removing stack ${terminalId}, ${this.settings.id}`)
+        this.terminals.delete(terminalId)
+        this.settings.palette = this.settings.palette?.filter(pal => pal.id !== terminalId)
+    }
+
     pingState() {
 
-        // setInterval(() => {
         const state = [...this.terminals.values()].map(term => {
+            if (!term) return term
             return {
                 id: term.settings.id,
                 running: term.isRunning
             }
         })
-        if (state.length === 0) return
-        // return state
-        //     console.log(state)
+
         this.server.emit('stackState', { stack: this.settings.id, state: state })
-        // }, 1500)
-
-
     }
 
     pingAll() {

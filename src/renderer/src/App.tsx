@@ -116,7 +116,7 @@ function App(): JSX.Element {
           <ResizablePanelGroup
             direction="horizontal"
             onLayout={(e) => handleResize(e, Panels.Terminals)}>
-            <ResizablePanel >
+            <ResizablePanel>
               {terminals && stack && !loading ? <TerminalUI engine={terminals.get(selectedStack)?.get(selectedTerminal)} /> : null}
             </ResizablePanel>
             <ResizableHandle />
@@ -132,15 +132,14 @@ function App(): JSX.Element {
                   Terminals
                 </span>
               </div>
-              <div className="overflow-hidden h-full">
+              <div className="overflow-hidden h-full" id='paletteBackground'>
                 {stack && !loading ?
                   <Palette data={stack}
                     onClick={handleSelection}
                     stackId={selectedStack}
                     terminalId={selectedTerminal}
                     onNewTerminal={addTerminal}
-                    onNewStack={addStack}
-                  />
+                    onNewStack={addStack} />
                   : "Loading..."}
               </div>
             </ResizablePanel> : null}

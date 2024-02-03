@@ -26,7 +26,7 @@ function TerminalUI({ engine }: TerminalUIProps) {
 
 
   return (
-    <div ref={terminalRef} className='h-full' />
+    <div ref={terminalRef} className='h-full overflow-hidden' />
   )
 }
 

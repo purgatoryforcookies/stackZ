@@ -28,6 +28,7 @@ function NewCommand({ afterAdd, stackId }: NewCommandProps) {
         setOpen(false)
         setTitle('')
         afterAdd(newCommand)
+        console.log('newCommand', newCommand)
     }
 
 

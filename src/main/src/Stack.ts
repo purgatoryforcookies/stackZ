@@ -145,6 +145,15 @@ export class Stack {
         this.palettes.get(stack)?.terminals.get(terminal)?.stop()
     }
 
+    deleteTerminal(stack: number, terminal: number) {
+
+        this.palettes.get(stack)?.terminals.get(terminal)?.stop()
+        this.palettes.get(stack)?.deleteTerminal(terminal)
+        this.palettes.get(stack)?.pingAll()
+        this.save()
+        this.server.emit("terminalDelete", { stack, terminal })
+    }
+
     createTerminal(title: string, stack: number) {
         const newT = this.palettes.get(stack)?.createCommand(title)
         this.save()

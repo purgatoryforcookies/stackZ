@@ -1,4 +1,5 @@
 import { TerminalUIEngine } from "@renderer/service/TerminalUIEngine"
+import { baseSocket } from "@renderer/service/socket"
 import { useEffect, useState } from "react"
 import { Cmd, PaletteStack } from "src/types"
 
@@ -66,8 +67,31 @@ export const useStack = (SOCKET_HOST: string) => {
         stacks.set(cmd.id, engine)
         setStack(newStack)
         setTerminals(newTerminals)
+        console.log(cmd)
+        selectTerminal(cmd.id)
     }
 
+
+    baseSocket.on("terminalDelete", (d: { stack: number, terminal: number }) => {
+
+        if (d.stack !== selectedStack) return
+        if (stack) {
+            const newStack = new Map(stack)
+            const palette = newStack.get(d.stack)?.palette
+            if (palette) {
+                newStack.get(d.stack)!.palette = palette.filter(pal => pal.id !== d.terminal)
+            }
+            setStack(newStack)
+        }
+        if (terminals) {
+            const newTerminals = new Map(terminals)
+            if (newTerminals.get(d.terminal)) {
+                newTerminals.delete(d.terminal)
+            }
+            setTerminals(newTerminals)
+        }
+
+    })
 
 
 

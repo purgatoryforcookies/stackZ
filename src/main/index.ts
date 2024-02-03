@@ -140,3 +140,7 @@ ipcMain.handle('createCommand', (_, title, stackId) => {
 ipcMain.handle('createStack', (_, title) => {
   return stack.createStack(title)
 })
+
+ipcMain.handle('deleteCommand', (_, stackId, terminalId) => {
+  return stack.deleteTerminal(stackId, terminalId)
+})

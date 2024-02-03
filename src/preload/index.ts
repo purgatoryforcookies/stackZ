@@ -23,6 +23,9 @@ const api = {
   createCommand: (title: string, stackId: number):
     Promise<Cmd> => ipcRenderer.invoke('createCommand', title, stackId),
 
+  deleteCommand: (terminalId: number, stackId: number):
+    Promise<Cmd> => ipcRenderer.invoke('deleteCommand', terminalId, stackId),
+
   createStack: (title: string) => ipcRenderer.invoke('createStack', title),
 }
 
