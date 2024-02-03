@@ -66,7 +66,7 @@ function App(): JSX.Element {
   //TODO: add more options and maybe make a hook or separate file?
   const handleSelection = (
     stackId: string,
-    terminalId: number,
+    terminalId: string,
     method = SelectionEvents.CONN,
     cb?: () => void
   ) => {

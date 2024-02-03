@@ -16,7 +16,7 @@ import { ThemeContext } from '@renderer/App'
 
 type CommandMenuProps = {
   stack: Map<string, PaletteStack> | undefined
-  dispatch: (stackId: string, terminalId: number, method: SelectionEvents, cb?: () => void) => void
+  dispatch: (stackId: string, terminalId: string, method: SelectionEvents, cb?: () => void) => void
 }
 
 export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
@@ -65,7 +65,7 @@ export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
                   className="flex gap-5"
                   value={stack.id + stack.stackName}
                   onSelect={() => {
-                    dispatch(stack.id, 1, SelectionEvents.CONN, () => {
+                    dispatch(stack.id, 'gibberish', SelectionEvents.CONN, () => {
                       setOpen(false)
                     })
                   }}

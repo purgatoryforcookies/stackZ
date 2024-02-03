@@ -92,7 +92,7 @@ ipcMain.handle('getStack', (_, id?: string) => {
   return stack.get(id)
 })
 
-ipcMain.handle('toggleTerminal', (_, stackId: string, terminalID: number, state: boolean) => {
+ipcMain.handle('toggleTerminal', (_, stackId: string, terminalID: string, state: boolean) => {
   if (state) {
     return stack.startTerminal(stackId, terminalID)
   } else {

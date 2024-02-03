@@ -18,7 +18,7 @@ export const stackSchema = z.array(
         palette: z
             .array(
                 z.object({
-                    id: z.number().default(1),
+                    id: z.string().default('gibberish'),
                     title: z.string().default('First command'),
                     command: z.object({
                         cmd: z.string().default('Echo Hello'),
@@ -106,13 +106,13 @@ export type StackStatus = {
     stack: string
     state: {
         running: boolean
-        id: number
+        id: string
     }[]
 }
 
 export type EnvironmentEditProps = {
     stack: string
-    terminal: number
+    terminal: string
     order: number
     key: string
     previousKey?: string
@@ -122,13 +122,13 @@ export type EnvironmentEditProps = {
 
 export type UtilityProps = {
     stack: string
-    terminal: number
+    terminal: string
     order: number
     value?: string
 }
 export type Utility2Props = {
     stack: string
-    terminal: number
+    terminal: string
     value: string
 }
 

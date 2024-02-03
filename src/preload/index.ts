@@ -7,10 +7,10 @@ const api = {
   getStack: (id?: string): Promise<PaletteStack[] | PaletteStack> =>
     ipcRenderer.invoke('getStack', id),
 
-  startTerminal: (stack: string, terminal: number): Promise<boolean> =>
+  startTerminal: (stack: string, terminal: string): Promise<boolean> =>
     ipcRenderer.invoke('toggleTerminal', stack, terminal, true),
 
-  stopTerminal: (stack: string, terminal: number): Promise<boolean> =>
+  stopTerminal: (stack: string, terminal: string): Promise<boolean> =>
     ipcRenderer.invoke('toggleTerminal', stack, terminal, false),
 
   startStack: (stack: string) => ipcRenderer.invoke('toggleStack', stack, true),
@@ -23,7 +23,7 @@ const api = {
   createCommand: (title: string, stackId: string): Promise<Cmd> =>
     ipcRenderer.invoke('createCommand', title, stackId),
 
-  deleteCommand: (stackId: string, terminalId: number): Promise<Cmd> =>
+  deleteCommand: (stackId: string, terminalId: string): Promise<Cmd> =>
     ipcRenderer.invoke('deleteCommand', stackId, terminalId),
 
   createStack: (title: string) => ipcRenderer.invoke('createStack', title)

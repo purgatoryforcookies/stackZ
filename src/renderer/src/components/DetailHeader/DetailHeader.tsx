@@ -6,7 +6,7 @@ import { NewEnvList } from '../Dialogs/NewEnvList'
 
 type DetailHeaderProps = {
     stackId: string
-    terminalId: number
+    terminalId: string
 }
 
 function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {

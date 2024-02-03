@@ -2,7 +2,6 @@ import { Cmd, Environment, EnvironmentEditProps, Status, UtilityProps } from '..
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from './util'
 import path from 'path'
-import { DataMiddleWare } from './DataMiddleWare'
 import { ITerminalDimensions } from 'xterm-addon-fit'
 import { Server } from 'socket.io'
 
@@ -14,12 +13,11 @@ export class Terminal {
     ptyProcess: IPty | null
     isRunning: boolean
     win: boolean
-    middleware: DataMiddleWare
     buffer: string[]
 
     constructor(stackId: string, cmd: Cmd, socketId: string, server: Server) {
         this.settings = cmd
-        // this.settings.command.env = envFactory(this.settings.command.env)
+        this.settings.command.env = envFactory(this.settings.command.env)
         this.socketId = socketId
         this.stackId = stackId
         this.server = server
@@ -27,7 +25,6 @@ export class Terminal {
         this.settings.command.shell = this.chooseShell(cmd.command.shell)
         this.ptyProcess = null
         this.isRunning = false
-        this.middleware = new DataMiddleWare(10)
         this.buffer = []
     }
 

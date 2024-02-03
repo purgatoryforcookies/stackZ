@@ -10,10 +10,10 @@ import { NewStack } from './Dialogs/NewStack'
 
 type PaletteProps = {
     data: Map<string, PaletteStack>
-    onClick: (stackId: string, terminalId: number, method?: SelectionEvents, cb?: () => void) => void
+    onClick: (stackId: string, terminalId: string, method?: SelectionEvents, cb?: () => void) => void
     onNewTerminal: (cmd: Cmd) => void
     onNewStack: (st: PaletteStack) => void
-    terminalId: number
+    terminalId: string
     stackId: string
 }
 
@@ -68,7 +68,7 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
                         return (
                             <Badge
                                 key={stack.id}
-                                onClick={() => onClick(stack.id, 1, SelectionEvents.CONN)}
+                                onClick={() => onClick(stack.id, 'gibberish', SelectionEvents.CONN)}
                                 variant={stackId === stack.id ? 'default' : 'outline'}
                                 className={`hover:bg-primary hover:text-background 
                         hover:cursor-pointer`}

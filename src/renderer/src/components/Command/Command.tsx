@@ -9,11 +9,11 @@ type CommandProps = {
     hostStack: string
     handleClick: (
         stackId: string,
-        terminalId: number,
+        terminalId: string,
         method?: SelectionEvents,
         cb?: () => void
     ) => void
-    selected: number | null
+    selected: string | null
 }
 
 function Command({ data, hostStack, handleClick, selected }: CommandProps) {

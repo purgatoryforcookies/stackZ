@@ -13,7 +13,7 @@ type EnvListProps = {
     disabled: string[]
   }
   onSelection: (e: string[]) => void
-  terminalId: number
+  terminalId: string
   stackId: string
 }
 

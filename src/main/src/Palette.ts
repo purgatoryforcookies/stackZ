@@ -5,16 +5,16 @@ import { Server } from 'socket.io'
 
 export class Palette {
   settings: PaletteStack
-  terminals: Map<number, Terminal>
+  terminals: Map<string, Terminal>
   server: Server
 
   constructor(settings: PaletteStack, server: Server) {
     this.settings = settings
-    this.terminals = new Map<number, Terminal>()
+    this.terminals = new Map<string, Terminal>()
     this.server = server
   }
 
-  initTerminal(socketId: string, server: Server, remoteTerminalID: number) {
+  initTerminal(socketId: string, server: Server, remoteTerminalID: string) {
     const terminal = this.settings.palette?.find((palette) => palette.id === remoteTerminalID)
     if (terminal) {
       const newTerminal = new Terminal(this.settings.id, terminal, socketId, server)
@@ -23,7 +23,7 @@ export class Palette {
     }
   }
 
-  deleteTerminal(terminalId: number) {
+  deleteTerminal(terminalId: string) {
     console.log(`Removing stack ${terminalId}, ${this.settings.id}`)
     this.terminals.delete(terminalId)
     this.settings.palette = this.settings.palette?.filter((pal) => pal.id !== terminalId)
@@ -68,7 +68,7 @@ export class Palette {
     return newOne
   }
 
-  startTerminal(id: number) {
+  startTerminal(id: string) {
     console.log(`Starting terminal number ${id}`)
     const terminal = this.terminals.get(id)
     if (!terminal) return false
@@ -76,7 +76,7 @@ export class Palette {
     return true
   }
 
-  stopTerminal(id: number) {
+  stopTerminal(id: string) {
     console.log(`Stopping terminal number ${id}`)
     const terminal = this.terminals.get(id)
     if (!terminal) return false

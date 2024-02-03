@@ -24,9 +24,13 @@ export class Stack {
 
     async load() {
         this.raw = await this.store.load()
-        console.log(this.raw)
-        for (const palette of this.raw) {
-            palette.id = uuidv4()
+        for (const stack of this.raw) {
+            stack.id = uuidv4()
+
+            if (!stack.palette) return
+            for (const palette of stack.palette) {
+                palette.id = uuidv4()
+            }
         }
 
         return this
@@ -51,13 +55,13 @@ export class Stack {
         this.server.on('connection', (client) => {
             console.log(`Client ${client.id} connected`)
             const stackId = String(client.handshake.query.stack)
-            const remoteTerminalID = Number(client.handshake.query.id)
+            const remoteTerminalID = String(client.handshake.query.id)
             const palette = this.palettes.get(stackId)
             // If there is no palette for the client, it is not a palette
             // then utility listeners are registered
 
             if (!palette) {
-                client.on('state', (arg: { stack: string; terminal?: number }) => {
+                client.on('state', (arg: { stack: string; terminal?: string }) => {
                     if (!arg.terminal) {
                         this.palettes.get(arg.stack)?.pingAll()
                         return
@@ -108,7 +112,7 @@ export class Stack {
             })
             client.on(
                 'resize',
-                (arg: { stack: string; terminal: number; value: ITerminalDimensions }) => {
+                (arg: { stack: string; terminal: string; value: ITerminalDimensions }) => {
                     this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.resize(arg.value)
                 }
             )
@@ -134,15 +138,15 @@ export class Stack {
         })
     }
 
-    startTerminal(stack: string, terminal: number) {
+    startTerminal(stack: string, terminal: string) {
         console.log(`Starting ${stack} -> ${terminal}`)
         this.palettes.get(stack)?.terminals.get(terminal)?.start()
     }
-    stopTerminal(stack: string, terminal: number) {
+    stopTerminal(stack: string, terminal: string) {
         this.palettes.get(stack)?.terminals.get(terminal)?.stop()
     }
 
-    deleteTerminal(stack: string, terminal: number) {
+    deleteTerminal(stack: string, terminal: string) {
         this.palettes.get(stack)?.terminals.get(terminal)?.stop()
         this.palettes.get(stack)?.deleteTerminal(terminal)
         this.palettes.get(stack)?.pingAll()

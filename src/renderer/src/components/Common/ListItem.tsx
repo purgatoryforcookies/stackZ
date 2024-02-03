@@ -4,7 +4,7 @@ import { baseSocket } from '@renderer/service/socket'
 
 type ListItemProps = {
   newRecord: boolean
-  terminalId: number
+  terminalId: string
   orderId: number
   minimized: boolean
   stackId: string
