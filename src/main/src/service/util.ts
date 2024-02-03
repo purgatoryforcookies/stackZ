@@ -72,3 +72,15 @@ export const mapEnvs = (obj: Environment[]) => {
 export const haveThesameElements = <T>(arr1: T[], arr2: T[]) => {
   return arr1.every((e) => arr2.includes(e))
 }
+
+export const resolveDefaultCwd = () => {
+
+  if (process.env.HOME) return process.env.HOME
+  if (process.env.HOMEDRIVE) {
+    if (process.env.HOMEPATH) {
+      return process.env.HOMEDRIVE + process.env.HOMEPATH
+    }
+  }
+  return "~"
+
+}

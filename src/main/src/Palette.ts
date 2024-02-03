@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Cmd, PaletteStack } from '../../types'
 import { Terminal } from './service/Terminal'
 import { Server } from 'socket.io'
+import { resolveDefaultCwd } from './service/util';
 
 export class Palette {
   settings: PaletteStack
@@ -56,7 +57,7 @@ export class Palette {
       title: title,
       command: {
         cmd: 'echo Hello World!',
-        cwd: process.env.HOME || '~'
+        cwd: resolveDefaultCwd()
       }
     }
     if (!this.settings.palette) {
