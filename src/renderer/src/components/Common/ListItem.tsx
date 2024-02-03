@@ -1,6 +1,7 @@
 import { GoPlusCircle } from 'react-icons/go'
 import { FormEvent, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
+import { Input } from '@renderer/@/ui/input'
 
 type ListItemProps = {
   newRecord: boolean
@@ -16,6 +17,7 @@ interface RecordProps extends ListItemProps {
   onClick: (key: string | undefined, e) => void
   editMode: boolean
   muted?: boolean
+  highlight?: boolean
 }
 
 type FieldProps = {
@@ -26,6 +28,7 @@ type FieldProps = {
   placeholder?: string
   muted?: boolean
   minimized?: boolean
+  highlight?: boolean
 }
 
 export const Field = ({
@@ -34,24 +37,24 @@ export const Field = ({
   onChange,
   variant,
   placeholder,
-  minimized
+  minimized,
+  highlight
 }: FieldProps) => {
   const style = `rounded-full py-1
     ${variant === 'primary'
       ? `pr-2 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
-      : ' pl-3 pr-3 bg-primary truncate text-secondary'
-    }`
+      : `pl-3 pr-3  truncate text-secondary ${highlight ? 'bg-red-900 text-white' : 'bg-primary'}`}`
 
   if (disabled) return <p className={style}>{value}</p>
 
   return (
-    <input
+    <Input
       type="text"
-      className={`${style} px-3`}
+      className={`${style} px-3 h-8`}
       onChange={(e) => onChange(e.target.value)}
       defaultValue={value}
       placeholder={placeholder}
-    ></input>
+    ></Input>
   )
 }
 
@@ -75,7 +78,8 @@ const Record = ({
   newRecord,
   orderId,
   minimized,
-  muted
+  muted,
+  highlight
 }: RecordProps) => {
   const [newRecordOpen, setNewRecordOpen] = useState(false)
   const [keyValue, setKeyValue] = useState<string | undefined>(keyv)
@@ -119,15 +123,14 @@ const Record = ({
       {newRecord && !newRecordOpen ? (
         <GoPlusCircle
           size={20}
-          color="var(--primary)"
           onClick={() => setNewRecordOpen(!newRecordOpen)}
-          className="flex justify-center items-center w-full mt-2 hover:cursor-pointer"
+          className="flex justify-center items-center w-full mt-2 hover:cursor-pointer text-secondary-foreground"
         />
       ) : (
         <form
           onSubmit={handleEdits}
           onBlur={handleEdits}
-          className="flex font-semibold justify-between bg-muted hover:cursor-pointer pl-3 rounded-full"
+          className="flex font-semibold justify-between hover:cursor-pointer pl-3 rounded-full bg-muted"
         >
           <Field
             value={keyv}
@@ -146,6 +149,7 @@ const Record = ({
               muted={muted}
               variant="secondary"
               placeholder="VALUE"
+              highlight={highlight}
             />
           ) : null}
           <button hidden>hello</button>

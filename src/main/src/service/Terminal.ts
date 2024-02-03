@@ -47,6 +47,7 @@ export class Terminal {
                 useConpty: this.win ? false : true,
             })
             this.isRunning = true
+            // this.run(this.settings.command.cmd)
 
             this.ptyProcess.onData((data) => {
                 this.sendToClient(data)
@@ -59,7 +60,7 @@ export class Terminal {
                     .fill('-')
                     .join('')
                 this.sendToClient(`${divider}\r\n$ `)
-
+                this.stop()
                 this.ping()
             })
             this.ping()

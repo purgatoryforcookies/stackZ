@@ -63,26 +63,31 @@ export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
                 <CommandItem
                   key={stack.id}
                   className="flex gap-5"
-                  value={stack.id + stack.stackName}
+                  value={stack.stackName}
                   onSelect={() => {
                     dispatch(stack.id, 'gibberish', SelectionEvents.CONN, () => {
                       setOpen(false)
                     })
                   }}
                 >
-                  <span>{stack.palette?.length ?? 0}x</span>
-                  <LayersIcon className="mr-2 h-4 w-4" />
+                  <div className='flex w-20 justify-between'>
+                    <span >{stack.palette?.length ?? 0}x</span>
+                    <LayersIcon className="mr-2 h-4 w-4" />
+                  </div>
                   <div className="flex justify-between w-full">
-                    <span>
-                      #{stack.id}: {stack.stackName}
-                    </span>
+                    <div className='flex flex-col'>
+                      <span>
+                        {stack.stackName}
+                      </span>
+                      <span className='text-white/20 text-[0.7rem]'>#{stack.id}</span>
+                    </div>
+
                     {stack.env?.length && stack.env.length > 0 ? (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
                             <GlobeIcon />
                           </TooltipTrigger>
-
                           <TooltipContent side={'left'}>
                             <p>Has global environments</p>
                           </TooltipContent>
@@ -103,7 +108,7 @@ export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
               return stack.palette.map((cmd) => {
                 return (
                   <CommandItem
-                    key={String(stack.id) + String(cmd.id)}
+                    key={cmd.id}
                     className="flex gap-5"
                     value={cmd.title + cmd.command.cmd + cmd.command.cwd + stack.stackName}
                     onSelect={() => {
@@ -115,13 +120,13 @@ export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
                     <ButtonIcon className="mr-2 h-4 w-4" />
                     <div className="flex flex-col">
                       <span>
-                        #{cmd.id}: {cmd.title}
+                        {cmd.title}
                       </span>
                       <div className="flex flex-col">
                         <span>{cmd.command.cmd}</span>
                         <span>@{cmd.command.cwd}</span>
                         <span>
-                          stack: #{stack.id} - {stack.stackName}
+                          stack: {stack.stackName}
                         </span>
                       </div>
                     </div>

@@ -3,6 +3,7 @@ import { baseSocket } from '@renderer/service/socket'
 import { Status } from 'src/types'
 import EnvList from '../Common/EnvList'
 import { NewEnvList } from '../Dialogs/NewEnvList'
+import { Badge } from '@renderer/@/ui/badge'
 
 type DetailHeaderProps = {
     stackId: string
@@ -40,7 +41,12 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
 
     return (
         <div className="h-full px-5">
-            <div className="flex gap-8 pb-20 h-full overflow-auto pr-32" ref={bodyRef}>
+            <div className='min-h-7 '>
+                {highlightedEnv ? <Badge className='text-md animate-in animate-out'>
+                    {`${highlightedEnv[0]}: ${highlightedEnv[1]}`}
+                </Badge> : null}
+            </div>
+            <div className="flex gap-8 pb-24 h-full overflow-auto pr-32" ref={bodyRef}>
                 {status?.cmd.command.env
                     ? status.cmd.command.env.map((record) => (
                         <EnvList
@@ -49,6 +55,7 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
                             onSelection={handleHighligt}
                             terminalId={terminalId}
                             stackId={stackId}
+                            highlight={highlightedEnv}
                         />
                     ))
                     : null}

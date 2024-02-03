@@ -14,10 +14,11 @@ type EnvListProps = {
   }
   onSelection: (e: string[]) => void
   terminalId: string
-  stackId: string
+  stackId: string,
+  highlight: string[] | null
 }
 
-function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
+function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListProps) {
   const [minimized, setMinimized] = useState<boolean>(false)
   const [hidden, setHidden] = useState<boolean>(false)
   const [editMode, setEditMode] = useState<boolean>(false)
@@ -25,7 +26,7 @@ function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
   const handleClik = (key: string | undefined, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if ((e.target as HTMLElement).nodeName === 'INPUT') return
 
-    onSelection([key ?? '', key ? '' : ''])
+    onSelection([key ?? '', key ? data.pairs[key] || '' : ''])
   }
 
   const handleMute = () => {
@@ -55,7 +56,7 @@ function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
 
   return (
     <div
-      className={`p-7 
+      className={`p-7 py-4
         ${minimized ? 'max-w-[19rem]' : 'max-w-[30rem]'}`}
     >
       <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
@@ -106,7 +107,7 @@ function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
           </h3>
         </div>
       ) : (
-        <div className="flex flex-col gap-1 overflow-auto h-[100%] ">
+        <div className="flex flex-col gap-1 overflow-auto h-[100%] py-2 ">
           {data.pairs
             ? Object.keys(data.pairs).map((key: string) => (
               <Record
@@ -121,6 +122,7 @@ function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
                 muted={data.disabled.includes(key)}
                 value={data.pairs[key]}
                 onClick={handleClik}
+                highlight={highlight ? highlight[0] === key : false}
               />
             ))
             : null}

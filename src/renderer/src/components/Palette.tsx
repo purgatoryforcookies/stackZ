@@ -29,7 +29,6 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
         })
         baseSocket.on('terminalState', (d: Status) => {
             if (d.stackId !== stackId) return
-            console.log(stackState)
             const newStatus = [...stackState]
             const index = newStatus.findIndex((term) => term.id === d.cmd.id)
             if (index === -1) {
@@ -40,6 +39,7 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
             setStackState(newStatus)
         })
 
+        // TODO: add a toast notification for unexpected exits
         // toast('info', {
         //     description: "Terminal stopped",
 
