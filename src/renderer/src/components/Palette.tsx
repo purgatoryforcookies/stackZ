@@ -20,6 +20,7 @@ type PaletteProps = {
 function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId }: PaletteProps) {
     const [palette, setPalette] = useState<Cmd[]>()
     const [stackState, setStackState] = useState<StackStatus['state']>([])
+    const [running, setRunning] = useState<boolean>(false)
 
     useEffect(() => {
         baseSocket.on('stackState', (d: StackStatus) => {
@@ -28,12 +29,14 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
         })
         baseSocket.on('terminalState', (d: Status) => {
             if (d.stackId !== stackId) return
-            if (stackState.length === 0) return
-
+            console.log(stackState)
             const newStatus = [...stackState]
             const index = newStatus.findIndex((term) => term.id === d.cmd.id)
-            if (index === -1) return
-            newStatus[index].running = d.isRunning
+            if (index === -1) {
+                newStatus.push({ id: d.cmd.id, running: d.isRunning })
+            } else {
+                newStatus[index].running = d.isRunning
+            }
             setStackState(newStatus)
         })
 
@@ -46,7 +49,7 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
     }, [stackId, terminalId])
 
     const toggleStack = () => {
-        if (stackState.some((term) => term.running)) {
+        if (running) {
             window.api.stopStack(stackId)
         } else {
             window.api.startStack(stackId)
@@ -60,6 +63,10 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
         setPalette(filtered)
     }, [stackId, data])
 
+    useEffect(() => {
+        setRunning(stackState.some((term) => term.running))
+    }, [stackState])
+
     return (
         <div className="h-full flex flex-col">
             <div className="flex gap-3 justify-center py-2">
@@ -68,7 +75,13 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
                         return (
                             <Badge
                                 key={stack.id}
-                                onClick={() => onClick(stack.id, 'gibberish', SelectionEvents.CONN)}
+                                onClick={() => {
+                                    let firstTerminalId = ''
+                                    const firstOneOnStack = data.get(stack.id)?.palette
+                                    if (!firstOneOnStack) firstTerminalId = 'gibberish'
+                                    else firstTerminalId = firstOneOnStack[0].id
+                                    onClick(stack.id, firstTerminalId, SelectionEvents.CONN)
+                                }}
                                 variant={stackId === stack.id ? 'default' : 'outline'}
                                 className={`hover:bg-primary hover:text-background 
                         hover:cursor-pointer`}
@@ -81,7 +94,7 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
             </div>
             <div className="flex w-full justify-end pr-12">
                 <Button variant={'link'} size={'sm'} onClick={toggleStack}>
-                    {stackState?.some((term) => term.running === true) ? (
+                    {running ? (
                         <>
                             <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                             Running...

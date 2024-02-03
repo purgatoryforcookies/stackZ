@@ -172,6 +172,10 @@ export class TerminalUIEngine {
         value: command.slice(5)
       })
       return
+    }
+    if (command.slice(0, 5) === 'clear' && command.length <= 5) {
+      this.clear()
+      return
     } else {
       this.socket.emit('changeCommand', {
         stack: this.stackId,

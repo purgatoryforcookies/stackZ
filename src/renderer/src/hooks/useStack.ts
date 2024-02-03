@@ -33,6 +33,15 @@ export const useStack = (SOCKET_HOST: string) => {
       })
     })
     setTerminals(() => newTerminals)
+    selectStack(data[0].id)
+    selectTerminal(() => {
+      const first = data[0].palette
+      if (first) {
+        const i = first[0].id
+        if (i) return i
+      }
+      return 'gibberish'
+    })
     setStack(() => newStack)
     setLoading(false)
   }
@@ -58,12 +67,12 @@ export const useStack = (SOCKET_HOST: string) => {
     }
     const stacks = newTerminals.get(selectedStack)
     if (!stacks) return
+
     const engine = new TerminalUIEngine(selectedStack, cmd.id, SOCKET_HOST)
     engine.startListening()
     stacks.set(cmd.id, engine)
     setStack(newStack)
     setTerminals(newTerminals)
-    console.log(cmd)
     selectTerminal(cmd.id)
   }
 
@@ -87,9 +96,9 @@ export const useStack = (SOCKET_HOST: string) => {
   })
 
   useEffect(() => {
-    // setTimeout(() => {
-    fetchTerminals()
-    // }, 500);
+    setTimeout(() => {
+      fetchTerminals()
+    }, 200);
   }, [])
 
   return {

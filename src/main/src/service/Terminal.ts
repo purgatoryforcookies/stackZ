@@ -22,7 +22,6 @@ export class Terminal {
         this.stackId = stackId
         this.server = server
         this.win = process.platform === 'win32' ? true : false
-        this.settings.command.shell = this.chooseShell(cmd.command.shell)
         this.ptyProcess = null
         this.isRunning = false
         this.buffer = []
@@ -40,11 +39,12 @@ export class Terminal {
         }
 
         try {
-            this.ptyProcess = spawn(this.settings.command.shell!, [this.settings.command.cmd], {
+
+            this.ptyProcess = spawn(this.chooseShell(this.settings.command.shell), [this.settings.command.cmd], {
                 name: `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
-                env: mapEnvs(this.settings.command.env as Environment[])
-                // useConpty: this.win ? false : true,
+                env: mapEnvs(this.settings.command.env as Environment[]),
+                useConpty: this.win ? false : true,
             })
             this.isRunning = true
 
@@ -52,13 +52,14 @@ export class Terminal {
                 this.sendToClient(data)
             })
             this.ptyProcess.onExit((data) => {
+                this.isRunning = false
                 this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? ''}\r\n`)
 
                 const divider = Array(this.ptyProcess?.cols || 20)
                     .fill('-')
                     .join('')
                 this.sendToClient(`${divider}\r\n$ `)
-                this.isRunning = false
+
                 this.ping()
             })
             this.ping()

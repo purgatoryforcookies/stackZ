@@ -155,6 +155,10 @@ export class Stack {
     }
 
     createTerminal(title: string, stack: string) {
+        const existingStack = this.palettes.get(stack)
+        if (!existingStack) {
+            throw new Error(`Whoah, stack ${stack} was not found when adding new temrinal!`)
+        }
         const newT = this.palettes.get(stack)?.createCommand(title)
         this.save()
         return newT
@@ -166,6 +170,7 @@ export class Stack {
             stackName: name
         }
         this.raw.push(newOne)
+        this.palettes.set(newOne.id, new Palette(newOne, this.server))
         this.save()
         return newOne
     }

@@ -51,20 +51,18 @@ export class Palette {
 
   createCommand(title: string) {
 
-
     const newOne: Cmd = {
       id: uuidv4(),
       title: title,
       command: {
         cmd: 'echo Hello World!',
-        cwd: process.env.HOME
+        cwd: process.env.HOME || '~'
       }
     }
     if (!this.settings.palette) {
       this.settings.palette = []
     }
     this.settings.palette.push(newOne)
-    // this.save()
     return newOne
   }
 
@@ -81,7 +79,6 @@ export class Palette {
     const terminal = this.terminals.get(id)
     if (!terminal) return false
     terminal.stop()
-    // this.save()
     return true
   }
 
@@ -89,6 +86,5 @@ export class Palette {
     this.terminals.forEach((terminal) => {
       terminal.stop()
     })
-    // this.save()
   }
 }

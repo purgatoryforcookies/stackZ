@@ -124,7 +124,8 @@ ipcMain.handle('save', () => {
 })
 
 ipcMain.handle('createCommand', (_, title, stackId) => {
-  return stack.createTerminal(title, stackId)
+  const newOne = stack.createTerminal(title, stackId)
+  return newOne
 })
 
 ipcMain.handle('createStack', (_, title) => {

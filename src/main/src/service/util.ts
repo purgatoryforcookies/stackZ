@@ -34,6 +34,11 @@ export const parseVariables = () => {
   return []
 }
 
+
+/**
+ * Factory sorts envs into order and adds host environments
+ * into the settings, if they dont already exist.
+ */
 export const envFactory = (args: Environment[] | undefined) => {
   const hostEnv: Environment = {
     title: 'OS Environment',
