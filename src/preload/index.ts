@@ -4,14 +4,14 @@ import { Cmd, PaletteStack } from '../types'
 
 // Custom APIs for renderer
 const api = {
-  getStack: (id?: number):
-    Promise<PaletteStack[] | PaletteStack> => ipcRenderer.invoke('getStack', id),
+  getStack: (id?: number): Promise<PaletteStack[] | PaletteStack> =>
+    ipcRenderer.invoke('getStack', id),
 
-  startTerminal: (stack: number, terminal: number):
-    Promise<boolean> => ipcRenderer.invoke('toggleTerminal', stack, terminal, true),
+  startTerminal: (stack: number, terminal: number): Promise<boolean> =>
+    ipcRenderer.invoke('toggleTerminal', stack, terminal, true),
 
-  stopTerminal: (stack: number, terminal: number):
-    Promise<boolean> => ipcRenderer.invoke('toggleTerminal', stack, terminal, false),
+  stopTerminal: (stack: number, terminal: number): Promise<boolean> =>
+    ipcRenderer.invoke('toggleTerminal', stack, terminal, false),
 
   startStack: (stack: number) => ipcRenderer.invoke('toggleStack', stack, true),
   stopStack: (stack: number) => ipcRenderer.invoke('toggleStack', stack, false),
@@ -20,13 +20,13 @@ const api = {
 
   save: (): Promise<void> => ipcRenderer.invoke('save'),
 
-  createCommand: (title: string, stackId: number):
-    Promise<Cmd> => ipcRenderer.invoke('createCommand', title, stackId),
+  createCommand: (title: string, stackId: number): Promise<Cmd> =>
+    ipcRenderer.invoke('createCommand', title, stackId),
 
-  deleteCommand: (terminalId: number, stackId: number):
-    Promise<Cmd> => ipcRenderer.invoke('deleteCommand', terminalId, stackId),
+  deleteCommand: (terminalId: number, stackId: number): Promise<Cmd> =>
+    ipcRenderer.invoke('deleteCommand', terminalId, stackId),
 
-  createStack: (title: string) => ipcRenderer.invoke('createStack', title),
+  createStack: (title: string) => ipcRenderer.invoke('createStack', title)
 }
 
 const store = {

@@ -1,4 +1,3 @@
-
 /**
  *
  * The governor is responsible for orchestrating terminals from
@@ -14,7 +13,6 @@
 // export const governor = (stack: number,
 //     terminal: number,
 //     method = SelectionEvents.CONN, cb?: (...args: any) => void) => {
-
 
 //         switch (method) {
 
