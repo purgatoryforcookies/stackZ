@@ -17,13 +17,13 @@ export class TerminalUIEngine {
   private isConnected = false
   private isRunning = false
   private host: string
-  private stackId: number
+  private stackId: string
   private terminalId: number
   private fitAddon: FitAddon
   private hostdiv: HTMLElement
   private buffer: string
 
-  constructor(stackId: number, terminalId: number, host: string) {
+  constructor(stackId: string, terminalId: number, host: string) {
     this.fitAddon = new FitAddon()
     this.stackId = stackId
     this.terminalId = terminalId

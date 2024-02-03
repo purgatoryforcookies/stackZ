@@ -17,7 +17,7 @@ import { useContext, useState } from 'react'
 
 type NewEnvListProps = {
   scroll: () => void
-  stackId: number
+  stackId: string
   terminalId: number
 }
 

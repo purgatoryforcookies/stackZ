@@ -18,7 +18,7 @@ import { Badge } from '@renderer/@/ui/badge'
 
 type NewCommandProps = {
   afterAdd: (cmd: Cmd) => void
-  stackId: number
+  stackId: string
 }
 
 function NewCommand({ afterAdd, stackId }: NewCommandProps) {

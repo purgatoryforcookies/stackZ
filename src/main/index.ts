@@ -88,18 +88,18 @@ app.on('window-all-closed', () => {
   }
 })
 
-ipcMain.handle('getStack', (_, id?: number) => {
+ipcMain.handle('getStack', (_, id?: string) => {
   return stack.get(id)
 })
 
-ipcMain.handle('toggleTerminal', (_, stackId: number, terminalID: number, state: boolean) => {
+ipcMain.handle('toggleTerminal', (_, stackId: string, terminalID: number, state: boolean) => {
   if (state) {
     return stack.startTerminal(stackId, terminalID)
   } else {
     return stack.stopTerminal(stackId, terminalID)
   }
 })
-ipcMain.handle('toggleStack', (_, stackId: number, state: boolean) => {
+ipcMain.handle('toggleStack', (_, stackId: string, state: boolean) => {
   if (state) {
     return stack.startStack(stackId)
   } else {

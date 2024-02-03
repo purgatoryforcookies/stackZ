@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { Cmd, PaletteStack } from '../../types'
 import { Terminal } from './service/Terminal'
 import { Server } from 'socket.io'
@@ -49,12 +50,10 @@ export class Palette {
   }
 
   createCommand(title: string) {
-    const newId = this.settings.palette
-      ? Math.max(...this.settings.palette.map((cmd) => cmd.id)) + 1
-      : 1
+
 
     const newOne: Cmd = {
-      id: newId,
+      id: uuidv4(),
       title: title,
       command: {
         cmd: 'echo Hello World!',

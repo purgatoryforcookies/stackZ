@@ -6,15 +6,15 @@ declare global {
     electron: ElectronAPI
     api: {
       getStack: (id?: number) => Promise<PaletteStack[] | PaletteStack>
-      startTerminal: (stack: number, stack: number) => Promise<boolean>
-      stopTerminal: (stack: number, stack: number) => Promise<boolean>
+      startTerminal: (stack: string, terminal: number) => Promise<boolean>
+      stopTerminal: (stack: string, terminal: number) => Promise<boolean>
       killAll: () => Promise<void>
       save: () => Promise<void>
-      createCommand: (title: string, stackId: number) => Promise<Cmd>
-      startStack: (stack: number) => Promise<void>
-      stopStack: (stack: number) => Promise<void>
+      createCommand: (title: string, stackId: string) => Promise<Cmd>
+      startStack: (stack: string) => Promise<void>
+      stopStack: (stack: string) => Promise<void>
       createStack: (title: string) => Promise<PaletteStack>
-      deleteCommand: (terminalId: number, stackId: number) => Promise<void>
+      deleteCommand: (stackId: string, terminalId: number) => Promise<void>
     }
     store: {
       get: (key: string) => Promise<string>

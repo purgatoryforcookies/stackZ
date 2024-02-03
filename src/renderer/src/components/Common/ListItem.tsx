@@ -7,7 +7,7 @@ type ListItemProps = {
   terminalId: number
   orderId: number
   minimized: boolean
-  stackId: number
+  stackId: string
 }
 
 interface RecordProps extends ListItemProps {
@@ -37,10 +37,9 @@ export const Field = ({
   minimized
 }: FieldProps) => {
   const style = `rounded-full py-1
-    ${
-      variant === 'primary'
-        ? `pr-2 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
-        : ' pl-3 pr-3 bg-primary truncate text-secondary'
+    ${variant === 'primary'
+      ? `pr-2 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
+      : ' pl-3 pr-3 bg-primary truncate text-secondary'
     }`
 
   if (disabled) return <p className={style}>{value}</p>

@@ -14,7 +14,7 @@ type EnvListProps = {
   }
   onSelection: (e: string[]) => void
   terminalId: number
-  stackId: number
+  stackId: string
 }
 
 function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
@@ -109,20 +109,20 @@ function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
         <div className="flex flex-col gap-1 overflow-auto h-[100%] ">
           {data.pairs
             ? Object.keys(data.pairs).map((key: string) => (
-                <Record
-                  newRecord={false}
-                  editMode={editMode}
-                  terminalId={terminalId}
-                  orderId={data.order}
-                  stackId={stackId}
-                  minimized={minimized}
-                  keyv={key}
-                  key={key}
-                  muted={data.disabled.includes(key)}
-                  value={data.pairs[key]}
-                  onClick={handleClik}
-                />
-              ))
+              <Record
+                newRecord={false}
+                editMode={editMode}
+                terminalId={terminalId}
+                orderId={data.order}
+                stackId={stackId}
+                minimized={minimized}
+                keyv={key}
+                key={key}
+                muted={data.disabled.includes(key)}
+                value={data.pairs[key]}
+                onClick={handleClik}
+              />
+            ))
             : null}
           {editMode ? (
             <Record
@@ -131,7 +131,7 @@ function EnvList({ data, onSelection, terminalId, stackId }: EnvListProps) {
               orderId={data.order}
               stackId={stackId}
               minimized={minimized}
-              onClick={() => {}}
+              onClick={() => { }}
               editMode={editMode}
             />
           ) : null}

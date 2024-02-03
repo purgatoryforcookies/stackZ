@@ -4,22 +4,22 @@ import { useEffect, useState } from 'react'
 import { Cmd, PaletteStack } from 'src/types'
 
 export const useStack = (SOCKET_HOST: string) => {
-  const [stack, setStack] = useState<Map<number, PaletteStack>>()
-  const [terminals, setTerminals] = useState<Map<number, Map<number, TerminalUIEngine>>>()
+  const [stack, setStack] = useState<Map<string, PaletteStack>>()
+  const [terminals, setTerminals] = useState<Map<string, Map<number, TerminalUIEngine>>>()
   const [loading, setLoading] = useState(false)
 
-  const [selectedStack, selectStack] = useState<number>(1)
+  const [selectedStack, selectStack] = useState<string>('a')
   const [selectedTerminal, selectTerminal] = useState<number>(1)
 
   const fetchTerminals = async () => {
     setLoading(true)
     const data = (await window.api.getStack()) as PaletteStack[]
-    const newStack = new Map<number, PaletteStack>()
+    const newStack = new Map<string, PaletteStack>()
     data.forEach((stack) => {
       newStack.set(stack.id, stack)
     })
 
-    const newTerminals = new Map<number, Map<number, TerminalUIEngine>>()
+    const newTerminals = new Map<string, Map<number, TerminalUIEngine>>()
     data.forEach((stack) => {
       if (!stack.palette) return
       newTerminals.set(stack.id, new Map<number, TerminalUIEngine>())
@@ -37,7 +37,7 @@ export const useStack = (SOCKET_HOST: string) => {
     setLoading(false)
   }
   const addStack = (st: PaletteStack) => {
-    const newStack = new Map<number, PaletteStack>(stack)
+    const newStack = new Map<string, PaletteStack>(stack)
     newStack.set(st.id, st)
     setStack(() => newStack)
   }
@@ -67,24 +67,24 @@ export const useStack = (SOCKET_HOST: string) => {
     selectTerminal(cmd.id)
   }
 
-  baseSocket.on('terminalDelete', (d: { stack: number; terminal: number }) => {
-    if (d.stack !== selectedStack) return
-    if (stack) {
-      const newStack = new Map(stack)
-      const palette = newStack.get(d.stack)?.palette
-      if (palette) {
-        newStack.get(d.stack)!.palette = palette.filter((pal) => pal.id !== d.terminal)
-      }
-      setStack(newStack)
-    }
-    if (terminals) {
-      const newTerminals = new Map(terminals)
-      if (newTerminals.get(d.terminal)) {
-        newTerminals.delete(d.terminal)
-      }
-      setTerminals(newTerminals)
-    }
-  })
+  // baseSocket.on('terminalDelete', (d: { stack: string; terminal: number }) => {
+  //   if (d.stack !== selectedStack) return
+  //   if (stack) {
+  //     const newStack = new Map(stack)
+  //     const palette = newStack.get(d.stack)?.palette
+  //     if (palette) {
+  //       newStack.get(d.stack)!.palette = palette.filter((pal) => pal.id !== d.terminal)
+  //     }
+  //     setStack(newStack)
+  //   }
+  //   if (terminals) {
+  //     const newTerminals = new Map(terminals)
+  //     if (newTerminals.get(d.terminal)) {
+  //       newTerminals.delete(d.terminal)
+  //     }
+  //     setTerminals(newTerminals)
+  //   }
+  // })
 
   useEffect(() => {
     // setTimeout(() => {

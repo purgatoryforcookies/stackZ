@@ -1,5 +1,5 @@
 import { readFile, writeFileSync, existsSync } from 'fs'
-import { ENVs, JsonEnv } from '../../../types'
+import { Environment } from '../../../types'
 import { ZodTypeAny, z } from 'zod'
 
 export const readJsonFile = <T extends z.ZodTypeAny>(
@@ -34,8 +34,8 @@ export const parseVariables = () => {
   return []
 }
 
-export const envFactory = (args: JsonEnv[] | undefined) => {
-  const hostEnv: ENVs = {
+export const envFactory = (args: Environment[] | undefined) => {
+  const hostEnv: Environment = {
     title: 'OS Environment',
     pairs: process.env as Record<string, string>,
     order: 0,
@@ -43,7 +43,7 @@ export const envFactory = (args: JsonEnv[] | undefined) => {
   }
   if (!args) return [hostEnv]
 
-  let allenvs = args.map((obj) => ({ ...obj, disabled: [] })) as ENVs[]
+  let allenvs = args.map((obj) => ({ ...obj, disabled: [] })) as Environment[]
 
   if (args.findIndex((item) => item.title === 'OS Environment') === -1) {
     allenvs = allenvs.concat(hostEnv)
@@ -52,13 +52,8 @@ export const envFactory = (args: JsonEnv[] | undefined) => {
   return allenvs.sort((a, b) => a.order - b.order)
 }
 
-// export const mandatoryFactory = (loose: Cmd) => {
 
-//     CmdSchema
-
-// }
-
-export const mapEnvs = (obj: ENVs[]) => {
+export const mapEnvs = (obj: Environment[]) => {
   const reduced: Record<string, string | undefined> = {}
   obj.forEach((envSet) => {
     Object.keys(envSet.pairs).forEach((key) => {
