@@ -6,6 +6,7 @@ import { DataStore } from './service/DataStore'
 import { ZodTypeAny } from 'zod'
 import { writeFile } from 'fs'
 import { Server } from 'socket.io'
+import { Terminal } from './service/Terminal';
 
 export class Stack {
     path: string
@@ -30,9 +31,11 @@ export class Stack {
             if (!stack.palette) return
             for (const palette of stack.palette) {
                 palette.id = uuidv4()
+                if (palette.executionOrder) return
+                const orders = stack.palette.map(pal => pal.executionOrder || 0)
+                palette.executionOrder = Math.max(...orders) + 1
             }
         }
-
         return this
     }
     init() {
@@ -128,9 +131,27 @@ export class Stack {
     }
 
     startStack(stack: string) {
+
+        const tempArray: Terminal[] = []
+
         this.palettes.get(stack)?.terminals.forEach((term) => {
-            term.start()
+
+            tempArray.push(term)
+
         })
+
+        tempArray.sort((a, b) => {
+            if (a.settings.executionOrder && b.settings.executionOrder) {
+                return a.settings.executionOrder - b.settings.executionOrder
+            }
+            return -1
+        })
+
+        for (let i = 0; i < tempArray.length; i++) {
+            setTimeout(() => {
+                tempArray[i].start()
+            }, 1500 * i);
+        }
     }
     stopStack(stack: string) {
         this.palettes.get(stack)?.terminals.forEach((term) => {

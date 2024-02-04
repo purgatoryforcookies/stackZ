@@ -19,6 +19,7 @@ export const stackSchema = z.array(
             .array(
                 z.object({
                     id: z.string().default('gibberish'),
+                    executionOrder: z.number().optional(),
                     title: z.string().default('First command'),
                     command: z.object({
                         cmd: z.string().default('Echo Hello'),
