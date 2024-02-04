@@ -39,8 +39,9 @@ export class Terminal {
         }
 
         try {
+            const shell = this.chooseShell(this.settings.command.shell)
 
-            this.ptyProcess = spawn(this.chooseShell(this.settings.command.shell), [this.settings.command.cmd], {
+            this.ptyProcess = spawn(shell, [this.settings.command.cmd], {
                 name: `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as Environment[]),
@@ -66,7 +67,7 @@ export class Terminal {
             this.ping()
         } catch (e) {
             this.sendToClient(
-                `Error starting terminal.\n\rIs current working directory a valid path? \n\rCwd is: ${this.settings.command.cwd}\n\r$ `
+                `${e} \r\n$ `
             )
         }
     }
