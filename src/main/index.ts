@@ -4,26 +4,22 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { socketServer } from './src/service/CommandService'
 import { store } from './src/service/Store'
 import { Stack } from './src/Stack'
-import { StackJsonSchema } from '../types'
+import { stackSchema } from '../types'
 
 // const savedCommandsPath = path.join(__dirname, './commands_save.json')
 
 const savedCommandsPath = './stacks.json'
-const stack = new Stack(savedCommandsPath, socketServer, StackJsonSchema)
-
+const stack = new Stack(savedCommandsPath, socketServer, stackSchema)
 
 async function createWindow(): Promise<void> {
-
   await stack.load()
   stack.init()?.startServer()
 
-
   // dev setup to open screen on 2nd monitor
-  let displays = electron.screen.getAllDisplays()
-  let externalDisplay = displays.find((display) => {
+  const displays = electron.screen.getAllDisplays()
+  const externalDisplay = displays.find((display) => {
     return display.bounds.x !== 0 || display.bounds.y !== 0
   })
-
 
   const mainWindow = new BrowserWindow({
     width: 1800,
@@ -38,15 +34,12 @@ async function createWindow(): Promise<void> {
     },
     x: externalDisplay!.bounds.x + 50, //DEV
     y: externalDisplay!.bounds.y + 50 //DEV
-
   })
 
   mainWindow.on('ready-to-show', () => {
-
     mainWindow.show()
     // dev setup to not focus on it on save
     mainWindow.blur()
-
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -95,27 +88,24 @@ app.on('window-all-closed', () => {
   }
 })
 
-ipcMain.handle('getStack', (_, id?: number) => {
+ipcMain.handle('getStack', (_, id?: string) => {
   return stack.get(id)
 })
 
-ipcMain.handle('toggleTerminal', (_, stackId: number, terminalID: number, state: boolean) => {
+ipcMain.handle('toggleTerminal', (_, stackId: string, terminalID: string, state: boolean) => {
   if (state) {
     return stack.startTerminal(stackId, terminalID)
-  }
-  else {
+  } else {
     return stack.stopTerminal(stackId, terminalID)
   }
 })
-ipcMain.handle('toggleStack', (_, stackId: number, state: boolean) => {
+ipcMain.handle('toggleStack', (_, stackId: string, state: boolean) => {
   if (state) {
     return stack.startStack(stackId)
-  }
-  else {
+  } else {
     return stack.stopStack(stackId)
   }
 })
-
 
 ipcMain.handle('killAll', () => {
   // return palette.killAll()
@@ -134,7 +124,8 @@ ipcMain.handle('save', () => {
 })
 
 ipcMain.handle('createCommand', (_, title, stackId) => {
-  return stack.createTerminal(title, stackId)
+  const newOne = stack.createTerminal(title, stackId)
+  return newOne
 })
 
 ipcMain.handle('createStack', (_, title) => {

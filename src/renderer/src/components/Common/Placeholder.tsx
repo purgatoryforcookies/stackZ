@@ -1,6 +1,3 @@
-
 export default function Placeholder({ message }: { message: string }) {
-    return (
-        <div className='placeholder'>{message}</div>
-    )
+  return <div className="placeholder">{message}</div>
 }

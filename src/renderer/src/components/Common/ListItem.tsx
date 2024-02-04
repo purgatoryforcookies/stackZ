@@ -1,151 +1,162 @@
 import { GoPlusCircle } from 'react-icons/go'
-import { FormEvent, useRef, useState } from 'react'
-import { useClickWatcher } from '@renderer/hooks/useClickWatcher'
+import { FormEvent, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
-
+import { Input } from '@renderer/@/ui/input'
 
 type ListItemProps = {
-    newRecord: boolean,
-    terminalId: number,
-    orderId: number,
-    minimized: boolean,
-    stackId: number,
-
+  newRecord: boolean
+  terminalId: string
+  orderId: number
+  minimized: boolean
+  stackId: string
 }
 
 interface RecordProps extends ListItemProps {
-    keyv?: string,
-    value?: string,
-    onClick: (key: string | undefined, e) => void,
-    editMode: boolean,
-    muted?: boolean,
+  keyv?: string
+  value?: string
+  onClick: (key: string | undefined, e) => void
+  editMode: boolean
+  muted?: boolean
+  highlight?: boolean
 }
-
 
 type FieldProps = {
-    value?: string,
-    disabled: boolean,
-    onChange: (value: string) => void,
-    variant: 'primary' | 'secondary',
-    placeholder?: string
-    muted?: boolean
-    minimized?: boolean
+  value?: string
+  disabled: boolean
+  onChange: (value: string) => void
+  variant: 'primary' | 'secondary'
+  placeholder?: string
+  muted?: boolean
+  minimized?: boolean
+  highlight?: boolean
 }
 
+export const Field = ({
+  value,
+  disabled,
+  onChange,
+  variant,
+  placeholder,
+  minimized,
+  highlight
+}: FieldProps) => {
+  const style = `rounded-full py-1
+    ${variant === 'primary'
+      ? `pr-2 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
+      : `pl-3 pr-3  truncate text-secondary ${highlight ? 'bg-red-900 text-white' : 'bg-primary'}`}`
 
-export const Field = ({ value, disabled, onChange, variant, placeholder, minimized }: FieldProps) => {
+  if (disabled) return <p className={style}>{value}</p>
 
-    const style = `rounded-full py-1
-    ${variant === 'primary' ?
-            `pr-2 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}` :
-            ' pl-3 pr-3 bg-primary truncate text-secondary'}`
-
-
-    if (disabled) return (
-        <p className={style}>
-            {value}
-        </p>
-    )
-
-    return (
-        <input
-            type='text'
-            className={`${style} px-3`}
-            onChange={(e) => onChange(e.target.value)}
-            defaultValue={value}
-            placeholder={placeholder}
-        ></input>
-    )
+  return (
+    <Input
+      type="text"
+      className={`${style} px-3 h-8`}
+      onChange={(e) => onChange(e.target.value)}
+      defaultValue={value}
+      placeholder={placeholder}
+    ></Input>
+  )
 }
 
 /**
  * Component shows key-value pair in a single row.
  * Can edit and create new records.
- * 
+ *
  * Sends changes to server.
- * 
+ *
  * @param {boolean} editMode - Fields become input fields to enable editing
  * @param {boolean} newRecord - Renders a new empty record
  * @param {string} minimized - Renders without value field
  */
-const Record = ({ terminalId, stackId, keyv, value, onClick, editMode, newRecord, orderId, minimized, muted }: RecordProps) => {
+const Record = ({
+  terminalId,
+  stackId,
+  keyv,
+  value,
+  onClick,
+  editMode,
+  newRecord,
+  orderId,
+  minimized,
+  muted,
+  highlight
+}: RecordProps) => {
+  const [newRecordOpen, setNewRecordOpen] = useState(false)
+  const [keyValue, setKeyValue] = useState<string | undefined>(keyv)
+  const [keyPreviousValue] = useState<string | undefined>(keyv)
+  const [valueValue, setValueValue] = useState<string | undefined>(value)
 
-    const [newRecordOpen, setNewRecordOpen] = useState(false)
-    const [keyValue, setKeyValue] = useState<string | undefined>(keyv)
-    const [keyPreviousValue] = useState<string | undefined>(keyv)
-    const [valueValue, setValueValue] = useState<string | undefined>(value)
-    const clickAwayRef = useRef<HTMLDivElement>(null)
+  const handleClick = () => {
+    if (editMode) return
+    baseSocket.emit('environmentMute', {
+      stack: stackId,
+      terminal: terminalId,
+      value: keyValue,
+      order: orderId
+    })
+  }
 
-    const { } = useClickWatcher(clickAwayRef, setNewRecordOpen)
+  const handleEdits = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
 
-    const handleClick = () => {
-        if (editMode) return
-        baseSocket.emit('environmentMute', { stack: stackId, terminal: terminalId, value: keyValue, order: orderId })
-    }
+    if (!keyValue) return
+    if (newRecordOpen && (!keyValue || !valueValue)) return
+    baseSocket.emit('environmentEdit', {
+      stack: stackId,
+      terminal: terminalId,
+      order: orderId,
+      key: keyValue,
+      previousKey: keyPreviousValue,
+      value: valueValue,
+      enabled: true
+    })
 
-    const handleEdits = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
+    setNewRecordOpen(false)
+  }
 
-        if (!keyValue) return
-        if (newRecordOpen && (!keyValue || !valueValue)) return
-        baseSocket.emit('environmentEdit',
-            {
-                stack: stackId,
-                terminal: terminalId,
-                order: orderId,
-                key: keyValue,
-                previousKey: keyPreviousValue,
-                value: valueValue,
-                enabled: true
-            })
+  return (
+    <div
+      className={`text-sm ${muted ? 'brightness-50' : ''}`}
+      onClick={(e) => onClick(keyValue, e)}
+      onContextMenu={handleClick}
+    >
+      {newRecord && !newRecordOpen ? (
+        <GoPlusCircle
+          size={20}
+          onClick={() => setNewRecordOpen(!newRecordOpen)}
+          className="flex justify-center items-center w-full mt-2 hover:cursor-pointer text-secondary-foreground"
+        />
+      ) : (
+        <form
+          onSubmit={handleEdits}
+          onBlur={handleEdits}
+          className="flex font-semibold justify-between hover:cursor-pointer pl-3 rounded-full bg-muted"
+        >
+          <Field
+            value={keyv}
+            disabled={!editMode}
+            onChange={setKeyValue}
+            variant="primary"
+            placeholder="KEY"
+            minimized={minimized}
+          />
 
-        setNewRecordOpen(false)
-
-    }
-
-
-
-    return (
-        <div className={`text-sm ${muted ? 'brightness-50' : ''}`}
-            ref={clickAwayRef}
-            onClick={(e) => onClick(keyValue, e)}
-            onContextMenu={handleClick}>
-            {newRecord && !newRecordOpen ? <GoPlusCircle
-                size={20}
-                color='var(--primary)'
-                onClick={() => setNewRecordOpen(!newRecordOpen)}
-                className='flex justify-center items-center w-full mt-2 hover:cursor-pointer'
-            /> :
-                <form onSubmit={handleEdits} onBlur={handleEdits}
-                    className='flex font-semibold justify-between bg-muted hover:cursor-pointer pl-3 rounded-full'>
-                    <Field
-                        value={keyv}
-                        disabled={!editMode}
-                        onChange={setKeyValue}
-                        variant='primary'
-                        placeholder='KEY'
-                        minimized={minimized} />
-
-                    {!minimized ?
-                        <Field
-                            value={value}
-                            disabled={!editMode}
-                            onChange={setValueValue}
-                            muted={muted}
-                            variant='secondary'
-                            placeholder='VALUE' />
-                        : null}
-                    <button hidden>hello</button>
-                </form>
-            }
-        </div>
-    )
-
-
+          {!minimized ? (
+            <Field
+              value={value}
+              disabled={!editMode}
+              onChange={setValueValue}
+              muted={muted}
+              variant="secondary"
+              placeholder="VALUE"
+              highlight={highlight}
+            />
+          ) : null}
+          <button hidden>hello</button>
+        </form>
+      )}
+    </div>
+  )
 }
 
-
-
 export default Record
-
-

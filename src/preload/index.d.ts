@@ -5,17 +5,17 @@ declare global {
   interface Window {
     electron: ElectronAPI
     api: {
-      getStack: (id?: number) => Promise<PaletteStack[] | PaletteStack>,
-      startTerminal: (stack: number, stack: number) => Promise<boolean>,
-      stopTerminal: (stack: number, stack: number) => Promise<boolean>,
-      killAll: () => Promise<void>,
-      save: () => Promise<void>,
-      createCommand: (title: string, stackId: number) => Promise<Cmd>,
-      startStack: (stack: number) => Promise<void>,
-      stopStack: (stack: number) => Promise<void>,
-      createStack: (title: string) => Promise<PaletteStack>,
-      deleteCommand: (terminalId: number, stackId: number) => Promise<void>
-    },
+      getStack: (id?: string) => Promise<PaletteStack[] | PaletteStack>
+      startTerminal: (stack: string, terminal: string) => Promise<boolean>
+      stopTerminal: (stack: string, terminal: string) => Promise<boolean>
+      killAll: () => Promise<void>
+      save: () => Promise<void>
+      createCommand: (title: string, stackId: string) => Promise<Cmd>
+      startStack: (stack: string) => Promise<void>
+      stopStack: (stack: string) => Promise<void>
+      createStack: (title: string) => Promise<PaletteStack>
+      deleteCommand: (stackId: string, terminalId: string) => Promise<void>
+    }
     store: {
       get: (key: string) => Promise<string>
       set: (key: string, value: string) => Promise<void>
