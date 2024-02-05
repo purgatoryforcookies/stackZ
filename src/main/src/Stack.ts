@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ITerminalDimensions } from 'xterm-addon-fit'
-import { EnvironmentEditProps, PaletteStack, Utility2Props, UtilityProps } from '../../types'
+import { CommandMetaSetting, EnvironmentEditProps, PaletteStack, Utility2Props, UtilityProps } from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './service/DataStore'
 import { ZodTypeAny } from 'zod'
@@ -91,6 +91,11 @@ export class Stack {
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.removeEnvList(args)
                     this.save()
                 })
+                client.on('commandMetaSetting', (args: { stack: string, terminal: string, settings: CommandMetaSetting }) => {
+                    this.palettes.get(args.stack)?.terminals.get(args.terminal)?.setMetaSettings(args.settings)
+                    this.save()
+
+                })
 
                 return
             }
@@ -147,10 +152,19 @@ export class Stack {
             return -1
         })
 
+        let timeouts = 0
+
         for (let i = 0; i < tempArray.length; i++) {
-            setTimeout(() => {
-                tempArray[i].start()
-            }, 1500 * i);
+            const stack = tempArray[i]
+            if (stack.settings.metaSettings?.delay) {
+                timeouts += stack.settings.metaSettings?.delay
+                setTimeout(() => {
+                    stack.start()
+                }, timeouts);
+            }
+            else {
+                stack.start()
+            }
         }
     }
     stopStack(stack: string) {

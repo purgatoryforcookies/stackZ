@@ -1,4 +1,4 @@
-import { Cmd, Environment, EnvironmentEditProps, Status, UtilityProps } from '../../../types'
+import { Cmd, CommandMetaSetting, Environment, EnvironmentEditProps, Status, UtilityProps } from '../../../types'
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from './util'
 import path from 'path'
@@ -27,10 +27,36 @@ export class Terminal {
         this.buffer = []
     }
 
-    chooseShell(shell: string | undefined) {
+    chooseShell(shell?: string) {
         if (shell) return shell.trim()
         if (this.win) return 'powershell.exe'
         return 'bash'
+    }
+
+    chooseStartSettings(shell: string | undefined, cmd: string, loose: boolean | undefined): [string, string[]] {
+        const tmpShell = shell ? shell.trim() : this.win ? 'powershell.exe' : 'bash'
+
+        if (loose) {
+            return [tmpShell, []]
+        }
+
+        switch (tmpShell) {
+            case 'cmd.exe':
+                return ['powershell.exe', ["cmd.exe", "/c", cmd]]
+            case 'wsl.exe':
+                return ['powershell.exe', ["wsl.exe", "-e", cmd]]
+            case 'powershell.exe':
+                return ['powershell.exe', [cmd]]
+            case 'bash':
+                return ['bash', ['-e', cmd]]
+            case 'zsh':
+                return ['zsh', ['-e', cmd]]
+            default:
+                if (this.win) {
+                    return ['powershell.exe', [cmd]]
+                }
+                return ['bash', ['-e', cmd]]
+        }
     }
 
     start() {
@@ -39,16 +65,22 @@ export class Terminal {
         }
 
         try {
-            const shell = this.chooseShell(this.settings.command.shell)
 
-            this.ptyProcess = spawn(shell, [this.settings.command.cmd], {
+            const [shell, cmd] = this.chooseStartSettings(
+                this.settings.command.shell,
+                this.settings.command.cmd,
+                this.settings.metaSettings?.loose)
+
+            this.ptyProcess = spawn(shell, cmd, {
                 name: `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as Environment[]),
                 useConpty: this.win ? false : true,
             })
             this.isRunning = true
-            // this.run(this.settings.command.cmd)
+            if (cmd.length === 0) {
+                this.run(this.settings.command.cmd)
+            }
 
             this.ptyProcess.onData((data) => {
                 this.sendToClient(data)
@@ -62,6 +94,9 @@ export class Terminal {
                     .join('')
                 this.sendToClient(`${divider}\r\n$ `)
                 this.stop()
+                if (this.settings.metaSettings?.rerun) {
+                    this.start()
+                }
                 this.ping()
             })
             this.ping()
@@ -104,6 +139,11 @@ export class Terminal {
     }
 
     getState(): Status {
+
+        if (!this.settings.command.shell) {
+            this.settings.command.shell = this.chooseShell()
+        }
+
         return {
             stackId: this.stackId,
             cmd: this.settings,
@@ -214,4 +254,10 @@ export class Terminal {
         this.settings.command.shell = this.chooseShell(newShell)
         this.ping()
     }
+
+    setMetaSettings(settings: CommandMetaSetting) {
+        this.settings.metaSettings = settings
+        this.ping()
+    }
+
 }

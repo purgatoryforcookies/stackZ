@@ -21,6 +21,11 @@ export const stackSchema = z.array(
                     id: z.string().default('gibberish'),
                     executionOrder: z.number().optional(),
                     title: z.string().default('First command'),
+                    metaSettings: z.object({
+                        loose: z.boolean().default(false),
+                        rerun: z.boolean().default(false),
+                        delay: z.number().default(0)
+                    }).optional(),
                     command: z.object({
                         cmd: z.string().default('Echo Hello'),
                         shell: z.string().optional(),
@@ -42,10 +47,12 @@ export const stackSchema = z.array(
     })
 )
 
+
 export type PaletteStack = z.infer<typeof stackSchema>[0]
 
 export type Cmd = Exclude<PaletteStack['palette'], undefined>[0]
 export type Environment = Exclude<Cmd['command']['env'], undefined>[0]
+export type CommandMetaSetting = Exclude<Cmd['metaSettings'], undefined>
 export type EnginedCmd = Cmd & { engine: TerminalUIEngine }
 
 // const env = z.object({
@@ -148,3 +155,4 @@ export type StoreType = {
     }
     theme: string
 }
+

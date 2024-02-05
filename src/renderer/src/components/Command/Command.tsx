@@ -78,7 +78,7 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                             <span>command: {ping.cmd.command.cmd}</span>
                             <span>shell: {ping.cmd.command.shell ?? data.command.shell}</span>
                             <span>
-                                palettes: {ping.cmd.command.env?.length} {'(3 active)'}
+                                palettes: X{ping.cmd.command.env?.length}
                             </span>
                             <span>notes: {ping.cmd.title}</span>
                         </div>
@@ -106,7 +106,7 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                     `}>
 
                         <div className="flex gap-1 justify-center p-2 pb-6 h-full">
-                            <CommandSettings expanded={expanded} data={data} />
+                            <CommandSettings expanded={expanded} data={data} stackId={hostStack} />
                         </div>
 
 
