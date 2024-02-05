@@ -14,13 +14,15 @@ export class Stack {
     raw: PaletteStack[]
     palettes: Map<string, Palette>
     store: DataStore
+    saveDisabled: boolean
 
-    constructor(jsonPath: string, server: Server, schema: ZodTypeAny) {
+    constructor(jsonPath: string, server: Server, schema: ZodTypeAny, disableSave = false) {
         this.path = jsonPath
         this.server = server
         this.raw = []
         this.store = new DataStore(jsonPath, schema)
         this.palettes = new Map<string, Palette>()
+        this.saveDisabled = disableSave
     }
 
     async load() {
@@ -211,6 +213,7 @@ export class Stack {
     }
 
     save(onExport = false) {
+        if (this.saveDisabled) return
         const toModify: PaletteStack[] = onExport ? JSON.parse(JSON.stringify(this.raw)) : this.raw
 
         toModify.forEach((palette) => {
@@ -223,7 +226,7 @@ export class Stack {
             }
         })
 
-        const filename = onExport ? 'commands_exported.json' : 'stacks.json'
+        const filename = onExport ? 'commands_exported.json' : this.path
 
         writeFile(filename, JSON.stringify(this.raw), (error) => {
             if (error) throw error
