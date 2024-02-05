@@ -52,17 +52,23 @@ export class Palette {
 
   createCommand(title: string) {
 
+
+    if (!this.settings.palette) {
+      this.settings.palette = []
+    }
+
+    const orders = this.settings.palette?.map(pal => pal.executionOrder || 0)
+
     const newOne: Cmd = {
       id: uuidv4(),
       title: title,
+      executionOrder: Math.max(...orders) + 1,
       command: {
         cmd: 'echo Hello World!',
         cwd: resolveDefaultCwd()
       }
     }
-    if (!this.settings.palette) {
-      this.settings.palette = []
-    }
+
     this.settings.palette.push(newOne)
     return newOne
   }

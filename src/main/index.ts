@@ -127,11 +127,11 @@ ipcMain.handle('createCommand', (_, title, stackId) => {
   const newOne = stack.createTerminal(title, stackId)
   return newOne
 })
-
+ipcMain.handle('deleteCommand', (_, stackId, terminalId) => {
+  return stack.deleteTerminal(stackId, terminalId)
+})
 ipcMain.handle('createStack', (_, title) => {
   return stack.createStack(title)
 })
 
-ipcMain.handle('deleteCommand', (_, stackId, terminalId) => {
-  return stack.deleteTerminal(stackId, terminalId)
-})
+

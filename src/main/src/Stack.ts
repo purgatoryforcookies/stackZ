@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ITerminalDimensions } from 'xterm-addon-fit'
-import { EnvironmentEditProps, PaletteStack, Utility2Props, UtilityProps } from '../../types'
+import { CommandMetaSetting, EnvironmentEditProps, PaletteStack, Utility2Props, UtilityProps } from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './service/DataStore'
 import { ZodTypeAny } from 'zod'
 import { writeFile } from 'fs'
 import { Server } from 'socket.io'
+import { Terminal } from './service/Terminal';
 
 export class Stack {
     path: string
@@ -30,9 +31,11 @@ export class Stack {
             if (!stack.palette) return
             for (const palette of stack.palette) {
                 palette.id = uuidv4()
+                if (palette.executionOrder) return
+                const orders = stack.palette.map(pal => pal.executionOrder || 0)
+                palette.executionOrder = Math.max(...orders) + 1
             }
         }
-
         return this
     }
     init() {
@@ -88,6 +91,11 @@ export class Stack {
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.removeEnvList(args)
                     this.save()
                 })
+                client.on('commandMetaSetting', (args: { stack: string, terminal: string, settings: CommandMetaSetting }) => {
+                    this.palettes.get(args.stack)?.terminals.get(args.terminal)?.setMetaSettings(args.settings)
+                    this.save()
+
+                })
 
                 return
             }
@@ -128,9 +136,36 @@ export class Stack {
     }
 
     startStack(stack: string) {
+
+        const tempArray: Terminal[] = []
+
         this.palettes.get(stack)?.terminals.forEach((term) => {
-            term.start()
+
+            tempArray.push(term)
+
         })
+
+        tempArray.sort((a, b) => {
+            if (a.settings.executionOrder && b.settings.executionOrder) {
+                return a.settings.executionOrder - b.settings.executionOrder
+            }
+            return -1
+        })
+
+        let timeouts = 0
+
+        for (let i = 0; i < tempArray.length; i++) {
+            const stack = tempArray[i]
+            if (stack.settings.metaSettings?.delay) {
+                timeouts += stack.settings.metaSettings?.delay
+                setTimeout(() => {
+                    stack.start()
+                }, timeouts);
+            }
+            else {
+                stack.start()
+            }
+        }
     }
     stopStack(stack: string) {
         this.palettes.get(stack)?.terminals.forEach((term) => {
