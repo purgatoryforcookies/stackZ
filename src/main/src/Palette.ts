@@ -30,39 +30,24 @@ export class Palette {
     this.settings.palette = this.settings.palette?.filter((pal) => pal.id !== terminalId)
   }
 
-  pingState() {
-    const state = [...this.terminals.values()].map((term) => {
-      if (!term) return term
-      return {
-        id: term.settings.id,
-        running: term.isRunning
-      }
-    })
-
-    this.server.emit('stackState', { stack: this.settings.id, state: state })
-  }
-
-  pingAll() {
-    this.terminals.forEach((term) => term.ping())
-  }
-
-  get() {
-    return this.settings
-  }
-
   createCommand(title: string) {
 
+    let newOrder = 0
 
     if (!this.settings.palette) {
       this.settings.palette = []
-    }
+    } else {
 
-    const orders = this.settings.palette?.map(pal => pal.executionOrder || 0)
+      const orders = this.settings.palette.map(pal => pal.executionOrder || 0)
+      const maxOrder = Math.max(...orders)
+      if (maxOrder !== Infinity) newOrder = maxOrder + 1
+
+    }
 
     const newOne: Cmd = {
       id: uuidv4(),
       title: title,
-      executionOrder: Math.max(...orders) + 1,
+      executionOrder: newOrder,
       command: {
         cmd: 'echo Hello World!',
         cwd: resolveDefaultCwd()
@@ -93,5 +78,25 @@ export class Palette {
     this.terminals.forEach((terminal) => {
       terminal.stop()
     })
+  }
+
+  pingState() {
+    const state = [...this.terminals.values()].map((term) => {
+      if (!term) return term
+      return {
+        id: term.settings.id,
+        running: term.isRunning
+      }
+    })
+
+    this.server.emit('stackState', { stack: this.settings.id, state: state })
+  }
+
+  pingAll() {
+    this.terminals.forEach((term) => term.ping())
+  }
+
+  get() {
+    return this.settings
   }
 }

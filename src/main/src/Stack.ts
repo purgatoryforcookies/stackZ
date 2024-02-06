@@ -4,7 +4,6 @@ import { CommandMetaSetting, EnvironmentEditProps, PaletteStack, Utility2Props, 
 import { Palette } from './Palette'
 import { DataStore } from './service/DataStore'
 import { ZodTypeAny } from 'zod'
-import { writeFile } from 'fs'
 import { Server } from 'socket.io'
 import { Terminal } from './service/Terminal';
 
@@ -14,15 +13,13 @@ export class Stack {
     raw: PaletteStack[]
     palettes: Map<string, Palette>
     store: DataStore
-    saveDisabled: boolean
 
-    constructor(jsonPath: string, server: Server, schema: ZodTypeAny, disableSave = false) {
+    constructor(jsonPath: string, server: Server, schema: ZodTypeAny) {
         this.path = jsonPath
         this.server = server
         this.raw = []
         this.store = new DataStore(jsonPath, schema)
         this.palettes = new Map<string, Palette>()
-        this.saveDisabled = disableSave
     }
 
     async load() {
@@ -35,7 +32,7 @@ export class Stack {
                 palette.id = uuidv4()
                 if (palette.executionOrder) return
                 const orders = stack.palette.map(pal => pal.executionOrder || 0)
-                palette.executionOrder = Math.max(...orders) + 1
+                palette.executionOrder = (Math.max(...orders) ?? 1) + 1
             }
         }
         return this
@@ -197,6 +194,7 @@ export class Stack {
             throw new Error(`Whoah, stack ${stack} was not found when adding new temrinal!`)
         }
         const newT = this.palettes.get(stack)?.createCommand(title)
+        if (!newT) throw new Error(`Could not create terminal ${title} ${stack}`)
         this.save()
         return newT
     }
@@ -212,8 +210,17 @@ export class Stack {
         return newOne
     }
 
+    removeStack(stackId: string) {
+
+        this.raw = this.raw.filter(s => s.id !== stackId)
+        this.palettes.delete(stackId)
+        this.save()
+
+        return
+    }
+
     save(onExport = false) {
-        if (this.saveDisabled) return
+
         const toModify: PaletteStack[] = onExport ? JSON.parse(JSON.stringify(this.raw)) : this.raw
 
         toModify.forEach((palette) => {
@@ -228,8 +235,6 @@ export class Stack {
 
         const filename = onExport ? 'commands_exported.json' : this.path
 
-        writeFile(filename, JSON.stringify(this.raw), (error) => {
-            if (error) throw error
-        })
+        this.store.save(filename, this.raw)
     }
 }
