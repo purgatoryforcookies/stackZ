@@ -1,7 +1,7 @@
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { baseSocket } from '@renderer/service/socket'
 import { useEffect, useState } from 'react'
-import { Cmd, PaletteStack } from 'src/types'
+import { ClientEvents, Cmd, PaletteStack } from 'src/types'
 
 export const useStack = (SOCKET_HOST: string) => {
   const [stack, setStack] = useState<Map<string, PaletteStack>>()
@@ -12,6 +12,7 @@ export const useStack = (SOCKET_HOST: string) => {
   const [selectedTerminal, selectTerminal] = useState<string>('a')
 
   const fetchTerminals = async () => {
+
     setLoading(true)
     const data = (await window.api.getStack()) as PaletteStack[]
     const newStack = new Map<string, PaletteStack>()
@@ -32,6 +33,7 @@ export const useStack = (SOCKET_HOST: string) => {
         s.set(cmd.id, engine)
       })
     })
+
     setTerminals(() => newTerminals)
     selectStack(data[0].id)
     selectTerminal(() => {
@@ -76,7 +78,7 @@ export const useStack = (SOCKET_HOST: string) => {
     selectTerminal(cmd.id)
   }
 
-  baseSocket.on('terminalDelete', (d: { stack: string; terminal: string }) => {
+  baseSocket.on(ClientEvents.DELTERMINAL, (d: { stack: string; terminal: string }) => {
     if (d.stack !== selectedStack) return
     if (stack) {
       const newStack = new Map(stack)

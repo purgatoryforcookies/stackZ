@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ITerminalDimensions } from 'xterm-addon-fit'
-import { CommandMetaSetting, EnvironmentEditProps, PaletteStack, Utility2Props, UtilityProps } from '../../types'
+import { CommandMetaSetting, EnvironmentEditProps, PaletteStack, TerminalEvents, Utility2Props, UtilityEvents, UtilityProps } from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './service/DataStore'
 import { ZodTypeAny } from 'zod'
@@ -63,62 +63,62 @@ export class Stack {
             // then utility listeners are registered
 
             if (!palette) {
-                client.on('state', (arg: { stack: string; terminal?: string }) => {
+
+                client.on(UtilityEvents.STATE, (arg: { stack: string; terminal?: string }) => {
                     if (!arg.terminal) {
                         this.palettes.get(arg.stack)?.pingAll()
                         return
                     }
                     this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.ping()
                 })
-                client.on('bigState', (arg: { stack: string }) => {
+                client.on(UtilityEvents.BIGSTATE, (arg: { stack: string }) => {
                     this.palettes.get(arg.stack)?.pingState()
                 })
-                client.on('environmentEdit', (args: EnvironmentEditProps) => {
+                client.on(UtilityEvents.ENVEDIT, (args: EnvironmentEditProps) => {
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.editVariable(args)
                     this.save()
                 })
-                client.on('environmentMute', (arg: UtilityProps) => {
+                client.on(UtilityEvents.ENVMUTE, (arg: UtilityProps) => {
                     this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.muteVariable(arg)
                     this.save()
                 })
-                client.on('environmentList', (args: Omit<UtilityProps, 'order'>) => {
+                client.on(UtilityEvents.ENVLIST, (args: Omit<UtilityProps, 'order'>) => {
                     if (!args.value) return
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.addEnvList(args.value)
                     this.save()
                 })
-                client.on('environmentDelete', (args: UtilityProps) => {
+                client.on(UtilityEvents.ENVDELETE, (args: UtilityProps) => {
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.removeEnvList(args)
                     this.save()
                 })
-                client.on('commandMetaSetting', (args: { stack: string, terminal: string, settings: CommandMetaSetting }) => {
+                client.on(UtilityEvents.CMDMETASETTINGS, (args: { stack: string, terminal: string, settings: CommandMetaSetting }) => {
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.setMetaSettings(args.settings)
                     this.save()
-
                 })
-
+                client.emit('hello')
                 return
             }
-            client.on('changeCwd', (arg: Utility2Props) => {
+            client.on(TerminalEvents.CWD, (arg: Utility2Props) => {
                 console.log(`Changing cwd! new Cwd: ${arg.value}`)
                 this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.updateCwd(arg.value)
                 this.save()
             })
-            client.on('changeCommand', (arg: Utility2Props) => {
+            client.on(TerminalEvents.CMD, (arg: Utility2Props) => {
                 console.log(`Changing command! new CMD: ${arg.value}`)
                 this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.updateCommand(arg.value)
                 this.save()
             })
-            client.on('changeShell', (arg: Utility2Props) => {
+            client.on(TerminalEvents.SHELL, (arg: Utility2Props) => {
                 console.log(`Changing shell! new shell: ${arg.value}`)
                 this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.changeShell(arg.value)
                 this.save()
             })
-            client.on('input', (arg: Utility2Props) => {
+            client.on(TerminalEvents.INPUT, (arg: Utility2Props) => {
                 console.log(`Getting input from ${arg.stack}-${arg.terminal}`)
                 this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.writeFromClient(arg.value)
             })
             client.on(
-                'resize',
+                TerminalEvents.RESIZE,
                 (arg: { stack: string; terminal: string; value: ITerminalDimensions }) => {
                     this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.resize(arg.value)
                 }

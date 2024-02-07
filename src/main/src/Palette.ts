@@ -21,7 +21,9 @@ export class Palette {
       const newTerminal = new Terminal(this.settings.id, terminal, socketId, server)
       this.terminals.set(terminal.id, newTerminal)
       newTerminal.ping()
+      return
     }
+    throw new Error(`No terminal found ${socketId}, ${remoteTerminalID}`)
   }
 
   deleteTerminal(terminalId: string) {

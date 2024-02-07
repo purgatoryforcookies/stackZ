@@ -55,45 +55,6 @@ export type Environment = Exclude<Cmd['command']['env'], undefined>[0]
 export type CommandMetaSetting = Exclude<Cmd['metaSettings'], undefined>
 export type EnginedCmd = Cmd & { engine: TerminalUIEngine }
 
-// const env = z.object({
-//     pairs: z.record(z.string().min(1), z.string().optional()),
-//     title: z.string().min(1).default('Default'),
-//     order: z.number().default(1),
-//     disabled: z.array(z.string())
-// })
-
-// export const CmdSchema = z.object({
-//     id: z.number(),
-//     title: z.string().default('First command'),
-//     command: z.object({
-//         cmd: z.string().default('Echo Hello'),
-//         shell: z.string().optional(),
-//         env: z.array(env).optional(),
-//         cwd: z.string().optional()
-//     })
-// })
-
-// export const CmdJsonSchema = z.array(
-//     CmdSchema
-// ).optional()
-
-// export const StackSchema = z.object({
-//     id: z.number().default(1),
-//     stackName: z.string().default('First'),
-//     env: z.array(env).optional(),
-//     palette: CmdJsonSchema
-// })
-// export const StackJsonSchema = z.array(StackSchema)
-
-// export type Cmd2 = z.infer<typeof CmdSchema>
-// export type JsonEnv = z.infer<typeof env>
-// export type PaletteStack2 = z.infer<typeof StackSchema>
-// export type ENVs = JsonEnv & { disabled: string[] }
-// export type EnginedCmd2 = Cmd2 & { engine: TerminalUIEngine }
-// export type ExtendedCmd = Map<number, EnginedCmd> | undefined
-// export type StackCmd = Map<number, PaletteStack>
-
-// export type SocketServer = Server
 
 export enum SelectionEvents {
     START = 'START',
@@ -102,6 +63,33 @@ export enum SelectionEvents {
     EXPAND = 'EXPAND',
     NEWSTACK = 'NEWSTACK'
 }
+
+export enum UtilityEvents {
+    STATE = 'state',
+    BIGSTATE = 'bigState',
+    ENVEDIT = 'environmentEdit',
+    ENVMUTE = 'environmentMute',
+    ENVLIST = 'environmentList',
+    ENVDELETE = 'environmentDelete',
+    CMDMETASETTINGS = 'commandMetaSetting'
+}
+
+export enum TerminalEvents {
+    CWD = 'changeCwd',
+    CMD = 'changeCommand',
+    SHELL = 'changeShell',
+    INPUT = 'input',
+    RESIZE = 'resize',
+}
+
+export enum ClientEvents {
+    DELTERMINAL = 'terminalDelete',
+    STACKSTATE = 'stackState',
+    TERMINALSTATE = 'terminalState',
+
+}
+
+
 
 export type Status = {
     stackId: string

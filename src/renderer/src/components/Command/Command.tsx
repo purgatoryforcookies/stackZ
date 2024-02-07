@@ -1,4 +1,4 @@
-import { Cmd, SelectionEvents, Status } from '../../../../types'
+import { ClientEvents, Cmd, SelectionEvents, Status, UtilityEvents } from '../../../../types'
 import { useEffect, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
 import { Button } from '@renderer/@/ui/button'
@@ -27,11 +27,11 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
     const [expanded, setExpanded] = useState<boolean>(false)
 
     useEffect(() => {
-        baseSocket.on('terminalState', (d: Exclude<Status, undefined>) => {
+        baseSocket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
             if (hostStack !== d.stackId || data.id !== d.cmd.id) return
             setPing(d)
         })
-        baseSocket.emit('state', { stack: hostStack, terminal: data.id })
+        baseSocket.emit(UtilityEvents.STATE, { stack: hostStack, terminal: data.id })
     }, [selected, hostStack, data])
 
     const handleState = async (delRecord = false) => {
@@ -45,7 +45,7 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
         } else {
             window.api.startTerminal(hostStack, data.id)
         }
-        baseSocket.emit('bigState', { stack: hostStack })
+        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: hostStack })
     }
 
     return (
