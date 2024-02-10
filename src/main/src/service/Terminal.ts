@@ -5,7 +5,7 @@ import {
     EnvironmentEditProps,
     Status,
     UtilityProps
-} from '@t'
+} from '../../../types'
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from './util'
 import path from 'path'

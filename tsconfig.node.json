@@ -6,9 +6,6 @@
     "src/main/**/*",
     "src/types.ts",
   ],
-  "exclude": [
-    "**/*.test.ts",
-  ],
   "compilerOptions": {
     "composite": true,
     "isolatedModules": true,
@@ -19,11 +16,6 @@
     "types": [
       "electron-vite/node",
       "jest",
-    ],
-    "paths": {
-      "@t": [
-        "src/types.ts"
-      ]
-    }
+    ]
   }
 }

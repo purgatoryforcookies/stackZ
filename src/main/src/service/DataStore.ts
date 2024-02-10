@@ -1,7 +1,7 @@
 import { ZodTypeAny } from 'zod'
 import { readJsonFile } from './util'
 import { writeFileSync } from 'fs'
-import { PaletteStack } from '@t'
+import { PaletteStack } from '../../../types'
 
 /**
  * DataStores job is to handle saving and loading the settings from a file.

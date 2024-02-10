@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { Cmd, PaletteStack } from '@t'
+import { Cmd, PaletteStack } from '../../types'
 import { Terminal } from './service/Terminal'
 import { Server } from 'socket.io'
 import { resolveDefaultCwd } from './service/util'
