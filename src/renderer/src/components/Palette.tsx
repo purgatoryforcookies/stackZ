@@ -1,4 +1,12 @@
-import { ClientEvents, Cmd, PaletteStack, SelectionEvents, StackStatus, Status, UtilityEvents } from '../../../types'
+import {
+    ClientEvents,
+    Cmd,
+    PaletteStack,
+    SelectionEvents,
+    StackStatus,
+    Status,
+    UtilityEvents
+} from '@t'
 import { useEffect, useState } from 'react'
 import { Badge } from '@renderer/@/ui/badge'
 import NewCommand from './Dialogs/NewCommand'
@@ -10,7 +18,12 @@ import { NewStack } from './Dialogs/NewStack'
 
 type PaletteProps = {
     data: Map<string, PaletteStack>
-    onClick: (stackId: string, terminalId: string, method?: SelectionEvents, cb?: () => void) => void
+    onClick: (
+        stackId: string,
+        terminalId: string,
+        method?: SelectionEvents,
+        cb?: () => void
+    ) => void
     onNewTerminal: (cmd: Cmd) => void
     onNewStack: (st: PaletteStack) => void
     terminalId: string

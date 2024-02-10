@@ -10,24 +10,19 @@ const testServer = new Server({
     }
 })
 
-
 const filepath = './src/main/tests/fixtures/testStack1.json'
 
 const SOCKET_HOST_FOR_CLIENT = 'http://localhost:3123'
 
-
 // Test is designed to be run in order.
 describe('stack', () => {
-
     const stack = new Stack(filepath, testServer, stackSchema)
     const testTerminalNames = ['terminal1', 'terminal2', 'terminal3', 'terminal4']
     const testStacks: Map<string, string[]> = new Map()
     const uiSockets: Socket[] = []
 
-
     beforeAll(async () => {
         await stack.load()
-
     })
 
     afterAll(() => {
@@ -35,34 +30,30 @@ describe('stack', () => {
         unlinkSync(filepath)
     })
 
-
-    it("Creates a file if it does not exists", () => {
+    it('Creates a file if it does not exists', () => {
         expect(existsSync(filepath)).toBeTruthy()
     })
 
     it('Inits the default stack, and starts a server', async () => {
-
         expect(stack.palettes.size).toBe(0)
-
 
         stack.init()?.startServer()
 
         expect(stack.palettes.size).toBe(1)
-        stack.palettes.forEach(palette => {
+        stack.palettes.forEach((palette) => {
             expect(palette.terminals.size).toBe(0)
             expect(palette.settings.id).toBeDefined()
         })
 
-        stack.raw.forEach(raw => {
+        stack.raw.forEach((raw) => {
             expect(raw.id).toBeDefined()
         })
 
         expect(stack.server).toBeDefined()
-
     })
 
-    it("Creates a new stack, and removes it", () => {
-        const newstack = stack.createStack("Test1")
+    it('Creates a new stack, and removes it', () => {
+        const newstack = stack.createStack('Test1')
 
         const test = stack.palettes.get(newstack.id)
 
@@ -72,20 +63,16 @@ describe('stack', () => {
         expect(test?.settings.stackName).toBe(newstack.stackName)
         expect(test?.settings.env).toBeUndefined()
 
-
         stack.removeStack(test!.settings.id)
         expect(stack.palettes.size).toBe(1)
         expect(stack.palettes.get(newstack.id)).toBeUndefined()
-
-
     })
 
-    it("Creates a terminal into a stack and removes it", () => {
-        const newstack = stack.createStack("Test1")
+    it('Creates a terminal into a stack and removes it', () => {
+        const newstack = stack.createStack('Test1')
 
-        const newTerminal = stack.createTerminal("Test00", newstack.id)
+        const newTerminal = stack.createTerminal('Test00', newstack.id)
         const test = stack.palettes.get(newstack.id)
-
 
         expect(test).toBeDefined()
         expect(test?.settings.palette?.length).toBe(1)
@@ -98,50 +85,44 @@ describe('stack', () => {
         stack.removeStack(test!.settings.id)
 
         expect(test?.settings.palette?.length).toBe(0)
-
     })
 
-
-    it("Creates terminal instances into palette settings", () => {
-
-
+    it('Creates terminal instances into palette settings', () => {
         const testNames = ['stack1', 'stack2', 'stack3']
         const testStackIds: string[] = []
 
-        testNames.forEach(m => {
+        testNames.forEach((m) => {
             const s = stack.createStack(m)
             testStackIds.push(s.id)
         })
 
-
-        testStackIds.forEach(id => {
+        testStackIds.forEach((id) => {
             const tTerminals: string[] = []
-            testTerminalNames.forEach(term => {
+            testTerminalNames.forEach((term) => {
                 const newT = stack.createTerminal(term, id)
                 tTerminals.push(newT.id)
             })
             testStacks.set(id, tTerminals)
         })
 
-        testStackIds.forEach(id => {
+        testStackIds.forEach((id) => {
             const s = stack.palettes.get(id)
             expect(s).toBeDefined()
             expect(s?.settings.palette?.length).toBe(4)
         })
     })
 
-    it("Creates a terminal instance once socket connects to it", async () => {
+    it('Creates a terminal instance once socket connects to it', async () => {
         // At this point each 3 stacks have 4 terminals
         // None of the terminals exist in anywhere else than in settings
-        // The client asks for a terminal to be connected once it is 
+        // The client asks for a terminal to be connected once it is
         // Being shown in the UI, so we need to make that happen somehow.
 
         // Lets pretend to be a ui's terminal engine and connect with sockets
 
         for (const [stackId, terms] of testStacks) {
             for (const termId of terms) {
-
-                await new Promise<void>(r => {
+                await new Promise<void>((r) => {
                     const sock = io(SOCKET_HOST_FOR_CLIENT, {
                         query: { stack: stackId, id: termId }
                     })
@@ -155,7 +136,6 @@ describe('stack', () => {
 
         expect(uiSockets.length).toBe(12)
 
-
         // Now there should be actual terminals in the palettes, not just in raw settings objects
         // Each terminals default settings are also being checked
 
@@ -167,10 +147,18 @@ describe('stack', () => {
                 expect(stack.palettes.get(stackId)?.terminals.get(tId)).toBeDefined()
                 expect(stack.palettes.get(stackId)?.terminals.get(tId)?.ptyProcess).toBeDefined()
                 expect(stack.palettes.get(stackId)?.terminals.get(tId)?.stackId).toBe(stackId)
-                expect(stack.palettes.get(stackId)?.terminals.get(tId)?.settings.command.cmd).toBeDefined()
-                expect(stack.palettes.get(stackId)?.terminals.get(tId)?.settings.executionOrder).toBe(i)
-                expect(stack.palettes.get(stackId)?.terminals.get(tId)?.settings.title).toBe(testTerminalNames[i])
-                expect(stack.palettes.get(stackId)?.terminals.get(tId)?.settings.metaSettings).toBeUndefined()
+                expect(
+                    stack.palettes.get(stackId)?.terminals.get(tId)?.settings.command.cmd
+                ).toBeDefined()
+                expect(
+                    stack.palettes.get(stackId)?.terminals.get(tId)?.settings.executionOrder
+                ).toBe(i)
+                expect(stack.palettes.get(stackId)?.terminals.get(tId)?.settings.title).toBe(
+                    testTerminalNames[i]
+                )
+                expect(
+                    stack.palettes.get(stackId)?.terminals.get(tId)?.settings.metaSettings
+                ).toBeUndefined()
             })
         }
     })
@@ -206,12 +194,11 @@ describe('stack', () => {
 
     // })
 
-    describe("Socket events :)", () => {
-
+    describe('Socket events :)', () => {
         let utilitySocket: Socket
 
         beforeAll(async () => {
-            utilitySocket = await new Promise<Socket>(r => {
+            utilitySocket = await new Promise<Socket>((r) => {
                 const sock = io(SOCKET_HOST_FOR_CLIENT)
                 sock.on('hello', () => {
                     r(sock)
@@ -221,7 +208,7 @@ describe('stack', () => {
 
         // We have 3 stacks and 12 terminals
 
-        it("Emits stacks state for al terminals of a stack if terminal id is not given", (done) => {
+        it('Emits stacks state for al terminals of a stack if terminal id is not given', (done) => {
             let stackCounter = 0
             let terminalCounter = 0
 
@@ -243,12 +230,9 @@ describe('stack', () => {
                 console.log(stackId)
                 utilitySocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
             }
-
-
         }, 1000)
 
         it("Emits individial terminals state with given id's", (done) => {
-
             let terminalCounter = 0
 
             utilitySocket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
@@ -260,20 +244,14 @@ describe('stack', () => {
 
                 if (terminalCounter === 12) {
                     done()
-
                 }
             })
 
             for (const [stackId, terms] of testStacks) {
                 for (const termId of terms) {
-                    utilitySocket.emit(UtilityEvents.STATE,
-                        { stack: stackId, terminal: termId })
+                    utilitySocket.emit(UtilityEvents.STATE, { stack: stackId, terminal: termId })
                 }
             }
-
         }, 1000)
-
     })
-
-
 })

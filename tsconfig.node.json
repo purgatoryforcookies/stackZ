@@ -2,10 +2,8 @@
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
   "include": [
     "electron.vite.config.*",
-    "src/main/*",
     "src/preload/*",
-    "src/main/*/*/*",
-    "src/main/*/*",
+    "src/main/**/*",
     "src/types.ts",
   ],
   "exclude": [
@@ -17,9 +15,15 @@
     "strictPropertyInitialization": false,
     "strict": true,
     "noEmit": true,
+    "baseUrl": ".",
     "types": [
       "electron-vite/node",
       "jest",
-    ]
+    ],
+    "paths": {
+      "@t": [
+        "src/types.ts"
+      ]
+    }
   }
 }

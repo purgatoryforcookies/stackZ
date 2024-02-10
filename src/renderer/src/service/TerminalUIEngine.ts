@@ -1,5 +1,5 @@
 import { Socket, io } from 'socket.io-client'
-import { Status } from '../../../types'
+import { Status } from '@t'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import 'xterm/css/xterm.css'

@@ -1,11 +1,19 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
 import { ITerminalDimensions } from 'xterm-addon-fit'
-import { CommandMetaSetting, EnvironmentEditProps, PaletteStack, TerminalEvents, Utility2Props, UtilityEvents, UtilityProps } from '../../types'
+import {
+    CommandMetaSetting,
+    EnvironmentEditProps,
+    PaletteStack,
+    TerminalEvents,
+    Utility2Props,
+    UtilityEvents,
+    UtilityProps
+} from '@t'
 import { Palette } from './Palette'
 import { DataStore } from './service/DataStore'
 import { ZodTypeAny } from 'zod'
 import { Server } from 'socket.io'
-import { Terminal } from './service/Terminal';
+import { Terminal } from './service/Terminal'
 
 export class Stack {
     path: string
@@ -31,7 +39,7 @@ export class Stack {
             for (const palette of stack.palette) {
                 palette.id = uuidv4()
                 if (palette.executionOrder) return
-                const orders = stack.palette.map(pal => pal.executionOrder || 0)
+                const orders = stack.palette.map((pal) => pal.executionOrder || 0)
                 palette.executionOrder = (Math.max(...orders) ?? 1) + 1
             }
         }
@@ -63,7 +71,6 @@ export class Stack {
             // then utility listeners are registered
 
             if (!palette) {
-
                 client.on(UtilityEvents.STATE, (arg: { stack: string; terminal?: string }) => {
                     if (!arg.terminal) {
                         this.palettes.get(arg.stack)?.pingAll()
@@ -84,17 +91,26 @@ export class Stack {
                 })
                 client.on(UtilityEvents.ENVLIST, (args: Omit<UtilityProps, 'order'>) => {
                     if (!args.value) return
-                    this.palettes.get(args.stack)?.terminals.get(args.terminal)?.addEnvList(args.value)
+                    this.palettes
+                        .get(args.stack)
+                        ?.terminals.get(args.terminal)
+                        ?.addEnvList(args.value)
                     this.save()
                 })
                 client.on(UtilityEvents.ENVDELETE, (args: UtilityProps) => {
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.removeEnvList(args)
                     this.save()
                 })
-                client.on(UtilityEvents.CMDMETASETTINGS, (args: { stack: string, terminal: string, settings: CommandMetaSetting }) => {
-                    this.palettes.get(args.stack)?.terminals.get(args.terminal)?.setMetaSettings(args.settings)
-                    this.save()
-                })
+                client.on(
+                    UtilityEvents.CMDMETASETTINGS,
+                    (args: { stack: string; terminal: string; settings: CommandMetaSetting }) => {
+                        this.palettes
+                            .get(args.stack)
+                            ?.terminals.get(args.terminal)
+                            ?.setMetaSettings(args.settings)
+                        this.save()
+                    }
+                )
                 client.emit('hello')
                 return
             }
@@ -115,7 +131,10 @@ export class Stack {
             })
             client.on(TerminalEvents.INPUT, (arg: Utility2Props) => {
                 console.log(`Getting input from ${arg.stack}-${arg.terminal}`)
-                this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.writeFromClient(arg.value)
+                this.palettes
+                    .get(arg.stack)
+                    ?.terminals.get(arg.terminal)
+                    ?.writeFromClient(arg.value)
             })
             client.on(
                 TerminalEvents.RESIZE,
@@ -135,13 +154,10 @@ export class Stack {
     }
 
     startStack(stack: string) {
-
         const tempArray: Terminal[] = []
 
         this.palettes.get(stack)?.terminals.forEach((term) => {
-
             tempArray.push(term)
-
         })
 
         tempArray.sort((a, b) => {
@@ -159,9 +175,8 @@ export class Stack {
                 timeouts += stack.settings.metaSettings?.delay
                 setTimeout(() => {
                     stack.start()
-                }, timeouts);
-            }
-            else {
+                }, timeouts)
+            } else {
                 stack.start()
             }
         }
@@ -211,8 +226,7 @@ export class Stack {
     }
 
     removeStack(stackId: string) {
-
-        this.raw = this.raw.filter(s => s.id !== stackId)
+        this.raw = this.raw.filter((s) => s.id !== stackId)
         this.palettes.delete(stackId)
         this.save()
 
@@ -220,7 +234,6 @@ export class Stack {
     }
 
     save(onExport = false) {
-
         const toModify: PaletteStack[] = onExport ? JSON.parse(JSON.stringify(this.raw)) : this.raw
 
         toModify.forEach((palette) => {

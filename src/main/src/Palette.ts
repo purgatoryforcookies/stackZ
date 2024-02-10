@@ -1,8 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
-import { Cmd, PaletteStack } from '../../types'
+import { v4 as uuidv4 } from 'uuid'
+import { Cmd, PaletteStack } from '@t'
 import { Terminal } from './service/Terminal'
 import { Server } from 'socket.io'
-import { resolveDefaultCwd } from './service/util';
+import { resolveDefaultCwd } from './service/util'
 
 export class Palette {
   settings: PaletteStack
@@ -33,17 +33,14 @@ export class Palette {
   }
 
   createCommand(title: string) {
-
     let newOrder = 0
 
     if (!this.settings.palette) {
       this.settings.palette = []
     } else {
-
-      const orders = this.settings.palette.map(pal => pal.executionOrder || 0)
+      const orders = this.settings.palette.map((pal) => pal.executionOrder || 0)
       const maxOrder = Math.max(...orders)
       if (maxOrder !== Infinity) newOrder = maxOrder + 1
-
     }
 
     const newOne: Cmd = {

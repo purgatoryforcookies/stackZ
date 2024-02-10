@@ -1,7 +1,7 @@
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { baseSocket } from '@renderer/service/socket'
 import { useEffect, useState } from 'react'
-import { ClientEvents, Cmd, PaletteStack } from 'src/types'
+import { ClientEvents, Cmd, PaletteStack } from '@t'
 
 export const useStack = (SOCKET_HOST: string) => {
   const [stack, setStack] = useState<Map<string, PaletteStack>>()
@@ -12,7 +12,6 @@ export const useStack = (SOCKET_HOST: string) => {
   const [selectedTerminal, selectTerminal] = useState<string>('a')
 
   const fetchTerminals = async () => {
-
     setLoading(true)
     const data = (await window.api.getStack()) as PaletteStack[]
     const newStack = new Map<string, PaletteStack>()
@@ -100,7 +99,7 @@ export const useStack = (SOCKET_HOST: string) => {
   useEffect(() => {
     setTimeout(() => {
       fetchTerminals()
-    }, 200);
+    }, 200)
   }, [])
 
   return {
