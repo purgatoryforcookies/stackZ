@@ -1,4 +1,4 @@
-import { Cmd, SelectionEvents, Status } from '../../../../types'
+import { ClientEvents, Cmd, SelectionEvents, Status, UtilityEvents } from '@t'
 import { useEffect, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
 import { Button } from '@renderer/@/ui/button'
@@ -27,11 +27,11 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
     const [expanded, setExpanded] = useState<boolean>(false)
 
     useEffect(() => {
-        baseSocket.on('terminalState', (d: Exclude<Status, undefined>) => {
+        baseSocket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
             if (hostStack !== d.stackId || data.id !== d.cmd.id) return
             setPing(d)
         })
-        baseSocket.emit('state', { stack: hostStack, terminal: data.id })
+        baseSocket.emit(UtilityEvents.STATE, { stack: hostStack, terminal: data.id })
     }, [selected, hostStack, data])
 
     const handleState = async (delRecord = false) => {
@@ -45,7 +45,7 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
         } else {
             window.api.startTerminal(hostStack, data.id)
         }
-        baseSocket.emit('bigState', { stack: hostStack })
+        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: hostStack })
     }
 
     return (
@@ -69,17 +69,16 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                         />
                     </span>
                 </div>
-                <div className={` relative
+                <div
+                    className={` relative
                      bg-terminalHeader 
-                    ${selected === data.id ? '' : 'bg-background'}`}>
-                    <div className='flex justify-between'>
-
+                    ${selected === data.id ? '' : 'bg-background'}`}
+                >
+                    <div className="flex justify-between">
                         <div className="flex flex-col pl-3 p-1 text-sm text-secondary-foreground">
                             <span>command: {ping.cmd.command.cmd}</span>
                             <span>shell: {ping.cmd.command.shell ?? data.command.shell}</span>
-                            <span>
-                                palettes: X{ping.cmd.command.env?.length}
-                            </span>
+                            <span>palettes: x{ping.cmd.command.env?.length}</span>
                             <span>notes: {ping.cmd.title}</span>
                         </div>
 
@@ -96,29 +95,35 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                                     )}
                                 </Button>
                             </div>
-                            <span className='absolute right-1 bottom-0 text-[0.7rem] text-white/30'>{ping.cmd.executionOrder ?? 'ei'}</span>
+                            <span className="absolute right-1 bottom-0 text-[0.7rem] text-white/30">
+                                {ping.cmd.executionOrder ?? 'ei'}
+                            </span>
                         </div>
                     </div>
 
-                    <div className={`${expanded ? "h-32" : "h-0"} 
+                    <div
+                        className={`${expanded ? 'h-32' : 'h-0'} 
                     transition-height duration-500 ease-in-out
                     
-                    `}>
-
+                    `}
+                    >
                         <div className="flex gap-1 justify-center p-2 pb-6 h-full">
                             <CommandSettings expanded={expanded} data={data} stackId={hostStack} />
                         </div>
-
-
                     </div>
-                    <div className='flex justify-center absolute bottom-0 right-[48%] hover:scale-125 hover:cursor-pointer w-7'
-                        onClick={() => setExpanded(!expanded)}>
-                        {expanded ? <ChevronUpIcon className='h-4 w-4 ' />
-                            : <ChevronDownIcon className='h-4 w-4 text-white/50' />}
+                    <div
+                        className="flex justify-center absolute bottom-0 right-[48%] hover:scale-125 hover:cursor-pointer w-7"
+                        onClick={() => setExpanded(!expanded)}
+                    >
+                        {expanded ? (
+                            <ChevronUpIcon className="h-4 w-4 " />
+                        ) : (
+                            <ChevronDownIcon className="h-4 w-4 text-white/50" />
+                        )}
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     )
 }
 

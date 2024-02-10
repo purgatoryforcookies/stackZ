@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { baseSocket } from '@renderer/service/socket'
-import { Status } from 'src/types'
+import { ClientEvents, Status, UtilityEvents } from '@t'
 import EnvList from '../Common/EnvList'
 import { NewEnvList } from '../Dialogs/NewEnvList'
 import { Badge } from '@renderer/@/ui/badge'
@@ -16,11 +16,11 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
     const bodyRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        baseSocket.on('terminalState', (d: Exclude<Status, undefined>) => {
+        baseSocket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
             if (stackId !== d.stackId || terminalId !== d.cmd.id) return
             setStatus(d)
         })
-        baseSocket.emit('state', { stack: stackId, terminal: terminalId })
+        baseSocket.emit(UtilityEvents.STATE, { stack: stackId, terminal: terminalId })
 
         if (status && status.stackId !== stackId) setStatus(null)
     }, [stackId, terminalId])
@@ -41,10 +41,12 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
 
     return (
         <div className="h-full px-5">
-            <div className='min-h-7 '>
-                {highlightedEnv ? <Badge className='text-md animate-in animate-out'>
-                    {`${highlightedEnv[0]}: ${highlightedEnv[1]}`}
-                </Badge> : null}
+            <div className="min-h-7 ">
+                {highlightedEnv ? (
+                    <Badge className="text-md animate-in animate-out">
+                        {`${highlightedEnv[0]}: ${highlightedEnv[1]}`}
+                    </Badge>
+                ) : null}
             </div>
             <div className="flex gap-8 pb-24 h-full overflow-auto pr-32" ref={bodyRef}>
                 {status?.cmd.command.env

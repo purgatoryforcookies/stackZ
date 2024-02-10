@@ -1,4 +1,12 @@
-import { Cmd, PaletteStack, SelectionEvents, StackStatus, Status } from '../../../types'
+import {
+    ClientEvents,
+    Cmd,
+    PaletteStack,
+    SelectionEvents,
+    StackStatus,
+    Status,
+    UtilityEvents
+} from '@t'
 import { useEffect, useState } from 'react'
 import { Badge } from '@renderer/@/ui/badge'
 import NewCommand from './Dialogs/NewCommand'
@@ -10,7 +18,12 @@ import { NewStack } from './Dialogs/NewStack'
 
 type PaletteProps = {
     data: Map<string, PaletteStack>
-    onClick: (stackId: string, terminalId: string, method?: SelectionEvents, cb?: () => void) => void
+    onClick: (
+        stackId: string,
+        terminalId: string,
+        method?: SelectionEvents,
+        cb?: () => void
+    ) => void
     onNewTerminal: (cmd: Cmd) => void
     onNewStack: (st: PaletteStack) => void
     terminalId: string
@@ -23,11 +36,11 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
     const [running, setRunning] = useState<boolean>(false)
 
     useEffect(() => {
-        baseSocket.on('stackState', (d: StackStatus) => {
+        baseSocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
             if (d.stack !== stackId) return
             setStackState(d.state)
         })
-        baseSocket.on('terminalState', (d: Status) => {
+        baseSocket.on(ClientEvents.STACKSTATE, (d: Status) => {
             if (d.stackId !== stackId) return
             const newStatus = [...stackState]
             const index = newStatus.findIndex((term) => term.id === d.cmd.id)
@@ -45,7 +58,7 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
 
         // })
 
-        baseSocket.emit('bigState', { stack: stackId })
+        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
     }, [stackId, terminalId])
 
     const toggleStack = () => {
@@ -54,7 +67,7 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
         } else {
             window.api.startStack(stackId)
         }
-        baseSocket.emit('bigState', { stack: stackId })
+        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
     }
 
     useEffect(() => {

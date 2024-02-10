@@ -1,4 +1,11 @@
-import { Cmd, CommandMetaSetting, Environment, EnvironmentEditProps, Status, UtilityProps } from '../../../types'
+import {
+    Cmd,
+    CommandMetaSetting,
+    Environment,
+    EnvironmentEditProps,
+    Status,
+    UtilityProps
+} from '@t'
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from './util'
 import path from 'path'
@@ -33,7 +40,11 @@ export class Terminal {
         return 'bash'
     }
 
-    chooseStartSettings(shell: string | undefined, cmd: string, loose: boolean | undefined): [string, string[]] {
+    chooseStartSettings(
+        shell: string | undefined,
+        cmd: string,
+        loose: boolean | undefined
+    ): [string, string[]] {
         const tmpShell = shell ? shell.trim() : this.win ? 'powershell.exe' : 'bash'
 
         if (loose) {
@@ -42,9 +53,9 @@ export class Terminal {
 
         switch (tmpShell) {
             case 'cmd.exe':
-                return ['powershell.exe', ["cmd.exe", "/c", cmd]]
+                return ['powershell.exe', ['cmd.exe', '/c', cmd]]
             case 'wsl.exe':
-                return ['powershell.exe', ["wsl.exe", "-e", cmd]]
+                return ['powershell.exe', ['wsl.exe', '-e', cmd]]
             case 'powershell.exe':
                 return ['powershell.exe', [cmd]]
             case 'bash':
@@ -65,17 +76,17 @@ export class Terminal {
         }
 
         try {
-
             const [shell, cmd] = this.chooseStartSettings(
                 this.settings.command.shell,
                 this.settings.command.cmd,
-                this.settings.metaSettings?.loose)
+                this.settings.metaSettings?.loose
+            )
 
             this.ptyProcess = spawn(shell, cmd, {
                 name: `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as Environment[]),
-                useConpty: this.win ? false : true,
+                useConpty: this.win ? false : true
             })
             this.isRunning = true
             if (cmd.length === 0) {
@@ -101,9 +112,7 @@ export class Terminal {
             })
             this.ping()
         } catch (e) {
-            this.sendToClient(
-                `${e} \r\n$ `
-            )
+            this.sendToClient(`${e} \r\n$ `)
         }
     }
 
@@ -139,7 +148,6 @@ export class Terminal {
     }
 
     getState(): Status {
-
         if (!this.settings.command.shell) {
             this.settings.command.shell = this.chooseShell()
         }
@@ -242,7 +250,9 @@ export class Terminal {
     }
 
     removeEnvList(args: UtilityProps) {
-        this.settings.command.env = this.settings.command.env!.filter((env) => env.order != args.order)
+        this.settings.command.env = this.settings.command.env!.filter(
+            (env) => env.order != args.order
+        )
 
         for (let i = 0; i < this.settings.command.env.length; i++) {
             this.settings.command.env[i].order = i
@@ -259,5 +269,4 @@ export class Terminal {
         this.settings.metaSettings = settings
         this.ping()
     }
-
 }

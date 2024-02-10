@@ -1,5 +1,7 @@
 import { ZodTypeAny } from 'zod'
 import { readJsonFile } from './util'
+import { writeFileSync } from 'fs'
+import { PaletteStack } from '@t'
 
 /**
  * DataStores job is to handle saving and loading the settings from a file.
@@ -11,26 +13,24 @@ import { readJsonFile } from './util'
  * source file without explicit sync.
  */
 export class DataStore {
-  path: string
-  schema: ZodTypeAny
+    path: string
+    schema: ZodTypeAny
 
-  constructor(path: string, schema: ZodTypeAny) {
-    this.path = path
-    this.schema = schema
-  }
-
-  async load() {
-    try {
-      const raw = await readJsonFile(this.path, this.schema)
-      return raw
-    } catch (error) {
-      console.log(error)
+    constructor(path: string, schema: ZodTypeAny) {
+        this.path = path
+        this.schema = schema
     }
-  }
 
-  // save() {}
+    async load() {
+        try {
+            const raw = await readJsonFile(this.path, this.schema)
+            return raw
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
-  // sync(structure: PaletteStack[]) {
-
-  // }
+    save(filepath: string, object: PaletteStack[]) {
+        writeFileSync(filepath, JSON.stringify(object), 'utf-8')
+    }
 }
