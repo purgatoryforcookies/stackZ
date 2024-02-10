@@ -3,6 +3,7 @@ import { Stack } from '../src/Stack'
 import { ClientEvents, StackStatus, Status, UtilityEvents, stackSchema } from '../../types'
 import { existsSync, unlinkSync } from 'fs'
 import { Socket, io } from 'socket.io-client'
+import { join } from 'path'
 
 const testServer = new Server({
     cors: {
@@ -10,7 +11,7 @@ const testServer = new Server({
     }
 })
 
-const filepath = './src/main/tests/fixtures/testStack1.json'
+const filepath = join(__dirname, './testStack1.json')
 
 const SOCKET_HOST_FOR_CLIENT = 'http://localhost:3123'
 
@@ -25,9 +26,10 @@ describe('stack', () => {
         await stack.load()
     })
 
-    afterAll(() => {
+    afterAll((done) => {
         testServer.close()
         unlinkSync(filepath)
+        done()
     })
 
     it('Creates a file if it does not exists', () => {
@@ -161,6 +163,11 @@ describe('stack', () => {
                 ).toBeUndefined()
             })
         }
+
+        uiSockets.forEach(sock => {
+            sock.disconnect()
+        })
+
     })
 
     // it("Starts and stops each terminal", () => {
@@ -204,6 +211,10 @@ describe('stack', () => {
                     r(sock)
                 })
             })
+        })
+
+        afterAll(() => {
+            if (utilitySocket) utilitySocket.disconnect()
         })
 
         // We have 3 stacks and 12 terminals
