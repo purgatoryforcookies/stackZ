@@ -226,7 +226,7 @@ describe('stack', () => {
                 }
             })
 
-            for (const [stackId, _] of testStacks) {
+            for (const [stackId] of testStacks) {
                 console.log(stackId)
                 utilitySocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
             }
