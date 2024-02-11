@@ -1,5 +1,5 @@
 {
-    "name": "command-palette",
+    "name": "stackz",
     "version": "1.0.0",
     "description": "Easy way to start your development environment",
     "main": "./out/main/index.js",
@@ -38,7 +38,6 @@
         "@radix-ui/react-toggle": "^1.0.3",
         "@radix-ui/react-toggle-group": "^1.0.4",
         "@radix-ui/react-tooltip": "^1.0.7",
-        "anser": "^2.1.1",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.0",
         "cmdk": "^0.2.0",
@@ -46,7 +45,6 @@
         "electron-store": "^8.1.0",
         "next-themes": "^0.2.1",
         "node-pty": "^1.0.0",
-        "re-resizable": "^6.9.11",
         "react-icons": "^4.12.0",
         "react-resizable-panels": "^1.0.9",
         "socket.io": "^4.7.2",
