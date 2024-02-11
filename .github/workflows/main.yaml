@@ -10,8 +10,11 @@ on:
 
 jobs:
     test:
+        strategy:
+            matrix:
+                os: [ubuntu-22.04, windows-2022, macos-12, macos-14]
         timeout-minutes: 10
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v4
