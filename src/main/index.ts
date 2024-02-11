@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { socketServer } from './src/service/CommandService'
 import { store } from './src/service/Store'
 import { Stack } from './src/Stack'
-import { stackSchema } from '@t'
+import { stackSchema } from '../types'
 
 // const savedCommandsPath = path.join(__dirname, './commands_save.json')
 

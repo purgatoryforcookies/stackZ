@@ -4,17 +4,12 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
     main: {
-        resolve: {
-            alias: {
-                "@t": resolve('src/types.ts')
-            }
-        },
         plugins: [externalizeDepsPlugin()]
     },
     preload: {
         resolve: {
             alias: {
-                "@t": resolve('src/types.ts')
+                '@t': resolve('src/types.ts')
             }
         },
         plugins: [externalizeDepsPlugin()]
@@ -23,7 +18,7 @@ export default defineConfig({
         resolve: {
             alias: {
                 '@renderer': resolve('src/renderer/src'),
-                "@t": resolve('src/types.ts')
+                '@t': resolve('src/types.ts')
             }
         },
         plugins: [react()]

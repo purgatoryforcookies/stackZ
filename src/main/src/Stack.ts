@@ -8,7 +8,7 @@ import {
     Utility2Props,
     UtilityEvents,
     UtilityProps
-} from '@t'
+} from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './service/DataStore'
 import { ZodTypeAny } from 'zod'

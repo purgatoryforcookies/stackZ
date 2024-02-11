@@ -120,17 +120,17 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
             <div className="overflow-auto pb-20">
                 {palette
                     ? palette.map((cmd) => {
-                        if (!cmd?.id) return null
-                        return (
-                            <Command
-                                key={cmd.id}
-                                data={cmd}
-                                hostStack={stackId}
-                                handleClick={onClick}
-                                selected={terminalId}
-                            />
-                        )
-                    })
+                          if (!cmd?.id) return null
+                          return (
+                              <Command
+                                  key={cmd.id}
+                                  data={cmd}
+                                  hostStack={stackId}
+                                  handleClick={onClick}
+                                  selected={terminalId}
+                              />
+                          )
+                      })
                     : null}
                 <div className="w-full flex justify-center">
                     <NewCommand afterAdd={onNewTerminal} stackId={stackId} />

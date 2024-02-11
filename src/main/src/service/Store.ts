@@ -1,5 +1,5 @@
 import ElectronStore from 'electron-store'
-import { StoreType } from '@t'
+import { StoreType } from '../../../types'
 
 export const store = new ElectronStore<StoreType>({
     defaults: {

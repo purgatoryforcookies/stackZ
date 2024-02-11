@@ -2,5 +2,8 @@ module.exports = {
     transform: {
         '^.+\\.ts?$': 'ts-jest'
     },
-    watchPathIgnorePatterns: ['src/main/tests/fixtures']
+    watchPathIgnorePatterns: ['src/main/tests/fixtures'],
+    moduleNameMapper: {
+        '^@t$': '<rootDir>/src/types'
+    }
 }

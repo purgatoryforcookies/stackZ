@@ -1,5 +1,5 @@
 import { readFile, writeFileSync, existsSync } from 'fs'
-import { Environment } from '@t'
+import { Environment } from '../../../types'
 import { ZodTypeAny, z } from 'zod'
 
 export const readJsonFile = <T extends z.ZodTypeAny>(
