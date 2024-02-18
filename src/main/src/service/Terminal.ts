@@ -64,7 +64,7 @@ export class Terminal {
             case 'bash':
                 return ['/bin/bash', ['-l', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
             case 'zsh':
-                return ['/bin/zsh', ['-i', '-l', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
+                return ['/bin/zsh', ['-il', '-c', `. ~/.zprofile && ${cmdArr.join(' ')}`]]
             default:
                 if (this.win) {
                     return ['powershell.exe', [cmd]]

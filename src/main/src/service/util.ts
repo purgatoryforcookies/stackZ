@@ -45,6 +45,7 @@ export const envFactory = (args: Environment[] | undefined) => {
         order: 0,
         disabled: []
     }
+    hostEnv.pairs['ZDOTDIR'] = '/Users/max.caroe'
     if (!args) return [hostEnv]
 
     let allenvs = args.map((obj) => ({ ...obj, disabled: [] })) as Environment[]
