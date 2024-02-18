@@ -64,7 +64,7 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
     return (
         <div
             className={`p-7 py-4
-        ${minimized ? 'max-w-[19rem]' : 'max-w-[30rem]'}`}
+        ${minimized ? 'max-w-[19rem]' : editMode ? '' : 'max-w-[33rem]'}`}
         >
             <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
             <Separator className="my-2" />

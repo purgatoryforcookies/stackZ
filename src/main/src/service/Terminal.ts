@@ -50,6 +50,7 @@ export class Terminal {
         if (loose) {
             return [tmpShell, []]
         }
+        const cmdArr = cmd.split(' ')
 
         switch (tmpShell) {
             case 'cmd.exe':
@@ -59,14 +60,14 @@ export class Terminal {
             case 'powershell.exe':
                 return ['powershell.exe', [cmd]]
             case 'bash':
-                return ['bash', ['-e', cmd]]
+                return ['/bin/bash', ['-l', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
             case 'zsh':
-                return ['zsh', ['-e', cmd]]
+                return ['/bin/zsh', ['-i', '-l', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
             default:
                 if (this.win) {
                     return ['powershell.exe', [cmd]]
                 }
-                return ['bash', ['-e', cmd]]
+                return ['/bin/bash', ['-l', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
         }
     }
 
@@ -81,6 +82,7 @@ export class Terminal {
                 this.settings.command.cmd,
                 this.settings.metaSettings?.loose
             )
+            console.log(shell, cmd)
 
             this.ptyProcess = spawn(shell, cmd, {
                 name: `Palette ${this.settings.id}`,
@@ -134,7 +136,7 @@ export class Terminal {
         if (!this.ptyProcess) return
         try {
             console.log('Killing', this.settings.id)
-            const code = this.win ? undefined : 'SIGINT'
+            const code = this.win ? undefined : 'SIGHUP'
             this.ptyProcess.kill(code)
             this.isRunning = false
         } catch (error) {

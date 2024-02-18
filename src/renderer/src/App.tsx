@@ -11,6 +11,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './@/ui/res
 import { useStack } from './hooks/useStack'
 import { createContext } from 'react'
 import { Toaster } from './@/ui/sonner'
+import { debounce } from './service/util'
 
 export const ThemeContext = createContext('aurora')
 
@@ -36,7 +37,10 @@ function App(): JSX.Element {
     useEffect(() => {
         const fetchPaletteWidth = async () => {
             const width = await window.store.get('paletteWidths')
-            setPaletteWidths(JSON.parse(width))
+
+            // setPaletteWidths(JSON.parse(width))
+
+            setPaletteWidths(width as StoreType['paletteWidths'])
         }
         fetchPaletteWidth()
     }, [])
@@ -91,14 +95,18 @@ function App(): JSX.Element {
         }
     }
 
-    const handleResize = async (e: number[], source: Panels) => {
-        if (!paletteWidths) return
+    // @ts-ignore
+    const handleResize = debounce(async (e: number[], source: Panels) => {
+        // if (!paletteWidths) return
         terminals?.get(selectedStack)?.get(selectedTerminal)?.resize()
-        const newWidths = { ...paletteWidths }
-        if (source === Panels.Terminals) newWidths.palette1 = e[1]
-        else newWidths.palette2 = e[1]
-        await window.store.set('paletteWidths', JSON.stringify(newWidths))
-    }
+
+        // console.log(paletteWidths)
+        // const newWidths = JSON.parse(JSON.stringify(paletteWidths))
+        // console.log(newWidths)
+        // if (source === Panels.Terminals) newWidths.palette1 = e[1]
+        // else newWidths.palette2 = e[1]
+        // await window.store.set('paletteWidths', JSON.stringify(newWidths))
+    }, 10)
 
     return (
         <ThemeContext.Provider value={theme ?? 'aurora'}>

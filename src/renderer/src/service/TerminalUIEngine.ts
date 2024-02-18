@@ -73,7 +73,6 @@ export class TerminalUIEngine {
 
         this.terminal.onKey((data) => {
             this.sendInput(data.key)
-
             if (this.isRunning) return
             switch (data.domEvent.key) {
                 case 'Enter': {
@@ -104,7 +103,7 @@ export class TerminalUIEngine {
             }
         })
         this.terminal.attachCustomKeyEventHandler((e) => {
-            if (e.code === 'KeyV' && e.ctrlKey) {
+            if (e.code === 'KeyV' && (e.ctrlKey || e.metaKey)) {
                 this.pasteClipBoardMaybe()
                 return false
             }
@@ -173,7 +172,7 @@ export class TerminalUIEngine {
             })
             return
         }
-        if (command.slice(0, 5) === 'clear' && command.length <= 5) {
+        if (command === 'clear') {
             this.clear()
             return
         } else {
