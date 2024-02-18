@@ -1,7 +1,7 @@
 
 # StackZ
 
-Are you struggling to keep up how did that one of your dozen projects started up again? Was this project configurable with .env-file, or did I use EXPORT's in the beginning commands? What differrent services needs to be up?
+Are you struggling to keep up how did that one of your dozen projects started up again? Was this project configurable with .env-file, or did I use EXPORT's in the beginning of commands? What differrent services needs to be up?
 I must have written it out in somewhere... I hope. 
 
 StackZ is a developer tool which purpose is to answer above mentioned questions. Most of them atleast. 
