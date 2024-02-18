@@ -40,7 +40,7 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
             if (d.stack !== stackId) return
             setStackState(d.state)
         })
-        baseSocket.on(ClientEvents.STACKSTATE, (d: Status) => {
+        baseSocket.on(ClientEvents.TERMINALSTATE, (d: Status) => {
             if (d.stackId !== stackId) return
             const newStatus = [...stackState]
             const index = newStatus.findIndex((term) => term.id === d.cmd.id)
@@ -57,6 +57,7 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
         //     description: "Terminal stopped",
 
         // })
+
 
         baseSocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
     }, [stackId, terminalId])
@@ -120,17 +121,17 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
             <div className="overflow-auto pb-20">
                 {palette
                     ? palette.map((cmd) => {
-                          if (!cmd?.id) return null
-                          return (
-                              <Command
-                                  key={cmd.id}
-                                  data={cmd}
-                                  hostStack={stackId}
-                                  handleClick={onClick}
-                                  selected={terminalId}
-                              />
-                          )
-                      })
+                        if (!cmd?.id) return null
+                        return (
+                            <Command
+                                key={cmd.id}
+                                data={cmd}
+                                hostStack={stackId}
+                                handleClick={onClick}
+                                selected={terminalId}
+                            />
+                        )
+                    })
                     : null}
                 <div className="w-full flex justify-center">
                     <NewCommand afterAdd={onNewTerminal} stackId={stackId} />
