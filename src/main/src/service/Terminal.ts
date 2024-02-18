@@ -21,6 +21,8 @@ export class Terminal {
     isRunning: boolean
     win: boolean
     buffer: string[]
+    rows: number | undefined
+    cols: number | undefined
 
     constructor(stackId: string, cmd: Cmd, socketId: string, server: Server) {
         this.settings = cmd
@@ -82,13 +84,14 @@ export class Terminal {
                 this.settings.command.cmd,
                 this.settings.metaSettings?.loose
             )
-            console.log(shell, cmd)
 
             this.ptyProcess = spawn(shell, cmd, {
                 name: `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as Environment[]),
-                useConpty: this.win ? false : true
+                useConpty: this.win ? false : true,
+                rows: this.rows,
+                cols: this.cols
             })
             this.isRunning = true
             if (cmd.length === 0) {
@@ -130,6 +133,8 @@ export class Terminal {
         } catch {
             // On stop, the pty process is not existing anymore but yet here we are...
         }
+        this.rows = dims.rows
+        this.cols = dims.cols
     }
 
     stop() {
@@ -166,15 +171,7 @@ export class Terminal {
         this.server
             .timeout(400)
             .to(this.socketId)
-            .emit('output', data, (_, resp: ITerminalDimensions) => {
-                if (this.ptyProcess) {
-                    try {
-                        this.ptyProcess.resize(resp[0].cols, resp[0].rows)
-                    } catch {
-                        // On stop, the pty process is not existing anymore but yet here we are...
-                    }
-                }
-            })
+            .emit('output', data)
     }
 
     writeFromClient(data: string) {
