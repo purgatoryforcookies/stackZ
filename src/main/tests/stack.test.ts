@@ -164,10 +164,9 @@ describe('stack', () => {
             })
         }
 
-        uiSockets.forEach(sock => {
+        uiSockets.forEach((sock) => {
             sock.disconnect()
         })
-
     })
 
     // it("Starts and stops each terminal", () => {
@@ -265,14 +264,13 @@ describe('stack', () => {
             }
         }, 1000)
 
-        it.todo("Changes current working directory of a terminal")
-        it.todo("Changes shell of a  terminal")
-        it.todo("Changes command to be run of a terminal")
-        it.todo("Mutes an env set")
-        it.todo("Mutes an env, singular")
-        it.todo("Deletes an env set")
-        it.todo("Edits a single env")
-        it.todo("Creates an env to a set")
-
+        it.todo('Changes current working directory of a terminal')
+        it.todo('Changes shell of a  terminal')
+        it.todo('Changes command to be run of a terminal')
+        it.todo('Mutes an env set')
+        it.todo('Mutes an env, singular')
+        it.todo('Deletes an env set')
+        it.todo('Edits a single env')
+        it.todo('Creates an env to a set')
     })
 })

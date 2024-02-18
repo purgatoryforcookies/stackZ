@@ -1,5 +1,5 @@
 import { Socket, io } from 'socket.io-client'
-import { Status } from '../../../types'
+import { Status, TerminalEvents } from '../../../types'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import 'xterm/css/xterm.css'
@@ -41,6 +41,8 @@ export class TerminalUIEngine {
 
     resize() {
         this.fitAddon.fit()
+        this.socket.emit(TerminalEvents.RESIZE,
+            { stack: this.stackId, terminal: this.terminalId, value: this.fitAddon.proposeDimensions() })
         return this
     }
 
@@ -48,9 +50,8 @@ export class TerminalUIEngine {
         this.socket = io(this.host, {
             query: { stack: this.stackId, id: this.terminalId }
         })
-        this.socket.on('output', (data: string, callback) => {
+        this.socket.on('output', (data: string) => {
             this.write(data)
-            callback(this.fitAddon.proposeDimensions())
         })
 
         this.socket.on('terminalState', (data: Status) => {
@@ -73,7 +74,6 @@ export class TerminalUIEngine {
 
         this.terminal.onKey((data) => {
             this.sendInput(data.key)
-
             if (this.isRunning) return
             switch (data.domEvent.key) {
                 case 'Enter': {
@@ -104,7 +104,7 @@ export class TerminalUIEngine {
             }
         })
         this.terminal.attachCustomKeyEventHandler((e) => {
-            if (e.code === 'KeyV' && e.ctrlKey) {
+            if (e.code === 'KeyV' && (e.ctrlKey || e.metaKey)) {
                 this.pasteClipBoardMaybe()
                 return false
             }
@@ -173,7 +173,7 @@ export class TerminalUIEngine {
             })
             return
         }
-        if (command.slice(0, 5) === 'clear' && command.length <= 5) {
+        if (command === 'clear') {
             this.clear()
             return
         } else {

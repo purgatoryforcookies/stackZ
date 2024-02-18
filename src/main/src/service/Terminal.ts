@@ -21,6 +21,8 @@ export class Terminal {
     isRunning: boolean
     win: boolean
     buffer: string[]
+    rows: number | undefined
+    cols: number | undefined
 
     constructor(stackId: string, cmd: Cmd, socketId: string, server: Server) {
         this.settings = cmd
@@ -50,6 +52,7 @@ export class Terminal {
         if (loose) {
             return [tmpShell, []]
         }
+        const cmdArr = cmd.split(' ')
 
         switch (tmpShell) {
             case 'cmd.exe':
@@ -59,14 +62,14 @@ export class Terminal {
             case 'powershell.exe':
                 return ['powershell.exe', [cmd]]
             case 'bash':
-                return ['bash', ['-e', cmd]]
+                return ['/bin/bash', ['-l', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
             case 'zsh':
-                return ['zsh', ['-e', cmd]]
+                return ['/bin/zsh', ['-i', '-l', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
             default:
                 if (this.win) {
                     return ['powershell.exe', [cmd]]
                 }
-                return ['bash', ['-e', cmd]]
+                return ['/bin/bash', ['-l', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
         }
     }
 
@@ -86,7 +89,9 @@ export class Terminal {
                 name: `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as Environment[]),
-                useConpty: this.win ? false : true
+                useConpty: this.win ? false : true,
+                rows: this.rows,
+                cols: this.cols
             })
             this.isRunning = true
             if (cmd.length === 0) {
@@ -128,13 +133,15 @@ export class Terminal {
         } catch {
             // On stop, the pty process is not existing anymore but yet here we are...
         }
+        this.rows = dims.rows
+        this.cols = dims.cols
     }
 
     stop() {
         if (!this.ptyProcess) return
         try {
             console.log('Killing', this.settings.id)
-            const code = this.win ? undefined : 'SIGINT'
+            const code = this.win ? undefined : 'SIGHUP'
             this.ptyProcess.kill(code)
             this.isRunning = false
         } catch (error) {
@@ -164,15 +171,7 @@ export class Terminal {
         this.server
             .timeout(400)
             .to(this.socketId)
-            .emit('output', data, (_, resp: ITerminalDimensions) => {
-                if (this.ptyProcess) {
-                    try {
-                        this.ptyProcess.resize(resp[0].cols, resp[0].rows)
-                    } catch {
-                        // On stop, the pty process is not existing anymore but yet here we are...
-                    }
-                }
-            })
+            .emit('output', data)
     }
 
     writeFromClient(data: string) {

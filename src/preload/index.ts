@@ -30,7 +30,7 @@ const api = {
 }
 
 const store = {
-    get: (key: string): Promise<string> => ipcRenderer.invoke('getStore', key),
+    get: (key: string): Promise<unknown> => ipcRenderer.invoke('getStore', key),
     set: (key: string, value: string): Promise<void> => ipcRenderer.invoke('setStore', key, value)
 }
 

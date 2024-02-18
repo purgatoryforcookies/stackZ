@@ -43,9 +43,9 @@ export const Field = ({
     const style = `rounded-full py-1
     ${
         variant === 'primary'
-            ? `pr-2 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
+            ? `pr-2 pl-1 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
             : `pl-3 pr-3  truncate text-secondary ${
-                  highlight ? 'bg-red-900 text-white' : 'bg-primary'
+                  highlight ? 'bg-orange-900 text-white' : 'bg-primary'
               }`
     }`
 
@@ -54,7 +54,7 @@ export const Field = ({
     return (
         <Input
             type="text"
-            className={`${style} px-3 h-8`}
+            className={`${style} px-3 h-8 ${variant === 'primary' ? 'max-w-[12rem]' : 'w-[40rem]'}`}
             onChange={(e) => onChange(e.target.value)}
             defaultValue={value}
             placeholder={placeholder}
@@ -114,7 +114,8 @@ const Record = ({
             value: valueValue,
             enabled: true
         })
-
+        setKeyValue(undefined)
+        setValueValue(undefined)
         setNewRecordOpen(false)
     }
 

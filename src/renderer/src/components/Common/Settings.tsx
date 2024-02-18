@@ -48,7 +48,7 @@ function Settings({ setTheme }: SettingsProps) {
     }, [theme])
     useEffect(() => {
         window.store.get('theme').then((t) => {
-            setTheme(t)
+            setTheme(t as string)
         })
     })
 

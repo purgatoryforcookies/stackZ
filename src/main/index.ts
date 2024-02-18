@@ -1,14 +1,14 @@
-import electron, { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { socketServer } from './src/service/CommandService'
 import { store } from './src/service/Store'
 import { Stack } from './src/Stack'
 import { stackSchema } from '../types'
 
-// const savedCommandsPath = path.join(__dirname, './commands_save.json')
+const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
 
-const savedCommandsPath = './stacks.json'
+// const savedCommandsPath = './stacks.json'
 const stack = new Stack(savedCommandsPath, socketServer, stackSchema)
 
 async function createWindow(): Promise<void> {
@@ -16,10 +16,10 @@ async function createWindow(): Promise<void> {
     stack.init()?.startServer()
 
     // dev setup to open screen on 2nd monitor
-    const displays = electron.screen.getAllDisplays()
-    const externalDisplay = displays.find((display) => {
-        return display.bounds.x !== 0 || display.bounds.y !== 0
-    })
+    // const displays = electron.screen.getAllDisplays()
+    // const externalDisplay = displays.find((display) => {
+    //     return display.bounds.x !== 0 || display.bounds.y !== 0
+    // })
 
     const mainWindow = new BrowserWindow({
         width: 1800,
@@ -31,15 +31,15 @@ async function createWindow(): Promise<void> {
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
             sandbox: false
-        },
-        x: externalDisplay!.bounds.x + 50, //DEV
-        y: externalDisplay!.bounds.y + 50 //DEV
+        }
+        // x: externalDisplay!.bounds.x + 50, //DEV
+        // y: externalDisplay!.bounds.y + 50 //DEV
     })
 
     mainWindow.on('ready-to-show', () => {
         mainWindow.show()
         // dev setup to not focus on it on save
-        mainWindow.blur()
+        // mainWindow.blur()
     })
 
     mainWindow.webContents.setWindowOpenHandler((details) => {

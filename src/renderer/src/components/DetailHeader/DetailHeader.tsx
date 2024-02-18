@@ -30,7 +30,7 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
             setHighlightedEnv(null)
             return
         }
-        setHighlightedEnv(e)
+        // setHighlightedEnv(e)
     }
 
     const scroll = () => {
@@ -41,11 +41,9 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
 
     return (
         <div className="h-full px-5">
-            <div className="min-h-7 ">
+            <div className="">
                 {highlightedEnv ? (
-                    <Badge className="text-md animate-in animate-out">
-                        {`${highlightedEnv[0]}: ${highlightedEnv[1]}`}
-                    </Badge>
+                    <Badge className="text-md">{`${highlightedEnv[0]}=${highlightedEnv[1]}`}</Badge>
                 ) : null}
             </div>
             <div className="flex gap-8 pb-24 h-full overflow-auto pr-32" ref={bodyRef}>
