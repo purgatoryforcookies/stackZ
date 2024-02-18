@@ -20,7 +20,7 @@ StackZ supports the following shells:
 - Bash
 - Zsh
 
-Zsh and bash shells run as a login shell. As each terminal's cwd can be changed, this also applies to WSL's directories. You can run a mix of Linux based projects running on WSL, and windows based projects for example. 
+Zsh and bash shells run as a login shell. As each terminal's cwd can be changed, this also applies to WSL's directories. You can run a mix of Linux based projects running on WSL and windows based projects, as an example. 
 
 StackZ has few hotkeys, which toggle additional features. The most import one is CMD+K (CTRL+K). It opens a quick navigation where you can search everything and see the other hotkeys used in the app. You'll come around disabled buttons and fields, they are placeholders for future use. 
 
