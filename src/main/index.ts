@@ -5,6 +5,7 @@ import { socketServer } from './src/service/CommandService'
 import { store } from './src/service/Store'
 import { Stack } from './src/Stack'
 import { stackSchema } from '../types'
+import { execSync } from 'child_process'
 
 const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
 
@@ -132,4 +133,21 @@ ipcMain.handle('deleteCommand', (_, stackId, terminalId) => {
 })
 ipcMain.handle('createStack', (_, title) => {
     return stack.createStack(title)
+})
+
+ipcMain.handle('openFilesLocation', () => {
+    const dirPath = app.getPath('userData')
+    let command = '';
+    switch (process.platform) {
+        case 'darwin':
+            command = 'open';
+            break;
+        case 'win32':
+            command = 'explorer';
+            break;
+        default:
+            command = 'xdg-open';
+            break;
+    }
+    execSync(`${command} "${dirPath}"`);
 })

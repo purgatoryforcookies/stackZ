@@ -18,7 +18,8 @@ declare global {
         }
         store: {
             get: (key: string) => Promise<unknown>
-            set: (key: string, value: string) => Promise<void>
+            set: (key: string, value: unknown) => Promise<void>
+            openFileLocation: () => Promise<void>
         }
     }
 }

@@ -38,8 +38,6 @@ function App(): JSX.Element {
         const fetchPaletteWidth = async () => {
             const width = await window.store.get('paletteWidths')
 
-            // setPaletteWidths(JSON.parse(width))
-
             setPaletteWidths(width as StoreType['paletteWidths'])
         }
         fetchPaletteWidth()
@@ -95,17 +93,14 @@ function App(): JSX.Element {
         }
     }
 
-    // @ts-ignore
-    const handleResize = debounce(async (e: number[], source: Panels) => {
-        // if (!paletteWidths) return
-        terminals?.get(selectedStack)?.get(selectedTerminal)?.resize()
 
-        // console.log(paletteWidths)
-        // const newWidths = JSON.parse(JSON.stringify(paletteWidths))
-        // console.log(newWidths)
-        // if (source === Panels.Terminals) newWidths.palette1 = e[1]
-        // else newWidths.palette2 = e[1]
-        // await window.store.set('paletteWidths', JSON.stringify(newWidths))
+    const handleResize = debounce(async (e: number[], source: Panels) => {
+        if (!paletteWidths) return
+        terminals?.get(selectedStack)?.get(selectedTerminal)?.resize()
+        const newWidths = { ...paletteWidths }
+        if (source === Panels.Terminals) newWidths.palette1 = e[1]
+        else newWidths.palette2 = e[1]
+        await window.store.set('paletteWidths', newWidths)
     }, 10)
 
     return (
