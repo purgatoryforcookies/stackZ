@@ -13,7 +13,7 @@ import {
 } from '@renderer/@/ui/sheet'
 import ColorSquare from './ColorSquare'
 import { useContext, useEffect, useState } from 'react'
-import { ArrowDownIcon, ArrowUpIcon } from '@radix-ui/react-icons'
+import { ArrowDownIcon, ArrowUpIcon, FileTextIcon } from '@radix-ui/react-icons'
 import KillSignal from './KillSignal'
 import { ThemeContext } from '@renderer/App'
 
@@ -163,7 +163,7 @@ function Settings({ setTheme }: SettingsProps) {
 
                 <div className="py-8">
                     <div className="flex items-center gap-4">
-                        <h1>Commands.json</h1>
+                        <h1>stacks.json</h1>
                         <Button variant={'outline'} disabled>
                             <ArrowUpIcon className="mr-2 h-4 w-4" />
                             Export
@@ -171,6 +171,10 @@ function Settings({ setTheme }: SettingsProps) {
                         <Button variant={'outline'} disabled>
                             <ArrowDownIcon className="mr-2 h-4 w-4" />
                             Import
+                        </Button>
+                        <Button variant={'outline'} onClick={window.store.openFileLocation}>
+                            <FileTextIcon className="mr-2 h-4 w-4" />
+                            Open
                         </Button>
                     </div>
                 </div>
