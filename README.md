@@ -10,7 +10,7 @@ With StackZ, you can create environments and pipelines withing your development 
 
 Each terminal in a stack can be run as a sequence, or separetly. In a sequence, the order or the terminal spawns is quaranteed, and you can set delays for terminal to slow down their startup. Delaying takes effect only when you start the stack. Running a single terminal from a stack does not obey the delay. 
 
-Terminals can be set to restart on error, or to run as a loose terminal. Loose terminal does not listen for exists. Session remains open and does not stop until you stop it. Rerun will trigger terminal restart always, even if you stop the terminal yourself. This functionality enables for quick restarts of the terminal. 
+Terminals can be set to restart on exits, or to run as a loose terminal. Loose terminal does not listen for exists. Session remains open and does not stop until you stop it. Rerun will trigger terminal restart always, even if you stop the terminal yourself. This functionality enables for quick restarts of the terminal. 
 
 StackZ supports the following shells:
 
