@@ -23,8 +23,9 @@ export class Terminal {
     buffer: string[]
     rows: number | undefined
     cols: number | undefined
+    stackPing: Function
 
-    constructor(stackId: string, cmd: Cmd, socketId: string, server: Server) {
+    constructor(stackId: string, cmd: Cmd, socketId: string, server: Server, stackPing: Function) {
         this.settings = cmd
         this.settings.command.env = envFactory(this.settings.command.env)
         this.socketId = socketId
@@ -34,6 +35,7 @@ export class Terminal {
         this.ptyProcess = null
         this.isRunning = false
         this.buffer = []
+        this.stackPing = stackPing
     }
 
     chooseShell(shell?: string) {
@@ -152,6 +154,7 @@ export class Terminal {
 
     ping() {
         this.server.emit('terminalState', this.getState())
+        this.stackPing()
     }
 
     getState(): Status {
@@ -169,7 +172,6 @@ export class Terminal {
 
     sendToClient(data: string) {
         this.server
-            .timeout(400)
             .to(this.socketId)
             .emit('output', data)
     }

@@ -173,12 +173,11 @@ export class Stack {
             const stack = tempArray[i]
             if (stack.settings.metaSettings?.delay) {
                 timeouts += stack.settings.metaSettings?.delay
-                setTimeout(() => {
-                    stack.start()
-                }, timeouts)
-            } else {
-                stack.start()
+
             }
+            setTimeout(() => {
+                stack.start()
+            }, timeouts)
         }
     }
     stopStack(stack: string) {
@@ -206,7 +205,7 @@ export class Stack {
     createTerminal(title: string, stack: string) {
         const existingStack = this.palettes.get(stack)
         if (!existingStack) {
-            throw new Error(`Whoah, stack ${stack} was not found when adding new temrinal!`)
+            throw new Error(`Whoah, stack ${stack} was not found when adding new terminal`)
         }
         const newT = this.palettes.get(stack)?.createCommand(title)
         if (!newT) throw new Error(`Could not create terminal ${title} ${stack}`)

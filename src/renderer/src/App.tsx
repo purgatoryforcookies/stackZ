@@ -69,18 +69,15 @@ function App(): JSX.Element {
     const handleSelection = (
         stackId: string,
         terminalId: string,
-        method = SelectionEvents.CONN,
-        cb?: () => void
+        method = SelectionEvents.CONN
     ) => {
         switch (method) {
             case SelectionEvents.CONN:
                 selectStack(stackId)
                 selectTerminal(terminalId)
-                if (cb) cb()
                 break
             case SelectionEvents.START:
                 window.api.startTerminal(stackId, terminalId)
-                if (cb) cb()
                 break
             case SelectionEvents.EXPAND:
                 setEditMode(!editMode)

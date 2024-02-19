@@ -17,7 +17,7 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
 
     useEffect(() => {
         baseSocket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
-            if (stackId !== d.stackId || terminalId !== d.cmd.id) return
+            if (stackId !== d.stackId && terminalId !== d.cmd.id) return
             setStatus(d)
         })
         baseSocket.emit(UtilityEvents.STATE, { stack: stackId, terminal: terminalId })
@@ -49,15 +49,15 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
             <div className="flex gap-8 pb-24 h-full overflow-auto pr-32" ref={bodyRef}>
                 {status?.cmd.command.env
                     ? status.cmd.command.env.map((record) => (
-                          <EnvList
-                              data={record}
-                              key={record.title}
-                              onSelection={handleHighligt}
-                              terminalId={terminalId}
-                              stackId={stackId}
-                              highlight={highlightedEnv}
-                          />
-                      ))
+                        <EnvList
+                            data={record}
+                            key={record.title}
+                            onSelection={handleHighligt}
+                            terminalId={terminalId}
+                            stackId={stackId}
+                            highlight={highlightedEnv}
+                        />
+                    ))
                     : null}
                 <div className="p-11">
                     <NewEnvList scroll={scroll} terminalId={terminalId} stackId={stackId} />

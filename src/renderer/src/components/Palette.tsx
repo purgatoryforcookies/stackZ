@@ -4,7 +4,6 @@ import {
     PaletteStack,
     SelectionEvents,
     StackStatus,
-    Status,
     UtilityEvents
 } from '@t'
 import { useEffect, useState } from 'react'
@@ -31,35 +30,18 @@ type PaletteProps = {
 }
 
 function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId }: PaletteProps) {
-    const [palette, setPalette] = useState<Cmd[]>()
-    const [stackState, setStackState] = useState<StackStatus['state']>([])
+
+
     const [running, setRunning] = useState<boolean>(false)
 
     useEffect(() => {
+
         baseSocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
             if (d.stack !== stackId) return
-            setStackState(d.state)
-        })
-        baseSocket.on(ClientEvents.TERMINALSTATE, (d: Status) => {
-            if (d.stackId !== stackId) return
-            const newStatus = [...stackState]
-            const index = newStatus.findIndex((term) => term.id === d.cmd.id)
-            if (index === -1) {
-                newStatus.push({ id: d.cmd.id, running: d.isRunning })
-            } else {
-                newStatus[index].running = d.isRunning
-            }
-            setStackState(newStatus)
+            console.log(d.stack, stackId)
+            setRunning(d.isRunning)
         })
 
-        // TODO: add a toast notification for unexpected exits
-        // toast('info', {
-        //     description: "Terminal stopped",
-
-        // })
-
-
-        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
     }, [stackId, terminalId])
 
     const toggleStack = () => {
@@ -71,15 +53,7 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
         baseSocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
     }
 
-    useEffect(() => {
-        const filtered = data.get(stackId)?.palette
-        if (!filtered) setPalette(undefined)
-        setPalette(filtered)
-    }, [stackId, data])
-
-    useEffect(() => {
-        setRunning(stackState.some((term) => term.running))
-    }, [stackState])
+    const stack = data.get(stackId)
 
     return (
         <div className="h-full flex flex-col">
@@ -119,8 +93,8 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
                 </Button>
             </div>
             <div className="overflow-auto pb-20">
-                {palette
-                    ? palette.map((cmd) => {
+                {stack?.palette
+                    ? stack.palette.sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0)).map((cmd) => {
                         if (!cmd?.id) return null
                         return (
                             <Command
@@ -133,7 +107,7 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
                         )
                     })
                     : null}
-                <div className="w-full flex justify-center">
+                <div className="w-full flex justify-center ">
                     <NewCommand afterAdd={onNewTerminal} stackId={stackId} />
                 </div>
             </div>

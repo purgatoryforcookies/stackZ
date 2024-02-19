@@ -53,19 +53,15 @@ function CommandSettings({ expanded, data, stackId }: CommandSettingsProps) {
     }
 
     return (
-        <div
-            className={`p-2 h-full w-full rounded-lg flex justify-evenly items-center
-        transition-opacity duration-500 ease-in-out
-        ${expanded ? 'opacity-100' : 'opacity-0'}
-        `}
+        <div className={`h-full w-full rounded-lg flex justify-evenly items-center
+        ${expanded ? '' : ' hidden'}`}
         >
             <div>
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label htmlFor="delay" className="flex items-center gap-2">
                         Start delay ms
                         <CustomToolTip
-                            message="Delays take effect only when the whole stack is started. 
-                        Delays stackup to next terminals delay."
+                            message="For delaying terminal when starting the stack"
                         />
                     </Label>
                     <Input
@@ -81,7 +77,7 @@ function CommandSettings({ expanded, data, stackId }: CommandSettingsProps) {
             <div className="flex flex-col gap-5">
                 <div className="flex items-center space-x-2">
                     <Checkbox
-                        id="interactivity"
+
                         name="loose"
                         onCheckedChange={(e) => handleSettings('loose', e)}
                         checked={settings.loose}
@@ -93,7 +89,7 @@ function CommandSettings({ expanded, data, stackId }: CommandSettingsProps) {
                 </div>
                 <div className="flex items-center space-x-2">
                     <Checkbox
-                        id="rerun"
+
                         name="rerun"
                         onCheckedChange={(e) => handleSettings('rerun', e)}
                         checked={settings.rerun}

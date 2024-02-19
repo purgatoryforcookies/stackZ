@@ -18,7 +18,7 @@ export class Palette {
     initTerminal(socketId: string, server: Server, remoteTerminalID: string) {
         const terminal = this.settings.palette?.find((palette) => palette.id === remoteTerminalID)
         if (terminal) {
-            const newTerminal = new Terminal(this.settings.id, terminal, socketId, server)
+            const newTerminal = new Terminal(this.settings.id, terminal, socketId, server, this.pingState.bind(this))
             this.terminals.set(terminal.id, newTerminal)
             newTerminal.ping()
             return
@@ -38,7 +38,7 @@ export class Palette {
         if (!this.settings.palette) {
             this.settings.palette = []
         } else {
-            const orders = this.settings.palette.map((pal) => pal.executionOrder || 0)
+            const orders = this.settings.palette.map((pal) => pal.executionOrder || 1)
             const maxOrder = Math.max(...orders)
             if (maxOrder !== Infinity) newOrder = maxOrder + 1
         }
@@ -80,6 +80,7 @@ export class Palette {
     }
 
     pingState() {
+        console.log("Pinging state ")
         const state = [...this.terminals.values()].map((term) => {
             if (!term) return term
             return {
@@ -88,7 +89,11 @@ export class Palette {
             }
         })
 
-        this.server.emit('stackState', { stack: this.settings.id, state: state })
+        this.server.emit('stackState', {
+            stack: this.settings.id,
+            isRunning: state.some(term => term.running === true),
+            state: state
+        })
     }
 
     pingAll() {
