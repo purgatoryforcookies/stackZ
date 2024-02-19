@@ -38,7 +38,6 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
 
         baseSocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
             if (d.stack !== stackId) return
-            console.log(d.stack, stackId)
             setRunning(d.isRunning)
         })
 
