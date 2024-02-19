@@ -35,11 +35,12 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
     const [running, setRunning] = useState<boolean>(false)
 
     useEffect(() => {
-
+        setRunning(false)
         baseSocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
-            if (d.stack !== stackId) return
-            setRunning(d.isRunning)
+            if (d.stack !== stackId)
+                setRunning(d.isRunning)
         })
+
 
     }, [stackId, terminalId])
 

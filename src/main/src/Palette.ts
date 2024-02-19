@@ -33,15 +33,12 @@ export class Palette {
     }
 
     createCommand(title: string) {
-        let newOrder = 1
+        let newOrder = 0
 
         if (!this.settings.palette) {
             this.settings.palette = []
         } else {
-            const orders = this.settings.palette.map((pal) => {
-                if (pal.executionOrder) return pal.executionOrder
-                return 0
-            })
+            const orders = this.settings.palette.map((pal) => pal.executionOrder || 0)
             const maxOrder = Math.max(...orders)
             if (maxOrder !== -Infinity) newOrder = maxOrder + 1
         }
