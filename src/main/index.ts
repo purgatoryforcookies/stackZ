@@ -5,7 +5,7 @@ import { socketServer } from './src/service/CommandService'
 import { store } from './src/service/Store'
 import { Stack } from './src/Stack'
 import { stackSchema } from '../types'
-import { execSync } from 'child_process'
+import { exec } from 'child_process'
 
 const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
 
@@ -149,5 +149,5 @@ ipcMain.handle('openFilesLocation', () => {
             command = 'xdg-open';
             break;
     }
-    execSync(`${command} "${dirPath}"`);
+    exec(`${command} "${dirPath}"`);
 })

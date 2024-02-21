@@ -146,8 +146,8 @@ export class Terminal {
             const code = this.win ? undefined : 'SIGHUP'
             this.ptyProcess.kill(code)
             this.isRunning = false
-        } catch (error) {
-            console.log(`Failed to kill ${this.settings.id}`)
+        } catch {
+            //swallow
         }
         this.ping()
     }
@@ -161,7 +161,6 @@ export class Terminal {
         if (!this.settings.command.shell) {
             this.settings.command.shell = this.chooseShell()
         }
-
         return {
             stackId: this.stackId,
             cmd: this.settings,
@@ -259,6 +258,14 @@ export class Terminal {
             this.settings.command.env[i].order = i
         }
         this.ping()
+    }
+
+    removeEnv(args: UtilityProps) {
+        if (!args.value) return
+        const list = this.settings.command.env?.find(list => list.order === args.order)
+        delete list?.pairs[args.value]
+        this.ping
+
     }
 
     changeShell(newShell: string | undefined) {

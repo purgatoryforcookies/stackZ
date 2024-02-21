@@ -22,6 +22,7 @@ function App(): JSX.Element {
     const [headerVisible, setHeaderVisible] = useState<boolean>(true)
     const [paletteVisible, setPaletteVisible] = useState<boolean>(true)
 
+
     const {
         stack,
         terminals,
@@ -37,7 +38,6 @@ function App(): JSX.Element {
     useEffect(() => {
         const fetchPaletteWidth = async () => {
             const width = await window.store.get('paletteWidths')
-
             setPaletteWidths(width as StoreType['paletteWidths'])
         }
         fetchPaletteWidth()
@@ -101,7 +101,7 @@ function App(): JSX.Element {
     }, 10)
 
     return (
-        <ThemeContext.Provider value={theme ?? 'aurora'}>
+        <ThemeContext.Provider value={theme!}>
             <ResizablePanelGroup
                 direction="vertical"
                 className="h-full bg-background text-primary-foreground"

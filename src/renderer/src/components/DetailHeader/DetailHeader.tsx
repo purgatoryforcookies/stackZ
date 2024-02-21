@@ -17,7 +17,7 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
 
     useEffect(() => {
         baseSocket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
-            if (stackId !== d.stackId && terminalId !== d.cmd.id) return
+            if (terminalId === d.cmd.id) return
             setStatus(d)
         })
         baseSocket.emit(UtilityEvents.STATE, { stack: stackId, terminal: terminalId })

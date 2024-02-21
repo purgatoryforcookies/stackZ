@@ -4,7 +4,6 @@ import {
     PaletteStack,
     SelectionEvents,
     StackStatus,
-    UtilityEvents
 } from '@t'
 import { useEffect, useState } from 'react'
 import { Badge } from '@renderer/@/ui/badge'
@@ -37,8 +36,14 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
     useEffect(() => {
         setRunning(false)
         baseSocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
-            if (d.stack !== stackId)
+            if (d.stack === stackId) {
+                console.log(`
+                Selected stack ${stackId}, is it running: ${d.isRunning}
+                received stack from status: ${d.stack}
+                
+                `)
                 setRunning(d.isRunning)
+            }
         })
 
 
@@ -50,7 +55,7 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
         } else {
             window.api.startStack(stackId)
         }
-        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
+
     }
 
     const stack = data.get(stackId)

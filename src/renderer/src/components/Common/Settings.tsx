@@ -46,15 +46,16 @@ function Settings({ setTheme }: SettingsProps) {
         if (!theme) return
         window.store.set('theme', theme)
     }, [theme])
+
     useEffect(() => {
         window.store.get('theme').then((t) => {
             setTheme(t as string)
         })
-    })
+    }, [])
 
     return (
         <Sheet open={open} onOpenChange={setOpen}>
-            <SheetContent className="w-[30vw] sm:max-w-none " data-theme={theme}>
+            <SheetContent className="w-[30vw] min-w-[30rem] sm:max-w-none " data-theme={theme}>
                 <SheetHeader>
                     <SheetTitle>Settings</SheetTitle>
                     <SheetDescription></SheetDescription>
@@ -180,9 +181,6 @@ function Settings({ setTheme }: SettingsProps) {
                 </div>
                 <SheetFooter>
                     <SheetClose asChild>
-                        <Button type="submit" disabled>
-                            Save changes
-                        </Button>
                     </SheetClose>
                 </SheetFooter>
             </SheetContent>

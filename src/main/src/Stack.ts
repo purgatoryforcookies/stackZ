@@ -71,11 +71,7 @@ export class Stack {
             // then utility listeners are registered
 
             if (!palette) {
-                client.on(UtilityEvents.STATE, (arg: { stack: string; terminal?: string }) => {
-                    if (!arg.terminal) {
-                        this.palettes.get(arg.stack)?.pingAll()
-                        return
-                    }
+                client.on(UtilityEvents.STATE, (arg: { stack: string; terminal: string }) => {
                     this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.ping()
                 })
                 client.on(UtilityEvents.BIGSTATE, (arg: { stack: string }) => {
@@ -97,8 +93,12 @@ export class Stack {
                         ?.addEnvList(args.value)
                     this.save()
                 })
-                client.on(UtilityEvents.ENVDELETE, (args: UtilityProps) => {
+                client.on(UtilityEvents.ENVLISTDELETE, (args: UtilityProps) => {
                     this.palettes.get(args.stack)?.terminals.get(args.terminal)?.removeEnvList(args)
+                    this.save()
+                })
+                client.on(UtilityEvents.ENVDELETE, (args: UtilityProps) => {
+                    this.palettes.get(args.stack)?.terminals.get(args.terminal)?.removeEnv(args)
                     this.save()
                 })
                 client.on(

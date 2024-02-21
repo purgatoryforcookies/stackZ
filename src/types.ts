@@ -70,6 +70,7 @@ export enum UtilityEvents {
     ENVEDIT = 'environmentEdit',
     ENVMUTE = 'environmentMute',
     ENVLIST = 'environmentList',
+    ENVLISTDELETE = 'environmentListDelete',
     ENVDELETE = 'environmentDelete',
     CMDMETASETTINGS = 'commandMetaSetting'
 }

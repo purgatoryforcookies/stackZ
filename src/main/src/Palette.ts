@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { Cmd, PaletteStack } from '../../types'
+import { Cmd, PaletteStack, StackStatus } from '../../types'
 import { Terminal } from './service/Terminal'
 import { Server } from 'socket.io'
 import { resolveDefaultCwd } from './service/util'
@@ -33,7 +33,7 @@ export class Palette {
     }
 
     createCommand(title: string) {
-        let newOrder = 0
+        let newOrder = 1
 
         if (!this.settings.palette) {
             this.settings.palette = []
@@ -80,20 +80,21 @@ export class Palette {
     }
 
     pingState() {
-        console.log("Pinging state ")
-        const state = [...this.terminals.values()].map((term) => {
-            if (!term) return term
+
+        const terminalStates = [...this.terminals.values()].map((term) => {
+
             return {
                 id: term.settings.id,
                 running: term.isRunning
             }
         })
-
-        this.server.emit('stackState', {
+        const state: StackStatus = {
             stack: this.settings.id,
-            isRunning: state.some(term => term.running === true),
-            state: state
-        })
+            isRunning: terminalStates.some(term => term.running === true),
+            state: terminalStates
+        }
+
+        this.server.emit('stackState', state)
     }
 
     pingAll() {
