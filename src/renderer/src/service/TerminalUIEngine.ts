@@ -12,13 +12,13 @@ export class TerminalUIEngine {
         cursorBlink: true,
         rightClickSelectsWord: false
     })
-    private socket: Socket
+    socket: Socket
     private mounted = false
     private isConnected = false
     private isRunning = false
     private host: string
-    private stackId: string
-    private terminalId: string
+    stackId: string
+    terminalId: string
     private fitAddon: FitAddon
     private hostdiv: HTMLElement
     private buffer: string
@@ -41,8 +41,9 @@ export class TerminalUIEngine {
 
     resize() {
         this.fitAddon.fit()
-        this.socket.emit(TerminalEvents.RESIZE,
-            { stack: this.stackId, terminal: this.terminalId, value: this.fitAddon.proposeDimensions() })
+        this.socket.emit(TerminalEvents.RESIZE, {
+            value: this.fitAddon.proposeDimensions()
+        })
         return this
     }
 
@@ -117,7 +118,7 @@ export class TerminalUIEngine {
     }
 
     sendInput(input: string) {
-        this.socket.emit('input', { stack: this.stackId, terminal: this.terminalId, value: input })
+        this.socket.emit('input', { data: input })
     }
 
     write(char: string) {

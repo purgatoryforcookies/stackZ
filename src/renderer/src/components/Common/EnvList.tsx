@@ -1,10 +1,10 @@
 import { baseSocket } from '@renderer/service/socket'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Record from '@renderer/components/Common/ListItem'
 import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
-import { ClientEvents, Environment, Status, UtilityEvents } from '@t'
+import { UtilityEvents } from '@t'
 
 type EnvListProps = {
     data: {
@@ -23,7 +23,6 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
     const [minimized, setMinimized] = useState<boolean>(false)
     const [hidden, setHidden] = useState<boolean>(false)
     const [editMode, setEditMode] = useState<boolean>(false)
-    const [ping, setPing] = useState<Environment>(data)
 
     const handleClik = (
         key: string | undefined,
@@ -34,21 +33,11 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
         onSelection([key ?? '', key ? data.pairs[key] || '' : ''])
     }
 
-    useEffect(() => {
-        baseSocket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
-            if (terminalId !== d.cmd.id) return
-            const override = d.cmd.command.env?.find((e) => e.order === data.order)
-            console.log(override)
-            if (!override) return
-            setPing(() => override)
-        })
-    }, [])
-
     const handleMute = () => {
         baseSocket.emit(UtilityEvents.ENVMUTE, {
             stack: stackId,
             terminal: terminalId,
-            order: ping.order
+            order: data.order
         })
     }
 
@@ -69,7 +58,7 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
         baseSocket.emit(UtilityEvents.ENVLISTDELETE, {
             stack: stackId,
             terminal: terminalId,
-            order: ping.order
+            order: data.order
         })
     }
 
@@ -80,7 +69,7 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
         ${editMode ? 'max-w-[100%]' : ''}
         `}
         >
-            <h1 className="text-center text-foreground text-nowrap">{ping.title}</h1>
+            <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
             <Separator className="my-2" />
             <div className="flex gap-1 justify-center mb-2">
                 <Badge
@@ -93,7 +82,7 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
                 </Badge>
                 <Badge
                     variant={
-                        ping.disabled.length === Object.keys(ping.pairs).length
+                        data.disabled.length === Object.keys(data.pairs).length
                             ? 'default'
                             : 'outline'
                     }
@@ -125,41 +114,41 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
             {hidden ? (
                 <div className="flex flex-col justify-center items-center pt-10 text-white/40">
                     <h2 className="text-2xl">
-                        {Object.keys(ping.pairs).length}{' '}
+                        {Object.keys(data.pairs).length}{' '}
                         <span className="text-base">variables</span>
                     </h2>
                     <h3 className="text-lg">
-                        {ping.disabled.length} <span className="text-sm">muted</span>
+                        {data.disabled.length} <span className="text-sm">muted</span>
                     </h3>
                 </div>
             ) : (
                 <div className="flex flex-col gap-1 overflow-auto h-[100%] py-2 ">
-                    {ping.pairs
-                        ? Object.keys(ping.pairs).map((key: string) => (
-                            <Record
-                                key={key} //react component key
-                                newRecord={false}
-                                editMode={editMode}
-                                terminalId={terminalId}
-                                orderId={ping.order}
-                                stackId={stackId}
-                                minimized={minimized}
-                                keyv={key}
-                                muted={ping.disabled.includes(key)}
-                                value={ping.pairs[key]}
-                                onClick={handleClik}
-                                highlight={highlight ? highlight[0] === key : false}
-                            />
-                        ))
+                    {data.pairs
+                        ? Object.keys(data.pairs).map((key: string) => (
+                              <Record
+                                  key={key} //react component key
+                                  newRecord={false}
+                                  editMode={editMode}
+                                  terminalId={terminalId}
+                                  orderId={data.order}
+                                  stackId={stackId}
+                                  minimized={minimized}
+                                  keyv={key}
+                                  muted={data.disabled.includes(key)}
+                                  value={data.pairs[key]}
+                                  onClick={handleClik}
+                                  highlight={highlight ? highlight[0] === key : false}
+                              />
+                          ))
                         : null}
                     {editMode ? (
                         <Record
                             newRecord={true}
                             terminalId={terminalId}
-                            orderId={ping.order}
+                            orderId={data.order}
                             stackId={stackId}
                             minimized={minimized}
-                            onClick={() => { }}
+                            onClick={() => {}}
                             editMode={editMode}
                         />
                     ) : null}

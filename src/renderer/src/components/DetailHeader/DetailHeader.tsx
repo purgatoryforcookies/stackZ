@@ -1,29 +1,33 @@
 import { useEffect, useRef, useState } from 'react'
-import { baseSocket } from '@renderer/service/socket'
 import { ClientEvents, Status, UtilityEvents } from '@t'
 import EnvList from '../Common/EnvList'
 import { NewEnvList } from '../Dialogs/NewEnvList'
 import { Badge } from '@renderer/@/ui/badge'
+import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 type DetailHeaderProps = {
     stackId: string
     terminalId: string
+    terminal: TerminalUIEngine | undefined
 }
 
-function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
+function DetailHeader({ terminal }: DetailHeaderProps) {
     const [status, setStatus] = useState<Status | null>(null)
     const [highlightedEnv, setHighlightedEnv] = useState<string[] | null>(null)
     const bodyRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        baseSocket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
-            if (terminalId === d.cmd.id) return
+        if (!terminal) return
+        terminal.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
             setStatus(d)
         })
-        baseSocket.emit(UtilityEvents.STATE, { stack: stackId, terminal: terminalId })
+        terminal.socket.emit(UtilityEvents.STATE, {
+            stack: terminal.stackId,
+            terminal: terminal.terminalId
+        })
 
-        if (status && status.stackId !== stackId) setStatus(null)
-    }, [stackId, terminalId])
+        if (status && status.stackId !== terminal.stackId) setStatus(null)
+    }, [terminal])
 
     const handleHighligt = (e: string[]) => {
         if (e[0] === highlightedEnv?.[0]) {
@@ -39,6 +43,8 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
         }, 290)
     }
 
+    if (!terminal) return null
+
     return (
         <div className="h-full px-5">
             <div className="">
@@ -49,18 +55,22 @@ function DetailHeader({ stackId, terminalId }: DetailHeaderProps) {
             <div className="flex gap-8 pb-24 h-full overflow-auto pr-32" ref={bodyRef}>
                 {status?.cmd.command.env
                     ? status.cmd.command.env.map((record) => (
-                        <EnvList
-                            data={record}
-                            key={record.title}
-                            onSelection={handleHighligt}
-                            terminalId={terminalId}
-                            stackId={stackId}
-                            highlight={highlightedEnv}
-                        />
-                    ))
+                          <EnvList
+                              data={record}
+                              key={record.title}
+                              onSelection={handleHighligt}
+                              terminalId={terminal.terminalId}
+                              stackId={terminal.stackId}
+                              highlight={highlightedEnv}
+                          />
+                      ))
                     : null}
                 <div className="p-11">
-                    <NewEnvList scroll={scroll} terminalId={terminalId} stackId={stackId} />
+                    <NewEnvList
+                        scroll={scroll}
+                        terminalId={terminal.terminalId}
+                        stackId={terminal.stackId}
+                    />
                 </div>
             </div>
         </div>

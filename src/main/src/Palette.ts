@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
-import { Cmd, PaletteStack, StackStatus } from '../../types'
+import { ClientEvents, Cmd, PaletteStack, StackStatus } from '../../types'
 import { Terminal } from './service/Terminal'
-import { Server } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 import { resolveDefaultCwd } from './service/util'
 
 export class Palette {
@@ -15,15 +15,20 @@ export class Palette {
         this.server = server
     }
 
-    initTerminal(socketId: string, server: Server, remoteTerminalID: string) {
+    initTerminal(socket: Socket, remoteTerminalID: string) {
         const terminal = this.settings.palette?.find((palette) => palette.id === remoteTerminalID)
         if (terminal) {
-            const newTerminal = new Terminal(this.settings.id, terminal, socketId, server, this.pingState.bind(this))
+            const newTerminal = new Terminal(
+                this.settings.id,
+                terminal,
+                socket,
+                this.pingState.bind(this)
+            )
             this.terminals.set(terminal.id, newTerminal)
             newTerminal.ping()
             return
         }
-        throw new Error(`No terminal found ${socketId}, ${remoteTerminalID}`)
+        throw new Error(`No terminal found ${remoteTerminalID}`)
     }
 
     deleteTerminal(terminalId: string) {
@@ -80,21 +85,20 @@ export class Palette {
     }
 
     pingState() {
-
         const terminalStates = [...this.terminals.values()].map((term) => {
-
             return {
                 id: term.settings.id,
                 running: term.isRunning
             }
         })
+
         const state: StackStatus = {
             stack: this.settings.id,
-            isRunning: terminalStates.some(term => term.running === true),
+            isRunning: terminalStates.some((term) => term.running === true),
             state: terminalStates
         }
 
-        this.server.emit('stackState', state)
+        this.server.emit(ClientEvents.STACKSTATE, state)
     }
 
     pingAll() {

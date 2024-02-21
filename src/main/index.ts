@@ -137,17 +137,17 @@ ipcMain.handle('createStack', (_, title) => {
 
 ipcMain.handle('openFilesLocation', () => {
     const dirPath = app.getPath('userData')
-    let command = '';
+    let command = ''
     switch (process.platform) {
         case 'darwin':
-            command = 'open';
-            break;
+            command = 'open'
+            break
         case 'win32':
-            command = 'explorer';
-            break;
+            command = 'explorer'
+            break
         default:
-            command = 'xdg-open';
-            break;
+            command = 'xdg-open'
+            break
     }
-    exec(`${command} "${dirPath}"`);
+    exec(`${command} "${dirPath}"`)
 })

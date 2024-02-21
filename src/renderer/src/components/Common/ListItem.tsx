@@ -43,11 +43,13 @@ export const Field = ({
     highlight
 }: FieldProps) => {
     const style = `rounded-full py-1
-    ${variant === 'primary'
+    ${
+        variant === 'primary'
             ? `pr-3 pl-3 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
-            : `pl-3 pr-3  truncate text-secondary ${highlight ? 'bg-orange-900 text-white' : 'bg-primary'
-            }`
-        }`
+            : `pl-3 pr-3  truncate text-secondary ${
+                  highlight ? 'bg-orange-900 text-white' : 'bg-primary'
+              }`
+    }`
 
     if (disabled) return <p className={style}>{value}</p>
 
@@ -135,20 +137,24 @@ const Record = ({
             onClick={(e) => onClick(keyValue, e)}
             onContextMenu={handleMute}
         >
-            {editMode && !newRecordOpen && !newRecord ? <Cross1Icon onClick={handleDelete} className='absolute left-3 top-2 w-4 h-4 hover:text-red-600 hover:cursor-pointer hover:scale-110' /> : null}
-            {newRecord && !newRecordOpen ?
+            {editMode && !newRecordOpen && !newRecord ? (
+                <Cross1Icon
+                    onClick={handleDelete}
+                    className="absolute left-3 top-2 w-4 h-4 hover:text-red-600 hover:cursor-pointer hover:scale-110"
+                />
+            ) : null}
+            {newRecord && !newRecordOpen ? (
                 <GoPlus
                     size={20}
                     onClick={() => setNewRecordOpen(!newRecordOpen)}
                     className="flex justify-center items-center w-full mt-2 hover:cursor-pointer text-secondary-foreground"
                 />
-                :
+            ) : (
                 <form
                     onSubmit={handleEdits}
                     onBlur={handleEdits}
                     className="flex font-semibold justify-between hover:cursor-pointer rounded-full bg-muted"
                 >
-
                     <Field
                         value={keyv}
                         disabled={!editMode}
@@ -170,7 +176,7 @@ const Record = ({
                         />
                     ) : null}
                 </form>
-            }
+            )}
         </div>
     )
 }

@@ -180,8 +180,7 @@ function Settings({ setTheme }: SettingsProps) {
                     </div>
                 </div>
                 <SheetFooter>
-                    <SheetClose asChild>
-                    </SheetClose>
+                    <SheetClose asChild></SheetClose>
                 </SheetFooter>
             </SheetContent>
         </Sheet>

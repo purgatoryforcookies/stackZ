@@ -22,7 +22,6 @@ function App(): JSX.Element {
     const [headerVisible, setHeaderVisible] = useState<boolean>(true)
     const [paletteVisible, setPaletteVisible] = useState<boolean>(true)
 
-
     const {
         stack,
         terminals,
@@ -90,7 +89,6 @@ function App(): JSX.Element {
         }
     }
 
-
     const handleResize = debounce(async (e: number[], source: Panels) => {
         if (!paletteWidths) return
         terminals?.get(selectedStack)?.get(selectedTerminal)?.resize()
@@ -98,7 +96,7 @@ function App(): JSX.Element {
         if (source === Panels.Terminals) newWidths.palette1 = e[1]
         else newWidths.palette2 = e[1]
         await window.store.set('paletteWidths', newWidths)
-    }, 10)
+    }, 40)
 
     return (
         <ThemeContext.Provider value={theme!}>
@@ -136,9 +134,10 @@ function App(): JSX.Element {
                                     <span className="font-semibold text-lg">Terminals</span>
                                 </div>
                                 <div className="overflow-hidden h-full" id="paletteBackground">
-                                    {stack && !loading ? (
+                                    {stack ? (
                                         <Palette
                                             data={stack}
+                                            engines={terminals?.get(selectedStack)}
                                             onClick={handleSelection}
                                             stackId={selectedStack}
                                             terminalId={selectedTerminal}
@@ -162,7 +161,11 @@ function App(): JSX.Element {
                         minSize={5}
                     >
                         {stack ? (
-                            <DetailHeader stackId={selectedStack} terminalId={selectedTerminal} />
+                            <DetailHeader
+                                stackId={selectedStack}
+                                terminalId={selectedTerminal}
+                                terminal={terminals?.get(selectedStack)?.get(selectedTerminal)}
+                            />
                         ) : (
                             <Placeholder message="Select from palette to get started" />
                         )}
