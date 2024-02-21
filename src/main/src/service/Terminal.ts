@@ -27,8 +27,9 @@ export class Terminal {
     rows: number | undefined
     cols: number | undefined
     stackPing: Function
+    save: Function
 
-    constructor(stackId: string, cmd: Cmd, socket: Socket, stackPing: Function) {
+    constructor(stackId: string, cmd: Cmd, socket: Socket, stackPing: Function, save: Function) {
         this.settings = cmd
         this.settings.command.env = envFactory(this.settings.command.env)
         this.stackId = stackId
@@ -39,6 +40,7 @@ export class Terminal {
         this.buffer = []
         this.stackPing = stackPing
         this.registerTerminalEvents()
+        this.save = save
     }
 
     chooseShell(shell?: string) {
@@ -161,6 +163,7 @@ export class Terminal {
 
     ping() {
         this.socket.emit(ClientEvents.TERMINALSTATE, this.getState())
+        this.save()
     }
 
     getState(): Status {
@@ -203,6 +206,7 @@ export class Terminal {
             target.pairs = Object.fromEntries(Object.entries(target.pairs).sort())
         }
         this.ping()
+
     }
 
     muteVariable(args: UtilityProps) {
@@ -285,20 +289,19 @@ export class Terminal {
         this.socket.on(TerminalEvents.CWD, (arg: Utility2Props) => {
             console.log(`Changing cwd! new Cwd: ${arg.value}`)
             this.updateCwd(arg.value)
-            // this.save()
+
         })
         this.socket.on(TerminalEvents.CMD, (arg: Utility2Props) => {
             console.log(`Changing command! new CMD: ${arg.value}`)
             this.updateCommand(arg.value)
-            // this.save()
+
         })
         this.socket.on(TerminalEvents.SHELL, (arg: Utility2Props) => {
             console.log(`Changing shell! new shell: ${arg.value}`)
             this.changeShell(arg.value)
-            // this.save()
+
         })
         this.socket.on(TerminalEvents.INPUT, (data) => {
-            console.log(`Getting input from data`)
             this.writeFromClient(data)
         })
         this.socket.on(
@@ -309,31 +312,31 @@ export class Terminal {
         )
         this.socket.on(UtilityEvents.ENVLISTDELETE, (args: UtilityProps) => {
             this.removeEnvList(args)
-            // this.save()
+
         })
         this.socket.on(UtilityEvents.ENVDELETE, (args: UtilityProps) => {
             this.removeEnv(args)
-            // this.save()
+
         })
         this.socket.on(
             UtilityEvents.CMDMETASETTINGS,
             (args: { stack: string; terminal: string; settings: CommandMetaSetting }) => {
                 this.setMetaSettings(args.settings)
-                // this.save()
+
             }
         )
-        this.socket.on(UtilityEvents.ENVLIST, (args: Omit<UtilityProps, 'order'>) => {
+        this.socket.on(UtilityEvents.ENVLIST, (args: { value: string }) => {
             if (!args.value) return
             this.addEnvList(args.value)
-            // this.save()
+
         })
         this.socket.on(UtilityEvents.ENVEDIT, (args: EnvironmentEditProps) => {
             this.editVariable(args)
-            // this.save()
+
         })
         this.socket.on(UtilityEvents.ENVMUTE, (arg: UtilityProps) => {
             this.muteVariable(arg)
-            // this.save()
+
         })
         this.socket.on(UtilityEvents.STATE, () => {
             console.log('pingign')

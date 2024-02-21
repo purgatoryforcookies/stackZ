@@ -15,14 +15,15 @@ export class Palette {
         this.server = server
     }
 
-    initTerminal(socket: Socket, remoteTerminalID: string) {
+    initTerminal(socket: Socket, remoteTerminalID: string, save: Function) {
         const terminal = this.settings.palette?.find((palette) => palette.id === remoteTerminalID)
         if (terminal) {
             const newTerminal = new Terminal(
                 this.settings.id,
                 terminal,
                 socket,
-                this.pingState.bind(this)
+                this.pingState.bind(this),
+                save
             )
             this.terminals.set(terminal.id, newTerminal)
             newTerminal.ping()

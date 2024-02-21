@@ -12,16 +12,16 @@ import {
 import { Input } from '@renderer/@/ui/input'
 import { Label } from '@renderer/@/ui/label'
 import { ThemeContext } from '@renderer/App'
-import { baseSocket } from '@renderer/service/socket'
+import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
+import { UtilityEvents } from '@t'
 import { useContext, useState } from 'react'
 
 type NewEnvListProps = {
     scroll: () => void
-    stackId: string
-    terminalId: string
+    terminal: TerminalUIEngine
 }
 
-export function NewEnvList({ scroll, terminalId, stackId }: NewEnvListProps) {
+export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
     const [title, setTitle] = useState<string>('')
     const [open, setOpen] = useState<boolean>(false)
 
@@ -29,7 +29,7 @@ export function NewEnvList({ scroll, terminalId, stackId }: NewEnvListProps) {
 
     const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        baseSocket.emit('environmentList', { stack: stackId, terminal: terminalId, value: title })
+        terminal.socket.emit(UtilityEvents.ENVLIST, { value: title })
         setTitle('')
         scroll()
         setOpen(false)

@@ -60,7 +60,7 @@ export class Stack {
             const palette = this.palettes.get(stackId)
 
             if (palette) {
-                palette.initTerminal(client, remoteTerminalID)
+                palette.initTerminal(client, remoteTerminalID, this.save.bind(this))
                 return
             }
 
@@ -155,7 +155,7 @@ export class Stack {
         return
     }
 
-    save(onExport = false) {
+    save = (onExport = false) => {
         const toModify: PaletteStack[] = onExport ? JSON.parse(JSON.stringify(this.raw)) : this.raw
 
         toModify.forEach((palette) => {
