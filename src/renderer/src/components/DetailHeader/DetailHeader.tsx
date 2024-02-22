@@ -21,12 +21,13 @@ function DetailHeader({ terminal }: DetailHeaderProps) {
         terminal.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
             setStatus(d)
         })
-        terminal.socket.emit(UtilityEvents.STATE, {
-            stack: terminal.stackId,
-            terminal: terminal.terminalId
-        })
+        terminal.socket.emit(UtilityEvents.STATE)
 
         if (status && status.stackId !== terminal.stackId) setStatus(null)
+
+        return () => {
+            terminal.socket.off(ClientEvents.TERMINALSTATE)
+        }
     }, [terminal])
 
     const handleHighligt = (e: string[]) => {
@@ -55,14 +56,14 @@ function DetailHeader({ terminal }: DetailHeaderProps) {
             <div className="flex gap-8 pb-24 h-full overflow-auto pr-32" ref={bodyRef}>
                 {status?.cmd.command.env
                     ? status.cmd.command.env.map((record) => (
-                        <EnvList
-                            data={record}
-                            key={record.title}
-                            onSelection={handleHighligt}
-                            terminal={terminal}
-                            highlight={highlightedEnv}
-                        />
-                    ))
+                          <EnvList
+                              data={record}
+                              key={record.title}
+                              onSelection={handleHighligt}
+                              terminal={terminal}
+                              highlight={highlightedEnv}
+                          />
+                      ))
                     : null}
                 <div className="p-11">
                     <NewEnvList scroll={scroll} terminal={terminal} />

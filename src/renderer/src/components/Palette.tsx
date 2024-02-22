@@ -1,4 +1,4 @@
-import { ClientEvents, Cmd, PaletteStack, SelectionEvents, StackStatus } from '@t'
+import { ClientEvents, Cmd, PaletteStack, SelectionEvents, StackStatus, UtilityEvents } from '@t'
 import { useEffect, useState } from 'react'
 import { Badge } from '@renderer/@/ui/badge'
 import NewCommand from './Dialogs/NewCommand'
@@ -39,11 +39,10 @@ function Palette({
         setRunning(false)
         baseSocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
             if (d.stack === stackId) {
-                console.log(stackId)
-                console.log(d)
                 setRunning(d.isRunning)
             }
         })
+        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
         return () => {
             baseSocket.off(ClientEvents.STACKSTATE)
         }

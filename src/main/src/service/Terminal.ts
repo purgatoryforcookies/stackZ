@@ -15,6 +15,7 @@ import { envFactory, haveThesameElements, mapEnvs } from './util'
 import path from 'path'
 import { ITerminalDimensions } from 'xterm-addon-fit'
 import { Socket } from 'socket.io'
+import { IPingFunction, ISaveFuntion } from '../Palette'
 
 export class Terminal {
     settings: Cmd
@@ -26,10 +27,16 @@ export class Terminal {
     buffer: string[]
     rows: number | undefined
     cols: number | undefined
-    stackPing: Function
-    save: Function
+    stackPing: IPingFunction
+    save: ISaveFuntion
 
-    constructor(stackId: string, cmd: Cmd, socket: Socket, stackPing: Function, save: Function) {
+    constructor(
+        stackId: string,
+        cmd: Cmd,
+        socket: Socket,
+        stackPing: IPingFunction,
+        save: ISaveFuntion
+    ) {
         this.settings = cmd
         this.settings.command.env = envFactory(this.settings.command.env)
         this.stackId = stackId
@@ -209,7 +216,7 @@ export class Terminal {
 
     muteVariable(args: UtilityProps) {
         if (args.value && args.value.trim().length == 0) return
-        const target = this.settings.command.env?.find((list) => list.order == args.order)
+        const target = this.settings.command.env?.find((list) => list.order === args.order)
 
         if (target) {
             if (!args.value) {
@@ -319,7 +326,7 @@ export class Terminal {
             this.addEnvList(args.value)
         })
         this.socket.on(UtilityEvents.ENVEDIT, (args: EnvironmentEditProps) => {
-            console.log("Receiving variables")
+            console.log('Receiving variables')
             this.editVariable(args)
         })
         this.socket.on(UtilityEvents.ENVMUTE, (arg: UtilityProps) => {

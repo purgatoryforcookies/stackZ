@@ -4,6 +4,14 @@ import { Terminal } from './service/Terminal'
 import { Server, Socket } from 'socket.io'
 import { resolveDefaultCwd } from './service/util'
 
+export interface ISaveFuntion {
+    (onExport?: boolean): void
+}
+
+export interface IPingFunction {
+    (): void
+}
+
 export class Palette {
     settings: PaletteStack
     terminals: Map<string, Terminal>
@@ -15,7 +23,7 @@ export class Palette {
         this.server = server
     }
 
-    initTerminal(socket: Socket, remoteTerminalID: string, save: Function) {
+    initTerminal(socket: Socket, remoteTerminalID: string, save: ISaveFuntion) {
         const terminal = this.settings.palette?.find((palette) => palette.id === remoteTerminalID)
         if (terminal) {
             const newTerminal = new Terminal(
