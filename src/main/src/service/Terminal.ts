@@ -319,6 +319,7 @@ export class Terminal {
             this.addEnvList(args.value)
         })
         this.socket.on(UtilityEvents.ENVEDIT, (args: EnvironmentEditProps) => {
+            console.log("Receiving variables")
             this.editVariable(args)
         })
         this.socket.on(UtilityEvents.ENVMUTE, (arg: UtilityProps) => {

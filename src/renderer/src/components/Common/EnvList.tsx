@@ -1,10 +1,10 @@
-import { baseSocket } from '@renderer/service/socket'
 import { useState } from 'react'
 import Record from '@renderer/components/Common/ListItem'
 import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
 import { UtilityEvents } from '@t'
+import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 type EnvListProps = {
     data: {
@@ -14,12 +14,11 @@ type EnvListProps = {
         disabled: string[]
     }
     onSelection: (e: string[]) => void
-    terminalId: string
-    stackId: string
     highlight: string[] | null
+    terminal: TerminalUIEngine
 }
 
-function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListProps) {
+function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
     const [minimized, setMinimized] = useState<boolean>(false)
     const [hidden, setHidden] = useState<boolean>(false)
     const [editMode, setEditMode] = useState<boolean>(false)
@@ -34,9 +33,7 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
     }
 
     const handleMute = () => {
-        baseSocket.emit(UtilityEvents.ENVMUTE, {
-            stack: stackId,
-            terminal: terminalId,
+        terminal.socket.emit(UtilityEvents.ENVMUTE, {
             order: data.order
         })
     }
@@ -55,9 +52,7 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
     }
 
     const handleDelete = () => {
-        baseSocket.emit(UtilityEvents.ENVLISTDELETE, {
-            stack: stackId,
-            terminal: terminalId,
+        terminal.socket.emit(UtilityEvents.ENVLISTDELETE, {
             order: data.order
         })
     }
@@ -125,30 +120,28 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
                 <div className="flex flex-col gap-1 overflow-auto h-[100%] py-2 ">
                     {data.pairs
                         ? Object.keys(data.pairs).map((key: string) => (
-                              <Record
-                                  key={key} //react component key
-                                  newRecord={false}
-                                  editMode={editMode}
-                                  terminalId={terminalId}
-                                  orderId={data.order}
-                                  stackId={stackId}
-                                  minimized={minimized}
-                                  keyv={key}
-                                  muted={data.disabled.includes(key)}
-                                  value={data.pairs[key]}
-                                  onClick={handleClik}
-                                  highlight={highlight ? highlight[0] === key : false}
-                              />
-                          ))
+                            <Record
+                                key={key} //react component key
+                                newRecord={false}
+                                editMode={editMode}
+                                terminal={terminal}
+                                orderId={data.order}
+                                minimized={minimized}
+                                keyv={key}
+                                muted={data.disabled.includes(key)}
+                                value={data.pairs[key]}
+                                onClick={handleClik}
+                                highlight={highlight ? highlight[0] === key : false}
+                            />
+                        ))
                         : null}
                     {editMode ? (
                         <Record
                             newRecord={true}
-                            terminalId={terminalId}
+                            terminal={terminal}
                             orderId={data.order}
-                            stackId={stackId}
                             minimized={minimized}
-                            onClick={() => {}}
+                            onClick={() => { }}
                             editMode={editMode}
                         />
                     ) : null}

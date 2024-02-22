@@ -1,16 +1,15 @@
 import { GoPlus } from 'react-icons/go'
 import { FormEvent, useState } from 'react'
-import { baseSocket } from '@renderer/service/socket'
 import { Input } from '@renderer/@/ui/input'
 import { Cross1Icon } from '@radix-ui/react-icons'
 import { UtilityEvents } from '@t'
+import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 type ListItemProps = {
     newRecord: boolean
-    terminalId: string
     orderId: number
     minimized: boolean
-    stackId: string
+    terminal: TerminalUIEngine
 }
 
 interface RecordProps extends ListItemProps {
@@ -43,13 +42,11 @@ export const Field = ({
     highlight
 }: FieldProps) => {
     const style = `rounded-full py-1
-    ${
-        variant === 'primary'
+    ${variant === 'primary'
             ? `pr-3 pl-3 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
-            : `pl-3 pr-3  truncate text-secondary ${
-                  highlight ? 'bg-orange-900 text-white' : 'bg-primary'
-              }`
-    }`
+            : `pl-3 pr-3  truncate text-secondary ${highlight ? 'bg-orange-900 text-white' : 'bg-primary'
+            }`
+        }`
 
     if (disabled) return <p className={style}>{value}</p>
 
@@ -76,8 +73,7 @@ export const Field = ({
  * @param {string} minimized - Renders without value field
  */
 const Record = ({
-    terminalId,
-    stackId,
+    terminal,
     keyv,
     value,
     onClick,
@@ -95,9 +91,7 @@ const Record = ({
 
     const handleMute = () => {
         if (editMode) return
-        baseSocket.emit('environmentMute', {
-            stack: stackId,
-            terminal: terminalId,
+        terminal.socket.emit('environmentMute', {
             value: keyValue,
             order: orderId
         })
@@ -108,9 +102,7 @@ const Record = ({
 
         if (!keyValue) return
         if (newRecordOpen && (!keyValue || !valueValue)) return
-        baseSocket.emit('environmentEdit', {
-            stack: stackId,
-            terminal: terminalId,
+        terminal.socket.emit('environmentEdit', {
             order: orderId,
             key: keyValue,
             previousKey: keyPreviousValue,
@@ -123,9 +115,7 @@ const Record = ({
     }
 
     const handleDelete = () => {
-        baseSocket.emit(UtilityEvents.ENVDELETE, {
-            stack: stackId,
-            terminal: terminalId,
+        terminal.socket.emit(UtilityEvents.ENVDELETE, {
             order: orderId,
             value: keyValue
         })
