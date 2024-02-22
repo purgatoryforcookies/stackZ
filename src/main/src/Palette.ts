@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { ClientEvents, Cmd, PaletteStack, StackStatus } from '../../types'
 import { Terminal } from './service/Terminal'
 import { Server, Socket } from 'socket.io'
-import { resolveDefaultCwd } from './service/util'
+import { store } from './service/Store'
 
 export interface ISaveFuntion {
     (onExport?: boolean): void
@@ -11,6 +11,7 @@ export interface ISaveFuntion {
 export interface IPingFunction {
     (): void
 }
+
 
 export class Palette {
     settings: PaletteStack
@@ -23,8 +24,9 @@ export class Palette {
         this.server = server
     }
 
-    initTerminal(socket: Socket, remoteTerminalID: string, save: ISaveFuntion) {
+    async initTerminal(socket: Socket, remoteTerminalID: string, save: ISaveFuntion) {
         const terminal = this.settings.palette?.find((palette) => palette.id === remoteTerminalID)
+
         if (terminal) {
             const newTerminal = new Terminal(
                 this.settings.id,
@@ -37,6 +39,7 @@ export class Palette {
             newTerminal.ping()
             return
         }
+
         throw new Error(`No terminal found ${remoteTerminalID}`)
     }
 
@@ -46,7 +49,7 @@ export class Palette {
         this.settings.palette = this.settings.palette?.filter((pal) => pal.id !== terminalId)
     }
 
-    createCommand(title: string) {
+    async createCommand(title: string) {
         let newOrder = 1
 
         if (!this.settings.palette) {
@@ -56,6 +59,9 @@ export class Palette {
             const maxOrder = Math.max(...orders)
             if (maxOrder !== -Infinity) newOrder = maxOrder + 1
         }
+        const defaultShell = await store.get('userSettings.defaultShell') as string
+        const defaultCwd = await store.get('userSettings.defaultCwd') as string
+
 
         const newOne: Cmd = {
             id: uuidv4(),
@@ -63,7 +69,8 @@ export class Palette {
             executionOrder: newOrder,
             command: {
                 cmd: 'echo Hello World!',
-                cwd: resolveDefaultCwd()
+                cwd: defaultCwd,
+                shell: defaultShell
             }
         }
 

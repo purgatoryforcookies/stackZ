@@ -140,5 +140,9 @@ export type StoreType = {
         palette1: number
         palette2: number
     }
+    userSettings: {
+        defaultShell: string
+        defaultCwd: string
+    }
     theme: string
 }
