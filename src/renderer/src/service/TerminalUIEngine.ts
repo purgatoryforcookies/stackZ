@@ -56,7 +56,6 @@ export class TerminalUIEngine {
         })
 
         this.socket.on('terminalState', (data: Status) => {
-            if (data.cmd?.id !== this.terminalId) return
             this.isRunning = data.isRunning
         })
 
@@ -67,9 +66,9 @@ export class TerminalUIEngine {
         })
 
         this.socket.on('error', (err) => {
-            this.write(`Error - ${this.socket.id} - ${err.message}`)
+            this.write(`Error - ${this.socket.id} ${err.message}`)
             this.prompt()
-            this.write(`--------------------------------------------------------------------------`)
+            this.write(`-----------------------------`)
             this.prompt()
         })
 

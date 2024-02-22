@@ -105,8 +105,9 @@ export class Terminal {
                 env: mapEnvs(this.settings.command.env as Environment[]),
                 useConpty: this.win ? false : true,
                 rows: this.rows,
-                cols: this.cols
+                cols: this.cols,
             })
+
             this.isRunning = true
             this.stackPing()
             if (cmd.length === 0) {
@@ -303,8 +304,8 @@ export class Terminal {
             console.log(`Changing shell! new shell: ${arg.value}`)
             this.changeShell(arg.value)
         })
-        this.socket.on(TerminalEvents.INPUT, (data) => {
-            this.writeFromClient(data)
+        this.socket.on(TerminalEvents.INPUT, (args) => {
+            this.writeFromClient(args.data)
         })
         this.socket.on(TerminalEvents.RESIZE, (args: { value: ITerminalDimensions }) => {
             this.resize(args.value)
