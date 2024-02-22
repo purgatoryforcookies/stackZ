@@ -95,8 +95,8 @@ export class Stack {
 
         for (let i = 0; i < tempArray.length; i++) {
             const stack = tempArray[i]
-            if (stack.settings.metaSettings?.delay) {
-                timeouts += stack.settings.metaSettings?.delay
+            if (stack.settings.metaSettings?.health?.delay) {
+                timeouts += stack.settings.metaSettings?.health?.delay
             }
             setTimeout(() => {
                 stack.start()

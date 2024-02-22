@@ -25,7 +25,11 @@ export const stackSchema = z.array(
                         .object({
                             loose: z.boolean().default(false),
                             rerun: z.boolean().default(false),
-                            delay: z.number().default(0)
+                            health: z.object({
+                                delay: z.number().default(0),
+                                limit: z.number().default(30),
+                                healthCheck: z.string()
+                            }).optional(),
                         })
                         .optional(),
                     command: z.object({

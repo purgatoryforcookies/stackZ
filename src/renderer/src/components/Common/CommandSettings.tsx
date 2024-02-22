@@ -30,16 +30,12 @@ const CustomToolTip = (props: { message: string }) => {
 }
 
 function CommandSettings({ expanded, data, engine }: CommandSettingsProps) {
-    const [settings, setSettings] = useState<CommandMetaSetting>(
-        data.metaSettings ?? {
-            delay: 0,
-            loose: false,
-            rerun: false
-        }
+    const [settings, setSettings] = useState<CommandMetaSetting | undefined>(
+        data.metaSettings
     )
 
     const handleSettings = (name: string, value: number | CheckedState) => {
-        if (!name) return
+        if (!name || !settings) return
 
         const newSettings = { ...settings }
         newSettings[name] = value
@@ -65,10 +61,10 @@ function CommandSettings({ expanded, data, engine }: CommandSettingsProps) {
                     </Label>
                     <Input
                         id="delay"
-                        name="delay"
+                        name="health"
                         className="w-32"
                         type="number"
-                        defaultValue={settings.delay}
+                        defaultValue={settings?.health?.delay}
                         onChange={(e) => handleSettings(e.target.name, Number(e.target.value))}
                     />
                 </div>
@@ -78,7 +74,7 @@ function CommandSettings({ expanded, data, engine }: CommandSettingsProps) {
                     <Checkbox
                         name="loose"
                         onCheckedChange={(e) => handleSettings('loose', e)}
-                        checked={settings.loose}
+                        checked={settings?.loose}
                     />
                     <Label htmlFor="interactivity" className="flex items-center gap-2">
                         Loose terminal
@@ -89,7 +85,7 @@ function CommandSettings({ expanded, data, engine }: CommandSettingsProps) {
                     <Checkbox
                         name="rerun"
                         onCheckedChange={(e) => handleSettings('rerun', e)}
-                        checked={settings.rerun}
+                        checked={settings?.rerun}
                     />
                     <Label htmlFor="rerun">Rerun on exit</Label>
                 </div>
