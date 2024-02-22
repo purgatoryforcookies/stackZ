@@ -278,7 +278,7 @@ export class Terminal {
         if (!args.value) return
         const list = this.settings.command.env?.find((list) => list.order === args.order)
         delete list?.pairs[args.value]
-        this.ping
+        this.ping()
     }
 
     changeShell(newShell: string | undefined) {
@@ -327,7 +327,6 @@ export class Terminal {
             this.addEnvList(args.value)
         })
         this.socket.on(UtilityEvents.ENVEDIT, (args: EnvironmentEditProps) => {
-            console.log('Receiving variables')
             this.editVariable(args)
         })
         this.socket.on(UtilityEvents.ENVMUTE, (arg: UtilityProps) => {

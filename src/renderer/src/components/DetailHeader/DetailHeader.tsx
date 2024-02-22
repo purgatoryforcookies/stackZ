@@ -19,6 +19,7 @@ function DetailHeader({ terminal }: DetailHeaderProps) {
     useEffect(() => {
         if (!terminal) return
         terminal.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
+            console.log(d)
             setStatus(d)
         })
         terminal.socket.emit(UtilityEvents.STATE)
@@ -56,14 +57,14 @@ function DetailHeader({ terminal }: DetailHeaderProps) {
             <div className="flex gap-8 pb-24 h-full overflow-auto pr-32" ref={bodyRef}>
                 {status?.cmd.command.env
                     ? status.cmd.command.env.map((record) => (
-                          <EnvList
-                              data={record}
-                              key={record.title}
-                              onSelection={handleHighligt}
-                              terminal={terminal}
-                              highlight={highlightedEnv}
-                          />
-                      ))
+                        <EnvList
+                            data={record}
+                            key={record.title}
+                            onSelection={handleHighligt}
+                            terminal={terminal}
+                            highlight={highlightedEnv}
+                        />
+                    ))
                     : null}
                 <div className="p-11">
                     <NewEnvList scroll={scroll} terminal={terminal} />
