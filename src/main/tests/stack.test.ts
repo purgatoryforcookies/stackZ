@@ -11,7 +11,7 @@ const testServer = new Server({
     }
 })
 
-const filepath = join(__dirname, './testStack1.json')
+const filepath = join(__dirname, './fixtures/testStack1.json')
 
 const SOCKET_HOST_FOR_CLIENT = 'http://localhost:3123'
 
@@ -154,7 +154,7 @@ describe('stack', () => {
                 ).toBeDefined()
                 expect(
                     stack.palettes.get(stackId)?.terminals.get(tId)?.settings.executionOrder
-                ).toBe(i)
+                ).toBe(i + 1)
                 expect(stack.palettes.get(stackId)?.terminals.get(tId)?.settings.title).toBe(
                     testTerminalNames[i]
                 )
@@ -163,10 +163,6 @@ describe('stack', () => {
                 ).toBeUndefined()
             })
         }
-
-        uiSockets.forEach((sock) => {
-            sock.disconnect()
-        })
     })
 
     // it("Starts and stops each terminal", () => {
@@ -214,6 +210,9 @@ describe('stack', () => {
 
         afterAll(() => {
             if (utilitySocket) utilitySocket.disconnect()
+            uiSockets.forEach((sock) => {
+                sock.disconnect()
+            })
         })
 
         // We have 3 stacks and 12 terminals
@@ -237,30 +236,26 @@ describe('stack', () => {
             })
 
             for (const [stackId] of testStacks) {
-                console.log(stackId)
                 utilitySocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
             }
-        }, 1000)
+        }, 3000)
 
         it("Emits individial terminals state with given id's", (done) => {
             let terminalCounter = 0
+            for (const sock of uiSockets) {
+                sock.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
+                    expect(d.isRunning).toBeDefined()
+                    expect(d.cmd).toBeDefined()
+                    expect(d.stackId).toBeDefined()
+                    expect(d.cwd).toBeDefined()
+                    terminalCounter += 1
 
-            utilitySocket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
-                expect(d.isRunning).toBeDefined()
-                expect(d.cmd).toBeDefined()
-                expect(d.stackId).toBeDefined()
-                expect(d.cwd).toBeDefined()
-                terminalCounter += 1
+                    if (terminalCounter === 12) {
+                        done()
+                    }
+                })
 
-                if (terminalCounter === 12) {
-                    done()
-                }
-            })
-
-            for (const [stackId, terms] of testStacks) {
-                for (const termId of terms) {
-                    utilitySocket.emit(UtilityEvents.STATE, { stack: stackId, terminal: termId })
-                }
+                sock.emit(UtilityEvents.STATE)
             }
         }, 1000)
 

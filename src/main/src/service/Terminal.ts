@@ -140,7 +140,6 @@ export class Terminal {
         try {
             this.ptyProcess?.resize(dims.cols, dims.rows)
         } catch {
-
             // On stop, the pty process is not existing anymore but yet here we are...
         }
         this.rows = dims.rows
@@ -206,7 +205,6 @@ export class Terminal {
             target.pairs = Object.fromEntries(Object.entries(target.pairs).sort())
         }
         this.ping()
-
     }
 
     muteVariable(args: UtilityProps) {
@@ -289,54 +287,42 @@ export class Terminal {
         this.socket.on(TerminalEvents.CWD, (arg: Utility2Props) => {
             console.log(`Changing cwd! new Cwd: ${arg.value}`)
             this.updateCwd(arg.value)
-
         })
         this.socket.on(TerminalEvents.CMD, (arg: Utility2Props) => {
             console.log(`Changing command! new CMD: ${arg.value}`)
             this.updateCommand(arg.value)
-
         })
         this.socket.on(TerminalEvents.SHELL, (arg: Utility2Props) => {
             console.log(`Changing shell! new shell: ${arg.value}`)
             this.changeShell(arg.value)
-
         })
         this.socket.on(TerminalEvents.INPUT, (data) => {
             this.writeFromClient(data)
         })
-        this.socket.on(
-            TerminalEvents.RESIZE,
-            (args: { value: ITerminalDimensions }) => {
-                this.resize(args.value)
-            }
-        )
+        this.socket.on(TerminalEvents.RESIZE, (args: { value: ITerminalDimensions }) => {
+            this.resize(args.value)
+        })
         this.socket.on(UtilityEvents.ENVLISTDELETE, (args: UtilityProps) => {
             this.removeEnvList(args)
-
         })
         this.socket.on(UtilityEvents.ENVDELETE, (args: UtilityProps) => {
             this.removeEnv(args)
-
         })
         this.socket.on(
             UtilityEvents.CMDMETASETTINGS,
             (args: { stack: string; terminal: string; settings: CommandMetaSetting }) => {
                 this.setMetaSettings(args.settings)
-
             }
         )
         this.socket.on(UtilityEvents.ENVLIST, (args: { value: string }) => {
             if (!args.value) return
             this.addEnvList(args.value)
-
         })
         this.socket.on(UtilityEvents.ENVEDIT, (args: EnvironmentEditProps) => {
             this.editVariable(args)
-
         })
         this.socket.on(UtilityEvents.ENVMUTE, (arg: UtilityProps) => {
             this.muteVariable(arg)
-
         })
         this.socket.on(UtilityEvents.STATE, () => {
             console.log('pingign')

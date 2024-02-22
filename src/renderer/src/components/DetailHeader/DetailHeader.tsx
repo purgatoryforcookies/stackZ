@@ -55,21 +55,18 @@ function DetailHeader({ terminal }: DetailHeaderProps) {
             <div className="flex gap-8 pb-24 h-full overflow-auto pr-32" ref={bodyRef}>
                 {status?.cmd.command.env
                     ? status.cmd.command.env.map((record) => (
-                        <EnvList
-                            data={record}
-                            key={record.title}
-                            onSelection={handleHighligt}
-                            terminalId={terminal.terminalId}
-                            stackId={terminal.stackId}
-                            highlight={highlightedEnv}
-                        />
-                    ))
+                          <EnvList
+                              data={record}
+                              key={record.title}
+                              onSelection={handleHighligt}
+                              terminalId={terminal.terminalId}
+                              stackId={terminal.stackId}
+                              highlight={highlightedEnv}
+                          />
+                      ))
                     : null}
                 <div className="p-11">
-                    <NewEnvList
-                        scroll={scroll}
-                        terminal={terminal}
-                    />
+                    <NewEnvList scroll={scroll} terminal={terminal} />
                 </div>
             </div>
         </div>
