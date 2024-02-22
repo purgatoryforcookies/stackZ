@@ -54,7 +54,7 @@ function DetailHeader({ terminal }: DetailHeaderProps) {
                     <Badge className="text-md">{`${highlightedEnv[0]}=${highlightedEnv[1]}`}</Badge>
                 ) : null}
             </div>
-            <div className="flex gap-8 pb-24 h-full overflow-auto pr-32" ref={bodyRef}>
+            <div className="flex gap-8 pb-16 h-full overflow-auto pr-32" ref={bodyRef}>
                 {status?.cmd.command.env
                     ? status.cmd.command.env.map((record) => (
                         <EnvList

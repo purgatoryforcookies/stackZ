@@ -59,7 +59,7 @@ function Palette({
     const stack = data.get(stackId)
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col" >
             <div className="flex gap-3 justify-center py-2">
                 {data &&
                     Array.from(data.values()).map((stack) => {
@@ -95,24 +95,24 @@ function Palette({
                     )}
                 </Button>
             </div>
-            <div className="overflow-auto pb-20">
+            <div className="overflow-auto pb-20" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
                     ? stack.palette
-                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                          .map((cmd) => {
-                              if (!cmd?.id) return null
-                              const engine = engines?.get(cmd.id)
-                              if (!engine) return null
-                              return (
-                                  <Command
-                                      key={cmd.id}
-                                      data={cmd}
-                                      handleClick={onClick}
-                                      engine={engine}
-                                      selected={cmd.id === terminalId}
-                                  />
-                              )
-                          })
+                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                        .map((cmd) => {
+                            if (!cmd?.id) return null
+                            const engine = engines?.get(cmd.id)
+                            if (!engine) return null
+                            return (
+                                <Command
+                                    key={cmd.id}
+                                    data={cmd}
+                                    handleClick={onClick}
+                                    engine={engine}
+                                    selected={cmd.id === terminalId}
+                                />
+                            )
+                        })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand afterAdd={onNewTerminal} stackId={stackId} />
