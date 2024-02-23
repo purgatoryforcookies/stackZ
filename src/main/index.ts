@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import electron, { app, shell, BrowserWindow, ipcMain } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { socketServer } from './src/service/CommandService'
@@ -18,10 +18,10 @@ async function createWindow(): Promise<void> {
     stack.init()?.startServer()
 
     // dev setup to open screen on 2nd monitor
-    // const displays = electron.screen.getAllDisplays()
-    // const externalDisplay = displays.find((display) => {
-    //     return display.bounds.x !== 0 || display.bounds.y !== 0
-    // })
+    const displays = electron.screen.getAllDisplays()
+    const externalDisplay = displays.find((display) => {
+        return display.bounds.x !== 0 || display.bounds.y !== 0
+    })
 
     const mainWindow = new BrowserWindow({
         width: 1800,
@@ -34,8 +34,8 @@ async function createWindow(): Promise<void> {
             preload: join(__dirname, '../preload/index.js'),
             sandbox: false
         },
-        // x: externalDisplay!.bounds.x + 50, //DEV
-        // y: externalDisplay!.bounds.y + 50 //DEV
+        x: externalDisplay!.bounds.x + 50, //DEV
+        y: externalDisplay!.bounds.y + 50 //DEV
     })
 
     mainWindow.on('ready-to-show', () => {

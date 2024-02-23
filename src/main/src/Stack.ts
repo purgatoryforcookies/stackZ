@@ -125,12 +125,12 @@ export class Stack {
         this.server.emit('terminalDelete', { stack, terminal })
     }
 
-    createTerminal(title: string, stack: string) {
+    async createTerminal(title: string, stack: string) {
         const existingStack = this.palettes.get(stack)
         if (!existingStack) {
             throw new Error(`Whoah, stack ${stack} was not found when adding new terminal`)
         }
-        const newT = this.palettes.get(stack)?.createCommand(title)
+        const newT = await this.palettes.get(stack)?.createCommand(title)
         if (!newT) throw new Error(`Could not create terminal ${title} ${stack}`)
         this.save()
         return newT

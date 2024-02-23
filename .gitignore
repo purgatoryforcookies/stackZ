@@ -7,3 +7,4 @@ commands.json
 commands_save.json
 commands_backup.json
 stacks.json
+fixtures/*

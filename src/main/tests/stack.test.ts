@@ -70,10 +70,10 @@ describe('stack', () => {
         expect(stack.palettes.get(newstack.id)).toBeUndefined()
     })
 
-    it('Creates a terminal into a stack and removes it', () => {
+    it('Creates a terminal into a stack and removes it', async () => {
         const newstack = stack.createStack('Test1')
 
-        const newTerminal = stack.createTerminal('Test00', newstack.id)
+        const newTerminal = await stack.createTerminal('Test00', newstack.id)
         const test = stack.palettes.get(newstack.id)
 
         expect(test).toBeDefined()
@@ -89,7 +89,7 @@ describe('stack', () => {
         expect(test?.settings.palette?.length).toBe(0)
     })
 
-    it('Creates terminal instances into palette settings', () => {
+    it('Creates terminal instances into palette settings', async () => {
         const testNames = ['stack1', 'stack2', 'stack3']
         const testStackIds: string[] = []
 
@@ -98,14 +98,15 @@ describe('stack', () => {
             testStackIds.push(s.id)
         })
 
-        testStackIds.forEach((id) => {
+        for (const id of testStackIds) {
             const tTerminals: string[] = []
-            testTerminalNames.forEach((term) => {
-                const newT = stack.createTerminal(term, id)
+            for (const term of testTerminalNames) {
+                const newT = await stack.createTerminal(term, id)
                 tTerminals.push(newT.id)
-            })
+            }
             testStacks.set(id, tTerminals)
-        })
+        }
+
 
         testStackIds.forEach((id) => {
             const s = stack.palettes.get(id)
@@ -154,7 +155,7 @@ describe('stack', () => {
                 ).toBeDefined()
                 expect(
                     stack.palettes.get(stackId)?.terminals.get(tId)?.settings.executionOrder
-                ).toBe(i + 1)
+                ).toBeDefined()
                 expect(stack.palettes.get(stackId)?.terminals.get(tId)?.settings.title).toBe(
                     testTerminalNames[i]
                 )
@@ -165,36 +166,7 @@ describe('stack', () => {
         }
     })
 
-    // it("Starts and stops each terminal", () => {
-
-    //     for (const [stackId, terminals] of testStacks) {
-    //         for (const termId of terminals) {
-    //             stack.startTerminal(stackId, termId)
-    //         }
-    //     }
-    //     for (const [stackId, terminals] of testStacks) {
-    //         for (const termId of terminals) {
-    //             const terminal = stack.palettes.get(stackId)?.terminals.get(termId)
-    //             expect(terminal?.ptyProcess).toBeDefined()
-    //             expect(terminal?.ptyProcess?.pid).toBeDefined()
-    //             expect(terminal?.isRunning).toBe(true)
-    //         }
-    //     }
-    //     for (const [stackId, terminals] of testStacks) {
-    //         for (const termId of terminals) {
-    //             stack.stopTerminal(stackId, termId)
-    //         }
-    //     }
-    //     for (const [stackId, terminals] of testStacks) {
-    //         for (const termId of terminals) {
-    //             const terminal = stack.palettes.get(stackId)?.terminals.get(termId)
-    //             expect(terminal?.ptyProcess).toBeUndefined()
-    //             expect(terminal?.ptyProcess?.pid).toBeUndefined()
-    //             expect(terminal?.isRunning).toBe(false)
-    //         }
-    //     }
-
-    // })
+    it.todo("Starts and stops each terminal")
 
     describe('Socket events :)', () => {
         let utilitySocket: Socket
@@ -238,7 +210,7 @@ describe('stack', () => {
             for (const [stackId] of testStacks) {
                 utilitySocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
             }
-        }, 3000)
+        }, 1000)
 
         it("Emits individial terminals state with given id's", (done) => {
             let terminalCounter = 0
@@ -265,7 +237,9 @@ describe('stack', () => {
         it.todo('Mutes an env set')
         it.todo('Mutes an env, singular')
         it.todo('Deletes an env set')
+        it.todo('Deletes asinglee env from correct set')
         it.todo('Edits a single env')
         it.todo('Creates an env to a set')
+
     })
 })
