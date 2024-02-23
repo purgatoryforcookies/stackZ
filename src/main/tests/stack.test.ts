@@ -11,7 +11,7 @@ const testServer = new Server({
     }
 })
 
-const filepath = join(__dirname, './fixtures/testStack1.json')
+const filepath = join(__dirname, './testStack1.json')
 
 const SOCKET_HOST_FOR_CLIENT = 'http://localhost:3123'
 
