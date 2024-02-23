@@ -8,11 +8,8 @@ on:
 
 jobs:
     test:
-        strategy:
-            matrix:
-                os: [ubuntu-22.04]
-        timeout-minutes: 10
-        runs-on: ${{ matrix.os }}
+        timeout-minutes: 8
+        runs-on: ubuntu-22.04
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v4
