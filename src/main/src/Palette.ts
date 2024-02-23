@@ -12,7 +12,6 @@ export interface IPingFunction {
     (): void
 }
 
-
 export class Palette {
     settings: PaletteStack
     terminals: Map<string, Terminal>
@@ -59,9 +58,8 @@ export class Palette {
             const maxOrder = Math.max(...orders)
             if (maxOrder !== -Infinity) newOrder = maxOrder + 1
         }
-        const defaultShell = await store.get('userSettings.defaultShell') as string
-        const defaultCwd = await store.get('userSettings.defaultCwd') as string
-
+        const defaultShell = (await store.get('userSettings.defaultShell')) as string
+        const defaultCwd = (await store.get('userSettings.defaultCwd')) as string
 
         const newOne: Cmd = {
             id: uuidv4(),

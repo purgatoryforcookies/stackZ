@@ -107,7 +107,6 @@ describe('stack', () => {
             testStacks.set(id, tTerminals)
         }
 
-
         testStackIds.forEach((id) => {
             const s = stack.palettes.get(id)
             expect(s).toBeDefined()
@@ -166,7 +165,7 @@ describe('stack', () => {
         }
     })
 
-    it.todo("Starts and stops each terminal")
+    it.todo('Starts and stops each terminal')
 
     describe('Socket events :)', () => {
         let utilitySocket: Socket
@@ -240,6 +239,5 @@ describe('stack', () => {
         it.todo('Deletes asinglee env from correct set')
         it.todo('Edits a single env')
         it.todo('Creates an env to a set')
-
     })
 })

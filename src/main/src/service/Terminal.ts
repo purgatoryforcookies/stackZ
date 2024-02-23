@@ -100,12 +100,15 @@ export class Terminal {
             )
 
             this.ptyProcess = spawn(shell, cmd, {
-                name: shell === 'zsh' || '/bin/zsh' ? 'xterm-256color' : `Palette ${this.settings.id}`,
+                name:
+                    shell === 'zsh' || shell === '/bin/zsh'
+                        ? 'xterm-256color'
+                        : `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as Environment[], shell),
                 useConpty: this.win ? false : true,
                 rows: this.rows,
-                cols: this.cols,
+                cols: this.cols
             })
 
             this.isRunning = true
@@ -121,9 +124,7 @@ export class Terminal {
                 this.isRunning = false
                 this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? ''}\r\n`)
 
-                const divider = Array(10)
-                    .fill('-')
-                    .join('')
+                const divider = Array(10).fill('-').join('')
                 this.sendToClient(`${divider}\r\n$ `)
                 this.stop()
                 if (this.settings.metaSettings?.rerun) {

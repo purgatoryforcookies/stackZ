@@ -1,4 +1,3 @@
-
 //  eslint-disable-next-line
 export const debounce = (fn: Function, ms = 300) => {
     let timeoutId: ReturnType<typeof setTimeout>

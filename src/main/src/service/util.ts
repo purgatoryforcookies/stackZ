@@ -67,9 +67,8 @@ export const mapEnvs = (obj: Environment[], shell?: string) => {
     })
 
     if (shell) {
-        if (shell = 'zsh' || '/bin/zsh') reduced['TERM'] = 'xterm-256color'
+        if (shell === 'zsh' || shell === '/bin/zsh') reduced['TERM'] = 'xterm-256color'
     }
-
 
     return reduced
 }

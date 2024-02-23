@@ -30,9 +30,7 @@ const CustomToolTip = (props: { message: string }) => {
 }
 
 function CommandSettings({ expanded, data, engine }: CommandSettingsProps) {
-    const [settings, setSettings] = useState<CommandMetaSetting | undefined>(
-        data.metaSettings
-    )
+    const [settings, setSettings] = useState<CommandMetaSetting | undefined>(data.metaSettings)
 
     const handleSettings = (name: string, value: number | CheckedState) => {
         if (!name || !settings) return
