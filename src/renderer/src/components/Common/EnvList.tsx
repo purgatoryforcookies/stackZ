@@ -1,9 +1,10 @@
-import { baseSocket } from '@renderer/service/socket'
 import { useState } from 'react'
 import Record from '@renderer/components/Common/ListItem'
 import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
+import { UtilityEvents } from '@t'
+import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 type EnvListProps = {
     data: {
@@ -13,12 +14,11 @@ type EnvListProps = {
         disabled: string[]
     }
     onSelection: (e: string[]) => void
-    terminalId: string
-    stackId: string
     highlight: string[] | null
+    terminal: TerminalUIEngine
 }
 
-function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListProps) {
+function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
     const [minimized, setMinimized] = useState<boolean>(false)
     const [hidden, setHidden] = useState<boolean>(false)
     const [editMode, setEditMode] = useState<boolean>(false)
@@ -33,9 +33,7 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
     }
 
     const handleMute = () => {
-        baseSocket.emit('environmentMute', {
-            stack: stackId,
-            terminal: terminalId,
+        terminal.socket.emit(UtilityEvents.ENVMUTE, {
             order: data.order
         })
     }
@@ -54,9 +52,7 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
     }
 
     const handleDelete = () => {
-        baseSocket.emit('environmentDelete', {
-            stack: stackId,
-            terminal: terminalId,
+        terminal.socket.emit(UtilityEvents.ENVLISTDELETE, {
             order: data.order
         })
     }
@@ -64,7 +60,9 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
     return (
         <div
             className={`p-7 py-4
-        ${minimized ? 'max-w-[19rem]' : editMode ? '' : 'max-w-[33rem]'}`}
+        ${minimized && editMode ? '' : 'max-w-[35rem]'}
+        ${editMode ? 'max-w-[100%]' : ''}
+        `}
         >
             <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
             <Separator className="my-2" />
@@ -119,18 +117,20 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
                     </h3>
                 </div>
             ) : (
-                <div className="flex flex-col gap-1 overflow-auto h-[100%] py-2 ">
+                <div
+                    className="flex flex-col gap-1 overflow-auto h-[100%] py-2 "
+                    style={{ scrollbarGutter: 'stable' }}
+                >
                     {data.pairs
                         ? Object.keys(data.pairs).map((key: string) => (
                               <Record
+                                  key={key} //react component key
                                   newRecord={false}
                                   editMode={editMode}
-                                  terminalId={terminalId}
+                                  terminal={terminal}
                                   orderId={data.order}
-                                  stackId={stackId}
                                   minimized={minimized}
                                   keyv={key}
-                                  key={key}
                                   muted={data.disabled.includes(key)}
                                   value={data.pairs[key]}
                                   onClick={handleClik}
@@ -141,9 +141,8 @@ function EnvList({ data, onSelection, terminalId, stackId, highlight }: EnvListP
                     {editMode ? (
                         <Record
                             newRecord={true}
-                            terminalId={terminalId}
+                            terminal={terminal}
                             orderId={data.order}
-                            stackId={stackId}
                             minimized={minimized}
                             onClick={() => {}}
                             editMode={editMode}

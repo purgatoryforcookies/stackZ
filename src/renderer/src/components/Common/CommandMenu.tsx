@@ -16,12 +16,7 @@ import { ThemeContext } from '@renderer/App'
 
 type CommandMenuProps = {
     stack: Map<string, PaletteStack> | undefined
-    dispatch: (
-        stackId: string,
-        terminalId: string,
-        method: SelectionEvents,
-        cb?: () => void
-    ) => void
+    dispatch: (stackId: string, terminalId: string, method: SelectionEvents) => void
 }
 
 export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
@@ -36,7 +31,7 @@ export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
                 setOpen((open) => !open)
             }
         }
-        document.addEventListener('keydown', down)
+        document.addEventListener('keydown', down, false)
         return () => document.removeEventListener('keydown', down)
     }, [])
 
@@ -70,14 +65,8 @@ export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
                                       className="flex gap-5"
                                       value={stack.stackName}
                                       onSelect={() => {
-                                          dispatch(
-                                              stack.id,
-                                              'gibberish',
-                                              SelectionEvents.CONN,
-                                              () => {
-                                                  setOpen(false)
-                                              }
-                                          )
+                                          dispatch(stack.id, 'gibberish', SelectionEvents.CONN)
+                                          setOpen(false)
                                       }}
                                   >
                                       <div className="flex w-20 justify-between">
@@ -127,14 +116,8 @@ export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
                                               stack.stackName
                                           }
                                           onSelect={() => {
-                                              dispatch(
-                                                  stack.id,
-                                                  cmd.id,
-                                                  SelectionEvents.CONN,
-                                                  () => {
-                                                      setOpen(false)
-                                                  }
-                                              )
+                                              dispatch(stack.id, cmd.id, SelectionEvents.CONN)
+                                              setOpen(false)
                                           }}
                                       >
                                           <ButtonIcon className="mr-2 h-4 w-4" />

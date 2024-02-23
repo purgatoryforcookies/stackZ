@@ -13,7 +13,7 @@ function KillSignal() {
     const theme = useContext(ThemeContext)
 
     return (
-        <Select defaultValue="SIGHUB" disabled>
+        <Select defaultValue="SIGHUP" disabled>
             <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select kill signal" />
             </SelectTrigger>

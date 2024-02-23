@@ -1,8 +1,16 @@
 import { v4 as uuidv4 } from 'uuid'
-import { Cmd, PaletteStack } from '../../types'
+import { ClientEvents, Cmd, PaletteStack, StackStatus } from '../../types'
 import { Terminal } from './service/Terminal'
-import { Server } from 'socket.io'
-import { resolveDefaultCwd } from './service/util'
+import { Server, Socket } from 'socket.io'
+import { store } from './service/Store'
+
+export interface ISaveFuntion {
+    (onExport?: boolean): void
+}
+
+export interface IPingFunction {
+    (): void
+}
 
 export class Palette {
     settings: PaletteStack
@@ -15,15 +23,23 @@ export class Palette {
         this.server = server
     }
 
-    initTerminal(socketId: string, server: Server, remoteTerminalID: string) {
+    async initTerminal(socket: Socket, remoteTerminalID: string, save: ISaveFuntion) {
         const terminal = this.settings.palette?.find((palette) => palette.id === remoteTerminalID)
+
         if (terminal) {
-            const newTerminal = new Terminal(this.settings.id, terminal, socketId, server, this.pingState.bind(this))
+            const newTerminal = new Terminal(
+                this.settings.id,
+                terminal,
+                socket,
+                this.pingState.bind(this),
+                save
+            )
             this.terminals.set(terminal.id, newTerminal)
             newTerminal.ping()
             return
         }
-        throw new Error(`No terminal found ${socketId}, ${remoteTerminalID}`)
+
+        throw new Error(`No terminal found ${remoteTerminalID}`)
     }
 
     deleteTerminal(terminalId: string) {
@@ -32,16 +48,18 @@ export class Palette {
         this.settings.palette = this.settings.palette?.filter((pal) => pal.id !== terminalId)
     }
 
-    createCommand(title: string) {
-        let newOrder = 0
+    async createCommand(title: string) {
+        let newOrder = 1
 
         if (!this.settings.palette) {
             this.settings.palette = []
         } else {
-            const orders = this.settings.palette.map((pal) => pal.executionOrder || 1)
+            const orders = this.settings.palette.map((pal) => pal.executionOrder || 0)
             const maxOrder = Math.max(...orders)
-            if (maxOrder !== Infinity) newOrder = maxOrder + 1
+            if (maxOrder !== -Infinity) newOrder = maxOrder + 1
         }
+        const defaultShell = (await store.get('userSettings.defaultShell')) as string
+        const defaultCwd = (await store.get('userSettings.defaultCwd')) as string
 
         const newOne: Cmd = {
             id: uuidv4(),
@@ -49,7 +67,8 @@ export class Palette {
             executionOrder: newOrder,
             command: {
                 cmd: 'echo Hello World!',
-                cwd: resolveDefaultCwd()
+                cwd: defaultCwd,
+                shell: defaultShell
             }
         }
 
@@ -80,20 +99,20 @@ export class Palette {
     }
 
     pingState() {
-        console.log("Pinging state ")
-        const state = [...this.terminals.values()].map((term) => {
-            if (!term) return term
+        const terminalStates = [...this.terminals.values()].map((term) => {
             return {
                 id: term.settings.id,
                 running: term.isRunning
             }
         })
 
-        this.server.emit('stackState', {
+        const state: StackStatus = {
             stack: this.settings.id,
-            isRunning: state.some(term => term.running === true),
-            state: state
-        })
+            isRunning: terminalStates.some((term) => term.running === true),
+            state: terminalStates
+        }
+
+        this.server.emit(ClientEvents.STACKSTATE, state)
     }
 
     pingAll() {

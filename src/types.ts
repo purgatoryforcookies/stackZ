@@ -19,13 +19,19 @@ export const stackSchema = z.array(
             .array(
                 z.object({
                     id: z.string().default('gibberish'),
-                    executionOrder: z.number().optional(),
+                    executionOrder: z.number().optional().nullable(),
                     title: z.string().default('First command'),
                     metaSettings: z
                         .object({
                             loose: z.boolean().default(false),
                             rerun: z.boolean().default(false),
-                            delay: z.number().default(0)
+                            health: z
+                                .object({
+                                    delay: z.number().default(0),
+                                    limit: z.number().default(30),
+                                    healthCheck: z.string()
+                                })
+                                .optional()
                         })
                         .optional(),
                     command: z.object({
@@ -70,6 +76,7 @@ export enum UtilityEvents {
     ENVEDIT = 'environmentEdit',
     ENVMUTE = 'environmentMute',
     ENVLIST = 'environmentList',
+    ENVLISTDELETE = 'environmentListDelete',
     ENVDELETE = 'environmentDelete',
     CMDMETASETTINGS = 'commandMetaSetting'
 }
@@ -138,6 +145,10 @@ export type StoreType = {
     paletteWidths: {
         palette1: number
         palette2: number
+    }
+    userSettings: {
+        defaultShell: string
+        defaultCwd: string
     }
     theme: string
 }

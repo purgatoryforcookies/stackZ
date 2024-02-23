@@ -45,7 +45,7 @@ export const envFactory = (args: Environment[] | undefined) => {
         order: 0,
         disabled: []
     }
-    hostEnv.pairs['ZDOTDIR'] = '/Users/max.caroe'
+
     if (!args) return [hostEnv]
 
     let allenvs = args.map((obj) => ({ ...obj, disabled: [] })) as Environment[]
@@ -57,7 +57,7 @@ export const envFactory = (args: Environment[] | undefined) => {
     return allenvs.sort((a, b) => a.order - b.order)
 }
 
-export const mapEnvs = (obj: Environment[]) => {
+export const mapEnvs = (obj: Environment[], shell?: string) => {
     const reduced: Record<string, string | undefined> = {}
     obj.forEach((envSet) => {
         Object.keys(envSet.pairs).forEach((key) => {
@@ -65,6 +65,11 @@ export const mapEnvs = (obj: Environment[]) => {
             reduced[key] = envSet.pairs[key]
         })
     })
+
+    if (shell) {
+        if (shell === 'zsh' || shell === '/bin/zsh') reduced['TERM'] = 'xterm-256color'
+    }
+
     return reduced
 }
 
@@ -80,4 +85,14 @@ export const resolveDefaultCwd = () => {
         }
     }
     return '~'
+}
+
+// eslint-disable-next-line
+export const debounce = (fn: Function, ms = 300) => {
+    let timeoutId: ReturnType<typeof setTimeout>
+    // eslint-disable-next-line
+    return function (this: any, ...args: any[]) {
+        clearTimeout(timeoutId)
+        timeoutId = setTimeout(() => fn.apply(this, args), ms)
+    }
 }

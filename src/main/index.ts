@@ -1,11 +1,11 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import electron, { app, shell, BrowserWindow, ipcMain } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { socketServer } from './src/service/CommandService'
 import { store } from './src/service/Store'
 import { Stack } from './src/Stack'
 import { stackSchema } from '../types'
-import { execSync } from 'child_process'
+import { exec } from 'child_process'
 
 const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
 
@@ -17,10 +17,10 @@ async function createWindow(): Promise<void> {
     stack.init()?.startServer()
 
     // dev setup to open screen on 2nd monitor
-    // const displays = electron.screen.getAllDisplays()
-    // const externalDisplay = displays.find((display) => {
-    //     return display.bounds.x !== 0 || display.bounds.y !== 0
-    // })
+    const displays = electron.screen.getAllDisplays()
+    const externalDisplay = displays.find((display) => {
+        return display.bounds.x !== 0 || display.bounds.y !== 0
+    })
 
     const mainWindow = new BrowserWindow({
         width: 1800,
@@ -32,15 +32,15 @@ async function createWindow(): Promise<void> {
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
             sandbox: false
-        }
-        // x: externalDisplay!.bounds.x + 50, //DEV
-        // y: externalDisplay!.bounds.y + 50 //DEV
+        },
+        x: externalDisplay!.bounds.x + 50, //DEV
+        y: externalDisplay!.bounds.y + 50 //DEV
     })
 
     mainWindow.on('ready-to-show', () => {
         mainWindow.show()
         // dev setup to not focus on it on save
-        // mainWindow.blur()
+        mainWindow.blur()
     })
 
     mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -137,17 +137,17 @@ ipcMain.handle('createStack', (_, title) => {
 
 ipcMain.handle('openFilesLocation', () => {
     const dirPath = app.getPath('userData')
-    let command = '';
+    let command = ''
     switch (process.platform) {
         case 'darwin':
-            command = 'open';
-            break;
+            command = 'open'
+            break
         case 'win32':
-            command = 'explorer';
-            break;
+            command = 'explorer'
+            break
         default:
-            command = 'xdg-open';
-            break;
+            command = 'xdg-open'
+            break
     }
-    execSync(`${command} "${dirPath}"`);
+    exec(`${command} "${dirPath}"`)
 })

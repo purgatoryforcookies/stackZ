@@ -23,6 +23,8 @@ type SettingsProps = {
 
 function Settings({ setTheme }: SettingsProps) {
     const [open, setOpen] = useState<boolean>(false)
+    const [defShell, setDefShell] = useState<string>()
+    const [defCwd, setDefCwd] = useState<string>()
     const theme = useContext(ThemeContext)
 
     const handleShortCuts = (e: KeyboardEvent) => {
@@ -46,15 +48,29 @@ function Settings({ setTheme }: SettingsProps) {
         if (!theme) return
         window.store.set('theme', theme)
     }, [theme])
+
     useEffect(() => {
-        window.store.get('theme').then((t) => {
-            setTheme(t as string)
-        })
-    })
+        const fetchStore = async () => {
+            await window.store.get('theme').then((t) => {
+                setTheme(t as string)
+            })
+            await window.store.get('userSettings.defaultShell').then((t) => {
+                setDefShell(t as string)
+            })
+            await window.store.get('userSettings.defaultCwd').then((t) => {
+                setDefCwd(t as string)
+            })
+        }
+        fetchStore()
+    }, [open])
 
     return (
         <Sheet open={open} onOpenChange={setOpen}>
-            <SheetContent className="w-[30vw] sm:max-w-none " data-theme={theme}>
+            <SheetContent
+                className="w-[30vw] min-w-[30rem] sm:max-w-none "
+                data-theme={theme}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+            >
                 <SheetHeader>
                     <SheetTitle>Settings</SheetTitle>
                     <SheetDescription></SheetDescription>
@@ -68,16 +84,27 @@ function Settings({ setTheme }: SettingsProps) {
                             </Label>
                             <Input
                                 id="shell"
-                                defaultValue="path..."
+                                defaultValue={defShell}
+                                spellCheck={false}
                                 className="col-span-3"
-                                disabled
+                                onChange={(e) => {
+                                    window.store.set('userSettings.defaultShell', e.target.value)
+                                }}
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="cwd" className="text-right">
                                 Default CWD
                             </Label>
-                            <Input id="cwd" placeholder="path..." className="col-span-3" disabled />
+                            <Input
+                                id="cwd"
+                                placeholder="path..."
+                                className="col-span-3"
+                                defaultValue={defCwd}
+                                onChange={(e) => {
+                                    window.store.set('userSettings.defaultCwd', e.target.value)
+                                }}
+                            />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="cwd" className="text-right">
@@ -179,11 +206,7 @@ function Settings({ setTheme }: SettingsProps) {
                     </div>
                 </div>
                 <SheetFooter>
-                    <SheetClose asChild>
-                        <Button type="submit" disabled>
-                            Save changes
-                        </Button>
-                    </SheetClose>
+                    <SheetClose asChild></SheetClose>
                 </SheetFooter>
             </SheetContent>
         </Sheet>

@@ -1,11 +1,4 @@
-import {
-    ClientEvents,
-    Cmd,
-    PaletteStack,
-    SelectionEvents,
-    StackStatus,
-    UtilityEvents
-} from '@t'
+import { ClientEvents, Cmd, PaletteStack, SelectionEvents, StackStatus, UtilityEvents } from '@t'
 import { useEffect, useState } from 'react'
 import { Badge } from '@renderer/@/ui/badge'
 import NewCommand from './Dialogs/NewCommand'
@@ -14,6 +7,7 @@ import { Button } from '@renderer/@/ui/button'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { baseSocket } from '@renderer/service/socket'
 import { NewStack } from './Dialogs/NewStack'
+import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 type PaletteProps = {
     data: Map<string, PaletteStack>
@@ -27,21 +21,32 @@ type PaletteProps = {
     onNewStack: (st: PaletteStack) => void
     terminalId: string
     stackId: string
+    engines: Map<string, TerminalUIEngine> | undefined
 }
 
-function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId }: PaletteProps) {
-
-
+function Palette({
+    data,
+    onClick,
+    onNewTerminal,
+    onNewStack,
+    terminalId,
+    stackId,
+    engines
+}: PaletteProps) {
     const [running, setRunning] = useState<boolean>(false)
 
     useEffect(() => {
-
+        setRunning(false)
         baseSocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
-            if (d.stack !== stackId) return
-            setRunning(d.isRunning)
+            if (d.stack === stackId) {
+                setRunning(d.isRunning)
+            }
         })
-
-    }, [stackId, terminalId])
+        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
+        return () => {
+            baseSocket.off(ClientEvents.STACKSTATE)
+        }
+    }, [stackId])
 
     const toggleStack = () => {
         if (running) {
@@ -49,7 +54,6 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
         } else {
             window.api.startStack(stackId)
         }
-        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
     }
 
     const stack = data.get(stackId)
@@ -91,20 +95,24 @@ function Palette({ data, onClick, onNewTerminal, onNewStack, terminalId, stackId
                     )}
                 </Button>
             </div>
-            <div className="overflow-auto pb-20">
+            <div className="overflow-auto pb-20" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
-                    ? stack.palette.sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0)).map((cmd) => {
-                        if (!cmd?.id) return null
-                        return (
-                            <Command
-                                key={cmd.id}
-                                data={cmd}
-                                hostStack={stackId}
-                                handleClick={onClick}
-                                selected={terminalId}
-                            />
-                        )
-                    })
+                    ? stack.palette
+                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                          .map((cmd) => {
+                              if (!cmd?.id) return null
+                              const engine = engines?.get(cmd.id)
+                              if (!engine) return null
+                              return (
+                                  <Command
+                                      key={cmd.id}
+                                      data={cmd}
+                                      handleClick={onClick}
+                                      engine={engine}
+                                      selected={cmd.id === terminalId}
+                                  />
+                              )
+                          })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand afterAdd={onNewTerminal} stackId={stackId} />

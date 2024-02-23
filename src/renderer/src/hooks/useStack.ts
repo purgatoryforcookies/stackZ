@@ -38,8 +38,8 @@ export const useStack = (SOCKET_HOST: string) => {
         selectTerminal(() => {
             const first = data[0].palette
             if (first) {
-                const i = first[0].id
-                if (i) return i
+                const term = first.find((t) => t.executionOrder === 1)
+                if (term) return term.id
             }
             return 'gibberish'
         })

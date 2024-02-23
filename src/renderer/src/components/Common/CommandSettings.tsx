@@ -4,14 +4,14 @@ import { Checkbox } from '@renderer/@/ui/checkbox'
 import { Input } from '@renderer/@/ui/input'
 import { Label } from '@renderer/@/ui/label'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@renderer/@/ui/tooltip'
-import { baseSocket } from '@renderer/service/socket'
 import { useState } from 'react'
 import { Cmd, CommandMetaSetting } from '@t'
+import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 type CommandSettingsProps = {
     expanded: boolean
     data: Exclude<Cmd, undefined>
-    stackId: string
+    engine: TerminalUIEngine
 }
 
 const CustomToolTip = (props: { message: string }) => {
@@ -29,23 +29,17 @@ const CustomToolTip = (props: { message: string }) => {
     )
 }
 
-function CommandSettings({ expanded, data, stackId }: CommandSettingsProps) {
-    const [settings, setSettings] = useState<CommandMetaSetting>(
-        data.metaSettings ?? {
-            delay: 0,
-            loose: false,
-            rerun: false
-        }
-    )
+function CommandSettings({ expanded, data, engine }: CommandSettingsProps) {
+    const [settings, setSettings] = useState<CommandMetaSetting | undefined>(data.metaSettings)
 
     const handleSettings = (name: string, value: number | CheckedState) => {
-        if (!name) return
+        if (!name || !settings) return
 
         const newSettings = { ...settings }
         newSettings[name] = value
 
-        baseSocket.emit('commandMetaSetting', {
-            stack: stackId,
+        engine.socket.emit('commandMetaSetting', {
+            stack: engine.stackId,
             terminal: data.id,
             settings: newSettings
         })
@@ -53,23 +47,22 @@ function CommandSettings({ expanded, data, stackId }: CommandSettingsProps) {
     }
 
     return (
-        <div className={`h-full w-full rounded-lg flex justify-evenly items-center
+        <div
+            className={`h-full w-full rounded-lg flex justify-evenly items-center
         ${expanded ? '' : ' hidden'}`}
         >
             <div>
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label htmlFor="delay" className="flex items-center gap-2">
                         Start delay ms
-                        <CustomToolTip
-                            message="For delaying terminal when starting the stack"
-                        />
+                        <CustomToolTip message="For delaying terminal when starting the stack" />
                     </Label>
                     <Input
                         id="delay"
-                        name="delay"
+                        name="health"
                         className="w-32"
                         type="number"
-                        defaultValue={settings.delay}
+                        defaultValue={settings?.health?.delay}
                         onChange={(e) => handleSettings(e.target.name, Number(e.target.value))}
                     />
                 </div>
@@ -77,10 +70,9 @@ function CommandSettings({ expanded, data, stackId }: CommandSettingsProps) {
             <div className="flex flex-col gap-5">
                 <div className="flex items-center space-x-2">
                     <Checkbox
-
                         name="loose"
                         onCheckedChange={(e) => handleSettings('loose', e)}
-                        checked={settings.loose}
+                        checked={settings?.loose}
                     />
                     <Label htmlFor="interactivity" className="flex items-center gap-2">
                         Loose terminal
@@ -89,10 +81,9 @@ function CommandSettings({ expanded, data, stackId }: CommandSettingsProps) {
                 </div>
                 <div className="flex items-center space-x-2">
                     <Checkbox
-
                         name="rerun"
                         onCheckedChange={(e) => handleSettings('rerun', e)}
-                        checked={settings.rerun}
+                        checked={settings?.rerun}
                     />
                     <Label htmlFor="rerun">Rerun on exit</Label>
                 </div>

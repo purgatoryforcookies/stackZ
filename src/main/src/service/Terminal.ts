@@ -1,41 +1,53 @@
 import {
+    ClientEvents,
     Cmd,
     CommandMetaSetting,
     Environment,
     EnvironmentEditProps,
     Status,
+    TerminalEvents,
+    Utility2Props,
+    UtilityEvents,
     UtilityProps
 } from '../../../types'
 import { spawn, IPty } from 'node-pty'
 import { envFactory, haveThesameElements, mapEnvs } from './util'
 import path from 'path'
 import { ITerminalDimensions } from 'xterm-addon-fit'
-import { Server } from 'socket.io'
+import { Socket } from 'socket.io'
+import { IPingFunction, ISaveFuntion } from '../Palette'
 
 export class Terminal {
     settings: Cmd
-    socketId: string
     stackId: string
-    server: Server
+    socket: Socket
     ptyProcess: IPty | null
     isRunning: boolean
     win: boolean
     buffer: string[]
     rows: number | undefined
     cols: number | undefined
-    stackPing: Function
+    stackPing: IPingFunction
+    save: ISaveFuntion
 
-    constructor(stackId: string, cmd: Cmd, socketId: string, server: Server, stackPing: Function) {
+    constructor(
+        stackId: string,
+        cmd: Cmd,
+        socket: Socket,
+        stackPing: IPingFunction,
+        save: ISaveFuntion
+    ) {
         this.settings = cmd
         this.settings.command.env = envFactory(this.settings.command.env)
-        this.socketId = socketId
         this.stackId = stackId
-        this.server = server
+        this.socket = socket
         this.win = process.platform === 'win32' ? true : false
         this.ptyProcess = null
         this.isRunning = false
         this.buffer = []
         this.stackPing = stackPing
+        this.registerTerminalEvents()
+        this.save = save
     }
 
     chooseShell(shell?: string) {
@@ -88,14 +100,19 @@ export class Terminal {
             )
 
             this.ptyProcess = spawn(shell, cmd, {
-                name: `Palette ${this.settings.id}`,
+                name:
+                    shell === 'zsh' || shell === '/bin/zsh'
+                        ? 'xterm-256color'
+                        : `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
-                env: mapEnvs(this.settings.command.env as Environment[]),
+                env: mapEnvs(this.settings.command.env as Environment[], shell),
                 useConpty: this.win ? false : true,
                 rows: this.rows,
                 cols: this.cols
             })
+
             this.isRunning = true
+            this.stackPing()
             if (cmd.length === 0) {
                 this.run(this.settings.command.cmd)
             }
@@ -107,15 +124,14 @@ export class Terminal {
                 this.isRunning = false
                 this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? ''}\r\n`)
 
-                const divider = Array(this.ptyProcess?.cols || 20)
-                    .fill('-')
-                    .join('')
+                const divider = Array(10).fill('-').join('')
                 this.sendToClient(`${divider}\r\n$ `)
                 this.stop()
                 if (this.settings.metaSettings?.rerun) {
                     this.start()
                 }
                 this.ping()
+                this.stackPing()
             })
             this.ping()
         } catch (e) {
@@ -146,22 +162,22 @@ export class Terminal {
             const code = this.win ? undefined : 'SIGHUP'
             this.ptyProcess.kill(code)
             this.isRunning = false
-        } catch (error) {
-            console.log(`Failed to kill ${this.settings.id}`)
+        } catch {
+            //swallow
         }
         this.ping()
+        this.stackPing()
     }
 
     ping() {
-        this.server.emit('terminalState', this.getState())
-        this.stackPing()
+        this.socket.emit(ClientEvents.TERMINALSTATE, this.getState())
+        this.save()
     }
 
     getState(): Status {
         if (!this.settings.command.shell) {
             this.settings.command.shell = this.chooseShell()
         }
-
         return {
             stackId: this.stackId,
             cmd: this.settings,
@@ -171,9 +187,7 @@ export class Terminal {
     }
 
     sendToClient(data: string) {
-        this.server
-            .to(this.socketId)
-            .emit('output', data)
+        this.socket.emit('output', data)
     }
 
     writeFromClient(data: string) {
@@ -204,7 +218,7 @@ export class Terminal {
 
     muteVariable(args: UtilityProps) {
         if (args.value && args.value.trim().length == 0) return
-        const target = this.settings.command.env?.find((list) => list.order == args.order)
+        const target = this.settings.command.env?.find((list) => list.order === args.order)
 
         if (target) {
             if (!args.value) {
@@ -261,6 +275,13 @@ export class Terminal {
         this.ping()
     }
 
+    removeEnv(args: UtilityProps) {
+        if (!args.value) return
+        const list = this.settings.command.env?.find((list) => list.order === args.order)
+        delete list?.pairs[args.value]
+        this.ping()
+    }
+
     changeShell(newShell: string | undefined) {
         this.settings.command.shell = this.chooseShell(newShell)
         this.ping()
@@ -269,5 +290,54 @@ export class Terminal {
     setMetaSettings(settings: CommandMetaSetting) {
         this.settings.metaSettings = settings
         this.ping()
+    }
+
+    registerTerminalEvents() {
+        this.socket.on(TerminalEvents.CWD, (arg: Utility2Props) => {
+            console.log(`Changing cwd! new Cwd: ${arg.value}`)
+            this.updateCwd(arg.value)
+        })
+        this.socket.on(TerminalEvents.CMD, (arg: Utility2Props) => {
+            console.log(`Changing command! new CMD: ${arg.value}`)
+            this.updateCommand(arg.value)
+        })
+        this.socket.on(TerminalEvents.SHELL, (arg: Utility2Props) => {
+            console.log(`Changing shell! new shell: ${arg.value}`)
+            this.changeShell(arg.value)
+        })
+        this.socket.on(TerminalEvents.INPUT, (args) => {
+            this.writeFromClient(args.data)
+        })
+        this.socket.on(TerminalEvents.RESIZE, (args: { value: ITerminalDimensions }) => {
+            this.resize(args.value)
+        })
+        this.socket.on(UtilityEvents.ENVLISTDELETE, (args: UtilityProps) => {
+            this.removeEnvList(args)
+        })
+        this.socket.on(UtilityEvents.ENVDELETE, (args: UtilityProps) => {
+            this.removeEnv(args)
+        })
+        this.socket.on(
+            UtilityEvents.CMDMETASETTINGS,
+            (args: { stack: string; terminal: string; settings: CommandMetaSetting }) => {
+                this.setMetaSettings(args.settings)
+            }
+        )
+        this.socket.on(UtilityEvents.ENVLIST, (args: { value: string }) => {
+            if (!args.value) return
+            this.addEnvList(args.value)
+        })
+        this.socket.on(UtilityEvents.ENVEDIT, (args: EnvironmentEditProps) => {
+            this.editVariable(args)
+        })
+        this.socket.on(UtilityEvents.ENVMUTE, (arg: UtilityProps) => {
+            this.muteVariable(arg)
+        })
+        this.socket.on(UtilityEvents.STATE, () => {
+            console.log('pingign')
+            this.ping()
+        })
+        this.socket.emit('hello')
+        this.stackPing()
     }
 }

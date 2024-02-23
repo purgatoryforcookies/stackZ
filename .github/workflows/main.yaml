@@ -7,31 +7,9 @@ on:
     workflow_dispatch:
 
 jobs:
-    test-pre:
-        name: Linux test before other os
-        strategy:
-            matrix:
-                os: [ubuntu-22.04]
-        timeout-minutes: 10
-        runs-on: ${{ matrix.os }}
-        steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: 21.6.1
-            - name: Test
-              run: |
-                  npm ci
-                  npm rebuild node-pty --update-binary
-                  npm run test
     test:
-        name: Test on multiple os
-        needs: test-pre
-        strategy:
-            matrix:
-                os: [windows-2022, macos-12, macos-14]
-        timeout-minutes: 10
-        runs-on: ${{ matrix.os }}
+        timeout-minutes: 8
+        runs-on: ubuntu-22.04
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-node@v4

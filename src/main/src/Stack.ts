@@ -1,14 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { ITerminalDimensions } from 'xterm-addon-fit'
-import {
-    CommandMetaSetting,
-    EnvironmentEditProps,
-    PaletteStack,
-    TerminalEvents,
-    Utility2Props,
-    UtilityEvents,
-    UtilityProps
-} from '../../types'
+import { PaletteStack, UtilityEvents } from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './service/DataStore'
 import { ZodTypeAny } from 'zod'
@@ -67,84 +58,17 @@ export class Stack {
             const stackId = String(client.handshake.query.stack)
             const remoteTerminalID = String(client.handshake.query.id)
             const palette = this.palettes.get(stackId)
-            // If there is no palette for the client, it is not a palette
-            // then utility listeners are registered
 
-            if (!palette) {
-                client.on(UtilityEvents.STATE, (arg: { stack: string; terminal?: string }) => {
-                    if (!arg.terminal) {
-                        this.palettes.get(arg.stack)?.pingAll()
-                        return
-                    }
-                    this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.ping()
-                })
-                client.on(UtilityEvents.BIGSTATE, (arg: { stack: string }) => {
-                    this.palettes.get(arg.stack)?.pingState()
-                })
-                client.on(UtilityEvents.ENVEDIT, (args: EnvironmentEditProps) => {
-                    this.palettes.get(args.stack)?.terminals.get(args.terminal)?.editVariable(args)
-                    this.save()
-                })
-                client.on(UtilityEvents.ENVMUTE, (arg: UtilityProps) => {
-                    this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.muteVariable(arg)
-                    this.save()
-                })
-                client.on(UtilityEvents.ENVLIST, (args: Omit<UtilityProps, 'order'>) => {
-                    if (!args.value) return
-                    this.palettes
-                        .get(args.stack)
-                        ?.terminals.get(args.terminal)
-                        ?.addEnvList(args.value)
-                    this.save()
-                })
-                client.on(UtilityEvents.ENVDELETE, (args: UtilityProps) => {
-                    this.palettes.get(args.stack)?.terminals.get(args.terminal)?.removeEnvList(args)
-                    this.save()
-                })
-                client.on(
-                    UtilityEvents.CMDMETASETTINGS,
-                    (args: { stack: string; terminal: string; settings: CommandMetaSetting }) => {
-                        this.palettes
-                            .get(args.stack)
-                            ?.terminals.get(args.terminal)
-                            ?.setMetaSettings(args.settings)
-                        this.save()
-                    }
-                )
-                client.emit('hello')
+            if (palette) {
+                palette.initTerminal(client, remoteTerminalID, this.save.bind(this))
                 return
             }
-            client.on(TerminalEvents.CWD, (arg: Utility2Props) => {
-                console.log(`Changing cwd! new Cwd: ${arg.value}`)
-                this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.updateCwd(arg.value)
-                this.save()
-            })
-            client.on(TerminalEvents.CMD, (arg: Utility2Props) => {
-                console.log(`Changing command! new CMD: ${arg.value}`)
-                this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.updateCommand(arg.value)
-                this.save()
-            })
-            client.on(TerminalEvents.SHELL, (arg: Utility2Props) => {
-                console.log(`Changing shell! new shell: ${arg.value}`)
-                this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.changeShell(arg.value)
-                this.save()
-            })
-            client.on(TerminalEvents.INPUT, (arg: Utility2Props) => {
-                console.log(`Getting input from ${arg.stack}-${arg.terminal}`)
-                this.palettes
-                    .get(arg.stack)
-                    ?.terminals.get(arg.terminal)
-                    ?.writeFromClient(arg.value)
-            })
-            client.on(
-                TerminalEvents.RESIZE,
-                (arg: { stack: string; terminal: string; value: ITerminalDimensions }) => {
-                    this.palettes.get(arg.stack)?.terminals.get(arg.terminal)?.resize(arg.value)
-                }
-            )
-            client.emit('hello')
 
-            palette.initTerminal(client.id, this.server, remoteTerminalID)
+            client.on(UtilityEvents.BIGSTATE, (arg: { stack: string }) => {
+                this.palettes.get(arg.stack)?.pingState()
+            })
+
+            client.emit('hello')
         })
     }
 
@@ -171,9 +95,8 @@ export class Stack {
 
         for (let i = 0; i < tempArray.length; i++) {
             const stack = tempArray[i]
-            if (stack.settings.metaSettings?.delay) {
-                timeouts += stack.settings.metaSettings?.delay
-
+            if (stack.settings.metaSettings?.health?.delay) {
+                timeouts += stack.settings.metaSettings?.health?.delay
             }
             setTimeout(() => {
                 stack.start()
@@ -202,12 +125,12 @@ export class Stack {
         this.server.emit('terminalDelete', { stack, terminal })
     }
 
-    createTerminal(title: string, stack: string) {
+    async createTerminal(title: string, stack: string) {
         const existingStack = this.palettes.get(stack)
         if (!existingStack) {
             throw new Error(`Whoah, stack ${stack} was not found when adding new terminal`)
         }
-        const newT = this.palettes.get(stack)?.createCommand(title)
+        const newT = await this.palettes.get(stack)?.createCommand(title)
         if (!newT) throw new Error(`Could not create terminal ${title} ${stack}`)
         this.save()
         return newT
@@ -232,7 +155,7 @@ export class Stack {
         return
     }
 
-    save(onExport = false) {
+    save = (onExport = false) => {
         const toModify: PaletteStack[] = onExport ? JSON.parse(JSON.stringify(this.raw)) : this.raw
 
         toModify.forEach((palette) => {

@@ -1,14 +1,15 @@
-import { GoPlusCircle } from 'react-icons/go'
+import { GoPlus } from 'react-icons/go'
 import { FormEvent, useState } from 'react'
-import { baseSocket } from '@renderer/service/socket'
 import { Input } from '@renderer/@/ui/input'
+import { Cross1Icon } from '@radix-ui/react-icons'
+import { UtilityEvents } from '@t'
+import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 type ListItemProps = {
     newRecord: boolean
-    terminalId: string
     orderId: number
     minimized: boolean
-    stackId: string
+    terminal: TerminalUIEngine
 }
 
 interface RecordProps extends ListItemProps {
@@ -43,7 +44,7 @@ export const Field = ({
     const style = `rounded-full py-1
     ${
         variant === 'primary'
-            ? `pr-2 pl-1 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
+            ? `pr-3 pl-3 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
             : `pl-3 pr-3  truncate text-secondary ${
                   highlight ? 'bg-orange-900 text-white' : 'bg-primary'
               }`
@@ -54,10 +55,11 @@ export const Field = ({
     return (
         <Input
             type="text"
-            className={`${style} px-3 h-8 ${variant === 'primary' ? 'max-w-[12rem]' : 'w-[40rem]'}`}
+            className={`${style} h-8 w-[20rem] ${variant === 'primary' ? 'pl-8' : ''}`}
             onChange={(e) => onChange(e.target.value)}
             defaultValue={value}
             placeholder={placeholder}
+            autoFocus={variant === 'primary' && !value}
         ></Input>
     )
 }
@@ -73,8 +75,7 @@ export const Field = ({
  * @param {string} minimized - Renders without value field
  */
 const Record = ({
-    terminalId,
-    stackId,
+    terminal,
     keyv,
     value,
     onClick,
@@ -90,11 +91,9 @@ const Record = ({
     const [keyPreviousValue] = useState<string | undefined>(keyv)
     const [valueValue, setValueValue] = useState<string | undefined>(value)
 
-    const handleClick = () => {
+    const handleMute = () => {
         if (editMode) return
-        baseSocket.emit('environmentMute', {
-            stack: stackId,
-            terminal: terminalId,
+        terminal.socket.emit('environmentMute', {
             value: keyValue,
             order: orderId
         })
@@ -105,9 +104,7 @@ const Record = ({
 
         if (!keyValue) return
         if (newRecordOpen && (!keyValue || !valueValue)) return
-        baseSocket.emit('environmentEdit', {
-            stack: stackId,
-            terminal: terminalId,
+        terminal.socket.emit('environmentEdit', {
             order: orderId,
             key: keyValue,
             previousKey: keyPreviousValue,
@@ -119,14 +116,27 @@ const Record = ({
         setNewRecordOpen(false)
     }
 
+    const handleDelete = () => {
+        terminal.socket.emit(UtilityEvents.ENVDELETE, {
+            order: orderId,
+            value: keyValue
+        })
+    }
+
     return (
         <div
-            className={`text-sm ${muted ? 'brightness-50' : ''}`}
+            className={`text-sm relative px-1 ${muted ? 'brightness-50' : ''}`}
             onClick={(e) => onClick(keyValue, e)}
-            onContextMenu={handleClick}
+            onContextMenu={handleMute}
         >
+            {editMode && !newRecordOpen && !newRecord ? (
+                <Cross1Icon
+                    onClick={handleDelete}
+                    className="absolute left-3 top-2 w-4 h-4 hover:text-red-600 hover:cursor-pointer hover:scale-110"
+                />
+            ) : null}
             {newRecord && !newRecordOpen ? (
-                <GoPlusCircle
+                <GoPlus
                     size={20}
                     onClick={() => setNewRecordOpen(!newRecordOpen)}
                     className="flex justify-center items-center w-full mt-2 hover:cursor-pointer text-secondary-foreground"
@@ -135,7 +145,7 @@ const Record = ({
                 <form
                     onSubmit={handleEdits}
                     onBlur={handleEdits}
-                    className="flex font-semibold justify-between hover:cursor-pointer pl-3 rounded-full bg-muted"
+                    className="flex font-semibold justify-between hover:cursor-pointer rounded-full bg-muted"
                 >
                     <Field
                         value={keyv}
@@ -157,7 +167,6 @@ const Record = ({
                             highlight={highlight}
                         />
                     ) : null}
-                    <button hidden>hello</button>
                 </form>
             )}
         </div>

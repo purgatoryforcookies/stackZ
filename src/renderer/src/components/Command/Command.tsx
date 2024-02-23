@@ -1,25 +1,25 @@
-import { ClientEvents, Cmd, SelectionEvents, Status, UtilityEvents } from '@t'
+import { ClientEvents, Cmd, SelectionEvents, Status } from '@t'
 import { useEffect, useState } from 'react'
-import { baseSocket } from '@renderer/service/socket'
 import { Button } from '@renderer/@/ui/button'
 import { ChevronDownIcon, ChevronUpIcon, Cross2Icon, ReloadIcon } from '@radix-ui/react-icons'
 import CommandSettings from '../Common/CommandSettings'
+import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 type CommandProps = {
     data: Exclude<Cmd, undefined>
-    hostStack: string
     handleClick: (
         stackId: string,
         terminalId: string,
         method?: SelectionEvents,
         cb?: () => void
     ) => void
-    selected: string | null
+    selected: boolean
+    engine: TerminalUIEngine
 }
 
-function Command({ data, hostStack, handleClick, selected }: CommandProps) {
+function Command({ data, handleClick, engine, selected }: CommandProps) {
     const [ping, setPing] = useState<Status>({
-        stackId: hostStack,
+        stackId: engine.stackId,
         cmd: data,
         isRunning: false,
         cwd: data.command.cwd
@@ -27,36 +27,33 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
     const [expanded, setExpanded] = useState<boolean>(false)
 
     useEffect(() => {
-        baseSocket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
-            if (hostStack !== d.stackId || data.id !== d.cmd.id) return
+        engine.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
             setPing(d)
         })
-        baseSocket.emit(UtilityEvents.STATE, { stack: hostStack, terminal: data.id })
-    }, [selected, hostStack, data])
+    }, [data, engine])
 
     const handleState = async (delRecord = false) => {
         if (delRecord) {
-            window.api.deleteCommand(hostStack, data.id)
+            window.api.deleteCommand(engine.stackId, data.id)
             return
         }
 
         if (ping?.isRunning) {
-            window.api.stopTerminal(hostStack, data.id)
+            window.api.stopTerminal(engine.stackId, data.id)
         } else {
-            window.api.startTerminal(hostStack, data.id)
+            window.api.startTerminal(engine.stackId, data.id)
         }
-        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: hostStack })
     }
 
     return (
         <div
             className={`
             p-1 m-2 rounded-md
-            ${selected === data.id ? 'bg-card' : ''}`}
+            ${selected ? 'bg-card' : ''}`}
         >
             <div
                 className="m-2 overflow-hidden rounded-md hover:cursor-pointer"
-                onClick={() => handleClick(hostStack, data.id, SelectionEvents.CONN)}
+                onClick={() => handleClick(engine.stackId, data.id, SelectionEvents.CONN)}
             >
                 <div className="pl-4 bg-black/80 flex justify-between pr-5 ">
                     <span className="truncate text-secondary-foreground " dir="rtl">
@@ -72,7 +69,8 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                 <div
                     className={` relative
                      bg-terminalHeader 
-                    ${selected === data.id ? '' : 'bg-background'}`}>
+                    ${engine.terminalId === data.id ? '' : 'bg-background'}`}
+                >
                     <div className="flex justify-between">
                         <div className="flex flex-col pl-3 p-1 text-sm text-secondary-foreground">
                             <span>command: {ping.cmd.command.cmd}</span>
@@ -94,7 +92,6 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                                     )}
                                 </Button>
                             </div>
-
                         </div>
                     </div>
 
@@ -105,7 +102,7 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                     `}
                     >
                         <div className="flex gap-1 justify-center  pb-6 h-full">
-                            <CommandSettings expanded={expanded} data={data} stackId={hostStack} />
+                            <CommandSettings expanded={expanded} data={data} engine={engine} />
                         </div>
                     </div>
                     <div
@@ -117,7 +114,6 @@ function Command({ data, hostStack, handleClick, selected }: CommandProps) {
                         ) : (
                             <ChevronDownIcon className="h-4 w-4 text-white/50" />
                         )}
-
                     </div>
                     <span className="absolute right-1 bottom-0 text-[0.7rem] text-white/30">
                         {ping.cmd.executionOrder ?? 'ei'}
