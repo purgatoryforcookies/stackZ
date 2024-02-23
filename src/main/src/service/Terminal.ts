@@ -178,6 +178,7 @@ export class Terminal {
         if (!this.settings.command.shell) {
             this.settings.command.shell = this.chooseShell()
         }
+
         return {
             stackId: this.stackId,
             cmd: this.settings,
@@ -319,7 +320,7 @@ export class Terminal {
         })
         this.socket.on(
             UtilityEvents.CMDMETASETTINGS,
-            (args: { stack: string; terminal: string; settings: CommandMetaSetting }) => {
+            (args: { settings: CommandMetaSetting }) => {
                 this.setMetaSettings(args.settings)
             }
         )

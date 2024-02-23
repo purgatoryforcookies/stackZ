@@ -30,7 +30,12 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
         engine.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
             setPing(d)
         })
-    }, [data, engine])
+        return () => {
+            engine.socket.off(ClientEvents.TERMINALSTATE)
+        }
+
+
+    }, [data, engine, selected])
 
     const handleState = async (delRecord = false) => {
         if (delRecord) {
@@ -43,6 +48,7 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
         } else {
             window.api.startTerminal(engine.stackId, data.id)
         }
+
     }
 
     return (
@@ -53,7 +59,7 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
         >
             <div
                 className="m-2 overflow-hidden rounded-md hover:cursor-pointer"
-                onClick={() => handleClick(engine.stackId, data.id, SelectionEvents.CONN)}
+                onClick={() => handleClick(engine.stackId, engine.terminalId, SelectionEvents.CONN)}
             >
                 <div className="pl-4 bg-black/80 flex justify-between pr-5 ">
                     <span className="truncate text-secondary-foreground " dir="rtl">
@@ -82,7 +88,7 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
                         <div className="flex items-center relative top-2 right-12">
                             <div>
                                 <Button variant={'ghost'} onClick={() => handleState()}>
-                                    {ping?.isRunning ? (
+                                    {ping.isRunning ? (
                                         <>
                                             <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                                             Running...

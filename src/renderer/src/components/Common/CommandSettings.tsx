@@ -30,20 +30,51 @@ const CustomToolTip = (props: { message: string }) => {
 }
 
 function CommandSettings({ expanded, data, engine }: CommandSettingsProps) {
-    const [settings, setSettings] = useState<CommandMetaSetting | undefined>(data.metaSettings)
+    const [settings, setSettings] = useState<CommandMetaSetting | undefined>(data.metaSettings ?? {
+        loose: false,
+        rerun: false,
+        health: {
+            delay: 0,
+            limit: 30,
+            healthCheck: ''
+        }
+    })
 
-    const handleSettings = (name: string, value: number | CheckedState) => {
+    const handleSettings = (name: string, value: number | string | CheckedState) => {
         if (!name || !settings) return
-
         const newSettings = { ...settings }
         newSettings[name] = value
 
         engine.socket.emit('commandMetaSetting', {
-            stack: engine.stackId,
-            terminal: data.id,
             settings: newSettings
         })
         setSettings(newSettings)
+    }
+
+    const handleHealthSettings = (name: string, value: number | string) => {
+        if (!name || !settings) return
+
+        const newHealth = {
+            delay: settings.health?.delay || 0,
+            limit: settings.health?.limit || 30,
+            healthCheck: settings.health?.healthCheck || ''
+        }
+
+        if (typeof value === 'number') {
+            newHealth[name] = Number(value)
+        }
+        else {
+            newHealth[name] = String(value)
+        }
+
+        const se: CommandMetaSetting = { ...settings, health: newHealth }
+
+        console.log(se)
+        engine.socket.emit('commandMetaSetting', {
+            settings: se
+        })
+        setSettings(se)
+
     }
 
     return (
@@ -59,11 +90,11 @@ function CommandSettings({ expanded, data, engine }: CommandSettingsProps) {
                     </Label>
                     <Input
                         id="delay"
-                        name="health"
+                        name="delay"
                         className="w-32"
                         type="number"
                         defaultValue={settings?.health?.delay}
-                        onChange={(e) => handleSettings(e.target.name, Number(e.target.value))}
+                        onChange={(e) => handleHealthSettings(e.target.name, Number(e.target.value))}
                     />
                 </div>
             </div>
