@@ -45,7 +45,7 @@ export const envFactory = (args: Environment[] | undefined) => {
         order: 0,
         disabled: []
     }
-    hostEnv.pairs['ZDOTDIR'] = '/Users/max.caroe'
+
     if (!args) return [hostEnv]
 
     let allenvs = args.map((obj) => ({ ...obj, disabled: [] })) as Environment[]
@@ -57,7 +57,7 @@ export const envFactory = (args: Environment[] | undefined) => {
     return allenvs.sort((a, b) => a.order - b.order)
 }
 
-export const mapEnvs = (obj: Environment[]) => {
+export const mapEnvs = (obj: Environment[], shell?: string) => {
     const reduced: Record<string, string | undefined> = {}
     obj.forEach((envSet) => {
         Object.keys(envSet.pairs).forEach((key) => {
@@ -65,6 +65,12 @@ export const mapEnvs = (obj: Environment[]) => {
             reduced[key] = envSet.pairs[key]
         })
     })
+
+    if (shell) {
+        if (shell = 'zsh' || '/bin/zsh') reduced['TERM'] = 'xterm-256color'
+    }
+
+
     return reduced
 }
 
