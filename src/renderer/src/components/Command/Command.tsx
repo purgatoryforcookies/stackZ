@@ -1,7 +1,7 @@
 import { ClientEvents, Cmd, SelectionEvents, Status } from '@t'
 import { useEffect, useState } from 'react'
 import { Button } from '@renderer/@/ui/button'
-import { ChevronDownIcon, ChevronUpIcon, Cross2Icon, ReloadIcon } from '@radix-ui/react-icons'
+import { ChevronDownIcon, ChevronUpIcon, Cross2Icon, EyeNoneIcon, HeartIcon, ReloadIcon, SymbolIcon, TimerIcon } from '@radix-ui/react-icons'
 import CommandSettings from '../Common/CommandSettings'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
@@ -121,6 +121,12 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
                             <ChevronDownIcon className="h-4 w-4 text-white/50" />
                         )}
                     </div>
+                    <span className="absolute right-10 bottom-1 text-[0.7rem] text-white/30 flex gap-2">
+                        {ping.cmd.metaSettings?.rerun ? <SymbolIcon className="h-4 w-4" /> : null}
+                        {ping.cmd.metaSettings?.loose ? <EyeNoneIcon className="h-4 w-4" /> : null}
+                        {ping.cmd.health?.delay ? <TimerIcon className="h-4 w-4" /> : null}
+                        {ping.cmd.health?.healthCheck ? <HeartIcon className="h-4 w-4" /> : null}
+                    </span>
                     <span className="absolute right-1 bottom-0 text-[0.7rem] text-white/30">
                         {ping.cmd.executionOrder ?? 'ei'}
                     </span>
