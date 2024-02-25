@@ -292,6 +292,11 @@ export class Terminal {
         this.settings.metaSettings = settings
         this.ping()
     }
+    setHealthSettings(settings: Cmd['health']) {
+        console.log("changing meta", settings)
+        this.settings.health = settings
+        this.ping()
+    }
 
     registerTerminalEvents() {
         this.socket.on(TerminalEvents.CWD, (arg: Utility2Props) => {
@@ -324,6 +329,12 @@ export class Terminal {
                 this.setMetaSettings(args.settings)
             }
         )
+        this.socket.on(
+            UtilityEvents.HEALTHSETTINGS,
+            (args: { health: Cmd['health'] }) => {
+                this.setHealthSettings(args.health)
+            }
+        )
         this.socket.on(UtilityEvents.ENVLIST, (args: { value: string }) => {
             if (!args.value) return
             this.addEnvList(args.value)
@@ -335,7 +346,7 @@ export class Terminal {
             this.muteVariable(arg)
         })
         this.socket.on(UtilityEvents.STATE, () => {
-            console.log('pingign')
+            console.log('ping')
             this.ping()
         })
         this.socket.emit('hello')

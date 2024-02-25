@@ -23,15 +23,14 @@ export const stackSchema = z.array(
                     title: z.string().default('First command'),
                     metaSettings: z
                         .object({
-                            loose: z.boolean().default(false),
-                            rerun: z.boolean().default(false),
-                            health: z
-                                .object({
-                                    delay: z.number().default(0),
-                                    limit: z.number().default(30),
-                                    healthCheck: z.string()
-                                })
-                                .optional()
+                            loose: z.boolean().default(false).optional(),
+                            rerun: z.boolean().default(false).optional(),
+                        })
+                        .optional(),
+                    health: z
+                        .object({
+                            delay: z.number().optional(),
+                            healthCheck: z.string().optional()
                         })
                         .optional(),
                     command: z.object({
@@ -78,7 +77,8 @@ export enum UtilityEvents {
     ENVLIST = 'environmentList',
     ENVLISTDELETE = 'environmentListDelete',
     ENVDELETE = 'environmentDelete',
-    CMDMETASETTINGS = 'commandMetaSetting'
+    CMDMETASETTINGS = 'commandMetaSetting',
+    HEALTHSETTINGS = 'commandHealthSetting'
 }
 
 export enum TerminalEvents {

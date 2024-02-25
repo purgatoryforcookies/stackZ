@@ -4,9 +4,11 @@ import { Checkbox } from '@renderer/@/ui/checkbox'
 import { Input } from '@renderer/@/ui/input'
 import { Label } from '@renderer/@/ui/label'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@renderer/@/ui/tooltip'
-import { useState } from 'react'
-import { Cmd, CommandMetaSetting } from '@t'
+import { useEffect, useState } from 'react'
+import { ClientEvents, Cmd, CommandMetaSetting, Status, UtilityEvents } from '@t'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/@/ui/tabs'
+
 
 type CommandSettingsProps = {
     expanded: boolean
@@ -14,7 +16,7 @@ type CommandSettingsProps = {
     engine: TerminalUIEngine
 }
 
-const CustomToolTip = (props: { message: string }) => {
+const CustomToolTip = ({ message }: { message: string }) => {
     return (
         <TooltipProvider>
             <Tooltip>
@@ -22,60 +24,65 @@ const CustomToolTip = (props: { message: string }) => {
                     <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>{props.message}</p>
+                    <p>{message}</p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>
     )
 }
 
-function CommandSettings({ expanded, data, engine }: CommandSettingsProps) {
-    const [settings, setSettings] = useState<CommandMetaSetting | undefined>(data.metaSettings ?? {
-        loose: false,
-        rerun: false,
-        health: {
-            delay: 0,
-            limit: 30,
-            healthCheck: ''
-        }
-    })
+function CommandSettings({ expanded, engine }: CommandSettingsProps) {
+    const [settings, setSettings] = useState<CommandMetaSetting | undefined>()
+    const [health, setHealth] = useState<Cmd['health'] | undefined>()
+    const [tab, setTab] = useState<string | undefined>('off')
+
 
     const handleSettings = (name: string, value: number | string | CheckedState) => {
-        if (!name || !settings) return
-        const newSettings = { ...settings }
+
+        const newSettings: CommandMetaSetting = { ...settings }
         newSettings[name] = value
 
-        engine.socket.emit('commandMetaSetting', {
+        engine.socket.emit(UtilityEvents.CMDMETASETTINGS, {
             settings: newSettings
         })
         setSettings(newSettings)
     }
 
-    const handleHealthSettings = (name: string, value: number | string) => {
-        if (!name || !settings) return
+    const handleHealthSettings = (name?: string, value?: number | string) => {
 
-        const newHealth = {
-            delay: settings.health?.delay || 0,
-            limit: settings.health?.limit || 30,
-            healthCheck: settings.health?.healthCheck || ''
-        }
+        let newHealth: Cmd['health'] = {}
 
-        if (typeof value === 'number') {
+        if (typeof value === 'number' && name) {
             newHealth[name] = Number(value)
         }
-        else {
+        else if (typeof value === 'string' && name) {
             newHealth[name] = String(value)
         }
-
-        const se: CommandMetaSetting = { ...settings, health: newHealth }
-
-        console.log(se)
-        engine.socket.emit('commandMetaSetting', {
-            settings: se
+        else {
+            newHealth = undefined
+        }
+        engine.socket.emit(UtilityEvents.HEALTHSETTINGS, {
+            health: newHealth
         })
-        setSettings(se)
+        setHealth(newHealth)
 
     }
+
+    useEffect(() => {
+        engine.socket.on(ClientEvents.TERMINALSTATE, (d: Status) => {
+            setHealth(d.cmd.health)
+            setSettings(d.cmd.metaSettings)
+
+            if (d.cmd.health?.delay) setTab('time')
+            else if (d.cmd.health?.healthCheck) setTab('health')
+            else setTab('off')
+        })
+
+        return () => {
+            engine.socket.off(ClientEvents.TERMINALSTATE)
+        }
+
+    }, [expanded])
 
     return (
         <div
@@ -84,18 +91,43 @@ function CommandSettings({ expanded, data, engine }: CommandSettingsProps) {
         >
             <div>
                 <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label htmlFor="delay" className="flex items-center gap-2">
-                        Start delay ms
-                        <CustomToolTip message="For delaying terminal when starting the stack" />
-                    </Label>
-                    <Input
-                        id="delay"
-                        name="delay"
-                        className="w-32"
-                        type="number"
-                        defaultValue={settings?.health?.delay}
-                        onChange={(e) => handleHealthSettings(e.target.name, Number(e.target.value))}
-                    />
+                    {tab ? <Tabs value={tab} className='h-full'>
+                        <TabsList className='w-[20rem]'>
+                            <TabsTrigger value="off" className='w-[100%] flex gap-2' onClick={() => handleHealthSettings()}>Off</TabsTrigger>
+                            <TabsTrigger value="time" onClick={() => setTab('time')} className='w-[100%] flex gap-2'>Time delay
+                                <CustomToolTip message="Time starts to tick when previous terminal has started" />
+                            </TabsTrigger>
+                            <TabsTrigger value="health" onClick={() => setTab('health')} className='w-[100%] flex gap-2'>Healthcheck
+                                <CustomToolTip message="Command which on returning 0 starts this terminal" />
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="time" className='h-full'>
+                            <Input
+                                id="delay"
+                                name="delay"
+                                step={500}
+                                min={0}
+                                type="number"
+                                placeholder='milliseconds'
+                                defaultValue={health?.delay}
+                                onChange={(e) => handleHealthSettings(e.target.name, Number(e.target.value))}
+                            />
+                        </TabsContent>
+                        <TabsContent value="health">
+
+                            <Input
+                                id="healthCheck"
+                                name="healthCheck"
+                                type="text"
+                                autoComplete='off'
+                                placeholder='curl --fail https://google.com || exit 1'
+                                defaultValue={health?.healthCheck}
+                                onChange={(e) => handleHealthSettings(e.target.name, e.target.value)}
+                            />
+
+                        </TabsContent>
+                    </Tabs>
+                        : null}
                 </div>
             </div>
             <div className="flex flex-col gap-5">

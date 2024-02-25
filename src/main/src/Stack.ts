@@ -4,7 +4,7 @@ import { Palette } from './Palette'
 import { DataStore } from './service/DataStore'
 import { ZodTypeAny } from 'zod'
 import { Server } from 'socket.io'
-import { Terminal } from './service/Terminal'
+import { TerminalScheduler } from './service/TerminalScheduler'
 
 export class Stack {
     path: string
@@ -12,6 +12,7 @@ export class Stack {
     raw: PaletteStack[]
     palettes: Map<string, Palette>
     store: DataStore
+    scheduler: Map<string, TerminalScheduler>
 
     constructor(jsonPath: string, server: Server, schema: ZodTypeAny) {
         this.path = jsonPath
@@ -19,6 +20,8 @@ export class Stack {
         this.raw = []
         this.store = new DataStore(jsonPath, schema)
         this.palettes = new Map<string, Palette>()
+        this.scheduler = new Map<string, TerminalScheduler>()
+
     }
 
     async load() {
@@ -78,32 +81,18 @@ export class Stack {
     }
 
     startStack(stack: string) {
-        const tempArray: Terminal[] = []
 
-        this.palettes.get(stack)?.terminals.forEach((term) => {
-            tempArray.push(term)
-        })
+        const terms = this.palettes.get(stack)?.terminals
 
-        tempArray.sort((a, b) => {
-            if (a.settings.executionOrder && b.settings.executionOrder) {
-                return a.settings.executionOrder - b.settings.executionOrder
-            }
-            return -1
-        })
-
-        let timeouts = 0
-
-        for (let i = 0; i < tempArray.length; i++) {
-            const stack = tempArray[i]
-            if (stack.settings.metaSettings?.health?.delay) {
-                timeouts += stack.settings.metaSettings?.health?.delay
-            }
-            setTimeout(() => {
-                stack.start()
-            }, timeouts)
+        if (!terms) {
+            throw new Error(`Tried to start stack ${stack}, but it was not found`)
         }
+
+        this.scheduler.set(stack, new TerminalScheduler(terms))
+
     }
     stopStack(stack: string) {
+        this.scheduler.get(stack)?.stop()
         this.palettes.get(stack)?.terminals.forEach((term) => {
             term.stop()
         })
