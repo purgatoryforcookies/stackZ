@@ -31,7 +31,7 @@ The stacks and terminals are saved and read from a json-file. You can build your
 
 -   Run terminals in a pipeline
 -   Mac and windows support (linux too but might be lacking)
--   Sequence runs and add delays
+-   Sequence runs and add delays or healthchecks
 -   Search with CMD+K menu
 -   Configure environment sets, and mute/edit them
 -   Backup, edit and share your stacks directly in the json-file
