@@ -62,8 +62,6 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
     }
 
     useEffect(() => {
-        if (data.cmd.health) setHealth(data.cmd.health)
-        if (data.cmd.metaSettings) setSettings(data.cmd.metaSettings)
 
         engine.socket.on(ClientEvents.TERMINALSTATE, (d: Status) => {
             setHealth(d.cmd.health)
@@ -91,7 +89,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                             <TabsTrigger
                                 value="off"
                                 className="w-[50%] flex gap-2"
-                                onClick={() => handleHealthSettings()}
+                                onClick={() => { handleHealthSettings(), setTab("off") }}
                                 disabled={data.reserved || data.isRunning}
                             >
                                 Off
