@@ -48,13 +48,13 @@ The stacks and terminals are saved and read from a json-file. You can build your
 
 Each environment has priority and you'll read them from left to right.
 
-On the very left, you'll have OS Environments which get inherited from your machine. They are applied first. One by one to the right. If you have KEY's with the same name, they will get overwritten.
+On the very left, you'll have OS Environments which get inherited from your machine. They are applied first. If you have KEY's with the same name between env sets they will get overwritten by the next key present. Last key will win. 
 
 You can mute a single ENV by right-clicking it, or a complete set from the toolbar. Muted variables are ignored. In order to edit the list, you'll need to be in edit mode.
 
 ### Terminals
 
-When terminal is stopped you can change its settings by typing commands.
+When terminal is stopped you can change its settings by typing commands, or by expanding the command from the menu. 
 
 `cd new/path/` will change the currenct working directory (cwd) of the terminal. Directory changes inside a running terminal are ignored.
 `shell terminal` will change the terminal used. This can be for e.g.
@@ -66,10 +66,10 @@ When terminal is stopped you can change its settings by typing commands.
 -   wsl.exe
 -   You can try any terminal you want, the support might be limited to running loose terminals only though
 
-`just type some command` changes the command to be executed once terminal is started. Can also be a squence or point to a file. Commands inside a running terminal are ignored.
+`just type some command` changes the command to be executed. Can also be a squence or point to a file. Commands inside a running terminal are ignored by stackZ and are run in the session.
 
 When you stop a terminal, it stops with SIGHUP (on Linux and Mac).
-You can also exit terminal process with typing CTRL+C in most cases.
+You can also exit terminal process with typing CTRL+C in most cases, or by typing `exit`
 
 Any commands typed inside a running terminal session are ignored by the terminals settings. For e.g. cwd changes do not get picked up.
 
