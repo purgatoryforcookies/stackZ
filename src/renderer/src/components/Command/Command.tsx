@@ -1,17 +1,22 @@
 import { ClientEvents, Cmd, SelectionEvents, Status, UtilityEvents } from '@t'
 import { useEffect, useState } from 'react'
 import { Button } from '@renderer/@/ui/button'
-import { ChevronDownIcon, ChevronUpIcon, Cross2Icon, EyeNoneIcon, HeartIcon, ReloadIcon, SymbolIcon, TimerIcon } from '@radix-ui/react-icons'
+import {
+    ChevronDownIcon,
+    ChevronUpIcon,
+    Cross2Icon,
+    EyeNoneIcon,
+    HeartIcon,
+    ReloadIcon,
+    SymbolIcon,
+    TimerIcon
+} from '@radix-ui/react-icons'
 import CommandSettings from '../Common/CommandSettings'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 
 type CommandProps = {
     data: Exclude<Cmd, undefined>
-    handleClick: (
-        stackId: string,
-        terminalId: string,
-        method?: SelectionEvents,
-    ) => void
+    handleClick: (stackId: string, terminalId: string, method?: SelectionEvents) => void
     selected: boolean
     engine: TerminalUIEngine
 }
@@ -41,8 +46,6 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
             engine.socket.off(ClientEvents.TERMINALSTATE)
             engine.socket.off(ClientEvents.HEARTBEAT)
         }
-
-
     }, [data, engine, selected])
 
     const handleState = async (delRecord = false) => {
@@ -56,7 +59,6 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
         } else {
             window.api.startTerminal(engine.stackId, data.id)
         }
-
     }
 
     return (
@@ -95,15 +97,19 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
 
                         <div className="flex items-center relative top-2 right-12">
                             <div>
-                                <Button variant={'ghost'} onClick={() => handleState()} disabled={ping.reserved}>
+                                <Button
+                                    variant={'ghost'}
+                                    onClick={() => handleState()}
+                                    disabled={ping.reserved}
+                                >
                                     {ping.isRunning ? (
                                         <>
                                             <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                                             Running...
                                         </>
-                                    ) :
+                                    ) : (
                                         'Start'
-                                    }
+                                    )}
                                 </Button>
                             </div>
                         </div>
@@ -132,20 +138,26 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
                     <span className="absolute right-10 bottom-1 text-[0.7rem] text-white/30 flex gap-2">
                         {ping.cmd.metaSettings?.rerun ? <SymbolIcon className="h-4 w-4" /> : null}
                         {ping.cmd.metaSettings?.loose ? <EyeNoneIcon className="h-4 w-4" /> : null}
-                        {ping.cmd.health?.delay ?
-                            <span className='flex relative'>
+                        {ping.cmd.health?.delay ? (
+                            <span className="flex relative">
                                 <TimerIcon className="h-4 w-4" />
-                                {ping.cmd.health.delay ? <span className='absolute left-[14.5px] bottom-2'>{ping.cmd.health.delay / 1000}</span> : null}
+                                {ping.cmd.health.delay ? (
+                                    <span className="absolute left-[14.5px] bottom-2">
+                                        {ping.cmd.health.delay / 1000}
+                                    </span>
+                                ) : null}
                             </span>
-                            : null}
-                        {ping.cmd.health?.healthCheck ?
-
-                            <span className='flex relative'>
+                        ) : null}
+                        {ping.cmd.health?.healthCheck ? (
+                            <span className="flex relative">
                                 <HeartIcon className="h-4 w-4" />
-                                {hcHeartBeat ? <span className='absolute left-[14.5px] bottom-2'>{hcHeartBeat}</span> : null}
+                                {hcHeartBeat ? (
+                                    <span className="absolute left-[14.5px] bottom-2">
+                                        {hcHeartBeat}
+                                    </span>
+                                ) : null}
                             </span>
-
-                            : null}
+                        ) : null}
                     </span>
                     <span className="absolute right-1 bottom-0 text-[0.7rem] text-white/30">
                         {ping.cmd.executionOrder ?? 'ei'}

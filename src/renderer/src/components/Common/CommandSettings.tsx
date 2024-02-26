@@ -9,7 +9,6 @@ import { ClientEvents, Cmd, CommandMetaSetting, Status, UtilityEvents } from '@t
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/@/ui/tabs'
 
-
 type CommandSettingsProps = {
     expanded: boolean
     data: Status
@@ -36,9 +35,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
     const [health, setHealth] = useState<Cmd['health'] | undefined>(data.cmd.health)
     const [tab, setTab] = useState<string | undefined>('off')
 
-
     const handleSettings = (name: string, value: number | string | CheckedState) => {
-
         const newSettings: CommandMetaSetting = { ...settings }
         newSettings[name] = value
 
@@ -49,28 +46,22 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
     }
 
     const handleHealthSettings = (name?: string, value?: number | string) => {
-
         let newHealth: Cmd['health'] = {}
 
         if (typeof value === 'number' && name) {
             newHealth[name] = Number(value)
-        }
-        else if (typeof value === 'string' && name) {
+        } else if (typeof value === 'string' && name) {
             newHealth[name] = String(value)
-        }
-        else {
+        } else {
             newHealth = undefined
         }
         setHealth(newHealth)
         engine.socket.emit(UtilityEvents.HEALTHSETTINGS, {
             health: newHealth
         })
-
-
     }
 
     useEffect(() => {
-
         if (data.cmd.health) setHealth(data.cmd.health)
         if (data.cmd.metaSettings) setSettings(data.cmd.metaSettings)
 
@@ -83,9 +74,8 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
             else setTab('off')
         })
 
-        // Do not remove the socket listener here. 
+        // Do not remove the socket listener here.
         // This components parent is handling that in case it needs to.
-
     }, [])
 
     return (
@@ -95,52 +85,67 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
         >
             <div>
                 <div className="grid w-full max-w-sm items-center gap-1.5">
-                    {tab ? <Tabs value={tab} className='h-full'>
-                        <TabsList className='w-[20rem]'>
-                            <TabsTrigger value="off" className='w-[100%] flex gap-2'
-                                onClick={() => handleHealthSettings()}
-                                disabled={data.reserved || data.isRunning}>Off</TabsTrigger>
-                            <TabsTrigger value="time" onClick={() => setTab('time')}
-                                className='w-[100%] flex gap-2'
-                                disabled={data.reserved || data.isRunning}>Time delay
-                                <CustomToolTip message="Time starts to tick when stack is started" />
-                            </TabsTrigger>
-                            <TabsTrigger value="health"
-                                onClick={() => setTab('health')}
-                                className='w-[100%] flex gap-2'
-                                disabled={data.reserved || data.isRunning}>Healthcheck
-                                <CustomToolTip message="Command which on returning 0 starts this terminal" />
-                            </TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="time" className='h-full'>
-                            <Input
-                                id="delay"
-                                name="delay"
-                                step={500}
-                                min={0}
-                                type="number"
-                                placeholder='milliseconds'
-                                disabled={data.reserved || data.isRunning}
-                                defaultValue={health?.delay}
-                                onChange={(e) => handleHealthSettings(e.target.name, Number(e.target.value))}
-                            />
-                        </TabsContent>
-                        <TabsContent value="health">
-
-                            <Input
-                                id="healthCheck"
-                                name="healthCheck"
-                                type="text"
-                                disabled={data.reserved || data.isRunning}
-                                autoComplete='off'
-                                placeholder='curl --fail https://google.com || exit 1'
-                                defaultValue={health?.healthCheck}
-                                onChange={(e) => handleHealthSettings(e.target.name, e.target.value)}
-                            />
-
-                        </TabsContent>
-                    </Tabs>
-                        : null}
+                    {tab ? (
+                        <Tabs value={tab} className="h-full">
+                            <TabsList className="w-[20rem]">
+                                <TabsTrigger
+                                    value="off"
+                                    className="w-[100%] flex gap-2"
+                                    onClick={() => handleHealthSettings()}
+                                    disabled={data.reserved || data.isRunning}
+                                >
+                                    Off
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="time"
+                                    onClick={() => setTab('time')}
+                                    className="w-[100%] flex gap-2"
+                                    disabled={data.reserved || data.isRunning}
+                                >
+                                    Time delay
+                                    <CustomToolTip message="Time starts to tick when stack is started" />
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="health"
+                                    onClick={() => setTab('health')}
+                                    className="w-[100%] flex gap-2"
+                                    disabled={data.reserved || data.isRunning}
+                                >
+                                    Healthcheck
+                                    <CustomToolTip message="Command which on returning 0 starts this terminal" />
+                                </TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="time" className="h-full">
+                                <Input
+                                    id="delay"
+                                    name="delay"
+                                    step={500}
+                                    min={0}
+                                    type="number"
+                                    placeholder="milliseconds"
+                                    disabled={data.reserved || data.isRunning}
+                                    defaultValue={health?.delay}
+                                    onChange={(e) =>
+                                        handleHealthSettings(e.target.name, Number(e.target.value))
+                                    }
+                                />
+                            </TabsContent>
+                            <TabsContent value="health">
+                                <Input
+                                    id="healthCheck"
+                                    name="healthCheck"
+                                    type="text"
+                                    disabled={data.reserved || data.isRunning}
+                                    autoComplete="off"
+                                    placeholder="curl --fail https://google.com || exit 1"
+                                    defaultValue={health?.healthCheck}
+                                    onChange={(e) =>
+                                        handleHealthSettings(e.target.name, e.target.value)
+                                    }
+                                />
+                            </TabsContent>
+                        </Tabs>
+                    ) : null}
                 </div>
             </div>
             <div className="flex flex-col gap-5">

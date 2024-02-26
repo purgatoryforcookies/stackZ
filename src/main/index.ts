@@ -16,8 +16,6 @@ async function createWindow(): Promise<void> {
     await stack.load()
     stack.init()?.startServer()
 
-
-
     // dev setup to open screen on 2nd monitor
     const displays = electron.screen.getAllDisplays()
     const externalDisplay = displays.find((display) => {

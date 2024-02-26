@@ -301,7 +301,7 @@ export class Terminal {
         this.ping()
     }
     setHealthSettings(settings: Cmd['health']) {
-        console.log("changing meta", settings)
+        console.log('changing meta', settings)
         this.settings.health = settings
         this.ping()
     }
@@ -331,18 +331,12 @@ export class Terminal {
         this.socket.on(UtilityEvents.ENVDELETE, (args: UtilityProps) => {
             this.removeEnv(args)
         })
-        this.socket.on(
-            UtilityEvents.CMDMETASETTINGS,
-            (args: { settings: CommandMetaSetting }) => {
-                this.setMetaSettings(args.settings)
-            }
-        )
-        this.socket.on(
-            UtilityEvents.HEALTHSETTINGS,
-            (args: { health: Cmd['health'] }) => {
-                this.setHealthSettings(args.health)
-            }
-        )
+        this.socket.on(UtilityEvents.CMDMETASETTINGS, (args: { settings: CommandMetaSetting }) => {
+            this.setMetaSettings(args.settings)
+        })
+        this.socket.on(UtilityEvents.HEALTHSETTINGS, (args: { health: Cmd['health'] }) => {
+            this.setHealthSettings(args.health)
+        })
         this.socket.on(UtilityEvents.ENVLIST, (args: { value: string }) => {
             if (!args.value) return
             this.addEnvList(args.value)

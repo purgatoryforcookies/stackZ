@@ -24,7 +24,7 @@ export const stackSchema = z.array(
                     metaSettings: z
                         .object({
                             loose: z.boolean().default(false).optional(),
-                            rerun: z.boolean().default(false).optional(),
+                            rerun: z.boolean().default(false).optional()
                         })
                         .optional(),
                     health: z

@@ -21,7 +21,6 @@ export class Stack {
         this.store = new DataStore(jsonPath, schema)
         this.palettes = new Map<string, Palette>()
         this.scheduler = new Map<string, TerminalScheduler>()
-
     }
 
     async load() {
@@ -81,7 +80,6 @@ export class Stack {
     }
 
     startStack(stack: string) {
-
         const terms = this.palettes.get(stack)?.terminals
 
         if (!terms) {
@@ -89,7 +87,6 @@ export class Stack {
         }
 
         this.scheduler.set(stack, new TerminalScheduler(terms))
-
     }
     stopStack(stack: string) {
         this.scheduler.get(stack)?.stop()
