@@ -1,5 +1,7 @@
-import { execSync } from 'child_process'
+import { exec } from 'child_process'
 import { Terminal } from './Terminal'
+import { ClientEvents } from '../../../types'
+
 
 
 
@@ -83,37 +85,47 @@ export class TerminalScheduler {
                 continue
             }
 
+
+            job.t_terminal.reserve()
             if (job.t_delay) {
                 job.job_timer = setTimeout(() => {
                     job.t_terminal.start()
                     job.hasRun = true
+                    job.t_terminal.unReserve()
                 }, job.t_delay);
                 continue
             }
 
-            job.job_timer = setInterval(async () => {
+            job.job_timer = setInterval(() => {
+
                 job.limit -= 1
+                job.t_terminal.socket.emit(ClientEvents.HEARTBEAT, job.limit)
+
                 if (job.limit === 0) {
                     clearInterval(job.job_timer)
                     job.t_terminal.start()
                     job.hasRun = true
+                    job.t_terminal.unReserve()
                 }
                 if (!job.t_healthCheck) {
                     clearInterval(job.job_timer)
                     job.t_terminal.start()
                     job.hasRun = true
+                    job.t_terminal.unReserve()
                     return
                 }
-                try {
-                    execSync(job.t_healthCheck).toString()
-                    job.t_terminal.start()
-                    job.hasRun = true
-                    clearInterval(job.job_timer)
-                } catch (error) {
-                    if (job.limit < 10) {
-                        job.t_terminal.sendToClient(`[Warning]: Healthcheck not passing, ${job.limit} attempts left until terminal start\n\r`)
+                exec(job.t_healthCheck, { timeout: 300 }, (error) => {
+                    if (error) {
+                        if (job.limit < 10 || job.limit % 10 === 0) {
+                            job.t_terminal.sendToClient(`[Warning]: Healthcheck not passing, ${job.limit} attempts left until terminal start\n\r`)
+                        }
+                    } else {
+                        job.t_terminal.start()
+                        job.hasRun = true
+                        job.t_terminal.unReserve()
+                        clearInterval(job.job_timer)
                     }
-                }
+                })
             }, HC_INTERVAL_MS)
         }
     }
@@ -121,8 +133,13 @@ export class TerminalScheduler {
     stop() {
         if (this.jobs.length > 0) {
             this.jobs.forEach(j => {
-                clearInterval(j.job_timer)
-                clearTimeout(j.job_timer)
+                if (j.job_timer) {
+                    j.t_terminal.socket.emit(ClientEvents.HEARTBEAT, undefined)
+                    j.t_terminal.unReserve()
+                    clearInterval(j.job_timer)
+                    clearTimeout(j.job_timer)
+                }
+
             })
         }
     }

@@ -78,10 +78,7 @@ export enum UtilityEvents {
     ENVLISTDELETE = 'environmentListDelete',
     ENVDELETE = 'environmentDelete',
     CMDMETASETTINGS = 'commandMetaSetting',
-    HEALTHSETTINGS = 'commandHealthSetting'
-}
-
-export enum TerminalEvents {
+    HEALTHSETTINGS = 'commandHealthSetting',
     CWD = 'changeCwd',
     CMD = 'changeCommand',
     SHELL = 'changeShell',
@@ -92,11 +89,13 @@ export enum TerminalEvents {
 export enum ClientEvents {
     DELTERMINAL = 'terminalDelete',
     STACKSTATE = 'stackState',
-    TERMINALSTATE = 'terminalState'
+    TERMINALSTATE = 'terminalState',
+    HEARTBEAT = 'heartbeat'
 }
 
 export type Status = {
     stackId: string
+    reserved: boolean
     cmd: Cmd
     isRunning: boolean
     cwd: string | undefined

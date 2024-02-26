@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/@/ui/tabs'
 
 type CommandSettingsProps = {
     expanded: boolean
-    data: Exclude<Cmd, undefined>
+    data: Status
     engine: TerminalUIEngine
 }
 
@@ -31,9 +31,9 @@ const CustomToolTip = ({ message }: { message: string }) => {
     )
 }
 
-function CommandSettings({ expanded, engine }: CommandSettingsProps) {
-    const [settings, setSettings] = useState<CommandMetaSetting | undefined>()
-    const [health, setHealth] = useState<Cmd['health'] | undefined>()
+function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
+    const [settings, setSettings] = useState<CommandMetaSetting | undefined>(data.cmd.metaSettings)
+    const [health, setHealth] = useState<Cmd['health'] | undefined>(data.cmd.health)
     const [tab, setTab] = useState<string | undefined>('off')
 
 
@@ -61,14 +61,19 @@ function CommandSettings({ expanded, engine }: CommandSettingsProps) {
         else {
             newHealth = undefined
         }
+        setHealth(newHealth)
         engine.socket.emit(UtilityEvents.HEALTHSETTINGS, {
             health: newHealth
         })
-        setHealth(newHealth)
+
 
     }
 
     useEffect(() => {
+
+        if (data.cmd.health) setHealth(data.cmd.health)
+        if (data.cmd.metaSettings) setSettings(data.cmd.metaSettings)
+
         engine.socket.on(ClientEvents.TERMINALSTATE, (d: Status) => {
             setHealth(d.cmd.health)
             setSettings(d.cmd.metaSettings)
@@ -78,11 +83,10 @@ function CommandSettings({ expanded, engine }: CommandSettingsProps) {
             else setTab('off')
         })
 
-        return () => {
-            engine.socket.off(ClientEvents.TERMINALSTATE)
-        }
+        // Do not remove the socket listener here. 
+        // This components parent is handling that in case it needs to.
 
-    }, [expanded])
+    }, [])
 
     return (
         <div
@@ -93,11 +97,18 @@ function CommandSettings({ expanded, engine }: CommandSettingsProps) {
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     {tab ? <Tabs value={tab} className='h-full'>
                         <TabsList className='w-[20rem]'>
-                            <TabsTrigger value="off" className='w-[100%] flex gap-2' onClick={() => handleHealthSettings()}>Off</TabsTrigger>
-                            <TabsTrigger value="time" onClick={() => setTab('time')} className='w-[100%] flex gap-2'>Time delay
-                                <CustomToolTip message="Time starts to tick when previous terminal has started" />
+                            <TabsTrigger value="off" className='w-[100%] flex gap-2'
+                                onClick={() => handleHealthSettings()}
+                                disabled={data.reserved || data.isRunning}>Off</TabsTrigger>
+                            <TabsTrigger value="time" onClick={() => setTab('time')}
+                                className='w-[100%] flex gap-2'
+                                disabled={data.reserved || data.isRunning}>Time delay
+                                <CustomToolTip message="Time starts to tick when stack is started" />
                             </TabsTrigger>
-                            <TabsTrigger value="health" onClick={() => setTab('health')} className='w-[100%] flex gap-2'>Healthcheck
+                            <TabsTrigger value="health"
+                                onClick={() => setTab('health')}
+                                className='w-[100%] flex gap-2'
+                                disabled={data.reserved || data.isRunning}>Healthcheck
                                 <CustomToolTip message="Command which on returning 0 starts this terminal" />
                             </TabsTrigger>
                         </TabsList>
@@ -109,6 +120,7 @@ function CommandSettings({ expanded, engine }: CommandSettingsProps) {
                                 min={0}
                                 type="number"
                                 placeholder='milliseconds'
+                                disabled={data.reserved || data.isRunning}
                                 defaultValue={health?.delay}
                                 onChange={(e) => handleHealthSettings(e.target.name, Number(e.target.value))}
                             />
@@ -119,6 +131,7 @@ function CommandSettings({ expanded, engine }: CommandSettingsProps) {
                                 id="healthCheck"
                                 name="healthCheck"
                                 type="text"
+                                disabled={data.reserved || data.isRunning}
                                 autoComplete='off'
                                 placeholder='curl --fail https://google.com || exit 1'
                                 defaultValue={health?.healthCheck}
@@ -136,6 +149,7 @@ function CommandSettings({ expanded, engine }: CommandSettingsProps) {
                         name="loose"
                         onCheckedChange={(e) => handleSettings('loose', e)}
                         checked={settings?.loose}
+                        disabled={data.reserved || data.isRunning}
                     />
                     <Label htmlFor="interactivity" className="flex items-center gap-2">
                         Loose terminal
@@ -147,6 +161,7 @@ function CommandSettings({ expanded, engine }: CommandSettingsProps) {
                         name="rerun"
                         onCheckedChange={(e) => handleSettings('rerun', e)}
                         checked={settings?.rerun}
+                        disabled={data.reserved}
                     />
                     <Label htmlFor="rerun">Rerun on exit</Label>
                 </div>

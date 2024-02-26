@@ -5,7 +5,6 @@ import {
     Environment,
     EnvironmentEditProps,
     Status,
-    TerminalEvents,
     Utility2Props,
     UtilityEvents,
     UtilityProps
@@ -23,8 +22,8 @@ export class Terminal {
     socket: Socket
     ptyProcess: IPty | null
     isRunning: boolean
+    isAboutToRun: boolean
     win: boolean
-    buffer: string[]
     rows: number | undefined
     cols: number | undefined
     stackPing: IPingFunction
@@ -44,7 +43,6 @@ export class Terminal {
         this.win = process.platform === 'win32' ? true : false
         this.ptyProcess = null
         this.isRunning = false
-        this.buffer = []
         this.stackPing = stackPing
         this.registerTerminalEvents()
         this.save = save
@@ -144,6 +142,15 @@ export class Terminal {
         this.prompt()
     }
 
+    reserve() {
+        this.isAboutToRun = true
+        this.ping()
+    }
+    unReserve() {
+        this.isAboutToRun = false
+        this.ping()
+    }
+
     resize(dims: ITerminalDimensions) {
         if (!dims) return
         try {
@@ -181,6 +188,7 @@ export class Terminal {
 
         return {
             stackId: this.stackId,
+            reserved: this.isAboutToRun,
             cmd: this.settings,
             isRunning: this.isRunning,
             cwd: this.settings.command.cwd ?? process.env.HOME
@@ -299,22 +307,22 @@ export class Terminal {
     }
 
     registerTerminalEvents() {
-        this.socket.on(TerminalEvents.CWD, (arg: Utility2Props) => {
+        this.socket.on(UtilityEvents.CWD, (arg: Utility2Props) => {
             console.log(`Changing cwd! new Cwd: ${arg.value}`)
             this.updateCwd(arg.value)
         })
-        this.socket.on(TerminalEvents.CMD, (arg: Utility2Props) => {
+        this.socket.on(UtilityEvents.CMD, (arg: Utility2Props) => {
             console.log(`Changing command! new CMD: ${arg.value}`)
             this.updateCommand(arg.value)
         })
-        this.socket.on(TerminalEvents.SHELL, (arg: Utility2Props) => {
+        this.socket.on(UtilityEvents.SHELL, (arg: Utility2Props) => {
             console.log(`Changing shell! new shell: ${arg.value}`)
             this.changeShell(arg.value)
         })
-        this.socket.on(TerminalEvents.INPUT, (args) => {
+        this.socket.on(UtilityEvents.INPUT, (args) => {
             this.writeFromClient(args.data)
         })
-        this.socket.on(TerminalEvents.RESIZE, (args: { value: ITerminalDimensions }) => {
+        this.socket.on(UtilityEvents.RESIZE, (args: { value: ITerminalDimensions }) => {
             this.resize(args.value)
         })
         this.socket.on(UtilityEvents.ENVLISTDELETE, (args: UtilityProps) => {
