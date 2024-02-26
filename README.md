@@ -23,7 +23,7 @@ Zsh and bash shells run as a login shell. As each terminal's cwd can be changed,
 
 StackZ has few hotkeys, which toggle additional features. The most import one is CMD+K (CTRL+K). It opens a quick navigation where you can search everything and see the other hotkeys used in the app. You'll come around disabled buttons and fields, they are placeholders for future use.
 
-You'll be naming things through out creating stacks and terminals. For terminals, you'll give each terminal notes. There you can add additional description about what the terminal does. These descriptions help you to both search the terminals from CMD+K menu, and to describe the purpose of the terminal for future you.
+You'll be naming things through out creating stacks and terminals. For terminals, you'll give each terminal notes. Notes add additional description about what the terminal does. Descriptions help you to both search the terminals from CMD+K menu, and to describe the purpose of the terminal for future you.
 
 The stacks and terminals are saved and read from a json-file. You can build your setup in the application, and by modifying the json file directly. Modifying the json-file gives you speed. You can backup your setup by taking a copy of your json-file. This enables also the ability to share the stacks with your teammates.
 
