@@ -1,5 +1,5 @@
 import { Socket, io } from 'socket.io-client'
-import { Status, TerminalEvents } from '../../../types'
+import { Status, UtilityEvents } from '../../../types'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import 'xterm/css/xterm.css'
@@ -41,7 +41,7 @@ export class TerminalUIEngine {
 
     resize() {
         this.fitAddon.fit()
-        this.socket.emit(TerminalEvents.RESIZE, {
+        this.socket.emit(UtilityEvents.RESIZE, {
             value: this.fitAddon.proposeDimensions()
         })
         return this

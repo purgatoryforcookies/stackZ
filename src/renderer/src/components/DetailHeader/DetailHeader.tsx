@@ -19,7 +19,6 @@ function DetailHeader({ terminal }: DetailHeaderProps) {
     useEffect(() => {
         if (!terminal) return
         terminal.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
-            console.log(d)
             setStatus(d)
         })
         terminal.socket.emit(UtilityEvents.STATE)
