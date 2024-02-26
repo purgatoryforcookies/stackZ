@@ -1,4 +1,4 @@
-import { ClientEvents, Cmd, SelectionEvents, Status } from '@t'
+import { ClientEvents, Cmd, SelectionEvents, Status, UtilityEvents } from '@t'
 import { useEffect, useState } from 'react'
 import { Button } from '@renderer/@/ui/button'
 import { ChevronDownIcon, ChevronUpIcon, Cross2Icon, EyeNoneIcon, HeartIcon, ReloadIcon, SymbolIcon, TimerIcon } from '@radix-ui/react-icons'
@@ -11,7 +11,6 @@ type CommandProps = {
         stackId: string,
         terminalId: string,
         method?: SelectionEvents,
-        cb?: () => void
     ) => void
     selected: boolean
     engine: TerminalUIEngine
@@ -36,6 +35,7 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
         engine.socket.on(ClientEvents.HEARTBEAT, (d: number) => {
             setHcHeartBeat(d)
         })
+        engine.socket.emit(UtilityEvents.STATE)
 
         return () => {
             engine.socket.off(ClientEvents.TERMINALSTATE)
@@ -69,7 +69,7 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
                 className="m-2 overflow-hidden rounded-md hover:cursor-pointer"
                 onClick={() => handleClick(engine.stackId, engine.terminalId, SelectionEvents.CONN)}
             >
-                <div className="pl-4 bg-black/80 flex justify-between pr-5 ">
+                <div className="pl-4 bg-black/80 flex justify-between pr-5 gap-3">
                     <span className="truncate text-secondary-foreground " dir="rtl">
                         {ping.cwd}
                     </span>
@@ -132,7 +132,12 @@ function Command({ data, handleClick, engine, selected }: CommandProps) {
                     <span className="absolute right-10 bottom-1 text-[0.7rem] text-white/30 flex gap-2">
                         {ping.cmd.metaSettings?.rerun ? <SymbolIcon className="h-4 w-4" /> : null}
                         {ping.cmd.metaSettings?.loose ? <EyeNoneIcon className="h-4 w-4" /> : null}
-                        {ping.cmd.health?.delay ? <TimerIcon className="h-4 w-4" /> : null}
+                        {ping.cmd.health?.delay ?
+                            <span className='flex relative'>
+                                <TimerIcon className="h-4 w-4" />
+                                {ping.cmd.health.delay ? <span className='absolute left-[14.5px] bottom-2'>{ping.cmd.health.delay / 1000}</span> : null}
+                            </span>
+                            : null}
                         {ping.cmd.health?.healthCheck ?
 
                             <span className='flex relative'>
