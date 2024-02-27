@@ -3,13 +3,9 @@ import { baseSocket } from '@renderer/service/socket'
 import { useEffect, useState } from 'react'
 import { ClientEvents, Cmd, PaletteStack, UtilityEvents } from '@t'
 
-
 export interface IReOrder {
     (stackId: string, terminalId: string, newOrder: number): void
 }
-
-
-
 
 export const useStack = (SOCKET_HOST: string) => {
     const [stack, setStack] = useState<Map<string, PaletteStack>>()
@@ -85,7 +81,6 @@ export const useStack = (SOCKET_HOST: string) => {
         selectTerminal(cmd.id)
     }
 
-
     /**
      *  Updates the execution order of a terminal
      */
@@ -95,9 +90,9 @@ export const useStack = (SOCKET_HOST: string) => {
         const oldPalette = selected?.palette
         if (!oldPalette) return
 
-        const objectIndex = oldPalette.findIndex(obj => obj.id === terminalId)
+        const objectIndex = oldPalette.findIndex((obj) => obj.id === terminalId)
         if (objectIndex === -1) {
-            throw new Error('Palette not found when trying to reorder');
+            throw new Error('Palette not found when trying to reorder')
         }
 
         const updatedArray = [...oldPalette]
@@ -111,9 +106,7 @@ export const useStack = (SOCKET_HOST: string) => {
 
         setStack(newStack)
 
-        baseSocket.emit(UtilityEvents.REORDER,
-            { stackId, terminalId, newOrder })
-
+        baseSocket.emit(UtilityEvents.REORDER, { stackId, terminalId, newOrder })
     }
 
     baseSocket.on(ClientEvents.DELTERMINAL, (d: { stack: string; terminal: string }) => {
@@ -134,11 +127,6 @@ export const useStack = (SOCKET_HOST: string) => {
             setTerminals(newTerminals)
         }
     })
-
-
-
-
-
 
     useEffect(() => {
         fetchTerminals()

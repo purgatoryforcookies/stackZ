@@ -11,14 +11,9 @@ import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { DraggableData } from 'react-draggable'
 import { IReOrder } from '@renderer/hooks/useStack'
 
-
 type PaletteProps = {
     data: Map<string, PaletteStack>
-    onClick: (
-        stackId: string,
-        terminalId: string,
-        method?: SelectionEvents,
-    ) => void
+    onClick: (stackId: string, terminalId: string, method?: SelectionEvents) => void
     reOrder: IReOrder
     onNewTerminal: (cmd: Cmd) => void
     onNewStack: (st: PaletteStack) => void
@@ -26,7 +21,6 @@ type PaletteProps = {
     stackId: string
     engines: Map<string, TerminalUIEngine> | undefined
 }
-
 
 function Palette({
     data,
@@ -64,7 +58,6 @@ function Palette({
     const stack = data.get(stackId)
 
     const handleDrag = (d: DraggableData, terminal: Cmd, stackId?: string) => {
-
         if (!stackId || !terminal.executionOrder) return
         const howManySlots = Math.abs(Math.floor(d.y / 120))
         if (d.y > 50) {
@@ -77,7 +70,6 @@ function Palette({
             if (oldExecutionOrder === 1) return
             reOrder(stackId, terminal.id, oldExecutionOrder - (howManySlots - 1))
         }
-
     }
 
     return (
@@ -120,24 +112,23 @@ function Palette({
             <div className="overflow-auto pb-20" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
                     ? stack.palette
-                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                        .map((cmd) => {
-                            if (!cmd?.id) return null
-                            const engine = engines?.get(cmd.id)
-                            if (!engine) return null
+                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                          .map((cmd) => {
+                              if (!cmd?.id) return null
+                              const engine = engines?.get(cmd.id)
+                              if (!engine) return null
 
-                            return (
-                                <Command
-                                    key={cmd.id}
-                                    data={cmd}
-                                    handleClick={onClick}
-                                    engine={engine}
-                                    selected={cmd.id === terminalId}
-                                    handleDrag={handleDrag}
-                                />
-
-                            )
-                        })
+                              return (
+                                  <Command
+                                      key={cmd.id}
+                                      data={cmd}
+                                      handleClick={onClick}
+                                      engine={engine}
+                                      selected={cmd.id === terminalId}
+                                      handleDrag={handleDrag}
+                                  />
+                              )
+                          })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand afterAdd={onNewTerminal} stackId={stackId} />

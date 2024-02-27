@@ -2,12 +2,11 @@
 
 Are you struggling to keep up how did that one of your dozen projects started up again? Was this project configurable with .env-file, or did I use EXPORT's in the beginning of commands? What differrent services needs to be up?
 
-
 StackZ is a developer tool which purpose is to answer above mentioned questions. Most of them atleast.
 
 With StackZ, you can create environments and pipelines withing your development machine. Each stack is easily configurable with environment variables, which get injected into the terminal when it is started. You can have multiple env-sets for each terminal, and they can be muted individually for quick adjustments, e.g. either dev, test or production enviroment. CWD's (current working directories) can be speficied within each terminal.
 
-Each terminal in a stack can be run as a sequence, or separetly. In a sequence, the order or the terminal spawns is quaranteed, and you can set delays for terminal to slow down their startup. Delaying takes effect only when you start the stack. Running a single terminal from a stack does not obey the delay. You can also set a healthcheck command (kind a like in docker compose) which on returning 0 exit will start the terminal. 
+Each terminal in a stack can be run as a sequence, or separetly. In a sequence, the order or the terminal spawns is quaranteed, and you can set delays for terminal to slow down their startup. Delaying takes effect only when you start the stack. Running a single terminal from a stack does not obey the delay. You can also set a healthcheck command (kind a like in docker compose) which on returning 0 exit will start the terminal.
 
 Terminals can be set to restart on exits, or to run as a loose terminal. Loose terminal does not listen for exists. Session remains open and does not stop until you stop it. Rerun will trigger terminal restart always, even if you stop the terminal yourself. This functionality enables for quick restarts of the terminal.
 
@@ -48,13 +47,13 @@ The stacks and terminals are saved and read from a json-file. You can build your
 
 Each environment has priority and you'll read them from left to right.
 
-On the very left, you'll have OS Environments which get inherited from your machine. They are applied first. If you have KEY's with the same name between env sets they will get overwritten by the next key present. Last key will win. 
+On the very left, you'll have OS Environments which get inherited from your machine. They are applied first. If you have KEY's with the same name between env sets they will get overwritten by the next key present. Last key will win.
 
 You can mute a single ENV by right-clicking it, or a complete set from the toolbar. Muted variables are ignored. In order to edit the list, you'll need to be in edit mode.
 
 ### Terminals
 
-When terminal is stopped you can change its settings by typing commands, or by expanding the command from the menu. 
+When terminal is stopped you can change its settings by typing commands, or by expanding the command from the menu.
 
 `cd new/path/` will change the currenct working directory (cwd) of the terminal. Directory changes inside a running terminal are ignored.
 `shell terminal` will change the terminal used. This can be for e.g.

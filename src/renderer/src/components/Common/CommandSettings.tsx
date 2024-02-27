@@ -62,7 +62,6 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
     }
 
     useEffect(() => {
-
         engine.socket.on(ClientEvents.TERMINALSTATE, (d: Status) => {
             setHealth(d.cmd.health)
             setSettings(d.cmd.metaSettings)
@@ -81,7 +80,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
             className={`w-full flex justify-around items-center transition-opacity duration-500 ease-in-out
         ${expanded ? 'opacity-100' : 'opacity-0'}`}
         >
-            {expanded ?
+            {expanded ? (
                 <>
                     <div className="w-[60%] max-w-[40rem] min-w-[22rem] gap-1.5">
                         {tab ? (
@@ -90,7 +89,9 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                     <TabsTrigger
                                         value="off"
                                         className="w-[50%] flex gap-2"
-                                        onClick={() => { handleHealthSettings(), setTab("off") }}
+                                        onClick={() => {
+                                            handleHealthSettings(), setTab('off')
+                                        }}
                                         disabled={data.reserved || data.isRunning}
                                     >
                                         Off
@@ -125,7 +126,10 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                         disabled={data.reserved || data.isRunning}
                                         defaultValue={health?.delay}
                                         onChange={(e) =>
-                                            handleHealthSettings(e.target.name, Number(e.target.value))
+                                            handleHealthSettings(
+                                                e.target.name,
+                                                Number(e.target.value)
+                                            )
                                         }
                                     />
                                 </TabsContent>
@@ -145,7 +149,6 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                 </TabsContent>
                             </Tabs>
                         ) : null}
-
                     </div>
                     <div className="flex flex-col gap-5">
                         <div className="flex items-center space-x-2">
@@ -171,7 +174,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                         </div>
                     </div>
                 </>
-                : null}
+            ) : null}
         </div>
     )
 }

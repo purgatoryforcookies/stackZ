@@ -69,10 +69,13 @@ export class Stack {
             client.on(UtilityEvents.BIGSTATE, (arg: { stack: string }) => {
                 this.palettes.get(arg.stack)?.pingState()
             })
-            client.on(UtilityEvents.REORDER, (arg: { stackId: string, terminalId: string, newOrder: number }) => {
-                this.palettes.get(arg.stackId)?.reOrderExecution(arg)
-                this.save()
-            })
+            client.on(
+                UtilityEvents.REORDER,
+                (arg: { stackId: string; terminalId: string; newOrder: number }) => {
+                    this.palettes.get(arg.stackId)?.reOrderExecution(arg)
+                    this.save()
+                }
+            )
 
             client.emit('hello')
         })

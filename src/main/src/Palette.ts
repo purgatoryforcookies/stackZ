@@ -123,17 +123,16 @@ export class Palette {
         return this.settings
     }
 
-    reOrderExecution(arg: { stackId: string, terminalId: string, newOrder: number }) {
-
+    reOrderExecution(arg: { stackId: string; terminalId: string; newOrder: number }) {
         // for updating the settings, which will be used almost all other places, than running the terminal.
         // The terminal instace contains the settings also, and they need to be updated separetly
 
         const oldPalette = this.settings.palette
         if (!oldPalette) return
 
-        const objectIndex = oldPalette.findIndex(obj => obj.id === arg.terminalId)
+        const objectIndex = oldPalette.findIndex((obj) => obj.id === arg.terminalId)
         if (objectIndex === -1) {
-            throw new Error('Palette not found when trying to reorder');
+            throw new Error('Palette not found when trying to reorder')
         }
 
         const updatedArray = [...oldPalette]
@@ -148,7 +147,7 @@ export class Palette {
         let newExecOrder = 0
         Array.from(this.terminals.values())
             .sort((a, b) => a.settings.executionOrder! - b.settings.executionOrder!)
-            .forEach(t => {
+            .forEach((t) => {
                 newExecOrder += 1
                 if (t.settings.id !== arg.terminalId) t.settings.executionOrder = newExecOrder
             })

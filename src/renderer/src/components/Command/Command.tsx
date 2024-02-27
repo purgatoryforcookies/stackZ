@@ -63,13 +63,11 @@ function Command({ data, handleClick, engine, selected, handleDrag }: CommandPro
         }
     }
 
-
-
     return (
         <Draggable
-            axis='y'
+            axis="y"
             position={{ x: 0, y: 0 }}
-            handle='.commandBody'
+            handle=".commandBody"
             onDrag={(_, d) => handleDrag(d, data)}
             onStop={(_, d) => handleDrag(d, data, engine.stackId)}
         >
@@ -80,7 +78,10 @@ function Command({ data, handleClick, engine, selected, handleDrag }: CommandPro
             >
                 <div
                     className="m-2 overflow-hidden rounded-md commandBody"
-                    onClick={() => handleClick(engine.stackId, engine.terminalId, SelectionEvents.CONN)}>
+                    onClick={() =>
+                        handleClick(engine.stackId, engine.terminalId, SelectionEvents.CONN)
+                    }
+                >
                     <div className="pl-4 bg-black/80 flex justify-between pr-5 gap-3">
                         <span className="truncate text-secondary-foreground " dir="rtl">
                             {ping.cwd}
@@ -125,10 +126,11 @@ function Command({ data, handleClick, engine, selected, handleDrag }: CommandPro
                             </div>
                         </div>
 
-                        <div className={`${expanded ? 'h-28' : 'h-0'} 
-                    transition-height duration-500 ease-in-out flex items-end pb-2`}>
+                        <div
+                            className={`${expanded ? 'h-28' : 'h-0'} 
+                    transition-height duration-500 ease-in-out flex items-end pb-2`}
+                        >
                             <CommandSettings expanded={expanded} data={ping} engine={engine} />
-
                         </div>
                         <div
                             className="flex justify-center w-full hover:scale-125 hover:cursor-pointer "
@@ -141,8 +143,12 @@ function Command({ data, handleClick, engine, selected, handleDrag }: CommandPro
                             )}
                         </div>
                         <span className="absolute right-10 bottom-1 text-[0.7rem] text-white/30 flex gap-2">
-                            {ping.cmd.metaSettings?.rerun ? <SymbolIcon className="h-4 w-4" /> : null}
-                            {ping.cmd.metaSettings?.loose ? <EyeNoneIcon className="h-4 w-4" /> : null}
+                            {ping.cmd.metaSettings?.rerun ? (
+                                <SymbolIcon className="h-4 w-4" />
+                            ) : null}
+                            {ping.cmd.metaSettings?.loose ? (
+                                <EyeNoneIcon className="h-4 w-4" />
+                            ) : null}
                             {ping.cmd.health?.delay ? (
                                 <span className="flex relative">
                                     <TimerIcon className="h-4 w-4" />
@@ -170,7 +176,6 @@ function Command({ data, handleClick, engine, selected, handleDrag }: CommandPro
                     </div>
                 </div>
             </div>
-
         </Draggable>
     )
 }
