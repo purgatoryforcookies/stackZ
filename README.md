@@ -32,6 +32,7 @@ The stacks and terminals are saved and read from a json-file. You can build your
 ## Features
 
 -   Run terminals in a pipeline
+-   Local, no cloud, no telemetry, no users, no emails
 -   Mac and windows support (linux too but might be lacking)
 -   Sequence runs with delays or healthchecks
 -   Search with CMD+K menu
