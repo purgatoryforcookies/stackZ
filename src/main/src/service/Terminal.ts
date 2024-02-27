@@ -306,6 +306,8 @@ export class Terminal {
         this.ping()
     }
 
+    // TODO: implement the listeners from below into the functions above, 
+    // this is otherwise unnessecary code
     registerTerminalEvents() {
         this.socket.on(UtilityEvents.CWD, (arg: Utility2Props) => {
             console.log(`Changing cwd! new Cwd: ${arg.value}`)

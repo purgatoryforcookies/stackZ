@@ -8,8 +8,6 @@ import { stackSchema } from '../types'
 import { exec } from 'child_process'
 
 const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
-
-// const savedCommandsPath = './stacks.json'
 const stack = new Stack(savedCommandsPath, socketServer, stackSchema)
 
 async function createWindow(): Promise<void> {
