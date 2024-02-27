@@ -58,7 +58,7 @@ You can mute a single ENV by right-clicking it, or a complete set from the toolb
 
 When terminal is stopped you can change its settings by typing commands, or by expanding the command from the menu.
 
-`cd new/path/` will change the currenct working directory (cwd) of the terminal. Directory changes inside a running terminal are ignored.
+`cd new/path/` will change the currenct working directory (cwd) of the terminal. Directory changes inside a running terminal are ignored. \n
 `shell terminal` will change the terminal used. This can be for e.g.
 
 -   bin/bash or bash (default)
