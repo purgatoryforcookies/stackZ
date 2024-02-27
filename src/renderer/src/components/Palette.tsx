@@ -8,15 +8,13 @@ import { ReloadIcon } from '@radix-ui/react-icons'
 import { baseSocket } from '@renderer/service/socket'
 import { NewStack } from './Dialogs/NewStack'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
+import { DraggableData } from 'react-draggable'
+import { IReOrder } from '@renderer/hooks/useStack'
 
 type PaletteProps = {
     data: Map<string, PaletteStack>
-    onClick: (
-        stackId: string,
-        terminalId: string,
-        method?: SelectionEvents,
-        cb?: () => void
-    ) => void
+    onClick: (stackId: string, terminalId: string, method?: SelectionEvents) => void
+    reOrder: IReOrder
     onNewTerminal: (cmd: Cmd) => void
     onNewStack: (st: PaletteStack) => void
     terminalId: string
@@ -29,6 +27,7 @@ function Palette({
     onClick,
     onNewTerminal,
     onNewStack,
+    reOrder,
     terminalId,
     stackId,
     engines
@@ -57,6 +56,22 @@ function Palette({
     }
 
     const stack = data.get(stackId)
+
+    const handleDrag = (d: DraggableData, terminal: Cmd, stackId?: string) => {
+        if (!stackId || !terminal.executionOrder) return
+        const howManySlots = Math.abs(Math.floor(d.y / 120))
+        if (d.y > 50) {
+            const oldExecutionOrder = terminal.executionOrder
+            if (!stack?.palette?.length) return
+            if (oldExecutionOrder === stack.palette.length + 1) return
+            reOrder(stackId, terminal.id, oldExecutionOrder + howManySlots)
+        }
+        if (d.y < -50) {
+            const oldExecutionOrder = terminal.executionOrder
+            if (oldExecutionOrder === 1) return
+            reOrder(stackId, terminal.id, oldExecutionOrder - (howManySlots - 1))
+        }
+    }
 
     return (
         <div className="h-full flex flex-col">
@@ -103,6 +118,7 @@ function Palette({
                               if (!cmd?.id) return null
                               const engine = engines?.get(cmd.id)
                               if (!engine) return null
+
                               return (
                                   <Command
                                       key={cmd.id}
@@ -110,6 +126,7 @@ function Palette({
                                       handleClick={onClick}
                                       engine={engine}
                                       selected={cmd.id === terminalId}
+                                      handleDrag={handleDrag}
                                   />
                               )
                           })

@@ -19,7 +19,7 @@ export const stackSchema = z.array(
             .array(
                 z.object({
                     id: z.string().default('gibberish'),
-                    executionOrder: z.number().optional().nullable(),
+                    executionOrder: z.number().optional(),
                     title: z.string().default('First command'),
                     metaSettings: z
                         .object({
@@ -83,7 +83,8 @@ export enum UtilityEvents {
     CMD = 'changeCommand',
     SHELL = 'changeShell',
     INPUT = 'input',
-    RESIZE = 'resize'
+    RESIZE = 'resize',
+    REORDER = 'reOrder'
 }
 
 export enum ClientEvents {

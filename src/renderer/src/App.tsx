@@ -30,6 +30,7 @@ function App(): JSX.Element {
         selectTerminal,
         addTerminal,
         addStack,
+        reOrder,
         selectedStack,
         selectedTerminal
     } = useStack(SOCKET_HOST)
@@ -143,6 +144,7 @@ function App(): JSX.Element {
                                             terminalId={selectedTerminal}
                                             onNewTerminal={addTerminal}
                                             onNewStack={addStack}
+                                            reOrder={reOrder}
                                         />
                                     ) : (
                                         'Loading...'

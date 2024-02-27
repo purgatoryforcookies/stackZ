@@ -1,7 +1,11 @@
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { baseSocket } from '@renderer/service/socket'
 import { useEffect, useState } from 'react'
-import { ClientEvents, Cmd, PaletteStack } from '@t'
+import { ClientEvents, Cmd, PaletteStack, UtilityEvents } from '@t'
+
+export interface IReOrder {
+    (stackId: string, terminalId: string, newOrder: number): void
+}
 
 export const useStack = (SOCKET_HOST: string) => {
     const [stack, setStack] = useState<Map<string, PaletteStack>>()
@@ -77,6 +81,34 @@ export const useStack = (SOCKET_HOST: string) => {
         selectTerminal(cmd.id)
     }
 
+    /**
+     *  Updates the execution order of a terminal
+     */
+    const reOrder: IReOrder = (stackId: string, terminalId: string, newOrder: number) => {
+        const newStack = new Map(stack)
+        const selected = newStack.get(stackId)
+        const oldPalette = selected?.palette
+        if (!oldPalette) return
+
+        const objectIndex = oldPalette.findIndex((obj) => obj.id === terminalId)
+        if (objectIndex === -1) {
+            throw new Error('Palette not found when trying to reorder')
+        }
+
+        const updatedArray = [...oldPalette]
+        const item = updatedArray.splice(objectIndex, 1)[0]
+        updatedArray.splice(newOrder - 1, 0, item)
+
+        //set the new palette and remap execution orders now that the object was moved
+        selected.palette = updatedArray.map((term, i) => {
+            return { ...term, executionOrder: i + 1 }
+        })
+
+        setStack(newStack)
+
+        baseSocket.emit(UtilityEvents.REORDER, { stackId, terminalId, newOrder })
+    }
+
     baseSocket.on(ClientEvents.DELTERMINAL, (d: { stack: string; terminal: string }) => {
         if (d.stack !== selectedStack) return
         if (stack) {
@@ -97,9 +129,7 @@ export const useStack = (SOCKET_HOST: string) => {
     })
 
     useEffect(() => {
-        setTimeout(() => {
-            fetchTerminals()
-        }, 200)
+        fetchTerminals()
     }, [])
 
     return {
@@ -110,6 +140,7 @@ export const useStack = (SOCKET_HOST: string) => {
         selectTerminal,
         addTerminal,
         addStack,
+        reOrder,
         selectedStack,
         selectedTerminal
     }
