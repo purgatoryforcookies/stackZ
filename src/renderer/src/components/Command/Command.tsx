@@ -125,15 +125,10 @@ function Command({ data, handleClick, engine, selected, handleDrag }: CommandPro
                             </div>
                         </div>
 
-                        <div
-                            className={`${expanded ? 'h-32' : 'h-0'} 
-                    transition-height duration-500 ease-in-out
-                    
-                    `}
-                        >
-                            <div className="flex gap-1 justify-center  pb-6 h-full">
-                                <CommandSettings expanded={expanded} data={ping} engine={engine} />
-                            </div>
+                        <div className={`${expanded ? 'h-28' : 'h-0'} 
+                    transition-height duration-500 ease-in-out flex items-end pb-2`}>
+                            <CommandSettings expanded={expanded} data={ping} engine={engine} />
+
                         </div>
                         <div
                             className="flex justify-center w-full hover:scale-125 hover:cursor-pointer "
