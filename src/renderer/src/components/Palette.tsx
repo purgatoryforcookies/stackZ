@@ -10,7 +10,6 @@ import { NewStack } from './Dialogs/NewStack'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { DraggableData } from 'react-draggable'
 import { IReOrder } from '@renderer/hooks/useStack'
-import { set } from 'zod'
 
 type PaletteProps = {
     data: Map<string, PaletteStack>

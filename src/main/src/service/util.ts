@@ -57,7 +57,7 @@ export const envFactory = (args: Environment[] | undefined) => {
     return allenvs.sort((a, b) => a.order - b.order)
 }
 
-export const mapEnvs = (obj: Environment[], shell?: string) => {
+export const mapEnvs = (obj: Environment[]) => {
     const reduced: Record<string, string | undefined> = {}
     obj.forEach((envSet) => {
         Object.keys(envSet.pairs).forEach((key) => {
@@ -66,9 +66,6 @@ export const mapEnvs = (obj: Environment[], shell?: string) => {
         })
     })
 
-    if (shell) {
-        if (shell === 'zsh' || shell === '/bin/zsh') reduced['TERM'] = 'xterm-256color'
-    }
 
     return reduced
 }

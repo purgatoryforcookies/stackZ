@@ -103,7 +103,7 @@ export class Terminal {
                         ? 'xterm-256color'
                         : `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
-                env: mapEnvs(this.settings.command.env as Environment[], shell),
+                env: mapEnvs(this.settings.command.env as Environment[]),
                 useConpty: this.win ? false : true,
                 rows: this.rows,
                 cols: this.cols
