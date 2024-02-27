@@ -39,6 +39,7 @@ The stacks and terminals are saved and read from a json-file. You can build your
 -   Backup, edit and share your stacks directly in the json-file
 -   Themes
 -   Combine with for e.g. taskfiles, shell scripts or docker compose files to complicate things up
+-   Drag and drop the terminals into right order
 
 ## Usage/Examples
 
