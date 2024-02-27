@@ -33,12 +33,12 @@ The stacks and terminals are saved and read from a json-file. You can build your
 
 -   Run terminals in a pipeline
 -   Mac and windows support (linux too but might be lacking)
--   Sequence runs and add delays or healthchecks
+-   Sequence runs with delays or healthchecks
 -   Search with CMD+K menu
 -   Configure environment sets, and mute/edit them
 -   Backup, edit and share your stacks directly in the json-file
--   Themes (only dark ones)
--   Combine with for e.g. taskfiles or shell scripts to complicate things up
+-   Themes
+-   Combine with for e.g. taskfiles, shell scripts or docker compose files to complicate things up
 
 ## Usage/Examples
 
