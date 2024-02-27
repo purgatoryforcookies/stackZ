@@ -10,6 +10,7 @@ import { NewStack } from './Dialogs/NewStack'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { DraggableData } from 'react-draggable'
 import { IReOrder } from '@renderer/hooks/useStack'
+import { set } from 'zod'
 
 type PaletteProps = {
     data: Map<string, PaletteStack>
@@ -38,7 +39,7 @@ function Palette({
         setRunning(false)
         baseSocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
             if (d.stack === stackId) {
-                setRunning(d.isRunning)
+                setRunning(d.isRunning || d.isReserved)
             }
         })
         baseSocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
@@ -52,6 +53,7 @@ function Palette({
             window.api.stopStack(stackId)
         } else {
             window.api.startStack(stackId)
+            setRunning(true)
         }
     }
 
@@ -113,23 +115,23 @@ function Palette({
             <div className="overflow-auto pb-20" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
                     ? stack.palette
-                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                          .map((cmd) => {
-                              if (!cmd?.id) return null
-                              const engine = engines?.get(cmd.id)
-                              if (!engine) return null
+                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                        .map((cmd) => {
+                            if (!cmd?.id) return null
+                            const engine = engines?.get(cmd.id)
+                            if (!engine) return null
 
-                              return (
-                                  <Command
-                                      key={cmd.id}
-                                      data={cmd}
-                                      handleClick={onClick}
-                                      engine={engine}
-                                      selected={cmd.id === terminalId}
-                                      handleDrag={handleDrag}
-                                  />
-                              )
-                          })
+                            return (
+                                <Command
+                                    key={cmd.id}
+                                    data={cmd}
+                                    handleClick={onClick}
+                                    engine={engine}
+                                    selected={cmd.id === terminalId}
+                                    handleDrag={handleDrag}
+                                />
+                            )
+                        })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand afterAdd={onNewTerminal} stackId={stackId} />

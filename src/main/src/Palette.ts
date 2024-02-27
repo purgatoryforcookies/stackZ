@@ -102,13 +102,15 @@ export class Palette {
         const terminalStates = [...this.terminals.values()].map((term) => {
             return {
                 id: term.settings.id,
-                running: term.isRunning
+                running: term.isRunning,
+                reserved: term.isAboutToRun
             }
         })
 
         const state: StackStatus = {
             stack: this.settings.id,
-            isRunning: terminalStates.some((term) => term.running === true),
+            isRunning: terminalStates.some((term) => term.running),
+            isReserved: terminalStates.some((term) => term.reserved),
             state: terminalStates
         }
 

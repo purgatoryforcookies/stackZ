@@ -13,6 +13,7 @@ export class Stack {
     palettes: Map<string, Palette>
     store: DataStore
     scheduler: Map<string, TerminalScheduler>
+    isRunning: boolean
 
     constructor(jsonPath: string, server: Server, schema: ZodTypeAny) {
         this.path = jsonPath
@@ -21,6 +22,7 @@ export class Stack {
         this.store = new DataStore(jsonPath, schema)
         this.palettes = new Map<string, Palette>()
         this.scheduler = new Map<string, TerminalScheduler>()
+        this.isRunning = false
     }
 
     async load() {
@@ -87,7 +89,12 @@ export class Stack {
     }
 
     startStack(stack: string) {
+        if (this.isRunning) {
+            this.stopStack(stack)
+            return
+        }
         const terms = this.palettes.get(stack)?.terminals
+        this.isRunning = true
 
         if (!terms) {
             throw new Error(`Tried to start stack ${stack}, but it was not found`)
@@ -100,6 +107,7 @@ export class Stack {
         this.palettes.get(stack)?.terminals.forEach((term) => {
             term.stop()
         })
+        this.isRunning = false
     }
 
     startTerminal(stack: string, terminal: string) {

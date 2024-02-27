@@ -113,7 +113,7 @@ function Command({ data, handleClick, engine, selected, handleDrag }: CommandPro
                                         onClick={() => handleState()}
                                         disabled={ping.reserved}
                                     >
-                                        {ping.isRunning ? (
+                                        {(ping.isRunning || ping.reserved) ? (
                                             <>
                                                 <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                                                 Running...
@@ -151,7 +151,9 @@ function Command({ data, handleClick, engine, selected, handleDrag }: CommandPro
                             ) : null}
                             {ping.cmd.health?.delay ? (
                                 <span className="flex relative">
-                                    <TimerIcon className="h-4 w-4" />
+                                    <TimerIcon className={`h-4 w-4 
+                                    ${ping.reserved ? 'text-primary brightness-110' : ''}
+                                    `} />
                                     {ping.cmd.health.delay ? (
                                         <span className="absolute left-[14.5px] bottom-2">
                                             {ping.cmd.health.delay / 1000}
@@ -161,7 +163,9 @@ function Command({ data, handleClick, engine, selected, handleDrag }: CommandPro
                             ) : null}
                             {ping.cmd.health?.healthCheck ? (
                                 <span className="flex relative">
-                                    <HeartIcon className="h-4 w-4" />
+                                    <HeartIcon className={`h-4 w-4 
+                                    ${hcHeartBeat ? 'text-primary brightness-110' : ''}
+                                    `} />
                                     {hcHeartBeat ? (
                                         <span className="absolute left-[14.5px] bottom-2">
                                             {hcHeartBeat}

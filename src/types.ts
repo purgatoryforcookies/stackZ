@@ -105,6 +105,7 @@ export type Status = {
 export type StackStatus = {
     stack: string
     isRunning: boolean
+    isReserved: boolean
     state: {
         running: boolean
         id: string

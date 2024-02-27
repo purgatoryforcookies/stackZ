@@ -104,7 +104,7 @@ export class TerminalScheduler {
                     job.t_terminal.unReserve()
                     return
                 }
-                exec(job.t_healthCheck, { timeout: 300 }, (error) => {
+                exec(job.t_healthCheck, (error) => {
                     if (error) {
                         if (job.limit < 10 || job.limit % 10 === 0) {
                             job.t_terminal.sendToClient(
@@ -130,8 +130,14 @@ export class TerminalScheduler {
                     j.t_terminal.unReserve()
                     clearInterval(j.job_timer)
                     clearTimeout(j.job_timer)
+                    try {
+                        j.t_terminal.stop()
+                    } catch {
+                        // swallow
+                    }
                 }
             })
+
         }
     }
 }
