@@ -62,7 +62,8 @@ function Palette({
         const howManySlots = Math.abs(Math.floor(d.y / 120))
         if (d.y > 50) {
             const oldExecutionOrder = terminal.executionOrder
-            if (oldExecutionOrder === stack?.palette?.length! + 1) return
+            if (!stack?.palette?.length) return
+            if (oldExecutionOrder === stack.palette.length + 1) return
             reOrder(stackId, terminal.id, oldExecutionOrder + howManySlots)
         }
         if (d.y < -50) {
