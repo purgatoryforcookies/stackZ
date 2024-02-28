@@ -82,8 +82,7 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
                     onClick={() => {
                         stack.selectStack(engine.stackId)
                         stack.selectTerminal(engine.terminalId)
-                    }
-                    }
+                    }}
                 >
                     <div className="pl-4 bg-black/80 flex justify-between pr-5 gap-3">
                         <span className="truncate text-secondary-foreground " dir="rtl">
@@ -116,12 +115,16 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
                                         onClick={() => handleState()}
                                         disabled={ping.reserved}
                                     >
-                                        {(ping.isRunning) ?
+                                        {ping.isRunning ? (
                                             <>
                                                 <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                                                 Running...
                                             </>
-                                            : ping.reserved ? 'Pending...' : 'Start'}
+                                        ) : ping.reserved ? (
+                                            'Pending...'
+                                        ) : (
+                                            'Start'
+                                        )}
                                     </Button>
                                 </div>
                             </div>
@@ -152,9 +155,11 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
                             ) : null}
                             {ping.cmd.health?.delay ? (
                                 <span className="flex relative">
-                                    <TimerIcon className={`h-4 w-4 
+                                    <TimerIcon
+                                        className={`h-4 w-4 
                                     ${ping.reserved ? 'text-primary brightness-110' : ''}
-                                    `} />
+                                    `}
+                                    />
                                     {ping.cmd.health.delay ? (
                                         <span className="absolute left-[14.5px] bottom-2">
                                             {ping.cmd.health.delay / 1000}
@@ -164,9 +169,11 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
                             ) : null}
                             {ping.cmd.health?.healthCheck ? (
                                 <span className="flex relative">
-                                    <HeartIcon className={`h-4 w-4 
+                                    <HeartIcon
+                                        className={`h-4 w-4 
                                     ${hcHeartBeat ? 'text-primary brightness-110' : ''}
-                                    `} />
+                                    `}
+                                    />
                                     {hcHeartBeat ? (
                                         <span className="absolute left-[14.5px] bottom-2">
                                             {hcHeartBeat}

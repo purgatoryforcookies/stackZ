@@ -68,7 +68,7 @@ function Settings({ setTheme }: SettingsProps) {
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-                <DotsHorizontalIcon className='w-5 h-5 absolute right-3 top-2 text-primary/90 hover:scale-110 hover:text-primary hover:cursor-pointer' />
+                <DotsHorizontalIcon className="w-5 h-5 absolute right-3 top-2 text-primary/90 hover:scale-110 hover:text-primary hover:cursor-pointer" />
             </SheetTrigger>
             <SheetContent
                 className="w-[30vw] min-w-[30rem] sm:max-w-none "

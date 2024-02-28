@@ -118,8 +118,6 @@ export class TerminalScheduler {
         job.t_terminal.unReserve()
     }
 
-
-
     stop() {
         if (this.jobs.length > 0) {
             this.jobs.forEach((j) => {
@@ -135,8 +133,7 @@ export class TerminalScheduler {
                     // swallow
                 }
             })
-
         }
+        this.jobs = []
     }
-
 }

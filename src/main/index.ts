@@ -10,8 +10,6 @@ import { exec } from 'child_process'
 const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
 const stack = new Stack(savedCommandsPath, socketServer, stackSchema)
 
-
-
 async function createWindow(): Promise<void> {
     await stack.load()
     stack.init()?.startServer()
@@ -27,7 +25,6 @@ async function createWindow(): Promise<void> {
         })
     }
 
-
     const mainWindow = new BrowserWindow({
         width: 1800,
         height: 900,
@@ -40,14 +37,13 @@ async function createWindow(): Promise<void> {
             sandbox: false
         },
         x: disp ? disp.bounds.x + 50 : undefined, //DEV
-        y: disp ? disp.bounds.y + 50 : undefined, //DEV
+        y: disp ? disp.bounds.y + 50 : undefined //DEV
     })
 
     mainWindow.on('ready-to-show', () => {
         mainWindow.show()
         // dev setup to not focus on it on save
         if (is.dev) mainWindow.blur()
-
     })
 
     mainWindow.webContents.setWindowOpenHandler((details) => {

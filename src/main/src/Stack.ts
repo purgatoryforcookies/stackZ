@@ -87,12 +87,15 @@ export class Stack {
     }
 
     startStack(stack: string) {
-
         const palette = this.palettes.get(stack)
         if (!palette) {
             throw new Error(`Tried to start stack ${stack}, but it was not found`)
         }
         palette.isRunning = true
+
+        // check if we already have a scheduler for this, if so
+        // destruct it. Otherwise there will be ghosts.
+        this.scheduler.get(stack)?.stop()
 
         this.scheduler.set(stack, new TerminalScheduler(palette.terminals))
     }

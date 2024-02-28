@@ -8,7 +8,6 @@ export interface IReOrder {
 }
 
 export interface IUseStack {
-
     stack: Map<string, PaletteStack> | undefined
     terminals: Map<string, Map<string, TerminalUIEngine>> | undefined
     loading: boolean
@@ -19,9 +18,7 @@ export interface IUseStack {
     reOrder: IReOrder
     selectedStack: string
     selectedTerminal: string
-
 }
-
 
 export const useStack = (SOCKET_HOST: string): IUseStack => {
     const [stack, setStack] = useState<Map<string, PaletteStack>>()
@@ -149,7 +146,6 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
     }, [])
 
     return {
-
         stack,
         terminals,
         loading,
@@ -160,6 +156,5 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         reOrder,
         selectedStack,
         selectedTerminal
-
     }
 }

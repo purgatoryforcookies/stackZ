@@ -38,7 +38,6 @@ function App(): JSX.Element {
         fetchPaletteWidth()
     }, [])
 
-
     const handleResize = debounce(async (e: number[], source: Panels) => {
         if (!paletteWidths) return
         stack.terminals?.get(stack.selectedStack)?.get(stack.selectedTerminal)?.resize()
@@ -56,7 +55,11 @@ function App(): JSX.Element {
                 data-theme={theme}
                 onLayout={(e) => handleResize(e, Panels.Details)}
             >
-                <CommandMenu stack={stack} togglePalette={togglePalette} toggleHeader={toggleHeader} />
+                <CommandMenu
+                    stack={stack}
+                    togglePalette={togglePalette}
+                    toggleHeader={toggleHeader}
+                />
                 <Settings setTheme={setTheme} />
                 <ResizablePanel>
                     <ResizablePanelGroup
@@ -66,7 +69,9 @@ function App(): JSX.Element {
                         <ResizablePanel>
                             {stack.terminals && !stack.loading ? (
                                 <TerminalUI
-                                    engine={stack.terminals.get(stack.selectedStack)?.get(stack.selectedTerminal)}
+                                    engine={stack.terminals
+                                        .get(stack.selectedStack)
+                                        ?.get(stack.selectedTerminal)}
                                 />
                             ) : null}
                         </ResizablePanel>
@@ -98,11 +103,11 @@ function App(): JSX.Element {
                         maxSize={99}
                         minSize={5}
                     >
-                        {stack ?
+                        {stack ? (
                             <DetailHeader stack={stack} />
-                            :
+                        ) : (
                             <Placeholder message="Select from palette to get started" />
-                        }
+                        )}
                     </ResizablePanel>
                 ) : null}
             </ResizablePanelGroup>
