@@ -3,20 +3,19 @@ import { ClientEvents, Status, UtilityEvents } from '@t'
 import EnvList from '../Common/EnvList'
 import { NewEnvList } from '../Dialogs/NewEnvList'
 import { Badge } from '@renderer/@/ui/badge'
-import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
+import { IUseStack } from '@renderer/hooks/useStack'
 
 type DetailHeaderProps = {
-    stackId: string
-    terminalId: string
-    terminal: TerminalUIEngine | undefined
+    stack: IUseStack
 }
 
-function DetailHeader({ terminal }: DetailHeaderProps) {
+function DetailHeader({ stack }: DetailHeaderProps) {
     const [status, setStatus] = useState<Status | null>(null)
     const [highlightedEnv, setHighlightedEnv] = useState<string[] | null>(null)
     const bodyRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
+        const terminal = stack.terminals?.get(stack.selectedStack)?.get(stack.selectedTerminal)
         if (!terminal) return
         terminal.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
             setStatus(d)
@@ -28,7 +27,7 @@ function DetailHeader({ terminal }: DetailHeaderProps) {
         return () => {
             terminal.socket.off(ClientEvents.TERMINALSTATE)
         }
-    }, [terminal])
+    }, [stack])
 
     const handleHighligt = (e: string[]) => {
         if (e[0] === highlightedEnv?.[0]) {
@@ -44,6 +43,7 @@ function DetailHeader({ terminal }: DetailHeaderProps) {
         }, 290)
     }
 
+    const terminal = stack.terminals?.get(stack.selectedStack)?.get(stack.selectedTerminal)
     if (!terminal) return null
 
     return (

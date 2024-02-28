@@ -14,11 +14,16 @@ async function createWindow(): Promise<void> {
     await stack.load()
     stack.init()?.startServer()
 
-    // dev setup to open screen on 2nd monitor
-    // const displays = electron.screen.getAllDisplays()
-    // const externalDisplay = displays.find((display) => {
-    //     return display.bounds.x !== 0 || display.bounds.y !== 0
-    // })
+    // dev setup to open screen on 2nd monitor for refresh
+    let disp: Electron.Display | undefined
+
+    if (is.dev) {
+        const electron = require('electron')
+        const displays = electron.screen.getAllDisplays()
+        disp = displays.find((display) => {
+            return display.bounds.x !== 0 || display.bounds.y !== 0
+        })
+    }
 
     const mainWindow = new BrowserWindow({
         width: 1800,
@@ -31,14 +36,14 @@ async function createWindow(): Promise<void> {
             preload: join(__dirname, '../preload/index.js'),
             sandbox: false
         },
-        // x: externalDisplay!.bounds.x + 50, //DEV
-        // y: externalDisplay!.bounds.y + 50 //DEV
+        x: disp ? disp.bounds.x + 50 : undefined, //DEV
+        y: disp ? disp.bounds.y + 50 : undefined //DEV
     })
 
     mainWindow.on('ready-to-show', () => {
         mainWindow.show()
         // dev setup to not focus on it on save
-        // mainWindow.blur()
+        if (is.dev) mainWindow.blur()
     })
 
     mainWindow.webContents.setWindowOpenHandler((details) => {

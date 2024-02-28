@@ -104,7 +104,7 @@ export class Terminal {
                         : `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
                 env: mapEnvs(this.settings.command.env as Environment[]),
-                useConpty: this.win ? false : true,
+                useConpty: false,
                 rows: this.rows,
                 cols: this.cols
             })
@@ -167,8 +167,8 @@ export class Terminal {
         try {
             console.log('Killing', this.settings.id)
             const code = this.win ? undefined : 'SIGHUP'
-            this.ptyProcess.kill(code)
             this.isRunning = false
+            this.ptyProcess.kill(code)
         } catch {
             //swallow
         }

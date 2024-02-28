@@ -16,11 +16,13 @@ export class Palette {
     settings: PaletteStack
     terminals: Map<string, Terminal>
     server: Server
+    isRunning: boolean
 
     constructor(settings: PaletteStack, server: Server) {
         this.settings = settings
         this.terminals = new Map<string, Terminal>()
         this.server = server
+        this.isRunning = false
     }
 
     async initTerminal(socket: Socket, remoteTerminalID: string, save: ISaveFuntion) {
