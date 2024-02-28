@@ -8,32 +8,101 @@ import {
     CommandShortcut
 } from '@renderer/@/ui/command'
 import { useContext, useEffect, useState } from 'react'
-import { PaletteStack, SelectionEvents } from '@t'
 import { ButtonIcon, GlobeIcon, LayersIcon } from '@radix-ui/react-icons'
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@renderer/@/ui/tooltip'
 import { Separator } from '@renderer/@/ui/separator'
 import { ThemeContext } from '@renderer/App'
+import { IUseStack } from '@renderer/hooks/useStack'
 
 type CommandMenuProps = {
-    stack: Map<string, PaletteStack> | undefined
-    dispatch: (stackId: string, terminalId: string, method: SelectionEvents) => void
+    stack: IUseStack
+    togglePalette: () => void
+    toggleHeader: () => void
 }
 
-export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
+export function CommandMenu({ stack, toggleHeader, togglePalette }: CommandMenuProps) {
     const theme = useContext(ThemeContext)
 
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(true)
+
+
+    const handleShortCuts = (e: KeyboardEvent) => {
+
+        switch (e.key) {
+            case 'k':
+                if (!e.metaKey && !e.ctrlKey) break
+                setOpen(!open)
+                break
+            case 'x':
+                if (!e.altKey && !e.metaKey) break
+                togglePalette()
+                break
+            case 'z':
+                if (!e.altKey && !e.metaKey) break
+                toggleHeader()
+                break
+            case 'Enter':
+                if (open) break
+                window.api.startTerminal(stack.selectedStack, stack.selectedTerminal)
+                break
+            case 'ArrowUp':
+                if (open) break
+                stack.selectTerminal((prev) => {
+                    const s = stack.stack?.get(stack.selectedStack)
+                    if (!s) return prev
+                    const oldOrder = s.palette?.find((p) => p.id === prev)?.executionOrder
+                    if (!oldOrder || (oldOrder - 1 <= 0)) return prev
+                    const newId = s.palette?.find(p => p.executionOrder === oldOrder - 1)?.id
+                    if (!newId) return prev
+                    return newId
+                })
+                break
+            case 'ArrowDown':
+                if (open) break
+                stack.selectTerminal((prev) => {
+                    const s = stack.stack?.get(stack.selectedStack)
+                    if (!s) return prev
+                    const oldOrder = s.palette?.find((p) => p.id === prev)?.executionOrder
+                    if (!oldOrder || (oldOrder + 1 > (s.palette?.length || 0))) return prev
+                    const newId = s.palette?.find(p => p.executionOrder === oldOrder + 1)?.id
+                    if (!newId) return prev
+                    return newId
+                })
+                break
+            case 'ArrowRight':
+                if (open) break
+                stack.selectStack((prev) => {
+                    const s = stack.stack
+                    if (!s) return prev
+                    const key = Array.from(s.keys()).findIndex((k) => k === prev)
+                    if (key === -1) return prev
+                    return Array.from(s.keys())[key + 1] || prev
+                })
+                break
+            case 'ArrowLeft':
+                if (open) break
+                stack.selectStack((prev) => {
+                    const s = stack.stack
+                    if (!s) return prev
+                    const key = Array.from(s.keys()).findIndex((k) => k === prev)
+                    if (key === -1) return prev
+                    return Array.from(s.keys())[key - 1] || prev
+                })
+                break
+            default:
+                break
+        }
+    }
+
 
     useEffect(() => {
-        const down = (e: KeyboardEvent) => {
-            if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault()
-                setOpen((open) => !open)
-            }
-        }
-        document.addEventListener('keydown', down, false)
-        return () => document.removeEventListener('keydown', down)
-    }, [])
+        window.addEventListener('keydown', handleShortCuts, true)
+        return () => window.removeEventListener('keydown', handleShortCuts, true)
+    }, [stack])
+
+    const st = stack.stack
+    if (!st) return null
+
 
     return (
         <CommandDialog open={open} onOpenChange={setOpen} data-theme={theme}>
@@ -41,11 +110,11 @@ export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
             <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup heading="Suggestions">
-                    <CommandItem>
+                    <CommandItem onSelect={toggleHeader}>
                         Hide/show env explorer
                         <CommandShortcut>Alt+X</CommandShortcut>
                     </CommandItem>
-                    <CommandItem>
+                    <CommandItem onSelect={togglePalette}>
                         Hide/show palette
                         <CommandShortcut>Alt+Z</CommandShortcut>
                     </CommandItem>
@@ -58,81 +127,83 @@ export function CommandMenu({ stack, dispatch }: CommandMenuProps) {
                 <Separator />
                 <CommandGroup heading="Stacks">
                     {stack
-                        ? [...stack.values()].map((stack) => {
-                              return (
-                                  <CommandItem
-                                      key={stack.id}
-                                      className="flex gap-5"
-                                      value={stack.stackName}
-                                      onSelect={() => {
-                                          dispatch(stack.id, 'gibberish', SelectionEvents.CONN)
-                                          setOpen(false)
-                                      }}
-                                  >
-                                      <div className="flex w-20 justify-between">
-                                          <span>{stack.palette?.length ?? 0}x</span>
-                                          <LayersIcon className="mr-2 h-4 w-4" />
-                                      </div>
-                                      <div className="flex justify-between w-full">
-                                          <div className="flex flex-col">
-                                              <span>{stack.stackName}</span>
-                                              <span className="text-white/20 text-[0.7rem]">
-                                                  #{stack.id}
-                                              </span>
-                                          </div>
+                        ? [...st.values()].map((s) => {
+                            return (
+                                <CommandItem
+                                    key={s.id}
+                                    className="flex gap-5"
+                                    value={s.stackName}
+                                    onSelect={() => {
+                                        stack.selectStack(s.id)
+                                        stack.selectTerminal(s.palette?.[0].id || 'gibberish')
+                                        setOpen(false)
+                                    }}
+                                >
+                                    <div className="flex w-20 justify-between">
+                                        <span>{s.palette?.length ?? 0}x</span>
+                                        <LayersIcon className="mr-2 h-4 w-4" />
+                                    </div>
+                                    <div className="flex justify-between w-full">
+                                        <div className="flex flex-col">
+                                            <span>{s.stackName}</span>
+                                            <span className="text-white/20 text-[0.7rem]">
+                                                #{s.id}
+                                            </span>
+                                        </div>
 
-                                          {stack.env?.length && stack.env.length > 0 ? (
-                                              <TooltipProvider>
-                                                  <Tooltip>
-                                                      <TooltipTrigger>
-                                                          <GlobeIcon />
-                                                      </TooltipTrigger>
-                                                      <TooltipContent side={'left'}>
-                                                          <p>Has global environments</p>
-                                                      </TooltipContent>
-                                                  </Tooltip>
-                                              </TooltipProvider>
-                                          ) : null}
-                                      </div>
-                                  </CommandItem>
-                              )
-                          })
+                                        {s.env?.length && s.env.length > 0 ? (
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger>
+                                                        <GlobeIcon />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent side={'left'}>
+                                                        <p>Has global environments</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        ) : null}
+                                    </div>
+                                </CommandItem>
+                            )
+                        })
                         : null}
                 </CommandGroup>
                 <Separator />
                 <CommandGroup heading="Terminals">
-                    {stack
-                        ? [...stack.values()].map((stack) => {
-                              if (!stack.palette) return null
-                              return stack.palette.map((cmd) => {
-                                  return (
-                                      <CommandItem
-                                          key={cmd.id}
-                                          className="flex gap-5"
-                                          value={
-                                              cmd.title +
-                                              cmd.command.cmd +
-                                              cmd.command.cwd +
-                                              stack.stackName
-                                          }
-                                          onSelect={() => {
-                                              dispatch(stack.id, cmd.id, SelectionEvents.CONN)
-                                              setOpen(false)
-                                          }}
-                                      >
-                                          <ButtonIcon className="mr-2 h-4 w-4" />
-                                          <div className="flex flex-col">
-                                              <span>{cmd.title}</span>
-                                              <div className="flex flex-col">
-                                                  <span>{cmd.command.cmd}</span>
-                                                  <span>@{cmd.command.cwd}</span>
-                                                  <span>stack: {stack.stackName}</span>
-                                              </div>
-                                          </div>
-                                      </CommandItem>
-                                  )
-                              })
-                          })
+                    {st
+                        ? [...st.values()].map((s) => {
+                            if (!s.palette) return null
+                            return s.palette.map((cmd) => {
+                                return (
+                                    <CommandItem
+                                        key={cmd.id}
+                                        className="flex gap-5"
+                                        value={
+                                            cmd.title +
+                                            cmd.command.cmd +
+                                            cmd.command.cwd +
+                                            s.stackName
+                                        }
+                                        onSelect={() => {
+                                            stack.selectStack(s.id)
+                                            stack.selectTerminal(cmd.id)
+                                            setOpen(false)
+                                        }}
+                                    >
+                                        <ButtonIcon className="mr-2 h-4 w-4" />
+                                        <div className="flex flex-col">
+                                            <span>{cmd.title}</span>
+                                            <div className="flex flex-col">
+                                                <span>{cmd.command.cmd}</span>
+                                                <span>@{cmd.command.cwd}</span>
+                                                <span>stack: {s.stackName}</span>
+                                            </div>
+                                        </div>
+                                    </CommandItem>
+                                )
+                            })
+                        })
                         : null}
                 </CommandGroup>
             </CommandList>

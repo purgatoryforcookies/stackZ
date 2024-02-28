@@ -1,4 +1,4 @@
-import { ClientEvents, Cmd, SelectionEvents, Status, UtilityEvents } from '@t'
+import { ClientEvents, Cmd, Status, UtilityEvents } from '@t'
 import { useEffect, useState } from 'react'
 import { Button } from '@renderer/@/ui/button'
 import {
@@ -14,16 +14,17 @@ import {
 import CommandSettings from '../Common/CommandSettings'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import Draggable, { DraggableData } from 'react-draggable'
+import { IUseStack } from '@renderer/hooks/useStack'
 
 type CommandProps = {
     data: Exclude<Cmd, undefined>
-    handleClick: (stackId: string, terminalId: string, method?: SelectionEvents) => void
     handleDrag: (data: DraggableData, terminal: Cmd, stack?: string) => void
     selected: boolean
     engine: TerminalUIEngine
+    stack: IUseStack
 }
 
-function Command({ data, handleClick, engine, selected, handleDrag }: CommandProps) {
+function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
     const [ping, setPing] = useState<Status>({
         stackId: engine.stackId,
         reserved: false,
@@ -78,8 +79,10 @@ function Command({ data, handleClick, engine, selected, handleDrag }: CommandPro
             >
                 <div
                     className="m-2 overflow-hidden rounded-md commandBody"
-                    onClick={() =>
-                        handleClick(engine.stackId, engine.terminalId, SelectionEvents.CONN)
+                    onClick={() => {
+                        stack.selectStack(engine.stackId)
+                        stack.selectTerminal(engine.terminalId)
+                    }
                     }
                 >
                     <div className="pl-4 bg-black/80 flex justify-between pr-5 gap-3">
@@ -113,14 +116,12 @@ function Command({ data, handleClick, engine, selected, handleDrag }: CommandPro
                                         onClick={() => handleState()}
                                         disabled={ping.reserved}
                                     >
-                                        {(ping.isRunning || ping.reserved) ? (
+                                        {(ping.isRunning) ?
                                             <>
                                                 <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                                                 Running...
                                             </>
-                                        ) : (
-                                            'Start'
-                                        )}
+                                            : ping.reserved ? 'Pending...' : 'Start'}
                                     </Button>
                                 </div>
                             </div>

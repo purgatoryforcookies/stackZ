@@ -1,5 +1,4 @@
 import { FormEvent, useContext, useState } from 'react'
-import { Cmd } from '@t'
 import {
     Dialog,
     DialogContent,
@@ -15,13 +14,13 @@ import { Button } from '@renderer/@/ui/button'
 import { Input } from '@renderer/@/ui/input'
 import { ThemeContext } from '@renderer/App'
 import { Badge } from '@renderer/@/ui/badge'
+import { IUseStack } from '@renderer/hooks/useStack'
 
 type NewCommandProps = {
-    afterAdd: (cmd: Cmd) => void
-    stackId: string
+    stack: IUseStack
 }
 
-function NewCommand({ afterAdd, stackId }: NewCommandProps) {
+function NewCommand({ stack }: NewCommandProps) {
     const [open, setOpen] = useState(false)
     const [title, setTitle] = useState<string>('')
     const [shell, setShell] = useState<string>('')
@@ -31,10 +30,10 @@ function NewCommand({ afterAdd, stackId }: NewCommandProps) {
     const handleSave = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (title.length === 0) return
-        const newCommand = await window.api.createCommand(title, stackId)
+        const newCommand = await window.api.createCommand(title, stack.selectedStack)
         setOpen(false)
         setTitle('')
-        afterAdd(newCommand)
+        stack.addTerminal(newCommand)
     }
 
     return (

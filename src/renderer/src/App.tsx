@@ -2,7 +2,7 @@ import TerminalUI from './components/TerminalUI/TerminalUI'
 import Palette from './components/Palette'
 import DetailHeader from './components/DetailHeader/DetailHeader'
 import { useEffect, useState } from 'react'
-import { Panels, SelectionEvents, StoreType } from '@t'
+import { Panels, StoreType } from '@t'
 import { SOCKET_HOST } from './service/socket'
 import Placeholder from './components/Common/Placeholder'
 import Settings from './components/Common/Settings'
@@ -17,23 +17,18 @@ export const ThemeContext = createContext('aurora')
 
 function App(): JSX.Element {
     const [paletteWidths, setPaletteWidths] = useState<StoreType['paletteWidths'] | undefined>()
-    const [editMode, setEditMode] = useState<boolean>(false)
     const [theme, setTheme] = useState<string | undefined>()
     const [headerVisible, setHeaderVisible] = useState<boolean>(true)
     const [paletteVisible, setPaletteVisible] = useState<boolean>(true)
 
-    const {
-        stack,
-        terminals,
-        loading,
-        selectStack,
-        selectTerminal,
-        addTerminal,
-        addStack,
-        reOrder,
-        selectedStack,
-        selectedTerminal
-    } = useStack(SOCKET_HOST)
+    const stack = useStack(SOCKET_HOST)
+
+    const togglePalette = () => {
+        setPaletteVisible((prev) => !prev)
+    }
+    const toggleHeader = () => {
+        setHeaderVisible((prev) => !prev)
+    }
 
     useEffect(() => {
         const fetchPaletteWidth = async () => {
@@ -43,56 +38,10 @@ function App(): JSX.Element {
         fetchPaletteWidth()
     }, [])
 
-    const handleShortCuts = (e: KeyboardEvent) => {
-        switch (e.key) {
-            case 'x':
-                if (!e.altKey) return
-                setHeaderVisible(!headerVisible)
-                break
-            case 'z':
-                if (!e.altKey) return
-                setPaletteVisible(!paletteVisible)
-                break
-            default:
-                break
-        }
-    }
-
-    useEffect(() => {
-        window.addEventListener('keydown', handleShortCuts, true)
-        return () => {
-            window.removeEventListener('keydown', handleShortCuts, true)
-        }
-    }, [headerVisible, paletteVisible])
-
-    //TODO: add more options and maybe make a hook or separate file?
-    const handleSelection = (
-        stackId: string,
-        terminalId: string,
-        method = SelectionEvents.CONN
-    ) => {
-        switch (method) {
-            case SelectionEvents.CONN:
-                selectStack(stackId)
-                selectTerminal(terminalId)
-                break
-            case SelectionEvents.START:
-                window.api.startTerminal(stackId, terminalId)
-                break
-            case SelectionEvents.EXPAND:
-                setEditMode(!editMode)
-                break
-            case SelectionEvents.NEWSTACK:
-                setEditMode(!editMode)
-                break
-            default:
-                break
-        }
-    }
 
     const handleResize = debounce(async (e: number[], source: Panels) => {
         if (!paletteWidths) return
-        terminals?.get(selectedStack)?.get(selectedTerminal)?.resize()
+        stack.terminals?.get(stack.selectedStack)?.get(stack.selectedTerminal)?.resize()
         const newWidths = { ...paletteWidths }
         if (source === Panels.Terminals) newWidths.palette1 = e[1]
         else newWidths.palette2 = e[1]
@@ -107,7 +56,7 @@ function App(): JSX.Element {
                 data-theme={theme}
                 onLayout={(e) => handleResize(e, Panels.Details)}
             >
-                <CommandMenu stack={stack} dispatch={handleSelection} />
+                <CommandMenu stack={stack} togglePalette={togglePalette} toggleHeader={toggleHeader} />
                 <Settings setTheme={setTheme} />
                 <ResizablePanel>
                     <ResizablePanelGroup
@@ -115,9 +64,9 @@ function App(): JSX.Element {
                         onLayout={(e) => handleResize(e, Panels.Terminals)}
                     >
                         <ResizablePanel>
-                            {terminals && stack && !loading ? (
+                            {stack.terminals && !stack.loading ? (
                                 <TerminalUI
-                                    engine={terminals.get(selectedStack)?.get(selectedTerminal)}
+                                    engine={stack.terminals.get(stack.selectedStack)?.get(stack.selectedTerminal)}
                                 />
                             ) : null}
                         </ResizablePanel>
@@ -135,20 +84,7 @@ function App(): JSX.Element {
                                     <span className="font-semibold text-lg">Terminals</span>
                                 </div>
                                 <div className="overflow-hidden h-full" id="paletteBackground">
-                                    {stack ? (
-                                        <Palette
-                                            data={stack}
-                                            engines={terminals?.get(selectedStack)}
-                                            onClick={handleSelection}
-                                            stackId={selectedStack}
-                                            terminalId={selectedTerminal}
-                                            onNewTerminal={addTerminal}
-                                            onNewStack={addStack}
-                                            reOrder={reOrder}
-                                        />
-                                    ) : (
-                                        'Loading...'
-                                    )}
+                                    {stack.stack ? <Palette data={stack} /> : null}
                                 </div>
                             </ResizablePanel>
                         ) : null}
@@ -162,15 +98,11 @@ function App(): JSX.Element {
                         maxSize={99}
                         minSize={5}
                     >
-                        {stack ? (
-                            <DetailHeader
-                                stackId={selectedStack}
-                                terminalId={selectedTerminal}
-                                terminal={terminals?.get(selectedStack)?.get(selectedTerminal)}
-                            />
-                        ) : (
+                        {stack ?
+                            <DetailHeader stack={stack} />
+                            :
                             <Placeholder message="Select from palette to get started" />
-                        )}
+                        }
                     </ResizablePanel>
                 ) : null}
             </ResizablePanelGroup>

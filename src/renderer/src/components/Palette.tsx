@@ -1,4 +1,4 @@
-import { ClientEvents, Cmd, PaletteStack, SelectionEvents, StackStatus, UtilityEvents } from '@t'
+import { ClientEvents, Cmd, StackStatus, UtilityEvents } from '@t'
 import { useEffect, useState } from 'react'
 import { Badge } from '@renderer/@/ui/badge'
 import NewCommand from './Dialogs/NewCommand'
@@ -7,56 +7,48 @@ import { Button } from '@renderer/@/ui/button'
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { baseSocket } from '@renderer/service/socket'
 import { NewStack } from './Dialogs/NewStack'
-import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { DraggableData } from 'react-draggable'
-import { IReOrder } from '@renderer/hooks/useStack'
+import { IUseStack } from '@renderer/hooks/useStack'
+
+
 
 type PaletteProps = {
-    data: Map<string, PaletteStack>
-    onClick: (stackId: string, terminalId: string, method?: SelectionEvents) => void
-    reOrder: IReOrder
-    onNewTerminal: (cmd: Cmd) => void
-    onNewStack: (st: PaletteStack) => void
-    terminalId: string
-    stackId: string
-    engines: Map<string, TerminalUIEngine> | undefined
+    data: IUseStack
 }
 
 function Palette({
     data,
-    onClick,
-    onNewTerminal,
-    onNewStack,
-    reOrder,
-    terminalId,
-    stackId,
-    engines
 }: PaletteProps) {
+
     const [running, setRunning] = useState<boolean>(false)
+
+    const sniffState = () => {
+        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: data })
+    }
 
     useEffect(() => {
         setRunning(false)
         baseSocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
-            if (d.stack === stackId) {
+            if (d.stack === data.selectedStack) {
                 setRunning(d.isRunning || d.isReserved)
             }
         })
-        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
+        sniffState()
         return () => {
             baseSocket.off(ClientEvents.STACKSTATE)
         }
-    }, [stackId])
+    }, [data])
 
     const toggleStack = () => {
         if (running) {
-            window.api.stopStack(stackId)
+            window.api.stopStack(data.selectedStack)
         } else {
-            window.api.startStack(stackId)
+            window.api.startStack(data.selectedStack)
             setRunning(true)
         }
     }
 
-    const stack = data.get(stackId)
+    const stack = data.stack?.get(data.selectedStack)
 
     const handleDrag = (d: DraggableData, terminal: Cmd, stackId?: string) => {
         if (!stackId || !terminal.executionOrder) return
@@ -65,31 +57,32 @@ function Palette({
             const oldExecutionOrder = terminal.executionOrder
             if (!stack?.palette?.length) return
             if (oldExecutionOrder === stack.palette.length + 1) return
-            reOrder(stackId, terminal.id, oldExecutionOrder + howManySlots)
+            data.reOrder(stackId, terminal.id, oldExecutionOrder + howManySlots)
         }
         if (d.y < -50) {
             const oldExecutionOrder = terminal.executionOrder
             if (oldExecutionOrder === 1) return
-            reOrder(stackId, terminal.id, oldExecutionOrder - (howManySlots - 1))
+            data.reOrder(stackId, terminal.id, oldExecutionOrder - (howManySlots - 1))
         }
     }
 
     return (
         <div className="h-full flex flex-col">
             <div className="flex gap-3 justify-center py-2">
-                {data &&
-                    Array.from(data.values()).map((stack) => {
+                {data.stack &&
+                    Array.from(data.stack.values()).map((stack) => {
                         return (
                             <Badge
                                 key={stack.id}
                                 onClick={() => {
                                     let firstTerminalId = ''
-                                    const firstOneOnStack = data.get(stack.id)?.palette
+                                    const firstOneOnStack = data.stack?.get(stack.id)?.palette
                                     if (!firstOneOnStack) firstTerminalId = 'gibberish'
                                     else firstTerminalId = firstOneOnStack[0].id
-                                    onClick(stack.id, firstTerminalId, SelectionEvents.CONN)
+                                    data.selectStack(stack.id)
+                                    data.selectTerminal(firstTerminalId)
                                 }}
-                                variant={stackId === stack.id ? 'default' : 'outline'}
+                                variant={data.selectedStack === stack.id ? 'default' : 'outline'}
                                 className={`hover:bg-primary hover:text-background 
                         hover:cursor-pointer`}
                             >
@@ -97,7 +90,7 @@ function Palette({
                             </Badge>
                         )
                     })}
-                <NewStack set={onNewStack} />
+                <NewStack set={data.addStack} />
             </div>
             <div className="flex w-full justify-end pr-12">
                 <Button variant={'link'} size={'sm'} onClick={toggleStack}>
@@ -117,23 +110,22 @@ function Palette({
                         .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
                         .map((cmd) => {
                             if (!cmd?.id) return null
-                            const engine = engines?.get(cmd.id)
+                            const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
                             if (!engine) return null
-
                             return (
                                 <Command
                                     key={cmd.id}
                                     data={cmd}
-                                    handleClick={onClick}
                                     engine={engine}
-                                    selected={cmd.id === terminalId}
+                                    selected={cmd.id === data.selectedTerminal}
                                     handleDrag={handleDrag}
+                                    stack={data}
                                 />
                             )
                         })
                     : null}
                 <div className="w-full flex justify-center ">
-                    <NewCommand afterAdd={onNewTerminal} stackId={stackId} />
+                    <NewCommand stack={data} />
                 </div>
             </div>
         </div>

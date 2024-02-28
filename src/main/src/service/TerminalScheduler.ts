@@ -62,27 +62,23 @@ export class TerminalScheduler {
                 })
             })
 
-        this.start()
+        this.set()
     }
 
-    start() {
+    set() {
         if (this.jobs.length === 0) return
 
         for (let i = 0; i < this.jobs.length; i++) {
             const job = this.jobs[i]
             if (!job.t_delay && !job.t_healthCheck) {
-                job.t_terminal.sendToClient('No healthchecks, starting immediately \n\r')
-                job.t_terminal.start()
-                job.hasRun = true
+                this.start(job)
                 continue
             }
 
             job.t_terminal.reserve()
             if (job.t_delay) {
                 job.job_timer = setTimeout(() => {
-                    job.t_terminal.start()
-                    job.hasRun = true
-                    job.t_terminal.unReserve()
+                    this.start(job)
                 }, job.t_delay)
                 continue
             }
@@ -93,15 +89,11 @@ export class TerminalScheduler {
 
                 if (job.limit === 0) {
                     clearInterval(job.job_timer)
-                    job.t_terminal.start()
-                    job.hasRun = true
-                    job.t_terminal.unReserve()
+                    this.start(job)
                 }
                 if (!job.t_healthCheck) {
                     clearInterval(job.job_timer)
-                    job.t_terminal.start()
-                    job.hasRun = true
-                    job.t_terminal.unReserve()
+                    this.start(job)
                     return
                 }
                 exec(job.t_healthCheck, (error) => {
@@ -112,15 +104,21 @@ export class TerminalScheduler {
                             )
                         }
                     } else {
-                        job.t_terminal.start()
-                        job.hasRun = true
-                        job.t_terminal.unReserve()
+                        this.start(job)
                         clearInterval(job.job_timer)
                     }
                 })
             }, HC_INTERVAL_MS)
         }
     }
+
+    start(job: StartJob) {
+        job.t_terminal.start()
+        job.hasRun = true
+        job.t_terminal.unReserve()
+    }
+
+
 
     stop() {
         if (this.jobs.length > 0) {
@@ -130,14 +128,15 @@ export class TerminalScheduler {
                     j.t_terminal.unReserve()
                     clearInterval(j.job_timer)
                     clearTimeout(j.job_timer)
-                    try {
-                        j.t_terminal.stop()
-                    } catch {
-                        // swallow
-                    }
+                }
+                try {
+                    j.t_terminal.stop()
+                } catch {
+                    // swallow
                 }
             })
 
         }
     }
+
 }
