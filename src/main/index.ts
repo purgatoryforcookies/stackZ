@@ -10,6 +10,15 @@ import { exec } from 'child_process'
 const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
 const stack = new Stack(savedCommandsPath, socketServer, stackSchema)
 
+process.on('uncaughtException', (err) => {
+    if (err.message.includes('Pty seems to have been killed already')) {
+        // this might be fixed when moving stacks to individual sockets
+        console.log('Rare pty error swallowed')
+        return
+    }
+    throw err
+})
+
 async function createWindow(): Promise<void> {
     await stack.load()
     stack.init()?.startServer()

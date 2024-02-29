@@ -77,18 +77,19 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
 
     return (
         <div
-            className={`w-full flex justify-around items-center transition-opacity duration-500 ease-in-out
+            className={`transition-opacity duration-500 ease-in-out flex items-center gap-3 justify-center w-full
+            
         ${expanded ? 'opacity-100' : 'opacity-0'}`}
         >
             {expanded ? (
                 <>
-                    <div className="w-[60%] max-w-[40rem] min-w-[22rem] gap-1.5">
+                    <div className={`h-20`}>
                         {tab ? (
-                            <Tabs value={tab} className="w-[90%]">
+                            <Tabs value={tab} className="">
                                 <TabsList className="w-full">
                                     <TabsTrigger
                                         value="off"
-                                        className="w-[50%] flex gap-2"
+                                        className=" flex gap-2"
                                         onClick={() => {
                                             handleHealthSettings(), setTab('off')
                                         }}
@@ -99,7 +100,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                     <TabsTrigger
                                         value="time"
                                         onClick={() => setTab('time')}
-                                        className="w-[100%] flex gap-2"
+                                        className=" flex gap-2"
                                         disabled={data.reserved || data.isRunning}
                                     >
                                         Time delay
@@ -108,7 +109,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                     <TabsTrigger
                                         value="health"
                                         onClick={() => setTab('health')}
-                                        className="w-[100%] flex gap-2"
+                                        className="flex gap-2"
                                         disabled={data.reserved || data.isRunning}
                                     >
                                         Healthcheck

@@ -71,7 +71,7 @@ export enum SelectionEvents {
 
 export enum UtilityEvents {
     STATE = 'state',
-    BIGSTATE = 'bigState',
+    STACKSTATE = 'stackState',
     ENVEDIT = 'environmentEdit',
     ENVMUTE = 'environmentMute',
     ENVLIST = 'environmentList',

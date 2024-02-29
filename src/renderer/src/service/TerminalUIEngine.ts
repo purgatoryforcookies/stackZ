@@ -66,7 +66,7 @@ export class TerminalUIEngine {
         })
 
         this.socket.on('error', (err) => {
-            this.write(`Error - ${this.socket.id} ${err.message}`)
+            this.write(`Error ${this.socket.id} ${err.message}`)
             this.prompt()
             this.write(`-----------------------------`)
             this.prompt()

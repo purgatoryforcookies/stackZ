@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { PaletteStack, UtilityEvents } from '../../types'
+import { PaletteStack } from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './service/DataStore'
 import { ZodTypeAny } from 'zod'
@@ -56,28 +56,21 @@ export class Stack {
         this.server.listen(port)
         console.log(`Starting server in ${port}`)
         this.server.on('connection', (client) => {
-            console.log(`Client ${client.id} connected`)
+
             const stackId = String(client.handshake.query.stack)
-            const remoteTerminalID = String(client.handshake.query.id)
+            const remoteTerminalID = client.handshake.query.id
             const palette = this.palettes.get(stackId)
 
             if (palette) {
-                palette.initTerminal(client, remoteTerminalID, this.save.bind(this))
-                return
-            }
-
-            client.on(UtilityEvents.BIGSTATE, (arg: { stack: string }) => {
-                this.palettes.get(arg.stack)?.pingState()
-            })
-            client.on(
-                UtilityEvents.REORDER,
-                (arg: { stackId: string; terminalId: string; newOrder: number }) => {
-                    this.palettes.get(arg.stackId)?.reOrderExecution(arg)
-                    this.save()
+                if (!remoteTerminalID) {
+                    console.log(`Stack ${stackId} connected`)
+                    palette.installStackSocket(client)
                 }
-            )
-
-            client.emit('hello')
+                else {
+                    console.log(`Terminal ${remoteTerminalID} connected`)
+                    palette.initTerminal(client, String(remoteTerminalID), this.save.bind(this))
+                }
+            }
         })
     }
 

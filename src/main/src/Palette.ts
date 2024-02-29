@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { ClientEvents, Cmd, PaletteStack, StackStatus } from '../../types'
+import { ClientEvents, Cmd, PaletteStack, StackStatus, UtilityEvents } from '../../types'
 import { Terminal } from './service/Terminal'
 import { Server, Socket } from 'socket.io'
 import { store } from './service/Store'
@@ -16,6 +16,7 @@ export class Palette {
     settings: PaletteStack
     terminals: Map<string, Terminal>
     server: Server
+    socket: Socket | null
     isRunning: boolean
 
     constructor(settings: PaletteStack, server: Server) {
@@ -23,6 +24,7 @@ export class Palette {
         this.terminals = new Map<string, Terminal>()
         this.server = server
         this.isRunning = false
+        this.socket = null
     }
 
     async initTerminal(socket: Socket, remoteTerminalID: string, save: ISaveFuntion) {
@@ -40,14 +42,29 @@ export class Palette {
             newTerminal.ping()
             return
         }
-
+        if (!this.socket) return
         throw new Error(`No terminal found ${remoteTerminalID}`)
     }
 
     deleteTerminal(terminalId: string) {
-        console.log(`Removing stack ${terminalId}, ${this.settings.id}`)
+        console.log(`Removing terminal ${terminalId}, ${this.settings.id}`)
         this.terminals.delete(terminalId)
         this.settings.palette = this.settings.palette?.filter((pal) => pal.id !== terminalId)
+    }
+    installStackSocket(socket: Socket) {
+        this.socket = socket
+
+        socket.on(UtilityEvents.STACKSTATE, () => {
+            this.pingState()
+        })
+        socket.on(
+            UtilityEvents.REORDER,
+            (arg: { terminalId: string; newOrder: number }) => {
+                this.reOrderExecution(arg)
+            }
+        )
+        socket.emit("hello")
+        this.pingState()
     }
 
     async createCommand(title: string) {
@@ -83,6 +100,7 @@ export class Palette {
         const terminal = this.terminals.get(id)
         if (!terminal) return false
         terminal.start()
+        this.pingState()
         return true
     }
 
@@ -91,6 +109,7 @@ export class Palette {
         const terminal = this.terminals.get(id)
         if (!terminal) return false
         terminal.stop()
+        this.pingState()
         return true
     }
 
@@ -115,8 +134,8 @@ export class Palette {
             isReserved: terminalStates.some((term) => term.reserved),
             state: terminalStates
         }
-
-        this.server.emit(ClientEvents.STACKSTATE, state)
+        if (!this.socket) return
+        this.socket.emit(ClientEvents.STACKSTATE, state)
     }
 
     pingAll() {
@@ -127,7 +146,7 @@ export class Palette {
         return this.settings
     }
 
-    reOrderExecution(arg: { stackId: string; terminalId: string; newOrder: number }) {
+    reOrderExecution(arg: { terminalId: string; newOrder: number }) {
         // for updating the settings, which will be used almost all other places, than running the terminal.
         // The terminal instace contains the settings also, and they need to be updated separetly
 

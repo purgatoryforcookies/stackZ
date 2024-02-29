@@ -5,7 +5,6 @@ import NewCommand from './Dialogs/NewCommand'
 import Command from './Command/Command'
 import { Button } from '@renderer/@/ui/button'
 import { ReloadIcon } from '@radix-ui/react-icons'
-import { baseSocket } from '@renderer/service/socket'
 import { NewStack } from './Dialogs/NewStack'
 import { DraggableData } from 'react-draggable'
 import { IUseStack } from '@renderer/hooks/useStack'
@@ -17,20 +16,19 @@ type PaletteProps = {
 function Palette({ data }: PaletteProps) {
     const [running, setRunning] = useState<boolean>(false)
 
-    const sniffState = () => {
-        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: data })
-    }
 
     useEffect(() => {
-        setRunning(false)
-        baseSocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
-            if (d.stack === data.selectedStack) {
-                setRunning(d.isRunning || d.isReserved)
-            }
+        const socket = data.stackSocket?.get(data.selectedStack)
+        if (!socket) return
+
+
+        socket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
+            setRunning(d.isRunning || d.isReserved)
         })
-        sniffState()
+
+        socket.emit(UtilityEvents.STACKSTATE)
         return () => {
-            baseSocket.off(ClientEvents.STACKSTATE)
+            socket.off(ClientEvents.STACKSTATE)
         }
     }, [data])
 
@@ -102,22 +100,22 @@ function Palette({ data }: PaletteProps) {
             <div className="overflow-auto pb-20" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
                     ? stack.palette
-                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                          .map((cmd) => {
-                              if (!cmd?.id) return null
-                              const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
-                              if (!engine) return null
-                              return (
-                                  <Command
-                                      key={cmd.id}
-                                      data={cmd}
-                                      engine={engine}
-                                      selected={cmd.id === data.selectedTerminal}
-                                      handleDrag={handleDrag}
-                                      stack={data}
-                                  />
-                              )
-                          })
+                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                        .map((cmd) => {
+                            if (!cmd?.id) return null
+                            const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
+                            if (!engine) return null
+                            return (
+                                <Command
+                                    key={cmd.id}
+                                    data={cmd}
+                                    engine={engine}
+                                    selected={cmd.id === data.selectedTerminal}
+                                    handleDrag={handleDrag}
+                                    stack={data}
+                                />
+                            )
+                        })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand stack={data} />

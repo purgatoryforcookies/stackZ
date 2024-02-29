@@ -124,7 +124,7 @@ export class Terminal {
 
                 const divider = Array(10).fill('-').join('')
                 this.sendToClient(`${divider}\r\n$ `)
-                this.stop()
+
                 if (this.settings.metaSettings?.rerun) {
                     this.start()
                 }
@@ -163,12 +163,11 @@ export class Terminal {
     }
 
     stop() {
-        if (!this.ptyProcess) return
+
         try {
-            console.log('Killing', this.settings.id)
             const code = this.win ? undefined : 'SIGHUP'
             this.isRunning = false
-            this.ptyProcess.kill(code)
+            this.ptyProcess?.kill(code)
         } catch {
             //swallow
         }
@@ -205,11 +204,14 @@ export class Terminal {
     }
 
     write(data: string) {
-        this.ptyProcess?.write(data)
+        if (!this.ptyProcess) return
+        this.ptyProcess.write(data)
+
     }
 
     prompt() {
-        this.ptyProcess?.write(`\r`)
+        if (!this.ptyProcess) return
+        this.ptyProcess.write(`\r`)
     }
 
     editVariable(args: EnvironmentEditProps) {
