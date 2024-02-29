@@ -17,6 +17,7 @@ function Palette({ data }: PaletteProps) {
     const [running, setRunning] = useState<boolean>(false)
 
 
+
     useEffect(() => {
         const socket = data.stackSocket?.get(data.selectedStack)
         if (!socket) return
@@ -90,7 +91,7 @@ function Palette({ data }: PaletteProps) {
                     {running ? (
                         <>
                             <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                            Running...
+                            Stop
                         </>
                     ) : (
                         'Start stack'

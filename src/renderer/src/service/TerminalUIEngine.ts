@@ -1,7 +1,8 @@
 import { Socket, io } from 'socket.io-client'
-import { Status, UtilityEvents } from '../../../types'
+import { ClientEvents, Status, UtilityEvents } from '../../../types'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
+import { SearchAddon } from '@xterm/addon-search';
 import 'xterm/css/xterm.css'
 
 export class TerminalUIEngine {
@@ -10,7 +11,8 @@ export class TerminalUIEngine {
             cursor: '#f7571c'
         },
         cursorBlink: true,
-        rightClickSelectsWord: false
+        rightClickSelectsWord: false,
+        allowProposedApi: true
     })
     socket: Socket
     private mounted = false
@@ -20,16 +22,21 @@ export class TerminalUIEngine {
     stackId: string
     terminalId: string
     private fitAddon: FitAddon
+    private searchAddon: SearchAddon
     private hostdiv: HTMLElement
     private buffer: string
+    private searchWord: string
 
     constructor(stackId: string, terminalId: string, host: string) {
         this.fitAddon = new FitAddon()
+        this.searchAddon = new SearchAddon()
         this.stackId = stackId
         this.terminalId = terminalId
         this.host = host
         this.terminal.loadAddon(this.fitAddon)
+        this.terminal.loadAddon(this.searchAddon)
         this.buffer = ''
+        this.searchWord = ''
     }
 
     isMounted() {
@@ -37,6 +44,21 @@ export class TerminalUIEngine {
     }
     isListening() {
         return this.isConnected
+    }
+    search(word?: string) {
+        if (word) this.searchWord = word
+        this.searchAddon.findPrevious(word || this.searchWord, {
+            decorations: {
+                activeMatchColorOverviewRuler: "#888a89",
+                activeMatchBackground: '#888a89',
+                matchOverviewRuler: "#403830",
+                matchBackground: '#403830',
+
+            }
+        })
+    }
+    blurSearch() {
+        this.searchAddon.clearDecorations()
     }
 
     resize() {
@@ -53,9 +75,10 @@ export class TerminalUIEngine {
         })
         this.socket.on('output', (data: string) => {
             this.write(data)
+
         })
 
-        this.socket.on('terminalState', (data: Status) => {
+        this.socket.on(ClientEvents.TERMINALSTATE, (data: Status) => {
             this.isRunning = data.isRunning
         })
 
@@ -87,6 +110,7 @@ export class TerminalUIEngine {
                     if (this.buffer.length === 0) break
                     this.buffer = this.buffer.slice(0, -1)
                     this.write('\b \b')
+
                     break
                 }
                 case 'ArrowDown':
@@ -157,6 +181,7 @@ export class TerminalUIEngine {
     }
 
     changeSettingsMaybe(command: string) {
+
         if (command.slice(0, 2) === 'cd') {
             this.socket.emit('changeCwd', {
                 stack: this.stackId,
