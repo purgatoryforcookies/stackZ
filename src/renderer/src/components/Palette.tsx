@@ -16,12 +16,9 @@ type PaletteProps = {
 function Palette({ data }: PaletteProps) {
     const [running, setRunning] = useState<boolean>(false)
 
-
-
     useEffect(() => {
         const socket = data.stackSocket?.get(data.selectedStack)
         if (!socket) return
-
 
         socket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
             setRunning(d.isRunning || d.isReserved)
@@ -101,22 +98,22 @@ function Palette({ data }: PaletteProps) {
             <div className="overflow-auto pb-20" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
                     ? stack.palette
-                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                        .map((cmd) => {
-                            if (!cmd?.id) return null
-                            const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
-                            if (!engine) return null
-                            return (
-                                <Command
-                                    key={cmd.id}
-                                    data={cmd}
-                                    engine={engine}
-                                    selected={cmd.id === data.selectedTerminal}
-                                    handleDrag={handleDrag}
-                                    stack={data}
-                                />
-                            )
-                        })
+                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                          .map((cmd) => {
+                              if (!cmd?.id) return null
+                              const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
+                              if (!engine) return null
+                              return (
+                                  <Command
+                                      key={cmd.id}
+                                      data={cmd}
+                                      engine={engine}
+                                      selected={cmd.id === data.selectedTerminal}
+                                      handleDrag={handleDrag}
+                                      stack={data}
+                                  />
+                              )
+                          })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand stack={data} />

@@ -116,7 +116,6 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         const connection = stackSocket.get(stackId)
         if (!connection) return
 
-
         const newStack = new Map(stack)
         const selected = newStack.get(stackId)
         const oldPalette = selected?.palette

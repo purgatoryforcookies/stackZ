@@ -36,9 +36,8 @@ function App(): JSX.Element {
             setPaletteWidths(width as StoreType['paletteWidths'])
         }
         fetchPaletteWidth()
-        window.addEventListener('resize', handleResize);
+        window.addEventListener('resize', handleResize)
         return () => window.removeEventListener('resize', handleResize)
-
     }, [])
 
     const handleResize = debounce(async (e: number[], source: Panels) => {
@@ -69,7 +68,7 @@ function App(): JSX.Element {
                         direction="horizontal"
                         onLayout={(e) => handleResize(e, Panels.Terminals)}
                     >
-                        <ResizablePanel className='relative'>
+                        <ResizablePanel className="relative">
                             {stack.terminals && !stack.loading ? (
                                 <TerminalUI
                                     engine={stack.terminals

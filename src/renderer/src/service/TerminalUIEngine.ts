@@ -2,7 +2,7 @@ import { Socket, io } from 'socket.io-client'
 import { ClientEvents, Status, UtilityEvents } from '../../../types'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
-import { SearchAddon } from '@xterm/addon-search';
+import { SearchAddon } from '@xterm/addon-search'
 import 'xterm/css/xterm.css'
 
 export class TerminalUIEngine {
@@ -49,11 +49,10 @@ export class TerminalUIEngine {
         if (word) this.searchWord = word
         this.searchAddon.findPrevious(word || this.searchWord, {
             decorations: {
-                activeMatchColorOverviewRuler: "#888a89",
+                activeMatchColorOverviewRuler: '#888a89',
                 activeMatchBackground: '#888a89',
-                matchOverviewRuler: "#403830",
-                matchBackground: '#403830',
-
+                matchOverviewRuler: '#403830',
+                matchBackground: '#403830'
             }
         })
     }
@@ -75,7 +74,6 @@ export class TerminalUIEngine {
         })
         this.socket.on('output', (data: string) => {
             this.write(data)
-
         })
 
         this.socket.on(ClientEvents.TERMINALSTATE, (data: Status) => {
@@ -181,7 +179,6 @@ export class TerminalUIEngine {
     }
 
     changeSettingsMaybe(command: string) {
-
         if (command.slice(0, 2) === 'cd') {
             this.socket.emit('changeCwd', {
                 stack: this.stackId,

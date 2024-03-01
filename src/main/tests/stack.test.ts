@@ -168,47 +168,46 @@ describe('stack', () => {
     it.todo('Starts and stops each terminal')
 
     describe('Socket events :)', () => {
-        let utilitySocket: Socket
+        let stackMockSockets: Socket[] = []
 
         beforeAll(async () => {
-            utilitySocket = await new Promise<Socket>((r) => {
-                const sock = io(SOCKET_HOST_FOR_CLIENT)
-                sock.on('hello', () => {
-                    r(sock)
-                })
+            Array.from(testStacks.keys()).forEach(id => {
+                stackMockSockets.push(io(SOCKET_HOST_FOR_CLIENT, {
+                    query: { stack: id }
+                }))
             })
         })
 
         afterAll(() => {
-            if (utilitySocket) utilitySocket.disconnect()
+            stackMockSockets.forEach(s => {
+                s.disconnect()
+            })
             uiSockets.forEach((sock) => {
                 sock.disconnect()
             })
         })
 
-        // We have 3 stacks and 12 terminals
+        // We have 3 stacks and 12 terminals (4 in each)
 
-        it('Emits stacks state for al terminals of a stack if terminal id is not given', (done) => {
+        it('Emits stacks state for all terminals of a stack if terminal id is not given', (done) => {
             let stackCounter = 0
-            let terminalCounter = 0
 
-            utilitySocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
-                expect(d.stack).toBeDefined()
-                expect(d.state.length).toBe(4)
-                expect(d.state[0].id).toBeDefined()
-                expect(d.state[0].running).toBeDefined()
+            stackMockSockets.forEach(socket => {
+                socket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
+                    expect(d.stack).toBeDefined()
+                    expect(d.state.length).toBe(4)
+                    expect(d.state[0].id).toBeDefined()
+                    expect(d.state[0].running).toBeDefined()
 
-                stackCounter += 1
-                terminalCounter += d.state.length
-
-                if (stackCounter === 3 && terminalCounter === 12) {
-                    done()
-                }
+                    stackCounter += 1
+                    if (stackCounter === 3) {
+                        done()
+                    }
+                })
+                socket.emit(UtilityEvents.STACKSTATE)
             })
 
-            for (const [stackId] of testStacks) {
-                utilitySocket.emit(UtilityEvents.BIGSTATE, { stack: stackId })
-            }
+
         }, 1000)
 
         it("Emits individial terminals state with given id's", (done) => {

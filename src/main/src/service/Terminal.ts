@@ -163,7 +163,6 @@ export class Terminal {
     }
 
     stop() {
-
         try {
             const code = this.win ? undefined : 'SIGHUP'
             this.isRunning = false
@@ -206,7 +205,6 @@ export class Terminal {
     write(data: string) {
         if (!this.ptyProcess) return
         this.ptyProcess.write(data)
-
     }
 
     prompt() {

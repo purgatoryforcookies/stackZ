@@ -56,7 +56,6 @@ export class Stack {
         this.server.listen(port)
         console.log(`Starting server in ${port}`)
         this.server.on('connection', (client) => {
-
             const stackId = String(client.handshake.query.stack)
             const remoteTerminalID = client.handshake.query.id
             const palette = this.palettes.get(stackId)
@@ -65,8 +64,7 @@ export class Stack {
                 if (!remoteTerminalID) {
                     console.log(`Stack ${stackId} connected`)
                     palette.installStackSocket(client)
-                }
-                else {
+                } else {
                     console.log(`Terminal ${remoteTerminalID} connected`)
                     palette.initTerminal(client, String(remoteTerminalID), this.save.bind(this))
                 }
