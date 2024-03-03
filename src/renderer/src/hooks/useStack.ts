@@ -18,6 +18,7 @@ export interface IUseStack {
     addTerminal: (cmd: Cmd) => void
     addStack: (st: PaletteStack) => void
     reOrder: IReOrder
+    askForResize: () => void
     selectedStack: string
     selectedTerminal: string
 }
@@ -159,6 +160,14 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         }
     })
 
+
+    const askForResize = () => {
+        console.log("Asking for resize", selectedStack, selectedTerminal)
+        terminals?.get(selectedStack)?.get(selectedTerminal)?.resize()
+    }
+
+
+
     useEffect(() => {
         fetchTerminals()
     }, [])
@@ -173,6 +182,7 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         addTerminal,
         addStack,
         reOrder,
+        askForResize,
         selectedStack,
         selectedTerminal
     }

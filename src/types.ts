@@ -144,8 +144,8 @@ export enum Panels {
 
 export type StoreType = {
     paletteWidths: {
-        palette1: number
-        palette2: number
+        header: number
+        palette: number
     }
     userSettings: {
         defaultShell: string

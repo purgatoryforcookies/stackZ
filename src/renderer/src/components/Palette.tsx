@@ -1,5 +1,5 @@
 import { ClientEvents, Cmd, StackStatus, UtilityEvents } from '@t'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Badge } from '@renderer/@/ui/badge'
 import NewCommand from './Dialogs/NewCommand'
 import Command from './Command/Command'
@@ -8,14 +8,21 @@ import { ReloadIcon } from '@radix-ui/react-icons'
 import { NewStack } from './Dialogs/NewStack'
 import { DraggableData } from 'react-draggable'
 import { IUseStack } from '@renderer/hooks/useStack'
+import { useTaalasmaa } from '@renderer/hooks/useTaalasmaa'
+import CommandSM from './Command/CommandSM'
 
 type PaletteProps = {
     data: IUseStack
 }
 
+const W_LIMIT_FOR_SM = 300
+
 function Palette({ data }: PaletteProps) {
     const [running, setRunning] = useState<boolean>(false)
+    const paletteRef = useRef<HTMLDivElement>(null)
 
+    const { w } = useTaalasmaa(paletteRef)
+    // console.log(w)
     useEffect(() => {
         const socket = data.stackSocket?.get(data.selectedStack)
         if (!socket) return
@@ -56,10 +63,11 @@ function Palette({ data }: PaletteProps) {
             data.reOrder(stackId, terminal.id, oldExecutionOrder - (howManySlots - 1))
         }
     }
+    const isCompact = w && w < W_LIMIT_FOR_SM
 
     return (
-        <div className="h-full flex flex-col">
-            <div className="flex gap-3 justify-center py-2">
+        <div className="h-full flex flex-col" ref={paletteRef}>
+            <div className="flex gap-3 justify-center py-5 flex-wrap px-4">
                 {data.stack &&
                     Array.from(data.stack.values()).map((stack) => {
                         return (
@@ -74,7 +82,7 @@ function Palette({ data }: PaletteProps) {
                                     data.selectTerminal(firstTerminalId)
                                 }}
                                 variant={data.selectedStack === stack.id ? 'default' : 'outline'}
-                                className={`hover:bg-primary hover:text-background 
+                                className={`hover:bg-primary hover:text-background text-nowrap
                         hover:cursor-pointer`}
                             >
                                 {stack.stackName}
@@ -83,7 +91,7 @@ function Palette({ data }: PaletteProps) {
                     })}
                 <NewStack set={data.addStack} />
             </div>
-            <div className="flex w-full justify-end pr-12">
+            <div className={`flex w-full mb-2  ${isCompact ? 'justify-center p-2 bg-card' : 'justify-end pr-12'}`}>
                 <Button variant={'link'} size={'sm'} onClick={toggleStack}>
                     {running ? (
                         <>
@@ -98,22 +106,31 @@ function Palette({ data }: PaletteProps) {
             <div className="overflow-auto pb-20" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
                     ? stack.palette
-                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                          .map((cmd) => {
-                              if (!cmd?.id) return null
-                              const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
-                              if (!engine) return null
-                              return (
-                                  <Command
-                                      key={cmd.id}
-                                      data={cmd}
-                                      engine={engine}
-                                      selected={cmd.id === data.selectedTerminal}
-                                      handleDrag={handleDrag}
-                                      stack={data}
-                                  />
-                              )
-                          })
+                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                        .map((cmd) => {
+                            if (!cmd?.id) return null
+                            const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
+                            if (!engine) return null
+                            return isCompact ?
+
+                                <CommandSM
+                                    key={cmd.id}
+                                    data={cmd}
+                                    engine={engine}
+                                    selected={cmd.id === data.selectedTerminal}
+                                    handleDrag={handleDrag}
+                                    stack={data}
+                                /> :
+                                <Command
+                                    key={cmd.id}
+                                    data={cmd}
+                                    engine={engine}
+                                    selected={cmd.id === data.selectedTerminal}
+                                    handleDrag={handleDrag}
+                                    stack={data}
+                                />
+
+                        })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand stack={data} />

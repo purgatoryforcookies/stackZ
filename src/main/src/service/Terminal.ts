@@ -110,7 +110,7 @@ export class Terminal {
             })
 
             this.isRunning = true
-            this.stackPing()
+
             if (cmd.length === 0) {
                 this.run(this.settings.command.cmd)
             }
@@ -132,8 +132,10 @@ export class Terminal {
                 this.stackPing()
             })
             this.ping()
+            this.stackPing()
         } catch (e) {
             this.sendToClient(`${e} \r\n$ `)
+            this.isRunning = false
         }
     }
 

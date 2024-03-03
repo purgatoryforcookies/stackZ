@@ -16,11 +16,14 @@ import { IUseStack } from '@renderer/hooks/useStack'
 
 type CommandMenuProps = {
     stack: IUseStack
-    togglePalette: () => void
-    toggleHeader: () => void
+    toggle: {
+        header: () => void
+        palette: () => void
+    }
+
 }
 
-export function CommandMenu({ stack, toggleHeader, togglePalette }: CommandMenuProps) {
+export function CommandMenu({ stack, toggle }: CommandMenuProps) {
     const theme = useContext(ThemeContext)
 
     const [open, setOpen] = useState(false)
@@ -33,11 +36,11 @@ export function CommandMenu({ stack, toggleHeader, togglePalette }: CommandMenuP
                 break
             case 'x':
                 if (!e.altKey && !e.metaKey) break
-                togglePalette()
+                toggle.header()
                 break
             case 'z':
                 if (!e.altKey && !e.metaKey) break
-                toggleHeader()
+                toggle.palette()
                 break
             case 'Enter':
                 // TODO:
@@ -96,7 +99,7 @@ export function CommandMenu({ stack, toggleHeader, togglePalette }: CommandMenuP
     useEffect(() => {
         window.addEventListener('keydown', handleShortCuts, true)
         return () => window.removeEventListener('keydown', handleShortCuts, true)
-    }, [stack])
+    }, [stack, open])
 
     const st = stack.stack
     if (!st) return null
@@ -107,100 +110,96 @@ export function CommandMenu({ stack, toggleHeader, togglePalette }: CommandMenuP
             <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup heading="Suggestions">
-                    <CommandItem onSelect={toggleHeader}>
+                    <CommandItem onSelect={toggle.header}>
                         Hide/show env explorer
                         <CommandShortcut>Alt+X</CommandShortcut>
                     </CommandItem>
-                    <CommandItem onSelect={togglePalette}>
+                    <CommandItem onSelect={toggle.palette}>
                         Hide/show palette
                         <CommandShortcut>Alt+Z</CommandShortcut>
                     </CommandItem>
                 </CommandGroup>
                 <Separator />
-                {/* <CommandGroup heading="New">
-                    <CommandItem>Terminal</CommandItem>
-                    <CommandItem>Environment</CommandItem>
-                </CommandGroup> */}
                 <Separator />
                 <CommandGroup heading="Stacks">
                     {stack
                         ? [...st.values()].map((s) => {
-                              return (
-                                  <CommandItem
-                                      key={s.id}
-                                      className="flex gap-5"
-                                      value={s.stackName}
-                                      onSelect={() => {
-                                          stack.selectStack(s.id)
-                                          stack.selectTerminal(s.palette?.[0].id || 'gibberish')
-                                          setOpen(false)
-                                      }}
-                                  >
-                                      <div className="flex w-20 justify-between">
-                                          <span>{s.palette?.length ?? 0}x</span>
-                                          <LayersIcon className="mr-2 h-4 w-4" />
-                                      </div>
-                                      <div className="flex justify-between w-full">
-                                          <div className="flex flex-col">
-                                              <span>{s.stackName}</span>
-                                              <span className="text-white/20 text-[0.7rem]">
-                                                  #{s.id}
-                                              </span>
-                                          </div>
+                            return (
+                                <CommandItem
+                                    key={s.id}
+                                    className="flex gap-5"
+                                    value={s.stackName}
+                                    onSelect={() => {
+                                        stack.selectStack(s.id)
+                                        stack.selectTerminal(s.palette?.[0].id || 'gibberish')
+                                        setOpen(false)
+                                    }}
+                                >
+                                    <div className="flex w-20 justify-between">
+                                        <span>{s.palette?.length ?? 0}x</span>
+                                        <LayersIcon className="mr-2 h-4 w-4" />
+                                    </div>
+                                    <div className="flex justify-between w-full">
+                                        <div className="flex flex-col">
+                                            <span>{s.stackName}</span>
+                                            <span className="text-white/20 text-[0.7rem]">
+                                                #{s.id}
+                                            </span>
+                                        </div>
 
-                                          {s.env?.length && s.env.length > 0 ? (
-                                              <TooltipProvider>
-                                                  <Tooltip>
-                                                      <TooltipTrigger>
-                                                          <GlobeIcon />
-                                                      </TooltipTrigger>
-                                                      <TooltipContent side={'left'}>
-                                                          <p>Has global environments</p>
-                                                      </TooltipContent>
-                                                  </Tooltip>
-                                              </TooltipProvider>
-                                          ) : null}
-                                      </div>
-                                  </CommandItem>
-                              )
-                          })
+                                        {s.env?.length && s.env.length > 0 ? (
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger>
+                                                        <GlobeIcon />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent side={'left'}>
+                                                        <p>Has global environments</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        ) : null}
+                                    </div>
+                                </CommandItem>
+                            )
+                        })
                         : null}
                 </CommandGroup>
                 <Separator />
                 <CommandGroup heading="Terminals">
                     {st
                         ? [...st.values()].map((s) => {
-                              if (!s.palette) return null
-                              return s.palette.map((cmd) => {
-                                  return (
-                                      <CommandItem
-                                          key={cmd.id}
-                                          className="flex gap-5"
-                                          value={
-                                              cmd.title +
-                                              cmd.command.cmd +
-                                              cmd.command.cwd +
-                                              s.stackName
-                                          }
-                                          onSelect={() => {
-                                              stack.selectStack(s.id)
-                                              stack.selectTerminal(cmd.id)
-                                              setOpen(false)
-                                          }}
-                                      >
-                                          <ButtonIcon className="mr-2 h-4 w-4" />
-                                          <div className="flex flex-col">
-                                              <span>{cmd.title}</span>
-                                              <div className="flex flex-col">
-                                                  <span>{cmd.command.cmd}</span>
-                                                  <span>@{cmd.command.cwd}</span>
-                                                  <span>stack: {s.stackName}</span>
-                                              </div>
-                                          </div>
-                                      </CommandItem>
-                                  )
-                              })
-                          })
+                            if (!s.palette) return null
+                            return s.palette.map((cmd) => {
+                                return (
+                                    <CommandItem
+                                        key={cmd.id}
+                                        className="flex gap-5"
+                                        value={
+                                            cmd.title +
+                                            cmd.command.cmd +
+                                            cmd.command.cwd +
+                                            s.stackName
+                                        }
+                                        onSelect={() => {
+                                            stack.selectStack(s.id)
+                                            stack.selectTerminal(cmd.id)
+                                            setOpen(false)
+                                        }}
+                                    >
+                                        <ButtonIcon className="mr-2 h-4 w-4" />
+                                        <div className="flex flex-col">
+                                            <span>{cmd.title}</span>
+                                            <div className="flex flex-col">
+                                                <span>{cmd.command.cmd}</span>
+                                                <span>@{cmd.command.cwd}</span>
+                                                <span>stack: {s.stackName}</span>
+                                            </div>
+                                        </div>
+                                    </CommandItem>
+                                )
+                            })
+                        })
                         : null}
                 </CommandGroup>
             </CommandList>

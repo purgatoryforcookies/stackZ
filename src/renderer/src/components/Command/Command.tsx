@@ -57,7 +57,7 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
             return
         }
 
-        if (ping?.isRunning) {
+        if (ping.isRunning) {
             window.api.stopTerminal(engine.stackId, data.id)
         } else {
             window.api.startTerminal(engine.stackId, data.id)
@@ -80,7 +80,6 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
                 <div
                     className="m-2 overflow-hidden rounded-md commandBody"
                     onClick={() => {
-                        stack.selectStack(engine.stackId)
                         stack.selectTerminal(engine.terminalId)
                     }}
                 >
@@ -131,8 +130,7 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
                         </div>
 
                         <div
-                            className={`${expanded ? 'h-28' : 'h-0'} 
-                    transition-height duration-500 ease-in-out flex items-end pb-2`}
+                            className={`transition-height duration-500 ease-in-out flex items-end `}
                         >
                             <CommandSettings expanded={expanded} data={ping} engine={engine} />
                         </div>
