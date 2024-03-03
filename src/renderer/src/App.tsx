@@ -24,8 +24,6 @@ function App(): JSX.Element {
         headerRef
     )
 
-    console.log('App rerenders')
-
     return (
         <ThemeContext.Provider value={theme!}>
             {storedWidth ? (

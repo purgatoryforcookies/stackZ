@@ -17,7 +17,7 @@ export class TerminalUIEngine {
     socket: Socket
     private mounted = false
     private isConnected = false
-    private isRunning = false
+    private isRunning: boolean
     private host: string
     stackId: string
     terminalId: string
@@ -37,6 +37,7 @@ export class TerminalUIEngine {
         this.terminal.loadAddon(this.searchAddon)
         this.buffer = ''
         this.searchWord = ''
+        this.isRunning = false
     }
 
     isMounted() {
@@ -76,9 +77,7 @@ export class TerminalUIEngine {
             this.write(data)
         })
 
-        this.socket.on(ClientEvents.TERMINALSTATE, (data: Status) => {
-            this.isRunning = data.isRunning
-        })
+
 
         this.socket.on('hello', () => {
             this.write(`Terminal connected - ${this.socket.id}`)
@@ -157,6 +156,9 @@ export class TerminalUIEngine {
         this.terminal.open(this.hostdiv)
         this.mounted = true
         this.resize()
+        this.socket.on(ClientEvents.TERMINALSTATE, (data: Status) => {
+            this.isRunning = data.isRunning
+        })
         return this
     }
 
@@ -167,6 +169,7 @@ export class TerminalUIEngine {
     detach() {
         this.hostdiv.innerHTML = ''
         this.mounted = false
+        this.socket.off(ClientEvents.STACKSTATE)
     }
 
     dispose() {

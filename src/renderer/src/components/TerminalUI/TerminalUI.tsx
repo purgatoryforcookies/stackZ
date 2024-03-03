@@ -18,6 +18,7 @@ function TerminalUI({ engine }: TerminalUIProps) {
             if (!engine) return
             engine.attachTo(terminalRef.current)
         }
+        return () => engine?.detach()
     }, [engine])
 
     useEffect(() => {
