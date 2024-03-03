@@ -38,9 +38,8 @@ export function CommandMenu({ stack, toggle }: CommandMenuProps) {
                 toggle.header()
                 break
             case 'z':
-                //TODO:
-                // if (!e.altKey && !e.metaKey) break
-                // toggle.palette()
+                if (!e.altKey && !e.metaKey) break
+                toggle.palette()
                 break
             case 'Enter':
                 // TODO:

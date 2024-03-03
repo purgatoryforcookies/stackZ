@@ -8,6 +8,7 @@ type RefT = RefObject<ImperativePanelHandle>
 
 export const useResizable = (paletteRef: RefT, headerRef: RefT) => {
     const [storedWidth, setStoredWidth] = useState<StoreType['paletteWidths'] | undefined>()
+    const [minW, setMinW] = useState(20)
 
     useEffect(() => {
         const fetchPaletteWidth = async () => {
@@ -29,9 +30,12 @@ export const useResizable = (paletteRef: RefT, headerRef: RefT) => {
 
             if (!paletteRef.current) return
             if (panel.clientWidth < MIN_PALETTE_WIDTH) {
+                if (paletteRef.current.isCollapsed()) return
                 const newFlexValue = (MIN_PALETTE_WIDTH / screenW) * 100
                 paletteRef.current.resize(newFlexValue)
+                setMinW(newFlexValue)
             }
+            setMinW(20)
         })
 
         observer.observe(panel)
@@ -52,12 +56,12 @@ export const useResizable = (paletteRef: RefT, headerRef: RefT) => {
 
     const togglePalette = () => {
         //TODO:
-        // if (!paletteRef.current) return
-        // if (paletteRef.current.isCollapsed()) {
-        //     paletteRef.current.expand()
-        // } else {
-        //     paletteRef.current.collapse()
-        // }
+        if (!paletteRef.current) return
+        if (paletteRef.current.isCollapsed()) {
+            paletteRef.current.expand()
+        } else {
+            paletteRef.current.collapse()
+        }
     }
     const toggleHeader = () => {
         if (!headerRef.current) return
@@ -72,6 +76,7 @@ export const useResizable = (paletteRef: RefT, headerRef: RefT) => {
         storedWidth,
         sizeHeader,
         sizePalette,
+        minW,
         toggle: {
             header: toggleHeader,
             palette: togglePalette

@@ -15,7 +15,7 @@ type PaletteProps = {
     data: IUseStack
 }
 
-const W_LIMIT_FOR_SM = 300
+const W_LIMIT_FOR_SM = 320
 
 function Palette({ data }: PaletteProps) {
     const [running, setRunning] = useState<boolean>(false)

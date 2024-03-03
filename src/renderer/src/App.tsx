@@ -19,7 +19,12 @@ function App(): JSX.Element {
     const headerRef = useRef<ImperativePanelHandle>(null)
 
     const stack = useStack(SOCKET_HOST)
-    const { storedWidth, sizeHeader, sizePalette, toggle } = useResizable(paletteRef, headerRef)
+    const { storedWidth, sizeHeader, sizePalette, toggle, minW } = useResizable(
+        paletteRef,
+        headerRef
+    )
+
+    console.log('App rerenders')
 
     return (
         <ThemeContext.Provider value={theme!}>
@@ -59,11 +64,14 @@ function App(): JSX.Element {
                         onResize={sizePalette}
                         ref={paletteRef}
                         collapsible
-                        minSize={15}
+                        minSize={minW}
                         maxSize={95}
                         id="palette"
                         className="text-secondary-foreground"
                     >
+                        <div className="h-10 flex justify-center items-center">
+                            <span className="font-semibold text-lg">Terminals</span>
+                        </div>
                         {stack.stack && !stack.loading ? <Palette data={stack} /> : null}
                     </ResizablePanel>
                 </ResizablePanelGroup>
