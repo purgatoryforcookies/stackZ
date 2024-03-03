@@ -5,8 +5,8 @@ import { resolveDefaultCwd } from './util'
 export const store = new ElectronStore<StoreType>({
     defaults: {
         paletteWidths: {
-            palette1: 30,
-            palette2: 30
+            header: 30,
+            palette: 30
         },
         userSettings: {
             defaultCwd: process.env.HOME || '',

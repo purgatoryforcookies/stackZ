@@ -4,10 +4,11 @@ import { Checkbox } from '@renderer/@/ui/checkbox'
 import { Input } from '@renderer/@/ui/input'
 import { Label } from '@renderer/@/ui/label'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@renderer/@/ui/tooltip'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ClientEvents, Cmd, CommandMetaSetting, Status, UtilityEvents } from '@t'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/@/ui/tabs'
+import { useTaalasmaa } from '@renderer/hooks/useTaalasmaa'
 
 type CommandSettingsProps = {
     expanded: boolean
@@ -34,6 +35,8 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
     const [settings, setSettings] = useState<CommandMetaSetting | undefined>(data.cmd.metaSettings)
     const [health, setHealth] = useState<Cmd['health'] | undefined>(data.cmd.health)
     const [tab, setTab] = useState<string | undefined>('off')
+    const commandRef = useRef<HTMLDivElement>(null)
+    const { w } = useTaalasmaa(commandRef)
 
     const handleSettings = (name: string, value: number | string | CheckedState) => {
         const newSettings: CommandMetaSetting = { ...settings }
@@ -75,20 +78,24 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
         // This components parent is handling that in case it needs to.
     }, [])
 
+    const isCompact = w && w < 350
+
     return (
         <div
-            className={`w-full flex justify-around items-center transition-opacity duration-500 ease-in-out
-        ${expanded ? 'opacity-100' : 'opacity-0'}`}
+            className={`transition-opacity duration-500 ease-in-out flex items-center gap-3 justify-center w-full h-full
+            ${isCompact ? 'flex-col-reverse gap-0 ' : 'flex-row'}
+        ${expanded ? 'opacity-100 py-4' : 'opacity-0'}`}
+            ref={commandRef}
         >
             {expanded ? (
                 <>
-                    <div className="w-[60%] max-w-[40rem] min-w-[22rem] gap-1.5">
+                    <div className={``}>
                         {tab ? (
-                            <Tabs value={tab} className="w-[90%]">
+                            <Tabs value={tab} className="">
                                 <TabsList className="w-full">
                                     <TabsTrigger
                                         value="off"
-                                        className="w-[50%] flex gap-2"
+                                        className=" flex gap-2"
                                         onClick={() => {
                                             handleHealthSettings(), setTab('off')
                                         }}
@@ -99,7 +106,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                     <TabsTrigger
                                         value="time"
                                         onClick={() => setTab('time')}
-                                        className="w-[100%] flex gap-2"
+                                        className=" flex gap-2"
                                         disabled={data.reserved || data.isRunning}
                                     >
                                         Time delay
@@ -108,7 +115,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                     <TabsTrigger
                                         value="health"
                                         onClick={() => setTab('health')}
-                                        className="w-[100%] flex gap-2"
+                                        className="flex gap-2"
                                         disabled={data.reserved || data.isRunning}
                                     >
                                         Healthcheck
@@ -150,7 +157,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                             </Tabs>
                         ) : null}
                     </div>
-                    <div className="flex flex-col gap-5">
+                    <div className={`flex  gap-5 ${isCompact ? 'flex-row gap-1 p-2' : 'flex-col'}`}>
                         <div className="flex items-center space-x-2">
                             <Checkbox
                                 name="loose"

@@ -1,36 +1,39 @@
 import { ClientEvents, Cmd, StackStatus, UtilityEvents } from '@t'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Badge } from '@renderer/@/ui/badge'
 import NewCommand from './Dialogs/NewCommand'
 import Command from './Command/Command'
 import { Button } from '@renderer/@/ui/button'
 import { ReloadIcon } from '@radix-ui/react-icons'
-import { baseSocket } from '@renderer/service/socket'
 import { NewStack } from './Dialogs/NewStack'
 import { DraggableData } from 'react-draggable'
 import { IUseStack } from '@renderer/hooks/useStack'
+import { useTaalasmaa } from '@renderer/hooks/useTaalasmaa'
+import CommandSM from './Command/CommandSM'
 
 type PaletteProps = {
     data: IUseStack
 }
 
+const W_LIMIT_FOR_SM = 320
+
 function Palette({ data }: PaletteProps) {
     const [running, setRunning] = useState<boolean>(false)
+    const paletteRef = useRef<HTMLDivElement>(null)
 
-    const sniffState = () => {
-        baseSocket.emit(UtilityEvents.BIGSTATE, { stack: data })
-    }
+    const { w } = useTaalasmaa(paletteRef)
 
     useEffect(() => {
-        setRunning(false)
-        baseSocket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
-            if (d.stack === data.selectedStack) {
-                setRunning(d.isRunning || d.isReserved)
-            }
+        const socket = data.stackSocket?.get(data.selectedStack)
+        if (!socket) return
+
+        socket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
+            setRunning(d.isRunning || d.isReserved)
         })
-        sniffState()
+
+        socket.emit(UtilityEvents.STACKSTATE)
         return () => {
-            baseSocket.off(ClientEvents.STACKSTATE)
+            socket.off(ClientEvents.STACKSTATE)
         }
     }, [data])
 
@@ -60,10 +63,11 @@ function Palette({ data }: PaletteProps) {
             data.reOrder(stackId, terminal.id, oldExecutionOrder - (howManySlots - 1))
         }
     }
+    const isCompact = w && w < W_LIMIT_FOR_SM
 
     return (
-        <div className="h-full flex flex-col">
-            <div className="flex gap-3 justify-center py-2">
+        <div className="h-full flex flex-col" ref={paletteRef}>
+            <div className="flex gap-3 justify-center py-5 flex-wrap px-4">
                 {data.stack &&
                     Array.from(data.stack.values()).map((stack) => {
                         return (
@@ -78,7 +82,7 @@ function Palette({ data }: PaletteProps) {
                                     data.selectTerminal(firstTerminalId)
                                 }}
                                 variant={data.selectedStack === stack.id ? 'default' : 'outline'}
-                                className={`hover:bg-primary hover:text-background 
+                                className={`hover:bg-primary hover:text-background text-nowrap
                         hover:cursor-pointer`}
                             >
                                 {stack.stackName}
@@ -87,12 +91,19 @@ function Palette({ data }: PaletteProps) {
                     })}
                 <NewStack set={data.addStack} />
             </div>
-            <div className="flex w-full justify-end pr-12">
-                <Button variant={'link'} size={'sm'} onClick={toggleStack}>
+            <div
+                className={`flex w-full mb-2 ${isCompact ? 'justify-center p-2 bg-card' : 'justify-end pr-12'}`}
+            >
+                <Button
+                    variant={'link'}
+                    size={'sm'}
+                    onClick={toggleStack}
+                    className="text-primary-secondary"
+                >
                     {running ? (
                         <>
                             <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                            Running...
+                            Stop
                         </>
                     ) : (
                         'Start stack'
@@ -107,7 +118,16 @@ function Palette({ data }: PaletteProps) {
                               if (!cmd?.id) return null
                               const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
                               if (!engine) return null
-                              return (
+                              return isCompact ? (
+                                  <CommandSM
+                                      key={cmd.id}
+                                      data={cmd}
+                                      engine={engine}
+                                      selected={cmd.id === data.selectedTerminal}
+                                      handleDrag={handleDrag}
+                                      stack={data}
+                                  />
+                              ) : (
                                   <Command
                                       key={cmd.id}
                                       data={cmd}

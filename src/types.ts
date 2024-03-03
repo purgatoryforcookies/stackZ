@@ -71,7 +71,7 @@ export enum SelectionEvents {
 
 export enum UtilityEvents {
     STATE = 'state',
-    BIGSTATE = 'bigState',
+    STACKSTATE = 'stackState',
     ENVEDIT = 'environmentEdit',
     ENVMUTE = 'environmentMute',
     ENVLIST = 'environmentList',
@@ -144,8 +144,8 @@ export enum Panels {
 
 export type StoreType = {
     paletteWidths: {
-        palette1: number
-        palette2: number
+        header: number
+        palette: number
     }
     userSettings: {
         defaultShell: string

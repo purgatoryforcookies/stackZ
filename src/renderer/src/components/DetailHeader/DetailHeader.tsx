@@ -23,10 +23,6 @@ function DetailHeader({ stack }: DetailHeaderProps) {
         terminal.socket.emit(UtilityEvents.STATE)
 
         if (status && status.stackId !== terminal.stackId) setStatus(null)
-
-        return () => {
-            terminal.socket.off(ClientEvents.TERMINALSTATE)
-        }
     }, [stack])
 
     const handleHighligt = (e: string[]) => {

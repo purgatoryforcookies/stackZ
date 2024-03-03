@@ -16,11 +16,13 @@ import { IUseStack } from '@renderer/hooks/useStack'
 
 type CommandMenuProps = {
     stack: IUseStack
-    togglePalette: () => void
-    toggleHeader: () => void
+    toggle: {
+        header: () => void
+        palette: () => void
+    }
 }
 
-export function CommandMenu({ stack, toggleHeader, togglePalette }: CommandMenuProps) {
+export function CommandMenu({ stack, toggle }: CommandMenuProps) {
     const theme = useContext(ThemeContext)
 
     const [open, setOpen] = useState(false)
@@ -33,15 +35,16 @@ export function CommandMenu({ stack, toggleHeader, togglePalette }: CommandMenuP
                 break
             case 'x':
                 if (!e.altKey && !e.metaKey) break
-                togglePalette()
+                toggle.header()
                 break
             case 'z':
                 if (!e.altKey && !e.metaKey) break
-                toggleHeader()
+                toggle.palette()
                 break
             case 'Enter':
-                if (open) break
-                window.api.startTerminal(stack.selectedStack, stack.selectedTerminal)
+                // TODO:
+                // if (open) break
+                // window.api.startTerminal(stack.selectedStack, stack.selectedTerminal)
                 break
             case 'ArrowUp':
                 if (open) break
@@ -95,7 +98,7 @@ export function CommandMenu({ stack, toggleHeader, togglePalette }: CommandMenuP
     useEffect(() => {
         window.addEventListener('keydown', handleShortCuts, true)
         return () => window.removeEventListener('keydown', handleShortCuts, true)
-    }, [stack])
+    }, [stack, open])
 
     const st = stack.stack
     if (!st) return null
@@ -106,20 +109,16 @@ export function CommandMenu({ stack, toggleHeader, togglePalette }: CommandMenuP
             <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup heading="Suggestions">
-                    <CommandItem onSelect={toggleHeader}>
+                    <CommandItem onSelect={toggle.header}>
                         Hide/show env explorer
                         <CommandShortcut>Alt+X</CommandShortcut>
                     </CommandItem>
-                    <CommandItem onSelect={togglePalette}>
+                    <CommandItem onSelect={toggle.palette}>
                         Hide/show palette
                         <CommandShortcut>Alt+Z</CommandShortcut>
                     </CommandItem>
                 </CommandGroup>
                 <Separator />
-                {/* <CommandGroup heading="New">
-                    <CommandItem>Terminal</CommandItem>
-                    <CommandItem>Environment</CommandItem>
-                </CommandGroup> */}
                 <Separator />
                 <CommandGroup heading="Stacks">
                     {stack

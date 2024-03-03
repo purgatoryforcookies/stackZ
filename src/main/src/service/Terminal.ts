@@ -110,7 +110,7 @@ export class Terminal {
             })
 
             this.isRunning = true
-            this.stackPing()
+
             if (cmd.length === 0) {
                 this.run(this.settings.command.cmd)
             }
@@ -120,11 +120,12 @@ export class Terminal {
             })
             this.ptyProcess.onExit((data) => {
                 this.isRunning = false
-                this.sendToClient(`Exiting with status ${data.exitCode} - ${data.signal ?? ''}\r\n`)
+                this.sendToClient(`Exiting with status ${data.exitCode} ${data.signal ?? ''}\r\n`)
 
                 const divider = Array(10).fill('-').join('')
                 this.sendToClient(`${divider}\r\n$ `)
                 this.stop()
+
                 if (this.settings.metaSettings?.rerun) {
                     this.start()
                 }
@@ -132,8 +133,10 @@ export class Terminal {
                 this.stackPing()
             })
             this.ping()
+            this.stackPing()
         } catch (e) {
             this.sendToClient(`${e} \r\n$ `)
+            this.isRunning = false
         }
     }
 
@@ -156,19 +159,17 @@ export class Terminal {
         try {
             this.ptyProcess?.resize(dims.cols, dims.rows)
         } catch {
-            // On stop, the pty process is not existing anymore but yet here we are...
+            // swallow
         }
         this.rows = dims.rows
         this.cols = dims.cols
     }
 
     stop() {
-        if (!this.ptyProcess) return
         try {
-            console.log('Killing', this.settings.id)
             const code = this.win ? undefined : 'SIGHUP'
             this.isRunning = false
-            this.ptyProcess.kill(code)
+            this.ptyProcess?.kill(code)
         } catch {
             //swallow
         }
@@ -205,11 +206,13 @@ export class Terminal {
     }
 
     write(data: string) {
-        this.ptyProcess?.write(data)
+        if (!this.ptyProcess) return
+        this.ptyProcess.write(data)
     }
 
     prompt() {
-        this.ptyProcess?.write(`\r`)
+        if (!this.ptyProcess) return
+        this.ptyProcess.write(`\r`)
     }
 
     editVariable(args: EnvironmentEditProps) {
@@ -350,7 +353,6 @@ export class Terminal {
             this.muteVariable(arg)
         })
         this.socket.on(UtilityEvents.STATE, () => {
-            console.log('ping')
             this.ping()
         })
         this.socket.emit('hello')

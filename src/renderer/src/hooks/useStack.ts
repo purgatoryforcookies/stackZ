@@ -2,6 +2,7 @@ import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { baseSocket } from '@renderer/service/socket'
 import { useEffect, useState } from 'react'
 import { ClientEvents, Cmd, PaletteStack, UtilityEvents } from '@t'
+import { Socket, io } from 'socket.io-client'
 
 export interface IReOrder {
     (stackId: string, terminalId: string, newOrder: number): void
@@ -9,6 +10,7 @@ export interface IReOrder {
 
 export interface IUseStack {
     stack: Map<string, PaletteStack> | undefined
+    stackSocket: Map<string, Socket>
     terminals: Map<string, Map<string, TerminalUIEngine>> | undefined
     loading: boolean
     selectStack: React.Dispatch<React.SetStateAction<string>>
@@ -16,12 +18,14 @@ export interface IUseStack {
     addTerminal: (cmd: Cmd) => void
     addStack: (st: PaletteStack) => void
     reOrder: IReOrder
+    askForResize: () => void
     selectedStack: string
     selectedTerminal: string
 }
 
 export const useStack = (SOCKET_HOST: string): IUseStack => {
     const [stack, setStack] = useState<Map<string, PaletteStack>>()
+    const [stackSocket, setStackSockets] = useState<Map<string, Socket>>(new Map())
     const [terminals, setTerminals] = useState<Map<string, Map<string, TerminalUIEngine>>>()
     const [loading, setLoading] = useState(false)
 
@@ -32,9 +36,15 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         setLoading(true)
         const data = (await window.api.getStack()) as PaletteStack[]
         const newStack = new Map<string, PaletteStack>()
+        const newSocketStack = new Map<string, Socket>()
         data.forEach((stack) => {
             newStack.set(stack.id, stack)
+            const sock = io(SOCKET_HOST, {
+                query: { stack: stack.id }
+            })
+            newSocketStack.set(stack.id, sock)
         })
+        setStackSockets(newSocketStack)
 
         const newTerminals = new Map<string, Map<string, TerminalUIEngine>>()
         data.forEach((stack) => {
@@ -64,9 +74,15 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         setLoading(false)
     }
     const addStack = (st: PaletteStack) => {
-        const newStack = new Map<string, PaletteStack>(stack)
+        const newStack = new Map(stack)
+        const newSocketStack = new Map(stackSocket)
         newStack.set(st.id, st)
+        const sock = io(SOCKET_HOST, {
+            query: { stack: st.id }
+        })
+        newSocketStack.set(st.id, sock)
         setStack(() => newStack)
+        setStackSockets(newSocketStack)
     }
 
     const addTerminal = async (cmd: Cmd) => {
@@ -98,6 +114,9 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
      *  Updates the execution order of a terminal
      */
     const reOrder: IReOrder = (stackId: string, terminalId: string, newOrder: number) => {
+        const connection = stackSocket.get(stackId)
+        if (!connection) return
+
         const newStack = new Map(stack)
         const selected = newStack.get(stackId)
         const oldPalette = selected?.palette
@@ -119,7 +138,7 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
 
         setStack(newStack)
 
-        baseSocket.emit(UtilityEvents.REORDER, { stackId, terminalId, newOrder })
+        connection.emit(UtilityEvents.REORDER, { terminalId, newOrder })
     }
 
     baseSocket.on(ClientEvents.DELTERMINAL, (d: { stack: string; terminal: string }) => {
@@ -141,12 +160,18 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         }
     })
 
+    const askForResize = () => {
+        console.log('Asking for resize', selectedStack, selectedTerminal)
+        terminals?.get(selectedStack)?.get(selectedTerminal)?.resize()
+    }
+
     useEffect(() => {
         fetchTerminals()
     }, [])
 
     return {
         stack,
+        stackSocket,
         terminals,
         loading,
         selectStack,
@@ -154,6 +179,7 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         addTerminal,
         addStack,
         reOrder,
+        askForResize,
         selectedStack,
         selectedTerminal
     }

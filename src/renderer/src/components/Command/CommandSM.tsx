@@ -2,16 +2,14 @@ import { ClientEvents, Cmd, Status, UtilityEvents } from '@t'
 import { useEffect, useState } from 'react'
 import { Button } from '@renderer/@/ui/button'
 import {
-    ChevronDownIcon,
-    ChevronUpIcon,
-    Cross2Icon,
     EyeNoneIcon,
     HeartIcon,
+    LapTimerIcon,
+    PlayIcon,
     ReloadIcon,
     SymbolIcon,
     TimerIcon
 } from '@radix-ui/react-icons'
-import CommandSettings from '../Common/CommandSettings'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import Draggable, { DraggableData } from 'react-draggable'
 import { IUseStack } from '@renderer/hooks/useStack'
@@ -24,7 +22,7 @@ type CommandProps = {
     stack: IUseStack
 }
 
-function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
+function CommandSM({ data, engine, stack, selected, handleDrag }: CommandProps) {
     const [ping, setPing] = useState<Status>({
         stackId: engine.stackId,
         reserved: false,
@@ -32,7 +30,6 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
         isRunning: false,
         cwd: data.command.cwd
     })
-    const [expanded, setExpanded] = useState<boolean>(false)
     const [hcHeartBeat, setHcHeartBeat] = useState<number>()
 
     useEffect(() => {
@@ -49,7 +46,7 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
             engine.socket.off(ClientEvents.TERMINALSTATE)
             engine.socket.off(ClientEvents.HEARTBEAT)
         }
-    }, [data, engine, selected])
+    }, [engine, selected, data])
 
     const handleState = async (delRecord = false) => {
         if (delRecord) {
@@ -57,7 +54,7 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
             return
         }
 
-        if (ping.isRunning) {
+        if (ping?.isRunning) {
             window.api.stopTerminal(engine.stackId, data.id)
         } else {
             window.api.startTerminal(engine.stackId, data.id)
@@ -85,13 +82,7 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
                 >
                     <div className="pl-4 bg-black/80 flex justify-between pr-5 gap-3">
                         <span className="truncate text-secondary-foreground " dir="rtl">
-                            {ping.cwd}
-                        </span>
-                        <span className="flex items-center ">
-                            <Cross2Icon
-                                className="h-4 w-4 text-secondary-foreground hover:scale-125 hover:cursor-pointer"
-                                onClick={() => handleState(true)}
-                            />
+                            {ping.cmd.title}
                         </span>
                     </div>
                     <div
@@ -99,52 +90,31 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
                      bg-terminalHeader 
                     ${engine.terminalId === data.id ? '' : 'bg-background'}`}
                     >
-                        <div className="flex justify-between">
-                            <div className="flex flex-col pl-3 p-1 text-sm text-secondary-foreground">
-                                <span>command: {ping.cmd.command.cmd}</span>
-                                <span>shell: {ping.cmd.command.shell ?? data.command.shell}</span>
-                                <span>palettes: x{ping.cmd.command.env?.length}</span>
-                                <span>notes: {ping.cmd.title}</span>
-                            </div>
+                        <div className="flex justify-between min-h-20">
+                            <div className="flex flex-col pl-3 p-1 text-sm text-secondary-foreground"></div>
 
-                            <div className="flex items-center relative top-2 right-12">
+                            <div className="flex items-center pr-5">
                                 <div>
                                     <Button
-                                        variant={'ghost'}
+                                        variant={'outline'}
                                         onClick={() => handleState()}
                                         disabled={ping.reserved}
                                     >
                                         {ping.isRunning ? (
                                             <>
-                                                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                                                Running...
+                                                <ReloadIcon className=" h-4 w-4 animate-spin" />
                                             </>
                                         ) : ping.reserved ? (
-                                            'Pending...'
+                                            <LapTimerIcon className=" h-4 w-4" />
                                         ) : (
-                                            'Start'
+                                            <PlayIcon className=" h-4 w-4" />
                                         )}
                                     </Button>
                                 </div>
                             </div>
                         </div>
 
-                        <div
-                            className={`transition-height duration-500 ease-in-out flex items-end `}
-                        >
-                            <CommandSettings expanded={expanded} data={ping} engine={engine} />
-                        </div>
-                        <div
-                            className="flex justify-center w-full hover:scale-125 hover:cursor-pointer "
-                            onClick={() => setExpanded(!expanded)}
-                        >
-                            {expanded ? (
-                                <ChevronUpIcon className="h-4 w-4" />
-                            ) : (
-                                <ChevronDownIcon className="h-4 w-4 text-white/50" />
-                            )}
-                        </div>
-                        <span className="absolute right-10 bottom-1 text-[0.7rem] text-white/30 flex gap-2">
+                        <span className="text-[0.7rem] text-white/30 flex gap-2 justify-end pr-10 pb-1">
                             {ping.cmd.metaSettings?.rerun ? (
                                 <SymbolIcon className="h-4 w-4" />
                             ) : null}
@@ -190,4 +160,4 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
     )
 }
 
-export default Command
+export default CommandSM
