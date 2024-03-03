@@ -39,7 +39,7 @@ async function createWindow(): Promise<void> {
         height: 900,
         minWidth: 200,
         show: false,
-        autoHideMenuBar: false,
+        autoHideMenuBar: true,
 
         ...(process.platform === 'linux' ? {} : {}),
         webPreferences: {

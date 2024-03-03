@@ -4,6 +4,8 @@ Do you remember how that one project of yours started up again? was there some s
 
 StackZ is a developer tool which purpose is to answer above mentioned questions.
 
+![Alt text](resources/screenshot1.png?raw=true "Overview")
+
 With StackZ, you can create environments and pipelines withing your development machine. Each stack is easily configurable with environment variables, which get injected into the terminal when it is started. You can have multiple env-sets for each terminal, and they can be muted individually for quick adjustments, e.g. either dev, test or production enviroment. CWD's (current working directories) can be speficied within each terminal.
 
 Each terminal in a stack can be run as a sequence, or separetly. In a sequence, the order or the terminal spawns is quaranteed, and you can set delays for terminal to slow down their startup. Delaying takes effect only when you start the stack. Running a single terminal from a stack does not obey the delay.

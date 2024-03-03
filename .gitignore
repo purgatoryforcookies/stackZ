@@ -9,3 +9,4 @@ commands_backup.json
 stacks.json
 fixtures/*
 .DS_Store
+README_local.md
