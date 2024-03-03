@@ -22,7 +22,7 @@ function Palette({ data }: PaletteProps) {
     const paletteRef = useRef<HTMLDivElement>(null)
 
     const { w } = useTaalasmaa(paletteRef)
-    // console.log(w)
+
     useEffect(() => {
         const socket = data.stackSocket?.get(data.selectedStack)
         if (!socket) return
@@ -91,8 +91,15 @@ function Palette({ data }: PaletteProps) {
                     })}
                 <NewStack set={data.addStack} />
             </div>
-            <div className={`flex w-full mb-2  ${isCompact ? 'justify-center p-2 bg-card' : 'justify-end pr-12'}`}>
-                <Button variant={'link'} size={'sm'} onClick={toggleStack}>
+            <div
+                className={`flex w-full mb-2 ${isCompact ? 'justify-center p-2 bg-card' : 'justify-end pr-12'}`}
+            >
+                <Button
+                    variant={'link'}
+                    size={'sm'}
+                    onClick={toggleStack}
+                    className="text-primary-secondary"
+                >
                     {running ? (
                         <>
                             <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
@@ -106,31 +113,31 @@ function Palette({ data }: PaletteProps) {
             <div className="overflow-auto pb-20" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
                     ? stack.palette
-                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                        .map((cmd) => {
-                            if (!cmd?.id) return null
-                            const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
-                            if (!engine) return null
-                            return isCompact ?
-
-                                <CommandSM
-                                    key={cmd.id}
-                                    data={cmd}
-                                    engine={engine}
-                                    selected={cmd.id === data.selectedTerminal}
-                                    handleDrag={handleDrag}
-                                    stack={data}
-                                /> :
-                                <Command
-                                    key={cmd.id}
-                                    data={cmd}
-                                    engine={engine}
-                                    selected={cmd.id === data.selectedTerminal}
-                                    handleDrag={handleDrag}
-                                    stack={data}
-                                />
-
-                        })
+                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                          .map((cmd) => {
+                              if (!cmd?.id) return null
+                              const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
+                              if (!engine) return null
+                              return isCompact ? (
+                                  <CommandSM
+                                      key={cmd.id}
+                                      data={cmd}
+                                      engine={engine}
+                                      selected={cmd.id === data.selectedTerminal}
+                                      handleDrag={handleDrag}
+                                      stack={data}
+                                  />
+                              ) : (
+                                  <Command
+                                      key={cmd.id}
+                                      data={cmd}
+                                      engine={engine}
+                                      selected={cmd.id === data.selectedTerminal}
+                                      handleDrag={handleDrag}
+                                      stack={data}
+                                  />
+                              )
+                          })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand stack={data} />

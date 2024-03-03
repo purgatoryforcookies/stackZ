@@ -55,7 +55,7 @@ export class Palette {
         this.socket = socket
 
         socket.on(UtilityEvents.STACKSTATE, () => {
-            console.log("HELLO")
+            console.log('HELLO')
             this.pingState()
         })
         socket.on(UtilityEvents.REORDER, (arg: { terminalId: string; newOrder: number }) => {

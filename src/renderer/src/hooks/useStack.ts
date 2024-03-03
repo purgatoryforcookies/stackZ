@@ -160,13 +160,10 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         }
     })
 
-
     const askForResize = () => {
-        console.log("Asking for resize", selectedStack, selectedTerminal)
+        console.log('Asking for resize', selectedStack, selectedTerminal)
         terminals?.get(selectedStack)?.get(selectedTerminal)?.resize()
     }
-
-
 
     useEffect(() => {
         fetchTerminals()

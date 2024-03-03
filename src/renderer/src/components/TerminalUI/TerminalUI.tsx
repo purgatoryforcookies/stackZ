@@ -20,8 +20,9 @@ function TerminalUI({ engine }: TerminalUIProps) {
         }
     }, [engine])
 
-
-    useEffect(() => { if (engine) engine.resize() }, [w, h])
+    useEffect(() => {
+        if (engine) engine.resize()
+    }, [w, h])
 
     const findNext = () => {
         if (engine) engine.search(search)

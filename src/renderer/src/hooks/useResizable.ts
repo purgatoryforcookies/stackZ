@@ -1,13 +1,12 @@
-import { StoreType } from "@t"
-import { RefObject, useEffect, useLayoutEffect, useState } from "react"
-import { ImperativePanelHandle } from "react-resizable-panels"
+import { StoreType } from '@t'
+import { RefObject, useEffect, useLayoutEffect, useState } from 'react'
+import { ImperativePanelHandle } from 'react-resizable-panels'
 
 const MIN_PALETTE_WIDTH = 230
 
 type RefT = RefObject<ImperativePanelHandle>
 
 export const useResizable = (paletteRef: RefT, headerRef: RefT) => {
-
     const [storedWidth, setStoredWidth] = useState<StoreType['paletteWidths'] | undefined>()
 
     useEffect(() => {
@@ -52,21 +51,19 @@ export const useResizable = (paletteRef: RefT, headerRef: RefT) => {
     }
 
     const togglePalette = () => {
-
-        if (!paletteRef.current) return
-        if (paletteRef.current.isCollapsed()) {
-            paletteRef.current.expand()
-        }
-        else {
-            paletteRef.current.collapse()
-        }
+        //TODO:
+        // if (!paletteRef.current) return
+        // if (paletteRef.current.isCollapsed()) {
+        //     paletteRef.current.expand()
+        // } else {
+        //     paletteRef.current.collapse()
+        // }
     }
     const toggleHeader = () => {
         if (!headerRef.current) return
         if (headerRef.current.isCollapsed()) {
             headerRef.current.expand()
-        }
-        else {
+        } else {
             headerRef.current.collapse()
         }
     }

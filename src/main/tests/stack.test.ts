@@ -168,18 +168,20 @@ describe('stack', () => {
     it.todo('Starts and stops each terminal')
 
     describe('Socket events :)', () => {
-        let stackMockSockets: Socket[] = []
+        const stackMockSockets: Socket[] = []
 
         beforeAll(async () => {
-            Array.from(testStacks.keys()).forEach(id => {
-                stackMockSockets.push(io(SOCKET_HOST_FOR_CLIENT, {
-                    query: { stack: id }
-                }))
+            Array.from(testStacks.keys()).forEach((id) => {
+                stackMockSockets.push(
+                    io(SOCKET_HOST_FOR_CLIENT, {
+                        query: { stack: id }
+                    })
+                )
             })
         })
 
         afterAll(() => {
-            stackMockSockets.forEach(s => {
+            stackMockSockets.forEach((s) => {
                 s.disconnect()
             })
             uiSockets.forEach((sock) => {
@@ -192,7 +194,7 @@ describe('stack', () => {
         it('Emits stacks state for all terminals of a stack if terminal id is not given', (done) => {
             let stackCounter = 0
 
-            stackMockSockets.forEach(socket => {
+            stackMockSockets.forEach((socket) => {
                 socket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
                     expect(d.stack).toBeDefined()
                     expect(d.state.length).toBe(4)
@@ -206,8 +208,6 @@ describe('stack', () => {
                 })
                 socket.emit(UtilityEvents.STACKSTATE)
             })
-
-
         }, 1000)
 
         it("Emits individial terminals state with given id's", (done) => {

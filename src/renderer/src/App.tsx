@@ -21,19 +21,19 @@ function App(): JSX.Element {
     const stack = useStack(SOCKET_HOST)
     const { storedWidth, sizeHeader, sizePalette, toggle } = useResizable(paletteRef, headerRef)
 
-
     return (
         <ThemeContext.Provider value={theme!}>
-            {storedWidth ?
-                <ResizablePanelGroup direction="horizontal">
-                    <CommandMenu
-                        stack={stack}
-                        toggle={toggle}
-                    />
+            {storedWidth ? (
+                <ResizablePanelGroup
+                    direction="horizontal"
+                    className="bg-background text-primary-foreground"
+                    data-theme={theme}
+                >
+                    <CommandMenu stack={stack} toggle={toggle} />
                     <Settings setTheme={setTheme} />
                     <ResizablePanel>
                         <ResizablePanelGroup direction="vertical">
-                            <ResizablePanel className='relative'>
+                            <ResizablePanel className="relative">
                                 {stack.terminals && !stack.loading ? (
                                     <TerminalUI
                                         engine={stack.terminals
@@ -43,7 +43,12 @@ function App(): JSX.Element {
                                 ) : null}
                             </ResizablePanel>
                             <ResizableHandle />
-                            <ResizablePanel defaultSize={storedWidth?.header} onResize={sizeHeader} ref={headerRef} collapsible>
+                            <ResizablePanel
+                                defaultSize={storedWidth?.header}
+                                onResize={sizeHeader}
+                                ref={headerRef}
+                                collapsible
+                            >
                                 <DetailHeader stack={stack} />
                             </ResizablePanel>
                         </ResizablePanelGroup>
@@ -56,12 +61,13 @@ function App(): JSX.Element {
                         collapsible
                         minSize={15}
                         maxSize={95}
-                        id='palette'
+                        id="palette"
+                        className="text-secondary-foreground"
                     >
                         {stack.stack && !stack.loading ? <Palette data={stack} /> : null}
                     </ResizablePanel>
                 </ResizablePanelGroup>
-                : null}
+            ) : null}
         </ThemeContext.Provider>
     )
 }

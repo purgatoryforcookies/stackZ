@@ -91,9 +91,7 @@ function CommandSM({ data, engine, stack, selected, handleDrag }: CommandProps) 
                     ${engine.terminalId === data.id ? '' : 'bg-background'}`}
                     >
                         <div className="flex justify-between min-h-20">
-                            <div className="flex flex-col pl-3 p-1 text-sm text-secondary-foreground">
-
-                            </div>
+                            <div className="flex flex-col pl-3 p-1 text-sm text-secondary-foreground"></div>
 
                             <div className="flex items-center pr-5">
                                 <div>
@@ -116,7 +114,7 @@ function CommandSM({ data, engine, stack, selected, handleDrag }: CommandProps) 
                             </div>
                         </div>
 
-                        <span className="absolute left-2 bottom-1 text-[0.7rem] text-white/30 flex gap-2">
+                        <span className="text-[0.7rem] text-white/30 flex gap-2 justify-end pr-10 pb-1">
                             {ping.cmd.metaSettings?.rerun ? (
                                 <SymbolIcon className="h-4 w-4" />
                             ) : null}
