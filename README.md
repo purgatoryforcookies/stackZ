@@ -90,3 +90,4 @@ Terminals can restart on exits.
 
 Not all features are supported nor implemented. Many of obvious ones are still missing. Refer to editing the .json file manually at this point, especially if you want to rename the stacks (and the placeholder stack that is created on first star). 
 
+There's a socket server, and it runs on port 3123.
