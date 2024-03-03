@@ -85,3 +85,8 @@ If you start the stack, it runs in order from top to bottom. Each terminal can b
 Loose terminals dont listen for exits and has to be stopped manually.
 
 Terminals can restart on exits.
+
+### Notes
+
+Not all features are supported nor implemented. Many of obvious ones are still missing. Refer to editing the .json file manually at this point, especially if you want to rename the stacks (and the placeholder stack that is created on first star). 
+
