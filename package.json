@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "Easy way to start your development environment",
     "main": "./out/main/index.js",
+    "license": "GPL-3.0-only",
     "author": "purgatoryforcookies",
     "scripts": {
         "format": "prettier --write .",
