@@ -44,7 +44,7 @@ export function NewStack({ set }: NewStack) {
                     <PlusIcon className="h-4 w-4" />
                 </Badge>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]" data-theme={theme}>
+            <DialogContent className="sm:max-w-[500px]" data-theme={theme}>
                 <DialogHeader>
                     <DialogTitle>New Stack</DialogTitle>
                     <DialogDescription>Create new</DialogDescription>
@@ -69,7 +69,29 @@ export function NewStack({ set }: NewStack) {
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="shell" className="text-right">
+                                Default command
+                            </Label>
+                            <Input
+                                id="shell"
+                                value="Not supported"
+                                disabled
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="shell" className="text-right">
                                 Default shell
+                            </Label>
+                            <Input
+                                id="shell"
+                                value="Not supported"
+                                disabled
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="shell" className="text-right">
+                                Default cwd
                             </Label>
                             <Input
                                 id="shell"

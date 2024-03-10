@@ -27,15 +27,14 @@ export const useResizable = (paletteRef: RefT, headerRef: RefT) => {
 
         const observer = new ResizeObserver(() => {
             const screenW = window.innerWidth
-
+            const newFlexValue = (MIN_PALETTE_WIDTH / screenW) * 100
             if (!paletteRef.current) return
             if (panel.clientWidth < MIN_PALETTE_WIDTH) {
                 if (paletteRef.current.isCollapsed()) return
-                const newFlexValue = (MIN_PALETTE_WIDTH / screenW) * 100
+
                 paletteRef.current.resize(newFlexValue)
-                setMinW(newFlexValue)
             }
-            setMinW(20)
+            setMinW(newFlexValue)
         })
 
         observer.observe(panel)

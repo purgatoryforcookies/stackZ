@@ -42,20 +42,18 @@ export const Field = ({
     highlight
 }: FieldProps) => {
     const style = `rounded-full py-1
-    ${
-        variant === 'primary'
-            ? `pr-3 pl-3 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
-            : `pl-3 pr-3  truncate text-secondary ${
-                  highlight ? 'bg-orange-900 text-white' : 'bg-primary'
-              }`
-    }`
+    ${variant === 'primary'
+            ? `px-3 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
+            : `px-3  truncate text-secondary ${highlight ? 'bg-orange-900 text-white' : 'bg-primary'
+            }`
+        }`
 
     if (disabled) return <p className={style}>{value}</p>
 
     return (
         <Input
             type="text"
-            className={`${style} h-8 w-[20rem] ${variant === 'primary' ? 'pl-8' : ''}`}
+            className={`${style} h-9 w-[20rem] ${variant === 'primary' ? 'pl-8' : ''}`}
             onChange={(e) => onChange(e.target.value)}
             defaultValue={value}
             placeholder={placeholder}
@@ -93,7 +91,7 @@ const Record = ({
 
     const handleMute = () => {
         if (editMode) return
-        terminal.socket.emit('environmentMute', {
+        terminal.socket.emit(UtilityEvents.ENVMUTE, {
             value: keyValue,
             order: orderId
         })
@@ -104,7 +102,7 @@ const Record = ({
 
         if (!keyValue) return
         if (newRecordOpen && (!keyValue || !valueValue)) return
-        terminal.socket.emit('environmentEdit', {
+        terminal.socket.emit(UtilityEvents.ENVEDIT, {
             order: orderId,
             key: keyValue,
             previousKey: keyPreviousValue,

@@ -10,10 +10,11 @@ declare global {
             stopTerminal: (stack: string, terminal: string) => Promise<boolean>
             killAll: () => Promise<void>
             save: () => Promise<void>
-            createCommand: (title: string, stackId: string) => Promise<Cmd>
+            createCommand: (payload: NewCommandPayload, stackId: string) => Promise<Cmd>
             startStack: (stack: string) => Promise<void>
             stopStack: (stack: string) => Promise<void>
             createStack: (title: string) => Promise<PaletteStack>
+            deleteStack: (stackId: string) => Promise<void>
             deleteCommand: (stackId: string, terminalId: string) => Promise<void>
         }
         store: {

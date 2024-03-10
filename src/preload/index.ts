@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { Cmd, PaletteStack } from '../types'
+import { Cmd, NewCommandPayload, PaletteStack } from '../types'
 
 // Custom APIs for renderer
 const api = {
@@ -20,13 +20,14 @@ const api = {
 
     save: (): Promise<void> => ipcRenderer.invoke('save'),
 
-    createCommand: (title: string, stackId: string): Promise<Cmd> =>
-        ipcRenderer.invoke('createCommand', title, stackId),
+    createCommand: (payload: NewCommandPayload, stackId: string): Promise<Cmd> =>
+        ipcRenderer.invoke('createCommand', payload, stackId),
 
     deleteCommand: (stackId: string, terminalId: string): Promise<Cmd> =>
         ipcRenderer.invoke('deleteCommand', stackId, terminalId),
 
-    createStack: (title: string) => ipcRenderer.invoke('createStack', title)
+    createStack: (title: string): Promise<PaletteStack> => ipcRenderer.invoke('createStack', title),
+    deleteStack: (stackId: string): Promise<void> => ipcRenderer.invoke('deleteStack', stackId)
 }
 
 const store = {

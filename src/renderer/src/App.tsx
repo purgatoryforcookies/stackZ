@@ -3,7 +3,7 @@ import Palette from './components/Palette'
 import DetailHeader from './components/DetailHeader/DetailHeader'
 import { useRef, useState } from 'react'
 import { SOCKET_HOST } from './service/socket'
-import Settings from './components/Common/Settings'
+import Settings from './components/settings/Settings'
 import { CommandMenu } from './components/Common/CommandMenu'
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './@/ui/resizable'
 import { useStack } from './hooks/useStack'
@@ -14,7 +14,7 @@ import { ImperativePanelHandle } from 'react-resizable-panels'
 export const ThemeContext = createContext('aurora')
 
 function App(): JSX.Element {
-    const [theme, setTheme] = useState<string | undefined>()
+    const [theme, setTheme] = useState<string>()
     const paletteRef = useRef<ImperativePanelHandle>(null)
     const headerRef = useRef<ImperativePanelHandle>(null)
 
@@ -29,11 +29,11 @@ function App(): JSX.Element {
             {storedWidth ? (
                 <ResizablePanelGroup
                     direction="horizontal"
-                    className="bg-background text-primary-foreground"
+                    className="bg-gradient text-primary-foreground"
                     data-theme={theme}
                 >
                     <CommandMenu stack={stack} toggle={toggle} />
-                    <Settings setTheme={setTheme} />
+                    <Settings setTheme={setTheme} stack={stack} />
                     <ResizablePanel>
                         <ResizablePanelGroup direction="vertical">
                             <ResizablePanel className="relative">

@@ -4,9 +4,14 @@ import { Button } from '@renderer/@/ui/button'
 import {
     ChevronDownIcon,
     ChevronUpIcon,
+    CornerBottomLeftIcon,
+    CornerBottomRightIcon,
+    CornerTopLeftIcon,
+    CornerTopRightIcon,
     Cross2Icon,
     EyeNoneIcon,
     HeartIcon,
+    MoveIcon,
     ReloadIcon,
     SymbolIcon,
     TimerIcon
@@ -68,17 +73,26 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
         <Draggable
             axis="y"
             position={{ x: 0, y: 0 }}
-            handle=".commandBody"
+            handle=".moveHandle"
+            defaultClassNameDragging="brightness-125 relative z-50"
             onDrag={(_, d) => handleDrag(d, data)}
             onStop={(_, d) => handleDrag(d, data, engine.stackId)}
         >
             <div
                 className={`
-            p-1 m-2 rounded-md
+            p-1 m-2 rounded-lg
             ${selected ? 'bg-card' : ''}`}
             >
+                {selected ? (
+                    <div>
+                        <CornerTopRightIcon className="absolute right-0 top-0 h-5 w-5 text-primary" />
+                        <CornerBottomRightIcon className="absolute right-0 bottom-0 h-5 w-5 text-primary" />
+                        <CornerBottomLeftIcon className="absolute left-0 bottom-0 h-5 w-5 text-primary" />
+                        <CornerTopLeftIcon className="absolute left-0 top-0 h-5 w-5 text-primary" />
+                    </div>
+                ) : null}
                 <div
-                    className="m-2 overflow-hidden rounded-md commandBody"
+                    className="m-2 overflow-hidden rounded-md"
                     onClick={() => {
                         stack.selectTerminal(engine.terminalId)
                     }}
@@ -87,7 +101,8 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
                         <span className="truncate text-secondary-foreground " dir="rtl">
                             {ping.cwd}
                         </span>
-                        <span className="flex items-center ">
+                        <span className="flex items-center gap-2">
+                            <MoveIcon className="h-4 w-4 text-secondary-foreground hover:scale-125 hover:cursor-pointer moveHandle" />
                             <Cross2Icon
                                 className="h-4 w-4 text-secondary-foreground hover:scale-125 hover:cursor-pointer"
                                 onClick={() => handleState(true)}

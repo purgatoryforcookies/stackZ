@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Record from '@renderer/components/Common/ListItem'
 import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
@@ -56,6 +56,13 @@ function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
             order: data.order
         })
     }
+
+    useEffect(() => {
+        if (data.order === 0) {
+            setHidden(true)
+            setMinimized(true)
+        }
+    }, [])
 
     return (
         <div
@@ -123,20 +130,20 @@ function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
                 >
                     {data.pairs
                         ? Object.keys(data.pairs).map((key: string) => (
-                              <Record
-                                  key={key} //react component key
-                                  newRecord={false}
-                                  editMode={editMode}
-                                  terminal={terminal}
-                                  orderId={data.order}
-                                  minimized={minimized}
-                                  keyv={key}
-                                  muted={data.disabled.includes(key)}
-                                  value={data.pairs[key]}
-                                  onClick={handleClik}
-                                  highlight={highlight ? highlight[0] === key : false}
-                              />
-                          ))
+                            <Record
+                                key={key} //react component key
+                                newRecord={false}
+                                editMode={editMode}
+                                terminal={terminal}
+                                orderId={data.order}
+                                minimized={minimized}
+                                keyv={key}
+                                muted={data.disabled.includes(key)}
+                                value={data.pairs[key]}
+                                onClick={handleClik}
+                                highlight={highlight ? highlight[0] === key : false}
+                            />
+                        ))
                         : null}
                     {editMode ? (
                         <Record
@@ -144,7 +151,7 @@ function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
                             terminal={terminal}
                             orderId={data.order}
                             minimized={minimized}
-                            onClick={() => {}}
+                            onClick={() => { }}
                             editMode={editMode}
                         />
                     ) : null}

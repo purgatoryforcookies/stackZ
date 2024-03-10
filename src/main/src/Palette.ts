@@ -1,8 +1,17 @@
 import { v4 as uuidv4 } from 'uuid'
-import { ClientEvents, Cmd, PaletteStack, StackStatus, UtilityEvents } from '../../types'
+import {
+    ClientEvents,
+    Cmd,
+    NewCommandPayload,
+    PaletteStack,
+    StackDefaultsProps,
+    StackStatus,
+    UtilityEvents
+} from '../../types'
 import { Terminal } from './service/Terminal'
 import { Server, Socket } from 'socket.io'
 import { store } from './service/Store'
+import { HistoryService } from './service/HistoryService'
 
 export interface ISaveFuntion {
     (onExport?: boolean): void
@@ -18,16 +27,20 @@ export class Palette {
     server: Server
     socket: Socket | null
     isRunning: boolean
+    save: ISaveFuntion
+    history: HistoryService
 
-    constructor(settings: PaletteStack, server: Server) {
+    constructor(settings: PaletteStack, server: Server, save: ISaveFuntion, history: HistoryService) {
         this.settings = settings
         this.terminals = new Map<string, Terminal>()
         this.server = server
         this.isRunning = false
         this.socket = null
+        this.save = save
+        this.history = history
     }
 
-    async initTerminal(socket: Socket, remoteTerminalID: string, save: ISaveFuntion) {
+    async initTerminal(socket: Socket, remoteTerminalID: string) {
         const terminal = this.settings.palette?.find((palette) => palette.id === remoteTerminalID)
 
         if (terminal) {
@@ -36,7 +49,8 @@ export class Palette {
                 terminal,
                 socket,
                 this.pingState.bind(this),
-                save
+                this.save,
+                this.history
             )
             this.terminals.set(terminal.id, newTerminal)
             newTerminal.ping()
@@ -60,11 +74,17 @@ export class Palette {
         socket.on(UtilityEvents.REORDER, (arg: { terminalId: string; newOrder: number }) => {
             this.reOrderExecution(arg)
         })
+        socket.on(UtilityEvents.STACKDEFAULTS, (arg: StackDefaultsProps) => {
+            this.updateDefaults(arg)
+        })
+        socket.on(UtilityEvents.STACKNAME, (arg: { name: string }) => {
+            this.rename(arg.name)
+        })
         socket.emit('hello')
         this.pingState()
     }
 
-    async createCommand(title: string) {
+    async createCommand(payload: NewCommandPayload) {
         let newOrder = 1
 
         if (!this.settings.palette) {
@@ -74,17 +94,25 @@ export class Palette {
             const maxOrder = Math.max(...orders)
             if (maxOrder !== -Infinity) newOrder = maxOrder + 1
         }
-        const defaultShell = (await store.get('userSettings.defaultShell')) as string
-        const defaultCwd = (await store.get('userSettings.defaultCwd')) as string
+
+        const userSettings = store.get('userSettings')
 
         const newOne: Cmd = {
             id: uuidv4(),
-            title: title,
+            title: payload.title,
             executionOrder: newOrder,
             command: {
-                cmd: 'echo Hello World!',
-                cwd: defaultCwd,
-                shell: defaultShell
+                cmd: payload.command ?? this.settings.defaultCommand ?? 'echo Hello World!',
+                cwd:
+                    payload.cwd ??
+                    this.settings.defaultCwd ??
+                    userSettings.global.defaultCwd ??
+                    process.env.HOME,
+                shell:
+                    payload.shell ??
+                    this.settings.defaultShell ??
+                    userSettings.global.defaultShell ??
+                    undefined
             }
         }
 
@@ -127,6 +155,9 @@ export class Palette {
 
         const state: StackStatus = {
             stack: this.settings.id,
+            shell: this.settings.defaultShell,
+            cwd: this.settings.defaultCwd,
+            cmd: this.settings.defaultCommand,
             isRunning: terminalStates.some((term) => term.running),
             isReserved: terminalStates.some((term) => term.reserved),
             state: terminalStates
@@ -171,5 +202,34 @@ export class Palette {
                 newExecOrder += 1
                 if (t.settings.id !== arg.terminalId) t.settings.executionOrder = newExecOrder
             })
+    }
+
+    rename(newName: string) {
+        this.settings.stackName = newName
+        this.save()
+    }
+    updateDefaults(arg: StackDefaultsProps) {
+        console.log(arg)
+        const { defaultCommand, defaultCwd, defaultShell } = arg
+        if (!defaultCwd || defaultCwd.length === 0) {
+            delete this.settings.defaultCwd
+        } else {
+            this.settings.defaultCwd = arg.defaultCwd
+        }
+
+        if (!defaultShell || defaultShell.length === 0) {
+            delete this.settings.defaultShell
+        } else {
+            this.settings.defaultShell = arg.defaultShell
+        }
+
+        if (!defaultCommand || defaultCommand.length === 0) {
+            delete this.settings.defaultCommand
+        } else {
+            this.settings.defaultCommand = arg.defaultCommand
+        }
+
+        this.save()
+        this.pingState()
     }
 }

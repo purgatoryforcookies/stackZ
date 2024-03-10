@@ -22,7 +22,7 @@ function DetailHeader({ stack }: DetailHeaderProps) {
         })
         terminal.socket.emit(UtilityEvents.STATE)
 
-        if (status && status.stackId !== terminal.stackId) setStatus(null)
+        if (status && status.stackId !== stack.selectedStack) setStatus(null)
     }, [stack])
 
     const handleHighligt = (e: string[]) => {
@@ -52,14 +52,14 @@ function DetailHeader({ stack }: DetailHeaderProps) {
             <div className="flex gap-8 pb-16 h-full overflow-auto pr-32" ref={bodyRef}>
                 {status?.cmd.command.env
                     ? status.cmd.command.env.map((record) => (
-                          <EnvList
-                              data={record}
-                              key={record.title}
-                              onSelection={handleHighligt}
-                              terminal={terminal}
-                              highlight={highlightedEnv}
-                          />
-                      ))
+                        <EnvList
+                            data={record}
+                            key={record.title}
+                            onSelection={handleHighligt}
+                            terminal={terminal}
+                            highlight={highlightedEnv}
+                        />
+                    ))
                     : null}
                 <div className="p-11">
                     <NewEnvList scroll={scroll} terminal={terminal} />
