@@ -143,7 +143,10 @@ export class Stack {
             stackName: name
         }
         this.raw.push(newOne)
-        this.palettes.set(newOne.id, new Palette(newOne, this.server, this.save.bind(this), this.history))
+        this.palettes.set(
+            newOne.id,
+            new Palette(newOne, this.server, this.save.bind(this), this.history)
+        )
         this.save()
         return newOne
     }

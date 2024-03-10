@@ -12,7 +12,7 @@ export class TerminalUIEngine {
         },
         cursorBlink: true,
         rightClickSelectsWord: false,
-        allowProposedApi: true,
+        allowProposedApi: true
     })
     socket: Socket
     private mounted = false
@@ -40,7 +40,6 @@ export class TerminalUIEngine {
         this.buffer = ''
         this.isRunning = false
         this.step = 0
-
     }
 
     isMounted() {
@@ -94,13 +93,12 @@ export class TerminalUIEngine {
         })
 
         this.terminal.onKey((data) => {
-
             this.sendInput(data.key)
             if (this.isRunning) return
 
             const isOutOfBoundsLeft = this.terminal.buffer.active.cursorX <= 2
-            const isOutOfBoundsRigth = this.terminal.buffer.active.cursorX - 1 > this.getCurrentTerminalLine().length
-
+            const isOutOfBoundsRigth =
+                this.terminal.buffer.active.cursorX - 1 > this.getCurrentTerminalLine().length
 
             switch (data.domEvent.key) {
                 case 'Enter': {
@@ -157,8 +155,8 @@ export class TerminalUIEngine {
      * Used for writing the users input to xterm terminal.
      * Writes into either end of the line or middle of it
      * depending on cursor positioning.
-     * 
-     * Note: Should not be used for escape character commands. 
+     *
+     * Note: Should not be used for escape character commands.
      * use rawWrite() instead.
      */
     writeViaBuffer(data: string) {
@@ -171,8 +169,7 @@ export class TerminalUIEngine {
         this.rawWrite('\u001b[1000D')
         if (curPos != this.buffer.length - 1) {
             this.rawWrite(`\u001b[${curPos + 3}C`)
-        }
-        else {
+        } else {
             this.rawWrite(`\u001b[${this.buffer.length + 2}C`)
         }
     }
@@ -185,7 +182,6 @@ export class TerminalUIEngine {
         this.rawWrite(this.buffer)
         this.rawWrite('\u001b[1000D')
         this.rawWrite(`\u001b[${curPos + 1}C`)
-
     }
 
     rawWrite(data: string) {
@@ -211,7 +207,6 @@ export class TerminalUIEngine {
 
     clear() {
         this.terminal.clear()
-
     }
 
     detach() {
@@ -230,12 +225,13 @@ export class TerminalUIEngine {
     }
 
     changeSettingsMaybe() {
-
         const cursorRow = this.terminal.buffer.active.cursorY
-        const currentRow = this.terminal.buffer.active.getLine(cursorRow)?.translateToString(true, 2)
+        const currentRow = this.terminal.buffer.active
+            .getLine(cursorRow)
+            ?.translateToString(true, 2)
         if (!currentRow) return
 
-        const [keyword, cmd] = currentRow.split(" ", 2)
+        const [keyword, cmd] = currentRow.split(' ', 2)
 
         switch (keyword) {
             case 'cd':
@@ -263,7 +259,6 @@ export class TerminalUIEngine {
                 })
                 break
         }
-
     }
 
     async pasteClipBoardMaybe() {
@@ -273,21 +268,24 @@ export class TerminalUIEngine {
     }
 
     getHistory(dir: 1 | -1) {
-
-        this.socket.emit("history", this.getCurrentTerminalLine(), this.step, (data: string) => {
+        this.socket.emit('history', this.getCurrentTerminalLine(), this.step, (data: string) => {
             if (!data) {
                 this.step = 0
+                this.rawWrite('\u001b[2K\u001b[1000D$ ')
+                this.buffer = ''
                 return
             }
             this.rawWrite('\u001b[2K\u001b[1000D$ ')
             this.rawWrite(data)
             this.buffer = data
-            dir === 1 ? this.step += 1 : this.step -= 1
+            dir === 1 ? (this.step += 1) : (this.step -= 1)
         })
     }
 
     getCurrentTerminalLine() {
         const cursorRow = this.terminal.buffer.active.cursorY
-        return this.terminal.buffer.active.getLine(cursorRow)?.translateToString(true).slice(2) || '' //Hack
+        return (
+            this.terminal.buffer.active.getLine(cursorRow)?.translateToString(true).slice(2) || ''
+        )
     }
 }

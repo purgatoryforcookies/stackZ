@@ -130,20 +130,20 @@ function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
                 >
                     {data.pairs
                         ? Object.keys(data.pairs).map((key: string) => (
-                            <Record
-                                key={key} //react component key
-                                newRecord={false}
-                                editMode={editMode}
-                                terminal={terminal}
-                                orderId={data.order}
-                                minimized={minimized}
-                                keyv={key}
-                                muted={data.disabled.includes(key)}
-                                value={data.pairs[key]}
-                                onClick={handleClik}
-                                highlight={highlight ? highlight[0] === key : false}
-                            />
-                        ))
+                              <Record
+                                  key={key} //react component key
+                                  newRecord={false}
+                                  editMode={editMode}
+                                  terminal={terminal}
+                                  orderId={data.order}
+                                  minimized={minimized}
+                                  keyv={key}
+                                  muted={data.disabled.includes(key)}
+                                  value={data.pairs[key]}
+                                  onClick={handleClik}
+                                  highlight={highlight ? highlight[0] === key : false}
+                              />
+                          ))
                         : null}
                     {editMode ? (
                         <Record
@@ -151,7 +151,7 @@ function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
                             terminal={terminal}
                             orderId={data.order}
                             minimized={minimized}
-                            onClick={() => { }}
+                            onClick={() => {}}
                             editMode={editMode}
                         />
                     ) : null}

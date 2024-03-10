@@ -77,7 +77,7 @@ function Settings({ setTheme, stack }: SettingsProps) {
                         </TabsList>
                         <TabsContent value="stack">
                             Change settings for the selected stack.
-                            <p className='text-muted-foreground text-sm'>
+                            <p className="text-muted-foreground text-sm">
                                 These will override the general defaults for this stack
                             </p>
                             <Stack stack={stack} close={() => setOpen(false)} />

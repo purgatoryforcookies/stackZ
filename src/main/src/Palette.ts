@@ -30,7 +30,12 @@ export class Palette {
     save: ISaveFuntion
     history: HistoryService
 
-    constructor(settings: PaletteStack, server: Server, save: ISaveFuntion, history: HistoryService) {
+    constructor(
+        settings: PaletteStack,
+        server: Server,
+        save: ISaveFuntion,
+        history: HistoryService
+    ) {
         this.settings = settings
         this.terminals = new Map<string, Terminal>()
         this.server = server

@@ -83,7 +83,7 @@ function Palette({ data }: PaletteProps) {
                                 }}
                                 variant={data.selectedStack === stack.id ? 'default' : 'outline'}
                                 className={`hover:bg-primary hover:text-background text-nowrap
-                                hover:cursor-pointer border-2`}
+                                hover:cursor-pointer`}
                             >
                                 {stack.stackName}
                             </Badge>
