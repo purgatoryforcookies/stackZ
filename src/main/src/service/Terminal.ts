@@ -59,29 +59,34 @@ export class Terminal {
         cmd: string,
         loose: boolean | undefined
     ): [string, string[]] {
-        const tmpShell = shell ? shell.trim() : this.win ? 'powershell.exe' : 'bash'
 
-        if (loose) {
-            return [tmpShell, []]
-        }
+
+        const tmpShell = shell ? shell.trim() : this.win ? 'powershell.exe' : 'bash'
         const cmdArr = cmd.split(' ')
 
         switch (tmpShell) {
             case 'cmd.exe':
+                if (loose) return [tmpShell, []]
                 return ['powershell.exe', ['cmd.exe', '/c', cmd]]
             case 'wsl.exe':
+                if (loose) return [tmpShell, []]
                 return ['powershell.exe', ['wsl.exe', '-e', cmd]]
             case 'powershell.exe':
+                if (loose) return [tmpShell, []]
                 return ['powershell.exe', [cmd]]
             case 'bash':
-                return ['/bin/bash', ['-l', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
+                if (loose) return [tmpShell, ['-il']]
+                return ['/bin/bash', ['-il', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
             case 'zsh':
+                if (loose) return [tmpShell, ['-il']]
                 return ['/bin/zsh', ['-il', '-c', `. ~/.zprofile && ${cmdArr.join(' ')}`]]
             default:
                 if (this.win) {
+                    if (loose) return [tmpShell, []]
                     return ['powershell.exe', [cmd]]
                 }
-                return ['/bin/bash', ['-l', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
+                if (loose) return [tmpShell, ['-il']]
+                return ['/bin/bash', ['-il', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
         }
     }
 
