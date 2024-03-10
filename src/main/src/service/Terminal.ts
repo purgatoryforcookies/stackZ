@@ -257,12 +257,23 @@ export class Terminal {
     }
 
     updateCwd(value: string) {
-        this.settings.command.cwd = path.normalize(value.trim())
+        const newPath = path.normalize(value.trim())
+        this.settings.command.cwd = newPath
+        this.history.store('CWD', 'cd ' + newPath) //hack, could this not be hardcoded here
         this.ping()
     }
 
     updateCommand(value: string) {
-        this.settings.command.cmd = value.trim()
+        const newCommand = value.trim()
+        this.settings.command.cmd = newCommand
+        this.history.store('CMD', newCommand)
+        this.ping()
+    }
+
+    changeShell(newShell: string | undefined) {
+        const resolvedShell = this.chooseShell(newShell)
+        this.settings.command.shell = resolvedShell
+        this.history.store('SHELL', 'shell ' + newShell) //hack, could this not be hardcoded here
         this.ping()
     }
 
@@ -298,11 +309,6 @@ export class Terminal {
         if (!args.value) return
         const list = this.settings.command.env?.find((list) => list.order === args.order)
         delete list?.pairs[args.value]
-        this.ping()
-    }
-
-    changeShell(newShell: string | undefined) {
-        this.settings.command.shell = this.chooseShell(newShell)
         this.ping()
     }
 
@@ -362,9 +368,8 @@ export class Terminal {
         this.socket.on(UtilityEvents.STATE, () => {
             this.ping()
         })
-        this.socket.on("history", (feed: string, step: number, akw) => {
-
-            const keyword = feed.split(" ", 2)[0]
+        this.socket.on('history', (feed: string, step: number, akw) => {
+            const keyword = feed.split(' ', 2)[0]
             switch (keyword) {
                 case 'cd':
                     akw(this.history.get('CWD', step))
@@ -373,11 +378,9 @@ export class Terminal {
                     akw(this.history.get('SHELL', step))
                     break
                 default:
-                    // akw(this.settings.command.cmd)
                     akw(this.history.get('CMD', step))
                     break
             }
-
         })
         this.socket.emit('hello')
         this.stackPing()

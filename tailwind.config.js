@@ -56,8 +56,7 @@ module.exports = {
                 }
             },
             backgroundImage: {
-                gradient:
-                    "var(--gradient)",
+                gradient: 'var(--gradient)'
             },
             borderRadius: {
                 lg: 'var(--radius)',

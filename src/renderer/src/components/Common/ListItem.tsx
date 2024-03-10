@@ -42,11 +42,13 @@ export const Field = ({
     highlight
 }: FieldProps) => {
     const style = `rounded-full py-1
-    ${variant === 'primary'
+    ${
+        variant === 'primary'
             ? `px-3 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
-            : `px-3  truncate text-secondary ${highlight ? 'bg-orange-900 text-white' : 'bg-primary'
-            }`
-        }`
+            : `px-3  truncate text-secondary ${
+                  highlight ? 'bg-orange-900 text-white' : 'bg-primary'
+              }`
+    }`
 
     if (disabled) return <p className={style}>{value}</p>
 

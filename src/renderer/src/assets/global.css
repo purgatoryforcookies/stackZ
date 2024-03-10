@@ -73,8 +73,6 @@
     [data-theme='aurora'] {
         --gradient: linear-gradient(to right bottom, #1d1407, #201608, #231808, #261909, #291b09);
 
-
-
         --background: 35 60.45% 7%;
         --foreground: 35 9.3% 97.75%;
 

@@ -4,7 +4,7 @@ Do you remember how that one project of yours started up again? was there some s
 
 StackZ is a developer tool which purpose is to answer above mentioned questions.
 
-![Alt text](resources/screenshot1.png?raw=true "Overview")
+![Alt text](resources/screenshot1.png?raw=true 'Overview')
 
 With StackZ, you can create environments and pipelines withing your development machine. Each stack is easily configurable with environment variables, which get injected into the terminal when it is started. You can have multiple env-sets for each terminal, and they can be muted individually for quick adjustments, e.g. either dev, test or production enviroment. CWD's (current working directories) can be speficied within each terminal.
 
@@ -88,6 +88,6 @@ Terminals can restart on exits.
 
 ### Notes
 
-Not all features are supported nor implemented. Many of obvious ones are still missing. Refer to editing the .json file manually at this point, especially if you want to rename the stacks (and the placeholder stack that is created on first star). 
+Not all features are supported nor implemented. Many of obvious ones are still missing. Refer to editing the .json file manually at this point, especially if you want to rename the stacks (and the placeholder stack that is created on first star).
 
 There's a socket server, and it runs on port 3123.
