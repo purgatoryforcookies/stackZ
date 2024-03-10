@@ -1,9 +1,12 @@
-import { HistoryKey, MkdirError } from 'src/types'
+import { HistoryKey, MkdirError } from '../../../types'
 import { readFile, access, constants, writeFileSync, mkdirSync, writeFile } from 'fs'
-import path from 'path'
+import { join } from 'path'
 import { app } from 'electron'
 
-const dirPath = path.join(app.getPath('userData'), './history')
+
+// app is not available during testing with the current suite
+// setting path to repo root fixes the issue
+const dirPath = join(app?.getPath('userData') || '', './history')
 
 export class HistoryService {
     private history: Map<keyof typeof HistoryKey, string[]>
@@ -25,7 +28,7 @@ export class HistoryService {
 
     store(key: keyof typeof HistoryKey, value: string) {
         const mem = this.history.get(key)
-        if (!mem) throw new Error(`Invalid Key ${key}`)
+        if (!mem) throw new Error(`Invalid Key ${String(key)}`)
 
         if (mem.length > this.limit) mem.pop()
         mem.unshift(value)
@@ -42,18 +45,18 @@ export class HistoryService {
             const hist = this.history.get(key as keyof typeof HistoryKey)
             if (!hist || hist.length === 0) return
 
-            writeFile(dirPath + `/${key.toLowerCase()}.txt`, hist.join('\n'), (err) => {
+            writeFile(dirPath + `/${String(key).toLowerCase()}.txt`, hist.join('\n'), (err) => {
                 if (err) {
-                    console.log(`Error, could not save history ${key}, ${err}`)
+                    console.log(`Error, could not save history ${String(key)}, ${err}`)
                 } else {
-                    console.log(`History saved, key ${key}`)
+                    console.log(`History saved, key ${String(key)}`)
                 }
             })
         })
     }
 
     async readFromDisk(basePath: string, key: keyof typeof HistoryKey) {
-        const fullPath = basePath + `/${key.toLowerCase()}.txt`
+        const fullPath = basePath + `/${String(key).toLowerCase()}.txt`
 
         const exists = await new Promise((res) => {
             access(fullPath, constants.F_OK, (err) => {

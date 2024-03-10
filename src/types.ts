@@ -166,9 +166,9 @@ export type MkdirError = {
 
 export type NewCommandPayload = {
     title: string
-    command: string
-    shell: string
-    cwd: string
+    command?: string
+    shell?: string
+    cwd?: string
 }
 
 export type StoreType = {

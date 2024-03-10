@@ -73,7 +73,7 @@ describe('stack', () => {
     it('Creates a terminal into a stack and removes it', async () => {
         const newstack = stack.createStack('Test1')
 
-        const newTerminal = await stack.createTerminal('Test00', newstack.id)
+        const newTerminal = await stack.createTerminal({ title: 'Test00' }, newstack.id)
         const test = stack.palettes.get(newstack.id)
 
         expect(test).toBeDefined()
@@ -101,7 +101,7 @@ describe('stack', () => {
         for (const id of testStackIds) {
             const tTerminals: string[] = []
             for (const term of testTerminalNames) {
-                const newT = await stack.createTerminal(term, id)
+                const newT = await stack.createTerminal({ title: term }, id)
                 tTerminals.push(newT.id)
             }
             testStacks.set(id, tTerminals)
