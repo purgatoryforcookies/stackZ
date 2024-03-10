@@ -39,7 +39,7 @@ async function createWindow(): Promise<void> {
         height: 900,
         minWidth: 200,
         show: false,
-        autoHideMenuBar: true,
+        autoHideMenuBar: !is.dev,
 
         ...(process.platform === 'linux' ? {} : {}),
         webPreferences: {
@@ -137,8 +137,8 @@ ipcMain.handle('save', () => {
     // return palette.save()
 })
 
-ipcMain.handle('createCommand', (_, title, stackId) => {
-    const newOne = stack.createTerminal(title, stackId)
+ipcMain.handle('createCommand', (_, payload, stackId) => {
+    const newOne = stack.createTerminal(payload, stackId)
     return newOne
 })
 ipcMain.handle('deleteCommand', (_, stackId, terminalId) => {
@@ -146,6 +146,9 @@ ipcMain.handle('deleteCommand', (_, stackId, terminalId) => {
 })
 ipcMain.handle('createStack', (_, title) => {
     return stack.createStack(title)
+})
+ipcMain.handle('deleteStack', (_, stackId) => {
+    return stack.removeStack(stackId)
 })
 
 ipcMain.handle('openFilesLocation', () => {

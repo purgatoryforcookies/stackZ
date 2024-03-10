@@ -22,7 +22,7 @@ function DetailHeader({ stack }: DetailHeaderProps) {
         })
         terminal.socket.emit(UtilityEvents.STATE)
 
-        if (status && status.stackId !== terminal.stackId) setStatus(null)
+        if (status && status.stackId !== stack.selectedStack) setStatus(null)
     }, [stack])
 
     const handleHighligt = (e: string[]) => {

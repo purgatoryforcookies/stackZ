@@ -47,48 +47,49 @@ export function CommandMenu({ stack, toggle }: CommandMenuProps) {
                 // window.api.startTerminal(stack.selectedStack, stack.selectedTerminal)
                 break
             case 'ArrowUp':
-                if (open) break
-                stack.selectTerminal((prev) => {
-                    const s = stack.stack?.get(stack.selectedStack)
-                    if (!s) return prev
-                    const oldOrder = s.palette?.find((p) => p.id === prev)?.executionOrder
-                    if (!oldOrder || oldOrder - 1 <= 0) return prev
-                    const newId = s.palette?.find((p) => p.executionOrder === oldOrder - 1)?.id
-                    if (!newId) return prev
-                    return newId
-                })
+                // TODO: These are clashing with terminal shortcuts, find another way to do this
+                // if (open) break
+                // stack.selectTerminal((prev) => {
+                //     const s = stack.stack?.get(stack.selectedStack)
+                //     if (!s) return prev
+                //     const oldOrder = s.palette?.find((p) => p.id === prev)?.executionOrder
+                //     if (!oldOrder || oldOrder - 1 <= 0) return prev
+                //     const newId = s.palette?.find((p) => p.executionOrder === oldOrder - 1)?.id
+                //     if (!newId) return prev
+                //     return newId
+                // })
                 break
             case 'ArrowDown':
-                if (open) break
-                stack.selectTerminal((prev) => {
-                    const s = stack.stack?.get(stack.selectedStack)
-                    if (!s) return prev
-                    const oldOrder = s.palette?.find((p) => p.id === prev)?.executionOrder
-                    if (!oldOrder || oldOrder + 1 > (s.palette?.length || 0)) return prev
-                    const newId = s.palette?.find((p) => p.executionOrder === oldOrder + 1)?.id
-                    if (!newId) return prev
-                    return newId
-                })
+                // if (open) break
+                // stack.selectTerminal((prev) => {
+                //     const s = stack.stack?.get(stack.selectedStack)
+                //     if (!s) return prev
+                //     const oldOrder = s.palette?.find((p) => p.id === prev)?.executionOrder
+                //     if (!oldOrder || oldOrder + 1 > (s.palette?.length || 0)) return prev
+                //     const newId = s.palette?.find((p) => p.executionOrder === oldOrder + 1)?.id
+                //     if (!newId) return prev
+                //     return newId
+                // })
                 break
             case 'ArrowRight':
-                if (open) break
-                stack.selectStack((prev) => {
-                    const s = stack.stack
-                    if (!s) return prev
-                    const key = Array.from(s.keys()).findIndex((k) => k === prev)
-                    if (key === -1) return prev
-                    return Array.from(s.keys())[key + 1] || prev
-                })
+                // if (open) break
+                // stack.selectStack((prev) => {
+                //     const s = stack.stack
+                //     if (!s) return prev
+                //     const key = Array.from(s.keys()).findIndex((k) => k === prev)
+                //     if (key === -1) return prev
+                //     return Array.from(s.keys())[key + 1] || prev
+                // })
                 break
             case 'ArrowLeft':
-                if (open) break
-                stack.selectStack((prev) => {
-                    const s = stack.stack
-                    if (!s) return prev
-                    const key = Array.from(s.keys()).findIndex((k) => k === prev)
-                    if (key === -1) return prev
-                    return Array.from(s.keys())[key - 1] || prev
-                })
+                // if (open) break
+                // stack.selectStack((prev) => {
+                //     const s = stack.stack
+                //     if (!s) return prev
+                //     const key = Array.from(s.keys()).findIndex((k) => k === prev)
+                //     if (key === -1) return prev
+                //     return Array.from(s.keys())[key - 1] || prev
+                // })
                 break
             default:
                 break

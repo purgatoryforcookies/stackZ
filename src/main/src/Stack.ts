@@ -1,10 +1,11 @@
 import { v4 as uuidv4 } from 'uuid'
-import { PaletteStack } from '../../types'
+import { NewCommandPayload, PaletteStack } from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './service/DataStore'
 import { ZodTypeAny } from 'zod'
 import { Server } from 'socket.io'
 import { TerminalScheduler } from './service/TerminalScheduler'
+import { HistoryService } from './service/HistoryService'
 
 export class Stack {
     path: string
@@ -13,6 +14,7 @@ export class Stack {
     palettes: Map<string, Palette>
     store: DataStore
     scheduler: Map<string, TerminalScheduler>
+    history: HistoryService
 
     constructor(jsonPath: string, server: Server, schema: ZodTypeAny) {
         this.path = jsonPath
@@ -21,6 +23,7 @@ export class Stack {
         this.store = new DataStore(jsonPath, schema)
         this.palettes = new Map<string, Palette>()
         this.scheduler = new Map<string, TerminalScheduler>()
+        this.history = new HistoryService()
     }
 
     async load() {
@@ -45,7 +48,10 @@ export class Stack {
                     console.log(`Palette with ID ${palette.id} exists`)
                     return
                 }
-                this.palettes.set(palette.id, new Palette(palette, this.server))
+                this.palettes.set(
+                    palette.id,
+                    new Palette(palette, this.server, this.save.bind(this), this.history)
+                )
             }
         }
         this.save()
@@ -66,7 +72,7 @@ export class Stack {
                     palette.installStackSocket(client)
                 } else {
                     console.log(`Terminal ${remoteTerminalID} connected`)
-                    palette.initTerminal(client, String(remoteTerminalID), this.save.bind(this))
+                    palette.initTerminal(client, String(remoteTerminalID))
                 }
             }
         })
@@ -120,13 +126,13 @@ export class Stack {
         this.server.emit('terminalDelete', { stack, terminal })
     }
 
-    async createTerminal(title: string, stack: string) {
+    async createTerminal(payload: NewCommandPayload, stack: string) {
         const existingStack = this.palettes.get(stack)
         if (!existingStack) {
             throw new Error(`Whoah, stack ${stack} was not found when adding new terminal`)
         }
-        const newT = await this.palettes.get(stack)?.createCommand(title)
-        if (!newT) throw new Error(`Could not create terminal ${title} ${stack}`)
+        const newT = await this.palettes.get(stack)?.createCommand(payload)
+        if (!newT) throw new Error(`Could not create terminal ${payload.title} ${stack}`)
         this.save()
         return newT
     }
@@ -137,7 +143,10 @@ export class Stack {
             stackName: name
         }
         this.raw.push(newOne)
-        this.palettes.set(newOne.id, new Palette(newOne, this.server))
+        this.palettes.set(
+            newOne.id,
+            new Palette(newOne, this.server, this.save.bind(this), this.history)
+        )
         this.save()
         return newOne
     }
@@ -146,7 +155,6 @@ export class Stack {
         this.raw = this.raw.filter((s) => s.id !== stackId)
         this.palettes.delete(stackId)
         this.save()
-
         return
     }
 

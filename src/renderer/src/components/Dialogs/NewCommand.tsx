@@ -15,6 +15,7 @@ import { Input } from '@renderer/@/ui/input'
 import { ThemeContext } from '@renderer/App'
 import { Badge } from '@renderer/@/ui/badge'
 import { IUseStack } from '@renderer/hooks/useStack'
+import { NewCommandPayload } from '@t'
 
 type NewCommandProps = {
     stack: IUseStack
@@ -22,18 +23,29 @@ type NewCommandProps = {
 
 function NewCommand({ stack }: NewCommandProps) {
     const [open, setOpen] = useState(false)
-    const [title, setTitle] = useState<string>('')
-    const [shell, setShell] = useState<string>('')
-    const [cwd, setCwd] = useState<string>('')
     const theme = useContext(ThemeContext)
+
+    const [command, setCommand] = useState<NewCommandPayload>()
 
     const handleSave = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (title.length === 0) return
-        const newCommand = await window.api.createCommand(title, stack.selectedStack)
+
+        if (!command) return
+        if (command.title.length === 0) return
+        const newCommand = await window.api.createCommand(command, stack.selectedStack)
+        console.log(newCommand)
         setOpen(false)
-        setTitle('')
+        setCommand(undefined)
         stack.addTerminal(newCommand)
+    }
+
+    const handleChange = (e: FormEvent<HTMLInputElement>) => {
+        const { name, value } = e.currentTarget
+
+        const newCommand = { ...command }
+        newCommand[name] = value
+
+        setCommand(newCommand as NewCommandPayload)
     }
 
     return (
@@ -55,7 +67,7 @@ function NewCommand({ stack }: NewCommandProps) {
                 <form
                     onSubmit={handleSave}
                     className="flex gap-5 text-secondary-foreground flex-col"
-                    onReset={() => setTitle('')}
+                    onReset={() => setCommand(undefined)}
                 >
                     <div className="grid gap-4 py-2 w-full">
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -65,8 +77,22 @@ function NewCommand({ stack }: NewCommandProps) {
                             <Input
                                 id="name"
                                 className="col-span-3"
-                                onChange={(e) => setTitle(e.target.value)}
-                                value={title}
+                                name="title"
+                                onChange={handleChange}
+                                value={command?.title}
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="command" className="text-right">
+                                Command
+                            </Label>
+                            <Input
+                                id="command"
+                                className="col-span-3"
+                                placeholder="Optional"
+                                name="command"
+                                onChange={handleChange}
+                                value={command?.command}
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -76,10 +102,10 @@ function NewCommand({ stack }: NewCommandProps) {
                             <Input
                                 id="name"
                                 className="col-span-3"
-                                onChange={(e) => setShell(e.target.value)}
+                                name="shell"
+                                onChange={handleChange}
                                 placeholder="Optional"
-                                disabled
-                                value={shell}
+                                value={command?.shell}
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -89,17 +115,15 @@ function NewCommand({ stack }: NewCommandProps) {
                             <Input
                                 id="name"
                                 className="col-span-3"
-                                onChange={(e) => setCwd(e.target.value)}
+                                name="cwd"
+                                onChange={handleChange}
                                 placeholder="Optional"
-                                disabled
-                                value={cwd}
+                                value={command?.cwd}
                             />
                         </div>
                     </div>
                     <DialogFooter className="w-full">
-                        <Button type="submit" disabled={title.length === 0}>
-                            Save
-                        </Button>
+                        <Button type="submit">Save</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

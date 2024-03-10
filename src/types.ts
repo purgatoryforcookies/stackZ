@@ -5,6 +5,9 @@ export const stackSchema = z.array(
     z.object({
         id: z.string().default('gibberish'),
         stackName: z.string().default('First'),
+        defaultCwd: z.string().optional(),
+        defaultShell: z.string().optional(),
+        defaultCommand: z.string().optional(),
         env: z
             .array(
                 z.object({
@@ -79,6 +82,8 @@ export enum UtilityEvents {
     ENVDELETE = 'environmentDelete',
     CMDMETASETTINGS = 'commandMetaSetting',
     HEALTHSETTINGS = 'commandHealthSetting',
+    STACKDEFAULTS = 'stackDefaults',
+    STACKNAME = 'stackName',
     CWD = 'changeCwd',
     CMD = 'changeCommand',
     SHELL = 'changeShell',
@@ -105,6 +110,9 @@ export type Status = {
 export type StackStatus = {
     stack: string
     isRunning: boolean
+    shell: string | undefined
+    cwd: string | undefined
+    cmd: string | undefined
     isReserved: boolean
     state: {
         running: boolean
@@ -133,6 +141,7 @@ export type Utility2Props = {
     terminal: string
     value: string
 }
+export type StackDefaultsProps = PickStartsWith<PaletteStack, 'default'>
 
 export type UpdateCwdProps = Pick<EnvironmentEditProps, 'order' | 'value'>
 export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'terminal' | 'order'>
@@ -142,14 +151,41 @@ export enum Panels {
     Terminals
 }
 
+export enum HistoryKey {
+    CWD,
+    CMD,
+    SHELL
+}
+
+export type MkdirError = {
+    errno: number
+    syscall: string
+    code: string
+    path: string
+}
+
+export type NewCommandPayload = {
+    title: string
+    command?: string
+    shell?: string
+    cwd?: string
+}
+
 export type StoreType = {
     paletteWidths: {
         header: number
         palette: number
     }
     userSettings: {
-        defaultShell: string
-        defaultCwd: string
+        global: {
+            defaultCwd: string | null
+            defaultShell: string | null
+        }
     }
     theme: string
+}
+
+type PickStartsWith<T extends object, S extends string> = {
+    // eslint-disable-next-line
+    [K in keyof T as K extends `${S}${infer _R}` ? K : never]: T[K]
 }

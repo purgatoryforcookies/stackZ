@@ -17,8 +17,10 @@ export interface IUseStack {
     selectTerminal: React.Dispatch<React.SetStateAction<string>>
     addTerminal: (cmd: Cmd) => void
     addStack: (st: PaletteStack) => void
+    deleteStack: () => void
     reOrder: IReOrder
     askForResize: () => void
+    renameStack: (newName: string) => void
     selectedStack: string
     selectedTerminal: string
 }
@@ -82,6 +84,15 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         })
         newSocketStack.set(st.id, sock)
         setStack(() => newStack)
+        setStackSockets(newSocketStack)
+    }
+    const deleteStack = () => {
+        const newStack = new Map(stack)
+        const newSocketStack = new Map(stackSocket)
+        newStack.delete(selectedStack)
+        newSocketStack.delete(selectedStack)
+
+        setStack(newStack)
         setStackSockets(newSocketStack)
     }
 
@@ -161,8 +172,15 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
     })
 
     const askForResize = () => {
-        console.log('Asking for resize', selectedStack, selectedTerminal)
         terminals?.get(selectedStack)?.get(selectedTerminal)?.resize()
+    }
+
+    const renameStack = (newName: string) => {
+        const newStack = new Map(stack)
+        const oldPalette = newStack.get(selectedStack)
+        if (!oldPalette) return
+        oldPalette.stackName = newName
+        setStack(newStack)
     }
 
     useEffect(() => {
@@ -178,8 +196,10 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         selectTerminal,
         addTerminal,
         addStack,
+        deleteStack,
         reOrder,
         askForResize,
+        renameStack,
         selectedStack,
         selectedTerminal
     }

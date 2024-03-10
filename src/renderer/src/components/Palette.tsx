@@ -77,13 +77,13 @@ function Palette({ data }: PaletteProps) {
                                     let firstTerminalId = ''
                                     const firstOneOnStack = data.stack?.get(stack.id)?.palette
                                     if (!firstOneOnStack) firstTerminalId = 'gibberish'
-                                    else firstTerminalId = firstOneOnStack[0].id
+                                    else firstTerminalId = firstOneOnStack[0]?.id
                                     data.selectStack(stack.id)
                                     data.selectTerminal(firstTerminalId)
                                 }}
                                 variant={data.selectedStack === stack.id ? 'default' : 'outline'}
                                 className={`hover:bg-primary hover:text-background text-nowrap
-                        hover:cursor-pointer`}
+                                hover:cursor-pointer`}
                             >
                                 {stack.stackName}
                             </Badge>
@@ -98,7 +98,7 @@ function Palette({ data }: PaletteProps) {
                     variant={'link'}
                     size={'sm'}
                     onClick={toggleStack}
-                    className="text-primary-secondary"
+                    className="text-foreground tracking-wide"
                 >
                     {running ? (
                         <>

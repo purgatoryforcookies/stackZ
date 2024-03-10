@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Record from '@renderer/components/Common/ListItem'
 import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
@@ -56,6 +56,13 @@ function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
             order: data.order
         })
     }
+
+    useEffect(() => {
+        if (data.order === 0) {
+            setHidden(true)
+            setMinimized(true)
+        }
+    }, [])
 
     return (
         <div

@@ -2,9 +2,14 @@ import { ClientEvents, Cmd, Status, UtilityEvents } from '@t'
 import { useEffect, useState } from 'react'
 import { Button } from '@renderer/@/ui/button'
 import {
+    CornerBottomLeftIcon,
+    CornerBottomRightIcon,
+    CornerTopLeftIcon,
+    CornerTopRightIcon,
     EyeNoneIcon,
     HeartIcon,
     LapTimerIcon,
+    MoveIcon,
     PlayIcon,
     ReloadIcon,
     SymbolIcon,
@@ -65,7 +70,8 @@ function CommandSM({ data, engine, stack, selected, handleDrag }: CommandProps) 
         <Draggable
             axis="y"
             position={{ x: 0, y: 0 }}
-            handle=".commandBody"
+            handle=".moveHandle"
+            defaultClassNameDragging="brightness-125 relative z-50"
             onDrag={(_, d) => handleDrag(d, data)}
             onStop={(_, d) => handleDrag(d, data, engine.stackId)}
         >
@@ -74,8 +80,16 @@ function CommandSM({ data, engine, stack, selected, handleDrag }: CommandProps) 
             p-1 m-2 rounded-md
             ${selected ? 'bg-card' : ''}`}
             >
+                {selected ? (
+                    <div>
+                        <CornerTopRightIcon className="absolute right-0 top-0 h-5 w-5 text-primary" />
+                        <CornerBottomRightIcon className="absolute right-0 bottom-0 h-5 w-5 text-primary" />
+                        <CornerBottomLeftIcon className="absolute left-0 bottom-0 h-5 w-5 text-primary" />
+                        <CornerTopLeftIcon className="absolute left-0 top-0 h-5 w-5 text-primary" />
+                    </div>
+                ) : null}
                 <div
-                    className="m-2 overflow-hidden rounded-md commandBody"
+                    className="m-2 overflow-hidden rounded-md"
                     onClick={() => {
                         stack.selectTerminal(engine.terminalId)
                     }}
@@ -83,6 +97,9 @@ function CommandSM({ data, engine, stack, selected, handleDrag }: CommandProps) 
                     <div className="pl-4 bg-black/80 flex justify-between pr-5 gap-3">
                         <span className="truncate text-secondary-foreground " dir="rtl">
                             {ping.cmd.title}
+                        </span>
+                        <span className="flex items-center">
+                            <MoveIcon className="h-4 w-4 text-secondary-foreground hover:scale-125 hover:cursor-pointer moveHandle" />
                         </span>
                     </div>
                     <div

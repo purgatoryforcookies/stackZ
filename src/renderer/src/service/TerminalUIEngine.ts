@@ -26,6 +26,7 @@ export class TerminalUIEngine {
     private hostdiv: HTMLElement
     private buffer: string
     private searchWord: string
+    private step: number
 
     constructor(stackId: string, terminalId: string, host: string) {
         this.fitAddon = new FitAddon()
@@ -35,9 +36,10 @@ export class TerminalUIEngine {
         this.host = host
         this.terminal.loadAddon(this.fitAddon)
         this.terminal.loadAddon(this.searchAddon)
-        this.buffer = ''
         this.searchWord = ''
+        this.buffer = ''
         this.isRunning = false
+        this.step = 0
     }
 
     isMounted() {
@@ -74,58 +76,66 @@ export class TerminalUIEngine {
             query: { stack: this.stackId, id: this.terminalId }
         })
         this.socket.on('output', (data: string) => {
-            this.write(data)
+            this.rawWrite(data)
         })
 
-
-
         this.socket.on('hello', () => {
-            this.write(`Terminal connected - ${this.socket.id}`)
+            this.rawWrite(`Terminal connected - ${this.socket.id}`)
             this.prompt()
             this.isConnected = true
         })
 
         this.socket.on('error', (err) => {
-            this.write(`Error ${this.socket.id} ${err.message}`)
+            this.rawWrite(`Error ${this.socket.id} ${err.message}`)
             this.prompt()
-            this.write(`-----------------------------`)
+            this.rawWrite(`-----------------------------`)
             this.prompt()
         })
 
         this.terminal.onKey((data) => {
             this.sendInput(data.key)
             if (this.isRunning) return
+
+            const isOutOfBoundsLeft = this.terminal.buffer.active.cursorX <= 2
+            const isOutOfBoundsRigth =
+                this.terminal.buffer.active.cursorX - 1 > this.getCurrentTerminalLine().length
+
             switch (data.domEvent.key) {
                 case 'Enter': {
-                    this.changeSettingsMaybe(this.buffer)
-                    this.sendInput(this.buffer)
+                    this.changeSettingsMaybe()
                     this.prompt()
                     this.buffer = ''
+                    this.step = 0
                     break
                 }
                 case 'Backspace': {
-                    if (this.buffer.length === 0) break
-                    this.buffer = this.buffer.slice(0, -1)
-                    this.write('\b \b')
-
+                    if (isOutOfBoundsLeft) return
+                    this.removeViaBuffer()
+                    this.step = 0
                     break
                 }
                 case 'ArrowDown':
+                    this.getHistory(-1)
                     break
                 case 'ArrowUp':
+                    this.getHistory(1)
                     break
                 case 'ArrowLeft':
+                    if (isOutOfBoundsLeft) return
+                    this.rawWrite('\u001b[1D')
                     break
                 case 'ArrowRight':
+                    if (isOutOfBoundsRigth) return
+                    this.rawWrite('\x1b[1C')
                     break
                 default: {
-                    this.buffer += data.key
-                    this.write(data.key)
+                    this.writeViaBuffer(data.key)
+                    this.step = 0
                 }
             }
         })
         this.terminal.attachCustomKeyEventHandler((e) => {
-            if (e.code === 'KeyV' && (e.ctrlKey || e.metaKey)) {
+            if (e.code === 'KeyV' && (e.ctrlKey || e.metaKey) && e.type === 'keyup') {
                 this.pasteClipBoardMaybe()
                 return false
             }
@@ -141,8 +151,41 @@ export class TerminalUIEngine {
         this.socket.emit('input', { data: input })
     }
 
-    write(char: string) {
-        this.terminal.write(char)
+    /**
+     * Used for writing the users input to xterm terminal.
+     * Writes into either end of the line or middle of it
+     * depending on cursor positioning.
+     *
+     * Note: Should not be used for escape character commands.
+     * use rawWrite() instead.
+     */
+    writeViaBuffer(data: string) {
+        const curPos = this.terminal.buffer.active.cursorX - 2
+
+        this.buffer = this.buffer.slice(0, curPos) + data + this.buffer.slice(curPos)
+        this.rawWrite('\u001b[1000D')
+        this.rawWrite('\u001b[0K$ ')
+        this.rawWrite(this.buffer)
+        this.rawWrite('\u001b[1000D')
+        if (curPos != this.buffer.length - 1) {
+            this.rawWrite(`\u001b[${curPos + 3}C`)
+        } else {
+            this.rawWrite(`\u001b[${this.buffer.length + 2}C`)
+        }
+    }
+
+    removeViaBuffer() {
+        const curPos = this.terminal.buffer.active.cursorX - 2
+        this.buffer = this.buffer.slice(0, curPos - 1) + this.buffer.slice(curPos)
+        this.rawWrite('\u001b[1000D')
+        this.rawWrite('\u001b[0K$ ')
+        this.rawWrite(this.buffer)
+        this.rawWrite('\u001b[1000D')
+        this.rawWrite(`\u001b[${curPos + 1}C`)
+    }
+
+    rawWrite(data: string) {
+        this.terminal.write(data)
     }
 
     prompt() {
@@ -181,40 +224,68 @@ export class TerminalUIEngine {
         this.isConnected = false
     }
 
-    changeSettingsMaybe(command: string) {
-        if (command.slice(0, 2) === 'cd') {
-            this.socket.emit('changeCwd', {
-                stack: this.stackId,
-                terminal: this.terminalId,
-                value: command.slice(2)
-            })
-            return
-        }
-        if (command.slice(0, 5) === 'shell') {
-            this.socket.emit('changeShell', {
-                stack: this.stackId,
-                terminal: this.terminalId,
-                value: command.slice(5)
-            })
-            return
-        }
-        if (command === 'clear') {
-            this.clear()
-            return
-        } else {
-            this.socket.emit('changeCommand', {
-                stack: this.stackId,
-                terminal: this.terminalId,
-                value: command
-            })
+    changeSettingsMaybe() {
+        const cursorRow = this.terminal.buffer.active.cursorY
+        const currentRow = this.terminal.buffer.active
+            .getLine(cursorRow)
+            ?.translateToString(true, 2)
+        if (!currentRow) return
+
+        const [keyword, cmd] = currentRow.split(' ', 2)
+
+        switch (keyword) {
+            case 'cd':
+                this.socket.emit('changeCwd', {
+                    stack: this.stackId,
+                    terminal: this.terminalId,
+                    value: cmd
+                })
+                break
+            case 'shell':
+                this.socket.emit('changeShell', {
+                    stack: this.stackId,
+                    terminal: this.terminalId,
+                    value: cmd
+                })
+                break
+            case 'clear':
+                this.clear()
+                break
+            default:
+                this.socket.emit('changeCommand', {
+                    stack: this.stackId,
+                    terminal: this.terminalId,
+                    value: currentRow
+                })
+                break
         }
     }
 
     async pasteClipBoardMaybe() {
         const clip = await navigator.clipboard.readText()
-        if (this.buffer.includes(clip)) return
-        this.buffer += clip
-        this.write(clip)
-        if (this.isRunning) this.sendInput(clip)
+        if (this.isRunning) this.terminal.paste(clip)
+        else this.rawWrite(clip)
+    }
+
+    getHistory(dir: 1 | -1) {
+        this.socket.emit('history', this.getCurrentTerminalLine(), this.step, (data: string) => {
+            if (!data) {
+                this.step = 0
+                this.rawWrite('\u001b[2K\u001b[1000D$ ')
+                this.buffer = ''
+                return
+            }
+            this.rawWrite('\u001b[2K\u001b[1000D$ ')
+            this.rawWrite(data)
+            this.buffer = data
+            dir === 1 ? (this.step += 1) : (this.step -= 1)
+        })
+    }
+
+    getCurrentTerminalLine() {
+        const cursorRow = this.terminal.buffer.active.cursorY
+        return (
+            this.terminal.buffer.active.getLine(cursorRow)?.translateToString(true).slice(2) || ''
+        )
     }
 }
