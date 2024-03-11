@@ -4,10 +4,6 @@ import { exec } from 'child_process';
 
 export class GitService {
 
-    constructor() {
-    }
-
-
     async getBranches() {
         try {
             const data: string = await new Promise((res, rej) => {
@@ -42,10 +38,6 @@ export class GitService {
         }
     }
 
-    /**
-     * 
-     * @returns An array, its empty if there were no errors.
-     */
     async pull(): Promise<string[]> {
         try {
             const data = await new Promise<string[]>((res) => {

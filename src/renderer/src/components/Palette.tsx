@@ -68,7 +68,7 @@ function Palette({ data }: PaletteProps) {
 
     return (
         <div className="h-full flex flex-col" ref={paletteRef}>
-            <div className="flex gap-3 justify-center py-5 flex-wrap px-4">
+            <div className="flex gap-3 justify-center py-4 flex-wrap px-4">
                 {data.stack &&
                     Array.from(data.stack.values()).map((stack) => {
                         return (
@@ -93,7 +93,7 @@ function Palette({ data }: PaletteProps) {
                 <NewStack set={data.addStack} />
             </div>
             <div
-                className={`flex w-full mb-2 items-center ${isCompact ? 'justify-center p-2 bg-card' : 'justify-end pr-12'}`}
+                className={`flex w-full mb-2 items-center ${isCompact ? 'justify-center p-1 bg-card' : 'justify-end pr-12'}`}
             >
                 <Button
                     variant={'link'}
