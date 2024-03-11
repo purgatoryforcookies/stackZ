@@ -78,17 +78,17 @@ export class Terminal {
                 return ['powershell.exe', [cmd]]
             case 'bash':
                 if (loose) return [tmpShell, ['-il']]
-                return ['/bin/bash', ['-il', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
+                return ['/bin/bash', ['-il', '-c', `. ~/.bash_profile && ${cmdArr.join(' ')}`]]
             case 'zsh':
                 if (loose) return [tmpShell, ['-il']]
                 return ['/bin/zsh', ['-il', '-c', `. ~/.zprofile && ${cmdArr.join(' ')}`]]
             default:
                 if (this.win) {
                     if (loose) return [tmpShell, []]
-                    return ['powershell.exe', [cmd]]
+                    return [tmpShell, [cmd]]
                 }
                 if (loose) return [tmpShell, ['-il']]
-                return ['/bin/bash', ['-il', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
+                return [tmpShell, ['-il', '-c', `'${cmdArr.shift()}' ${cmdArr.join(' ')}`]]
         }
     }
 

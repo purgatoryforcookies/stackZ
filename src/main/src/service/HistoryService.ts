@@ -93,8 +93,6 @@ export class HistoryService {
                     .forEach((i) => {
                         this.history.get(key)?.push(i)
                     })
-
-                console.log(this.history)
                 res()
             })
         })
