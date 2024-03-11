@@ -46,7 +46,7 @@ export class Palette {
         this.socket = null
         this.save = save
         this.history = history
-        this.git = new GitService()
+        this.git = new GitService(this.settings.defaultCwd)
     }
 
     async initTerminal(socket: Socket, remoteTerminalID: string) {
@@ -230,24 +230,26 @@ export class Palette {
         this.save()
     }
     updateDefaults(arg: StackDefaultsProps) {
-        console.log(arg)
+
         const { defaultCommand, defaultCwd, defaultShell } = arg
         if (!defaultCwd || defaultCwd.length === 0) {
             delete this.settings.defaultCwd
+            this.git.clearCwd()
         } else {
-            this.settings.defaultCwd = arg.defaultCwd
+            this.settings.defaultCwd = defaultCwd
+            this.git.setCwd(defaultCwd)
         }
 
         if (!defaultShell || defaultShell.length === 0) {
             delete this.settings.defaultShell
         } else {
-            this.settings.defaultShell = arg.defaultShell
+            this.settings.defaultShell = defaultShell
         }
 
         if (!defaultCommand || defaultCommand.length === 0) {
             delete this.settings.defaultCommand
         } else {
-            this.settings.defaultCommand = arg.defaultCommand
+            this.settings.defaultCommand = defaultCommand
         }
 
         this.save()
