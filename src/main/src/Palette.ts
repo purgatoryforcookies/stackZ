@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import {
     ClientEvents,
     Cmd,
+    GitEvents,
     NewCommandPayload,
     PaletteStack,
     StackDefaultsProps,
@@ -12,6 +13,7 @@ import { Terminal } from './service/Terminal'
 import { Server, Socket } from 'socket.io'
 import { store } from './service/Store'
 import { HistoryService } from './service/HistoryService'
+import { GitService } from './service/GitService'
 
 export interface ISaveFuntion {
     (onExport?: boolean): void
@@ -29,6 +31,7 @@ export class Palette {
     isRunning: boolean
     save: ISaveFuntion
     history: HistoryService
+    git: GitService
 
     constructor(
         settings: PaletteStack,
@@ -43,6 +46,7 @@ export class Palette {
         this.socket = null
         this.save = save
         this.history = history
+        this.git = new GitService()
     }
 
     async initTerminal(socket: Socket, remoteTerminalID: string) {
@@ -84,6 +88,18 @@ export class Palette {
         })
         socket.on(UtilityEvents.STACKNAME, (arg: { name: string }) => {
             this.rename(arg.name)
+        })
+        socket.on(GitEvents.PULL, async (akw) => {
+            const errors = await this.git.pull().catch(r => r)
+            akw(errors)
+        })
+        socket.on(GitEvents.GETBRANCHES, async (akw) => {
+            const branches = await this.git.getBranches().catch(r => r)
+            akw(branches)
+        })
+        socket.on(GitEvents.SWITCHBRANCH, async (branch, akw) => {
+            const errors = await this.git.switchBranch(branch)
+            akw(errors)
         })
         socket.emit('hello')
         this.pingState()

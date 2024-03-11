@@ -99,6 +99,12 @@ export enum ClientEvents {
     HEARTBEAT = 'heartbeat'
 }
 
+export enum GitEvents {
+    GETBRANCHES = 'getBranches',
+    PULL = 'pull',
+    SWITCHBRANCH = 'switchBranch'
+}
+
 export type Status = {
     stackId: string
     reserved: boolean

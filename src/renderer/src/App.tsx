@@ -10,6 +10,7 @@ import { useStack } from './hooks/useStack'
 import { createContext } from 'react'
 import { useResizable } from './hooks/useResizable'
 import { ImperativePanelHandle } from 'react-resizable-panels'
+import BranchDropdown from './components/Common/BranchDropdown'
 
 export const ThemeContext = createContext('aurora')
 
@@ -67,8 +68,11 @@ function App(): JSX.Element {
                         id="palette"
                         className="text-secondary-foreground"
                     >
-                        <div className="h-10 flex justify-center items-center">
-                            <span className="font-semibold text-lg">Terminals</span>
+                        <div className="h-10 p-2 grid grid-cols-3 grid-rows-1">
+                            <div>
+                                <BranchDropdown stack={stack} />
+                            </div>
+                            <span className="font-semibold text-lg text-center">Terminals</span>
                         </div>
                         {stack.stack && !stack.loading ? <Palette data={stack} /> : null}
                     </ResizablePanel>
