@@ -67,8 +67,13 @@ function App(): JSX.Element {
                         id="palette"
                         className="text-secondary-foreground"
                     >
-                        <div className={`p-1 ${w < 450 ? 'flex flex-col-reverse justify-center items-center gap-2'
-                            : 'grid grid-cols-3 grid-rows-1'}`}>
+                        <div
+                            className={`p-1 ${
+                                w < 450
+                                    ? 'flex flex-col-reverse justify-center items-center gap-2'
+                                    : 'grid grid-cols-3 grid-rows-1'
+                            }`}
+                        >
                             <BranchDropdown stack={stack} />
                             <span className="font-semibold text-lg text-center">Terminals</span>
                         </div>

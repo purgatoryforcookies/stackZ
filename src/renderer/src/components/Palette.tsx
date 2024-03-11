@@ -11,7 +11,6 @@ import { IUseStack } from '@renderer/hooks/useStack'
 import { useTaalasmaa } from '@renderer/hooks/useTaalasmaa'
 import CommandSM from './Command/CommandSM'
 
-
 type PaletteProps = {
     data: IUseStack
 }
@@ -110,37 +109,35 @@ function Palette({ data }: PaletteProps) {
                         'Start stack'
                     )}
                 </Button>
-
             </div>
             <div className="overflow-auto pb-20" style={{ scrollbarGutter: 'stable' }}>
-
                 {stack?.palette
                     ? stack.palette
-                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                        .map((cmd) => {
-                            if (!cmd?.id) return null
-                            const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
-                            if (!engine) return null
-                            return isCompact ? (
-                                <CommandSM
-                                    key={cmd.id}
-                                    data={cmd}
-                                    engine={engine}
-                                    selected={cmd.id === data.selectedTerminal}
-                                    handleDrag={handleDrag}
-                                    stack={data}
-                                />
-                            ) : (
-                                <Command
-                                    key={cmd.id}
-                                    data={cmd}
-                                    engine={engine}
-                                    selected={cmd.id === data.selectedTerminal}
-                                    handleDrag={handleDrag}
-                                    stack={data}
-                                />
-                            )
-                        })
+                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                          .map((cmd) => {
+                              if (!cmd?.id) return null
+                              const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
+                              if (!engine) return null
+                              return isCompact ? (
+                                  <CommandSM
+                                      key={cmd.id}
+                                      data={cmd}
+                                      engine={engine}
+                                      selected={cmd.id === data.selectedTerminal}
+                                      handleDrag={handleDrag}
+                                      stack={data}
+                                  />
+                              ) : (
+                                  <Command
+                                      key={cmd.id}
+                                      data={cmd}
+                                      engine={engine}
+                                      selected={cmd.id === data.selectedTerminal}
+                                      handleDrag={handleDrag}
+                                      stack={data}
+                                  />
+                              )
+                          })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand stack={data} />

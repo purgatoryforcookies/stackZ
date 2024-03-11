@@ -3,7 +3,6 @@ import { readFile, access, constants, writeFileSync, mkdirSync, writeFile } from
 import { join } from 'path'
 import { app } from 'electron'
 
-
 // app is not available during testing with the current suite
 // setting path to repo root fixes the issue
 const dirPath = join(app?.getPath('userData') || '', './history')

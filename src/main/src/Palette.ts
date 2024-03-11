@@ -90,11 +90,11 @@ export class Palette {
             this.rename(arg.name)
         })
         socket.on(GitEvents.PULL, async (akw) => {
-            const errors = await this.git.pull().catch(r => r)
+            const errors = await this.git.pull().catch((r) => r)
             akw(errors)
         })
         socket.on(GitEvents.GETBRANCHES, async (akw) => {
-            const branches = await this.git.getBranches().catch(r => r)
+            const branches = await this.git.getBranches().catch((r) => r)
             akw(branches)
         })
         socket.on(GitEvents.SWITCHBRANCH, async (branch, akw) => {
@@ -230,7 +230,6 @@ export class Palette {
         this.save()
     }
     updateDefaults(arg: StackDefaultsProps) {
-
         const { defaultCommand, defaultCwd, defaultShell } = arg
         if (!defaultCwd || defaultCwd.length === 0) {
             delete this.settings.defaultCwd

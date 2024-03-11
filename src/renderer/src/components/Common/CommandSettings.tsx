@@ -16,8 +16,6 @@ type CommandSettingsProps = {
     engine: TerminalUIEngine
 }
 
-
-
 function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
     const [settings, setSettings] = useState<CommandMetaSetting | undefined>(data.cmd.metaSettings)
     const [health, setHealth] = useState<Cmd['health'] | undefined>(data.cmd.health)
@@ -97,7 +95,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                         disabled={data.reserved || data.isRunning}
                                     >
                                         Time delay
-                                        <CustomToolTip message="Time starts to tick when stack is started" >
+                                        <CustomToolTip message="Time starts to tick when stack is started">
                                             <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
                                         </CustomToolTip>
                                     </TabsTrigger>
@@ -108,7 +106,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                         disabled={data.reserved || data.isRunning}
                                     >
                                         Healthcheck
-                                        <CustomToolTip message="Command which on returning 0 starts this terminal" >
+                                        <CustomToolTip message="Command which on returning 0 starts this terminal">
                                             <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
                                         </CustomToolTip>
                                     </TabsTrigger>
@@ -158,8 +156,9 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                             />
                             <Label htmlFor="interactivity" className="flex items-center gap-2">
                                 Loose terminal
-                                <CustomToolTip message="Loose terminal does not listen to exits, and does not stop until stopped" >
-                                    <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" /></CustomToolTip>
+                                <CustomToolTip message="Loose terminal does not listen to exits, and does not stop until stopped">
+                                    <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
+                                </CustomToolTip>
                             </Label>
                         </div>
                         <div className="flex items-center space-x-2">

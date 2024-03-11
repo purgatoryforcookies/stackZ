@@ -35,7 +35,6 @@ export const useResizable = (paletteRef: RefT, headerRef: RefT) => {
             }
             setW(panel.clientWidth)
             setMinW(newFlexValue)
-
         })
 
         observer.observe(panel)
