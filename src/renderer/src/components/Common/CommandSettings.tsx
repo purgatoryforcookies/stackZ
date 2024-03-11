@@ -1,34 +1,19 @@
 import { CheckedState } from '@radix-ui/react-checkbox'
-import { InfoCircledIcon } from '@radix-ui/react-icons'
 import { Checkbox } from '@renderer/@/ui/checkbox'
 import { Input } from '@renderer/@/ui/input'
 import { Label } from '@renderer/@/ui/label'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@renderer/@/ui/tooltip'
 import { useEffect, useRef, useState } from 'react'
 import { ClientEvents, Cmd, CommandMetaSetting, Status, UtilityEvents } from '@t'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/@/ui/tabs'
 import { useTaalasmaa } from '@renderer/hooks/useTaalasmaa'
+import { CustomToolTip } from './CustomTooltip'
+import { InfoCircledIcon } from '@radix-ui/react-icons'
 
 type CommandSettingsProps = {
     expanded: boolean
     data: Status
     engine: TerminalUIEngine
-}
-
-const CustomToolTip = ({ message }: { message: string }) => {
-    return (
-        <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
-                </TooltipTrigger>
-                <TooltipContent>
-                    <p>{message}</p>
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
-    )
 }
 
 function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
@@ -110,7 +95,9 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                         disabled={data.reserved || data.isRunning}
                                     >
                                         Time delay
-                                        <CustomToolTip message="Time starts to tick when stack is started" />
+                                        <CustomToolTip message="Time starts to tick when stack is started">
+                                            <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
+                                        </CustomToolTip>
                                     </TabsTrigger>
                                     <TabsTrigger
                                         value="health"
@@ -119,7 +106,9 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                         disabled={data.reserved || data.isRunning}
                                     >
                                         Healthcheck
-                                        <CustomToolTip message="Command which on returning 0 starts this terminal" />
+                                        <CustomToolTip message="Command which on returning 0 starts this terminal">
+                                            <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
+                                        </CustomToolTip>
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="time" className="h-full">
@@ -167,7 +156,9 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                             />
                             <Label htmlFor="interactivity" className="flex items-center gap-2">
                                 Loose terminal
-                                <CustomToolTip message="Loose terminal does not listen to exits, and does not stop until stopped" />
+                                <CustomToolTip message="Loose terminal does not listen to exits, and does not stop until stopped">
+                                    <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
+                                </CustomToolTip>
                             </Label>
                         </div>
                         <div className="flex items-center space-x-2">
