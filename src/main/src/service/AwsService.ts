@@ -16,7 +16,7 @@ export class AwsService {
     expiration: Date
 
     constructor() {
-        this.awsDirectory = join(app.getPath('home'), './.aws')
+        this.awsDirectory = join(app?.getPath('home') || '', './.aws')
     }
 
     async ssoLoginExpiration() {
