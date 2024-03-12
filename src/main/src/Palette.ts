@@ -11,7 +11,7 @@ import {
 } from '../../types'
 import { Terminal } from './service/Terminal'
 import { Server, Socket } from 'socket.io'
-import { store } from './service/Store'
+import { store } from './stores/Store'
 import { HistoryService } from './service/HistoryService'
 import { GitService } from './service/GitService'
 

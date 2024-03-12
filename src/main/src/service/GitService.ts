@@ -37,9 +37,21 @@ export class GitService {
 
     async switchBranch(branch: string): Promise<string[]> {
         if (!this.cwd) return ['Error', 'Stack default CWD is not set']
+
+        const command: string[] = []
+
+        command.push('git checkout')
+        if (branch.includes('/')) {
+            command.push('-b')
+            command.push(branch.split('/').slice(-1)[0])
+            command.push(branch)
+        } else {
+            command.push(branch.replace('* ', ''))
+        }
+
         try {
             const data = await new Promise<string[]>((res) => {
-                exec(`git checkout ${branch.replace("* ", "")}`, { cwd: this.cwd }, (err) => {
+                exec(command.join(' '), { cwd: this.cwd }, (err) => {
                     if (err) {
                         res(err.message.split('\n').slice(0, 2))
                     }

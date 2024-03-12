@@ -40,7 +40,7 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
                 setLoading(false)
             }, 300)
         })
-    }, [stack])
+    }, [stack.selectedStack])
 
     const handleSelect = (branch: string) => {
         const socket = stack.stackSocket?.get(stack.selectedStack)

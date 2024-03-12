@@ -1,6 +1,6 @@
 import ElectronStore, { Schema } from 'electron-store'
 import { StoreType } from '../../../types'
-import { resolveDefaultCwd } from './util'
+import { resolveDefaultCwd } from '../util/util'
 
 const schema: Schema<StoreType> = {
     theme: {
@@ -36,6 +36,10 @@ const schema: Schema<StoreType> = {
                     defaultShell: {
                         type: ['string', 'null'],
                         default: null
+                    },
+                    awsPlugin: {
+                        type: ['boolean'],
+                        default: true
                     }
                 }
             }

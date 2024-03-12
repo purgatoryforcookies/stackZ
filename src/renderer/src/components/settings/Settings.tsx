@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/@/ui/tabs'
 import General from './General'
 import Stack from './Stack'
 import { IUseStack } from '@renderer/hooks/useStack'
+import AwsWatch from '../Common/AwsWatch'
 
 export type SettingsProps = {
     setTheme: (name: string) => void
@@ -23,6 +24,7 @@ export type SettingsProps = {
 
 function Settings({ setTheme, stack }: SettingsProps) {
     const [open, setOpen] = useState<boolean>(false)
+    const [awsPlugin, setAwsPlugin] = useState(false)
 
     const theme = useContext(ThemeContext)
 
@@ -53,6 +55,9 @@ function Settings({ setTheme, stack }: SettingsProps) {
             await window.store.get('theme').then((t) => {
                 setTheme(t as string)
             })
+            await window.store.get('userSettings.global.awsPlugin').then((t) => {
+                setAwsPlugin(t as boolean)
+            })
         }
         fetchStore()
     }, [open])
@@ -69,7 +74,13 @@ function Settings({ setTheme, stack }: SettingsProps) {
             >
                 <SheetHeader>
                     <SheetTitle>Settings</SheetTitle>
-                    <SheetDescription></SheetDescription>
+                    <SheetDescription>
+                        {awsPlugin ? (
+                            <div className="absolute top-3 right-12">
+                                <AwsWatch stack={stack} />
+                            </div>
+                        ) : null}
+                    </SheetDescription>
                     <Tabs defaultValue="stack" data-theme={theme}>
                         <TabsList>
                             <TabsTrigger value="stack">Stack</TabsTrigger>
@@ -84,7 +95,11 @@ function Settings({ setTheme, stack }: SettingsProps) {
                         </TabsContent>
                         <TabsContent value="general">
                             General settings
-                            <General setTheme={setTheme} />
+                            <General
+                                setTheme={setTheme}
+                                setAwsPlugin={setAwsPlugin}
+                                awsPlugin={awsPlugin}
+                            />
                         </TabsContent>
                     </Tabs>
                 </SheetHeader>

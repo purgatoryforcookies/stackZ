@@ -105,6 +105,10 @@ export enum GitEvents {
     SWITCHBRANCH = 'switchBranch'
 }
 
+export enum AwsEvents {
+    SSOSTATUS = 'getSsoLoginStatus'
+}
+
 export type Status = {
     stackId: string
     reserved: boolean
@@ -186,6 +190,7 @@ export type StoreType = {
         global: {
             defaultCwd: string | null
             defaultShell: string | null
+            awsPlugin: boolean
         }
     }
     theme: string
