@@ -40,7 +40,7 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
                 setLoading(false)
             }, 300)
         })
-    }, [stack])
+    }, [stack.selectedStack])
 
     const handleSelect = (branch: string) => {
         const socket = stack.stackSocket?.get(stack.selectedStack)
@@ -94,10 +94,10 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
                     <SelectGroup>
                         {!loading && options
                             ? options.map((option) => (
-                                  <SelectItem key={option} value={option}>
-                                      {option}
-                                  </SelectItem>
-                              ))
+                                <SelectItem key={option} value={option}>
+                                    {option}
+                                </SelectItem>
+                            ))
                             : null}
                     </SelectGroup>
                 </SelectContent>
