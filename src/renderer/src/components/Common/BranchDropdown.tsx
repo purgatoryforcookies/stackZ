@@ -94,10 +94,10 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
                     <SelectGroup>
                         {!loading && options
                             ? options.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                    {option}
-                                </SelectItem>
-                            ))
+                                  <SelectItem key={option} value={option}>
+                                      {option}
+                                  </SelectItem>
+                              ))
                             : null}
                     </SelectGroup>
                 </SelectContent>

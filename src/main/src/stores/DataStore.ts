@@ -1,5 +1,5 @@
 import { ZodTypeAny } from 'zod'
-import { readJsonFile } from './util'
+import { readJsonFile } from '../util/util'
 import { writeFileSync } from 'fs'
 import { PaletteStack } from '../../../types'
 

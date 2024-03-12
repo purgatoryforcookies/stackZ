@@ -39,7 +39,7 @@ export class GitService {
         if (!this.cwd) return ['Error', 'Stack default CWD is not set']
         try {
             const data = await new Promise<string[]>((res) => {
-                exec(`git checkout ${branch.replace("* ", "")}`, { cwd: this.cwd }, (err) => {
+                exec(`git checkout ${branch.replace('* ', '')}`, { cwd: this.cwd }, (err) => {
                     if (err) {
                         res(err.message.split('\n').slice(0, 2))
                     }

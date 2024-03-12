@@ -10,7 +10,7 @@ import {
     UtilityProps
 } from '../../../types'
 import { spawn, IPty } from 'node-pty'
-import { envFactory, haveThesameElements, mapEnvs } from './util'
+import { envFactory, haveThesameElements, mapEnvs } from '../util/util'
 import path from 'path'
 import { ITerminalDimensions } from 'xterm-addon-fit'
 import { Socket } from 'socket.io'

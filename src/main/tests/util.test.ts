@@ -1,5 +1,5 @@
 import { Environment } from '../../types'
-import { mapEnvs } from '../src/service/util'
+import { mapEnvs } from '../src/util/util'
 
 describe('Utilities tests', () => {
     // it('Parses variables from string', () => {

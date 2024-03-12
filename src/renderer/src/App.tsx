@@ -12,6 +12,7 @@ import { useResizable } from './hooks/useResizable'
 import { ImperativePanelHandle } from 'react-resizable-panels'
 import BranchDropdown from './components/Common/BranchDropdown'
 
+
 export const ThemeContext = createContext('aurora')
 
 function App(): JSX.Element {
@@ -68,11 +69,10 @@ function App(): JSX.Element {
                         className="text-secondary-foreground"
                     >
                         <div
-                            className={`p-1 ${
-                                w < 450
+                            className={`p-1 ${w < 450
                                     ? 'flex flex-col-reverse justify-center items-center gap-2'
                                     : 'grid grid-cols-3 grid-rows-1'
-                            }`}
+                                }`}
                         >
                             <BranchDropdown stack={stack} />
                             <span className="font-semibold text-lg text-center">Terminals</span>
