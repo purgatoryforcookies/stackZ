@@ -95,7 +95,11 @@ function Settings({ setTheme, stack }: SettingsProps) {
                         </TabsContent>
                         <TabsContent value="general">
                             General settings
-                            <General setTheme={setTheme} />
+                            <General
+                                setTheme={setTheme}
+                                setAwsPlugin={setAwsPlugin}
+                                awsPlugin={awsPlugin}
+                            />
                         </TabsContent>
                     </Tabs>
                 </SheetHeader>

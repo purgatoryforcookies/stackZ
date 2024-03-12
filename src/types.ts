@@ -190,6 +190,7 @@ export type StoreType = {
         global: {
             defaultCwd: string | null
             defaultShell: string | null
+            awsPlugin: boolean
         }
     }
     theme: string

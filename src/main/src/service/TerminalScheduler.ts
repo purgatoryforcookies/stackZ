@@ -126,7 +126,6 @@ export class TerminalScheduler {
                     clearTimeout(j.job_timer)
                 }
                 j.t_terminal.stop()
-
             })
         }
         this.jobs = []

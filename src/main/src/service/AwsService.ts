@@ -38,16 +38,15 @@ export class AwsService {
         const tokens: AwsCachedToken[] = []
 
         try {
-            await promises.readdir(this.awsDirectory + '/sso/cache')
-                .then(async filenames => {
-                    for (const file of filenames) {
-                        await promises.readFile(this.awsDirectory + "/sso/cache/" + file)
-                            .then(t => tokens.push(JSON.parse(t.toString())))
-
-                    }
-                })
+            await promises.readdir(this.awsDirectory + '/sso/cache').then(async (filenames) => {
+                for (const file of filenames) {
+                    await promises
+                        .readFile(this.awsDirectory + '/sso/cache/' + file)
+                        .then((t) => tokens.push(JSON.parse(t.toString())))
+                }
+            })
         } catch (error) {
-            console.log("[WARNING]: Could not read tokens from directory")
+            console.log('[WARNING]: Could not read tokens from directory')
         }
 
         return tokens
