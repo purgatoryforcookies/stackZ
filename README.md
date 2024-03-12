@@ -1,93 +1,41 @@
-# StackZ
 
-Do you remember how that one project of yours started up again? was there some special configurations for it?
+# StackZ: Your new dev vibe is here 🔥
 
-StackZ is a developer tool which purpose is to answer above mentioned questions.
+Ever found yourself pondering the inception of a project or struggling with configurations? Enter StackZ – the dependable tool crafted to streamline your development journey!
 
 ![Alt text](resources/screenshot1.png?raw=true 'Overview')
 
-With StackZ, you can create environments and pipelines withing your development machine. Each stack is easily configurable with environment variables, which get injected into the terminal when it is started. You can have multiple env-sets for each terminal, and they can be muted individually for quick adjustments, e.g. either dev, test or production enviroment. CWD's (current working directories) can be speficied within each terminal.
+## What's StackZ all about?
 
-Each terminal in a stack can be run as a sequence, or separetly. In a sequence, the order or the terminal spawns is quaranteed, and you can set delays for terminal to slow down their startup. Delaying takes effect only when you start the stack. Running a single terminal from a stack does not obey the delay.
+StackZ simplifies the management of development environments right from your local machine. With StackZ, you're empowered to create and customize stacks, tweak variables, organize terminals, and even switch git branches effortlessly. Whether it's development, testing, or production – StackZ has got your back!
+## Key features
 
-You can also set a healthcheck command (kind off like in docker) which on returning exit 0 starts the terminal.
+- **Local Lgends Only:** No cloud drama, no snooping, no accounts. Just you, your code and good vibes.
+- **Pipeline Power:** Run terminals solo or in a sequence, ensuring not only one purpose.
+- **Flexible Environments:** Easily configure environment variables for quick gear shifting.
+- **Healthchecks:** Start them only when they are needed to. 
+- **Terminal Control:** Run terminals inside or outside the stack with automatic restarts or as loose, which acts like your terminal you keep open on the side anyways.
+- **Git Branch Switcher:** Quick PR anyone? Switch branches faster than... well, its fast. 
+- **Shell Support:** Power up with PowerShell, Command Prompt, WSL, Bash, Zsh. 
+- **Efficient Navigation:** Hotkeys anyone? There's only one to remember: **CMD+K**, or **CTRL+K** if you're on windows.
+## Compatibility and Customization
 
-Terminals can be set to restart on exits, or to run as a loose terminal. Loose terminal does not listen for exists. Session remains open and does not stop until you stop it. Rerun will trigger terminal restart always, even if you stop the terminal yourself. This functionality enables for quick restarts of the terminal.
+- **Platform Support:** Compatible with Mac and Windows (Linux support is just a matter of building it)
+- **Versatility:** Combine StackZ with other tools like taskfiles or Docker Compose for enhanced functionality.
+- **Themes:** Well, theres themes. Only dark ones. 
+- **Customization:** Edit *the* JSON file to tailor configurations to your needs with speed, and share them with your team.
 
-StackZ supports the following shells:
+## Getting started
 
--   Powershell
--   CommandPrompt
--   WSL.exe
--   Bash
--   Zsh
 
-Zsh and bash shells run as a login shell. As each terminal's cwd can be changed, this also applies to WSL's directories. You can run a mix of Linux based projects running on WSL and windows based projects running in other teminals with a push of a button.
+When you start StackZ firs time, it creates your first stack for you. 
 
-StackZ has few hotkeys, which toggle additional features. The most import one is CMD+K (CTRL+K). It opens a quick navigation where you can search everything and see the other hotkeys used in the app. You'll come around disabled buttons and fields, they are placeholders for future use.
+Change terminal settings by typing commands into a stopped terminal, or edit the settings from terminal dropdowns. Or by editing the JSON file. 
 
-You'll be naming things through out creating stacks and terminals. For terminals, you'll give each terminal notes. Notes add additional description about what the terminal does. Descriptions help you to both search the terminals from CMD+K menu, and to describe the purpose of the terminal for future you.
-
-The stacks and terminals are saved and read from a json-file. You can build your setup in the application, and by modifying the json file directly. Modifying the json-file gives you speed. You can backup your setup by taking a copy of your json-file. This enables also the ability to share the stacks with your teammates.
-
-## Features
-
--   Run terminals in a pipeline
--   Local, no cloud, no telemetry, no users, no emails
--   Mac and windows support (linux too but might be lacking)
--   Sequence runs with delays or healthchecks
--   Search with CMD+K menu
--   Configure environment sets, and mute/edit them
--   Backup, edit and share your stacks directly in the json-file
--   Themes
--   Combine with for e.g. taskfiles, shell scripts or docker compose files to complicate things up
--   Drag and drop the terminals into right order
-
-## Usage/Examples
-
-###
-
-## Instructions
 
 ### Environments
 
-Each environment has priority and you'll read them from left to right.
+On the left side, you've got OS Environments that come straight from your machine. They're the first ones in line, always. If you've got keys with the same name between different env sets, the new ones take over. It's like battle royale, the last key wins.
 
-On the very left, you'll have OS Environments which get inherited from your machine. They are applied first. If you have KEY's with the same name between env sets they will get overwritten by the next key present. Last key will win.
+You can mute a single ENV with a right-click or mute a whole set from the toolbar. Muted variables lowkey gets just ghosted. And if you want to make changes to the list, you've gotta switch to edit mode.
 
-You can mute a single ENV by right-clicking it, or a complete set from the toolbar. Muted variables are ignored. In order to edit the list, you'll need to be in edit mode.
-
-### Terminals
-
-When terminal is stopped you can change its settings by typing commands, or by expanding the command from the menu.
-
-`cd new/path/` will change the currenct working directory (cwd) of the terminal. Directory changes inside a running terminal are ignored. \n
-`shell terminal` will change the terminal used. This can be for e.g.
-
--   bin/bash or bash (default)
--   bin/zsh or zsh
--   powershell.exe (default)
--   cmd.exe
--   wsl.exe
--   You can try any terminal you want, the support might be limited to running loose terminals only though
-
-`just type some command` changes the command to be executed. Can also be a squence or point to a file. Commands inside a running terminal are ignored by stackZ and are run in the session.
-
-When you stop a terminal, it stops with SIGHUP (on Linux and Mac).
-You can also exit terminal process with typing CTRL+C in most cases, or by typing `exit`
-
-Any commands typed inside a running terminal session are ignored by the terminals settings. For e.g. cwd changes do not get picked up.
-
-### Stacks
-
-If you start the stack, it runs in order from top to bottom. Each terminal can be delayed from its dropdown menu. Delays are only respected when starting the stack.
-
-Loose terminals dont listen for exits and has to be stopped manually.
-
-Terminals can restart on exits.
-
-### Notes
-
-Not all features are supported nor implemented. Many of obvious ones are still missing. Refer to editing the .json file manually at this point, especially if you want to rename the stacks (and the placeholder stack that is created on first star).
-
-There's a socket server, and it runs on port 3123.
