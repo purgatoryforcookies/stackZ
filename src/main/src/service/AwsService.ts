@@ -1,5 +1,5 @@
 import { app } from 'electron'
-import { readFile, readdir } from 'fs'
+import { promises } from 'fs'
 import { join } from 'path'
 
 type AwsCachedToken = {
@@ -28,6 +28,7 @@ export class AwsService {
 
         const tokens = await this.readSsoLoginToken()
         const latestToken = this.getLatestToken(tokens)
+        if (!latestToken) return
         this.expiration = new Date(latestToken.expiresAt)
 
         return this.expiration
@@ -37,26 +38,16 @@ export class AwsService {
         const tokens: AwsCachedToken[] = []
 
         try {
-            await new Promise<void>((res, rej) => {
-                readdir(this.awsDirectory + '/sso/cache', async (err, filenames) => {
-                    if (err) rej(err)
-
+            await promises.readdir(this.awsDirectory + '/sso/cache')
+                .then(async filenames => {
                     for (const file of filenames) {
-                        await new Promise<void>((r) => {
-                            readFile(this.awsDirectory + '/sso/cache/' + file, (err, data) => {
-                                if (err) rej(err)
-                                const tmp: AwsCachedToken = JSON.parse(data.toString())
-                                if (!tmp.startUrl) r()
-                                else tokens.push(tmp)
-                                r()
-                            })
-                        })
+                        await promises.readFile(this.awsDirectory + "/sso/cache/" + file)
+                            .then(t => tokens.push(JSON.parse(t.toString())))
+
                     }
-                    res()
                 })
-            })
         } catch (error) {
-            console.log(error)
+            console.log("[WARNING]: Could not read tokens from directory")
         }
 
         return tokens
@@ -69,6 +60,7 @@ export class AwsService {
     }
 
     getLatestToken(tokens: AwsCachedToken[]) {
+        if (tokens.length === 0) return
         return tokens.reduce((a, b) => {
             return new Date(a.expiresAt) > new Date(b.expiresAt) ? a : b
         })

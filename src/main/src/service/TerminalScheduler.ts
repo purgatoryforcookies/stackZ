@@ -26,9 +26,7 @@ const HC_LIMIT = 240
  * Scheduler can be stopped by calling stop(). All timers will be cleared and stack startup
  * aborted.
  *
- * If healthcheck fails to compute (bad command), the terminal will not be started
- * and a warning message will be emitted to its socket. Scheduler will then discard it
- * and move on to next one.
+ * If healthcheck fails to compute (bad command), it will count as a failed healthcheck.
  */
 export class TerminalScheduler {
     jobs: StartJob[]
@@ -127,11 +125,8 @@ export class TerminalScheduler {
                     clearInterval(j.job_timer)
                     clearTimeout(j.job_timer)
                 }
-                try {
-                    j.t_terminal.stop()
-                } catch {
-                    // swallow
-                }
+                j.t_terminal.stop()
+
             })
         }
         this.jobs = []
