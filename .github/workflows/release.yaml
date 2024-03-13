@@ -22,7 +22,7 @@ jobs:
             output: "StackZ-arm64-mac"
           - os: windows-2022
             keyword: "build:win"
-            filename: "stackz-1.0.0.exe"
+            filename: "stackz-1.0.0-setup.exe"
             output: "StackZ-win"
     runs-on: ${{ matrix.os }}
     steps:
