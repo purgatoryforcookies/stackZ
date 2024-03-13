@@ -11,7 +11,7 @@ jobs:
         timeout-minutes: 8
         runs-on: ubuntu-22.04
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - uses: actions/setup-node@v4
               with:
                   node-version: 21.6.1
@@ -24,7 +24,7 @@ jobs:
         timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - name: Typecheck node and web
               run: |
                   npm ci
@@ -33,7 +33,7 @@ jobs:
         timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - name: Format code
               run: |
                   npm ci
