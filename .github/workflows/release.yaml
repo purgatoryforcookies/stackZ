@@ -50,13 +50,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts/
-      - name: Display structure of downloaded files
-        run: ls -R
+      - name: Get version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
       - name: Create Release
         id: create_release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
+          automatic_release_tag: ${{ steps.package-version.outputs.current-version}}
           prerelease: true
           files: ./artifacts/*/**
