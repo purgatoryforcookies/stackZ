@@ -1,12 +1,11 @@
 import { v4 as uuidv4 } from 'uuid'
-import { AwsEvents, NewCommandPayload, PaletteStack } from '../../types'
+import { NewCommandPayload, PaletteStack } from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './stores/DataStore'
 import { ZodTypeAny } from 'zod'
 import { Server } from 'socket.io'
 import { TerminalScheduler } from './service/TerminalScheduler'
 import { HistoryService } from './service/HistoryService'
-import { AwsService } from './service/AwsService'
 
 export class Stack {
     path: string
@@ -16,7 +15,6 @@ export class Stack {
     store: DataStore
     scheduler: Map<string, TerminalScheduler>
     history: HistoryService
-    awsService: AwsService
 
     constructor(jsonPath: string, server: Server, schema: ZodTypeAny) {
         this.path = jsonPath
@@ -26,7 +24,6 @@ export class Stack {
         this.palettes = new Map<string, Palette>()
         this.scheduler = new Map<string, TerminalScheduler>()
         this.history = new HistoryService()
-        this.awsService = new AwsService()
     }
 
     async load() {
@@ -77,11 +74,6 @@ export class Stack {
                     console.log(`Terminal ${remoteTerminalID} connected`)
                     palette.initTerminal(client, String(remoteTerminalID))
                 }
-            } else {
-                client.on(AwsEvents.SSOSTATUS, async (akw) => {
-                    const isValid = await this.awsService.ssoLoginExpiration()
-                    akw(isValid)
-                })
             }
         })
     }

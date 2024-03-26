@@ -7,17 +7,13 @@ import { Input } from '@renderer/@/ui/input'
 import { RadioGroup, RadioGroupItem } from '@renderer/@/ui/radio-group'
 import { useContext, useEffect, useState } from 'react'
 import { ThemeContext } from '@renderer/App'
-
 import { StoreType } from '@t'
-import { Switch } from '@renderer/@/ui/switch'
 
 type GeneralProps = {
     setTheme: (name: string) => void
-    awsPlugin: boolean
-    setAwsPlugin: (value: boolean) => void
 }
 
-function General({ setTheme, awsPlugin, setAwsPlugin }: GeneralProps) {
+function General({ setTheme }: GeneralProps) {
     const theme = useContext(ThemeContext)
 
     const [defShell, setDefShell] = useState<string>()
@@ -30,15 +26,11 @@ function General({ setTheme, awsPlugin, setAwsPlugin }: GeneralProps) {
             )) as StoreType['userSettings']
             if (userSettings.global.defaultCwd) setDefCwd(userSettings.global.defaultCwd)
             if (userSettings.global.defaultShell) setDefShell(userSettings.global.defaultShell)
-            if (userSettings.global.awsPlugin) setAwsPlugin(userSettings.global.awsPlugin)
         }
         fetchStore()
     }, [open])
 
-    const handleAwsPlugin = (value: boolean) => {
-        window.store.set('userSettings.global.awsPlugin', value)
-        setAwsPlugin(value)
-    }
+
 
     return (
         <>
@@ -146,14 +138,6 @@ function General({ setTheme, awsPlugin, setAwsPlugin }: GeneralProps) {
                                 <ColorSquare theme="pink" />
                             </div>
                         </RadioGroup>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                        <Switch
-                            id="aws-sso-plugin-toggle"
-                            checked={awsPlugin}
-                            onCheckedChange={handleAwsPlugin}
-                        />
-                        <Label htmlFor="aws-sso-plugin-toggle">AWS SSO plugin</Label>
                     </div>
                 </div>
             </div>

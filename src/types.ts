@@ -105,9 +105,6 @@ export enum GitEvents {
     SWITCHBRANCH = 'switchBranch'
 }
 
-export enum AwsEvents {
-    SSOSTATUS = 'getSsoLoginStatus'
-}
 
 export type Status = {
     stackId: string
