@@ -12,11 +12,11 @@ export class HistoryService {
     private limit: number
 
     constructor() {
-        this.history = new Map([
-            ['CMD', []],
-            ['CWD', []],
-            ['SHELL', []]
-        ])
+        this.history = new Map()
+        for (var key in HistoryKey) {
+            //@ts-ignore
+            this.history.set(key, [])
+        }
 
         this.limit = 5
 
