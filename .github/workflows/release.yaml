@@ -1,63 +1,63 @@
 name: Release on new merges to main
 
 on:
-    pull_request:
-        branches: [master]
-        types: [closed]
-    workflow_dispatch:
+  pull_request:
+    branches: [master]
+    types: [closed]
+  workflow_dispatch:
 jobs:
-    build:
-        timeout-minutes: 10
-        strategy:
-            matrix:
-                include:
-                    - os: macos-12
-                      keyword: 'build:mac'
-                      filename: 'StackZ-1.0.0-mac.zip'
-                      output: 'StackZ-mac'
-                    - os: macos-14
-                      keyword: 'build:mac'
-                      filename: 'StackZ-1.0.0-arm64-mac.zip'
-                      output: 'StackZ-arm64-mac'
-                    - os: windows-2022
-                      keyword: 'build:win'
-                      filename: 'stackz-1.0.0-setup.exe'
-                      output: 'StackZ-win'
-        runs-on: ${{ matrix.os }}
-        steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: 21.6.1
-            - name: Build
-              run: |
-                  npm ci
-                  npm rebuild node-pty --update-binary
-                  npm run ${{ matrix.keyword }}
-            - name: Store build artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: build-${{ matrix.os }}
-                  path: ./dist/${{ matrix.filename }}
-    release:
-        runs-on: ubuntu-latest
-        permissions: write-all
-        needs: build
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-            - name: Download artifacts
-              uses: actions/download-artifact@v4
-              with:
-                  path: artifacts/
-            - name: Get version
-              id: package-version
-              uses: martinbeentjes/npm-get-version-action@v1.3.1
-            - name: Create Release
-              id: create_release
-              uses: 'marvinpinto/action-automatic-releases@latest'
-              with:
-                  repo_token: '${{ secrets.GITHUB_TOKEN }}'
-                  automatic_release_tag: ${{ steps.package-version.outputs.current-version}}
-                  prerelease: true
-                  files: ./artifacts/*/**
+  build:
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        include:
+          - os: macos-12
+            keyword: "build:mac"
+            arch: "x64.dmg"
+          - os: macos-14
+            keyword: "build:mac"
+            arch: "arm64.dmg"
+          - os: windows-2022
+            keyword: "build:win"
+            arch: "x64.exe"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 21.6.1
+      - name: Build
+        run: |
+          npm ci
+          npm rebuild node-pty --update-binary
+          npm run ${{ matrix.keyword }}
+      - name: Get version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+      - name: Store build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.os }}
+          path: ./dist/stackz-${{ steps.package-version.outputs.current-version }}-${{ matrix.arch }}
+  release:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+      - name: Get version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+      - name: Create Release
+        id: create_release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ steps.package-version.outputs.current-version}}
+          prerelease: true
+          files: ./artifacts/*/**
