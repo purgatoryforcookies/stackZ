@@ -27,9 +27,10 @@ type CommandProps = {
     selected: boolean
     engine: TerminalUIEngine
     stack: IUseStack
+    stackRunning: boolean
 }
 
-function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
+function Command({ data, engine, stack, selected, handleDrag, stackRunning }: CommandProps) {
     const [ping, setPing] = useState<Status>({
         stackId: engine.stackId,
         reserved: false,
@@ -58,6 +59,7 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
 
     const handleState = async (delRecord = false) => {
         if (delRecord) {
+            if (stackRunning) return
             window.api.deleteCommand(engine.stackId, data.id)
             return
         }
@@ -77,6 +79,7 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
             defaultClassNameDragging="brightness-125 relative z-50"
             onDrag={(_, d) => handleDrag(d, data)}
             onStop={(_, d) => handleDrag(d, data, engine.stackId)}
+            disabled={stackRunning}
         >
             <div
                 className={`
@@ -102,9 +105,11 @@ function Command({ data, engine, stack, selected, handleDrag }: CommandProps) {
                             {ping.cwd}
                         </span>
                         <span className="flex items-center gap-2">
-                            <MoveIcon className="h-4 w-4 text-secondary-foreground hover:scale-125 hover:cursor-pointer moveHandle" />
+                            <MoveIcon className={`h-4 w-4 moveHandle
+                            ${stackRunning ? 'text-muted' : 'text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`} />
                             <Cross2Icon
-                                className="h-4 w-4 text-secondary-foreground hover:scale-125 hover:cursor-pointer"
+                                className={`h-4 w-4 
+                                ${stackRunning ? 'text-muted' : 'text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`}
                                 onClick={() => handleState(true)}
                             />
                         </span>
