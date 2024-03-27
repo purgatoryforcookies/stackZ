@@ -1,6 +1,6 @@
 {
     "name": "stackz",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Easy way to start your development environment",
     "main": "./out/main/index.js",
     "license": "GPL-3.0",
