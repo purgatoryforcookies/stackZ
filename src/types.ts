@@ -105,7 +105,6 @@ export enum GitEvents {
     SWITCHBRANCH = 'switchBranch'
 }
 
-
 export type Status = {
     stackId: string
     reserved: boolean

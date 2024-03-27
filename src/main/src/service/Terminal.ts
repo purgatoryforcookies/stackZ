@@ -372,11 +372,11 @@ export class Terminal {
             const keyword = feed.split(' ', 2)[0]
             switch (keyword) {
                 case 'cd':
-                    if (step === 0) akw("cd " + this.settings.command.cwd, step)
+                    if (step === 0) akw('cd ' + this.settings.command.cwd, step)
                     akw(this.history.get('CWD', step))
                     break
                 case 'shell':
-                    if (step === 0) akw("shell " + this.settings.command.shell, step)
+                    if (step === 0) akw('shell ' + this.settings.command.shell, step)
                     akw(this.history.get('SHELL', step))
                     break
                 default:

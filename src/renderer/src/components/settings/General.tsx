@@ -30,8 +30,6 @@ function General({ setTheme }: GeneralProps) {
         fetchStore()
     }, [open])
 
-
-
     return (
         <>
             <div className="py-8">

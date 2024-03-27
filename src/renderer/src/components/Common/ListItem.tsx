@@ -60,7 +60,7 @@ export const Field = ({
             defaultValue={value}
             placeholder={placeholder}
             autoFocus={variant === 'primary' && !value}
-        ></Input>
+        />
     )
 }
 
@@ -102,7 +102,6 @@ const Record = ({
     const handleEdits = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        if (!keyValue) return
         if (newRecordOpen && (!keyValue || !valueValue)) return
         terminal.socket.emit(UtilityEvents.ENVEDIT, {
             order: orderId,
@@ -111,8 +110,6 @@ const Record = ({
             value: valueValue,
             enabled: true
         })
-        setKeyValue(undefined)
-        setValueValue(undefined)
         setNewRecordOpen(false)
     }
 

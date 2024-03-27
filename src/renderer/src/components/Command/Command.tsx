@@ -105,8 +105,10 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                             {ping.cwd}
                         </span>
                         <span className="flex items-center gap-2">
-                            <MoveIcon className={`h-4 w-4 moveHandle
-                            ${stackRunning ? 'text-muted' : 'text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`} />
+                            <MoveIcon
+                                className={`h-4 w-4 moveHandle
+                            ${stackRunning ? 'text-muted' : 'text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`}
+                            />
                             <Cross2Icon
                                 className={`h-4 w-4 
                                 ${stackRunning ? 'text-muted' : 'text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`}
