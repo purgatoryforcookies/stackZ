@@ -5,6 +5,7 @@ on:
     branches: [master]
     types: [closed]
   workflow_dispatch:
+
 jobs:
   build:
     timeout-minutes: 10
@@ -31,14 +32,11 @@ jobs:
           npm ci
           npm rebuild node-pty --update-binary
           npm run ${{ matrix.keyword }}
-      - name: Get version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
       - name: Store build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.os }}
-          path: ./dist/stackz-${{ steps.package-version.outputs.current-version }}-${{ matrix.arch }}
+          path: ./dist/*.${{ matrix.arch }}
   release:
     runs-on: ubuntu-latest
     permissions: write-all
