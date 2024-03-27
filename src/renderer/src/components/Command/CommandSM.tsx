@@ -101,8 +101,10 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
                             {ping.cmd.title}
                         </span>
                         <span className="flex items-center">
-                            <MoveIcon className={`h-4 w-4 moveHandle
-                            ${stackRunning ? 'text-muted' : 'text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`} />
+                            <MoveIcon
+                                className={`h-4 w-4 moveHandle
+                            ${stackRunning ? 'text-muted' : 'text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`}
+                            />
                         </span>
                     </div>
                     <div

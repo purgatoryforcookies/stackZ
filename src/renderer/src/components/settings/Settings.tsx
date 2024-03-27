@@ -69,8 +69,7 @@ function Settings({ setTheme, stack }: SettingsProps) {
             >
                 <SheetHeader>
                     <SheetTitle>Settings</SheetTitle>
-                    <SheetDescription>
-                    </SheetDescription>
+                    <SheetDescription></SheetDescription>
                     <Tabs defaultValue="stack" data-theme={theme}>
                         <TabsList>
                             <TabsTrigger value="stack">Stack</TabsTrigger>
@@ -85,9 +84,7 @@ function Settings({ setTheme, stack }: SettingsProps) {
                         </TabsContent>
                         <TabsContent value="general">
                             General settings
-                            <General
-                                setTheme={setTheme}
-                            />
+                            <General setTheme={setTheme} />
                         </TabsContent>
                     </Tabs>
                 </SheetHeader>
