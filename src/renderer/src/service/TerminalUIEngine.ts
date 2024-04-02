@@ -126,7 +126,11 @@ export class TerminalUIEngine {
                     break
                 case 'ArrowRight':
                     if (isOutOfBoundsRigth) return
-                    this.rawWrite('\x1b[1C')
+                    this.rawWrite('\u001b[1C')
+                    break
+                case 'Delete':
+                    this.rawWrite('\u001b[1C')
+                    this.removeViaBuffer()
                     break
                 default: {
                     this.writeViaBuffer(data.key)
@@ -135,10 +139,14 @@ export class TerminalUIEngine {
             }
         })
         this.terminal.attachCustomKeyEventHandler((e) => {
-            if (e.code === 'KeyV' && (e.ctrlKey || e.metaKey) && e.type === 'keyup') {
-                this.pasteClipBoardMaybe()
+            if (e.code === 'KeyV' && (e.ctrlKey || e.metaKey)) {
+                if (e.type === 'keyup') this.pasteClipBoardMaybe()
                 return false
             }
+            if (e.code === 'KeyC' && (e.ctrlKey || e.metaKey)) {
+                //TODO: Allow copying
+                return false
+            } else if (e.ctrlKey || e.metaKey) return false
             return true
         })
     }
@@ -167,6 +175,9 @@ export class TerminalUIEngine {
         this.rawWrite('\u001b[0K$ ')
         this.rawWrite(this.buffer)
         this.rawWrite('\u001b[1000D')
+
+        // this.rawWrite(`\u001b[${this.buffer.length + 2}C`)
+
         if (curPos != this.buffer.length - 1) {
             this.rawWrite(`\u001b[${curPos + 3}C`)
         } else {
@@ -207,6 +218,7 @@ export class TerminalUIEngine {
 
     clear() {
         this.terminal.clear()
+        this.buffer = ''
     }
 
     detach() {
@@ -264,7 +276,7 @@ export class TerminalUIEngine {
     async pasteClipBoardMaybe() {
         const clip = await navigator.clipboard.readText()
         if (this.isRunning) this.terminal.paste(clip)
-        else this.rawWrite(clip)
+        else this.writeViaBuffer(clip)
     }
 
     getHistory(dir: 1 | -1) {

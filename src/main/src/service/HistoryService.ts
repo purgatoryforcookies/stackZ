@@ -13,8 +13,8 @@ export class HistoryService {
 
     constructor() {
         this.history = new Map()
-        for (var key in HistoryKey) {
-            //@ts-ignore
+        for (const key in HistoryKey) {
+            //@ts-ignore the key is one of the HistoryKeys, trust me
             this.history.set(key, [])
         }
 
@@ -47,8 +47,6 @@ export class HistoryService {
             writeFile(dirPath + `/${String(key).toLowerCase()}.txt`, hist.join('\n'), (err) => {
                 if (err) {
                     console.log(`Error, could not save history ${String(key)}, ${err}`)
-                } else {
-                    console.log(`History saved, key ${String(key)}`)
                 }
             })
         })
