@@ -38,10 +38,12 @@ function TerminalUI({ engine }: TerminalUIProps) {
                 onSubmit={(e) => {
                     e.preventDefault(), findNext()
                 }}
-                className='absolute top-1 right-1 z-10'
+                className="absolute top-1 right-1 z-10"
             >
-                <CaretLeftIcon className="absolute top-2 right-1 size-5 z-10 text-white hover:cursor-pointer"
-                    onClick={() => setSearchOpen(!searchOpen)} />
+                <CaretLeftIcon
+                    className="absolute top-2 right-1 size-5 z-10 text-white hover:cursor-pointer"
+                    onClick={() => setSearchOpen(!searchOpen)}
+                />
                 <Input
                     type="text"
                     className={`text-white truncate transition-width duration-500 ease-in-out backdrop-blur-lg ${searchOpen ? 'w-[1rem]' : 'w-[20rem]'}`}

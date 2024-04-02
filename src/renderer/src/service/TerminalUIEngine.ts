@@ -12,7 +12,7 @@ export class TerminalUIEngine {
         },
         cursorBlink: true,
         rightClickSelectsWord: false,
-        allowProposedApi: true,
+        allowProposedApi: true
     })
     socket: Socket
     private mounted = false
@@ -146,8 +146,7 @@ export class TerminalUIEngine {
             if (e.code === 'KeyC' && (e.ctrlKey || e.metaKey)) {
                 //TODO: Allow copying
                 return false
-            }
-            else if (e.ctrlKey || e.metaKey) return false
+            } else if (e.ctrlKey || e.metaKey) return false
             return true
         })
     }
@@ -169,7 +168,6 @@ export class TerminalUIEngine {
      * use rawWrite() instead.
      */
     writeViaBuffer(data: string) {
-
         const curPos = this.terminal.buffer.active.cursorX - 2
 
         this.buffer = this.buffer.slice(0, curPos) + data + this.buffer.slice(curPos)
@@ -185,7 +183,6 @@ export class TerminalUIEngine {
         } else {
             this.rawWrite(`\u001b[${this.buffer.length + 2}C`)
         }
-
     }
 
     removeViaBuffer() {
@@ -280,7 +277,6 @@ export class TerminalUIEngine {
         const clip = await navigator.clipboard.readText()
         if (this.isRunning) this.terminal.paste(clip)
         else this.writeViaBuffer(clip)
-
     }
 
     getHistory(dir: 1 | -1) {
