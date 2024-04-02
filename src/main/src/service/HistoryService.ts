@@ -47,8 +47,6 @@ export class HistoryService {
             writeFile(dirPath + `/${String(key).toLowerCase()}.txt`, hist.join('\n'), (err) => {
                 if (err) {
                     console.log(`Error, could not save history ${String(key)}, ${err}`)
-                } else {
-                    console.log(`History saved, key ${String(key)}`)
                 }
             })
         })
