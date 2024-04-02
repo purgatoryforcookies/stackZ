@@ -13,8 +13,8 @@ export class HistoryService {
 
     constructor() {
         this.history = new Map()
-        for (var key in HistoryKey) {
-            //@ts-ignore
+        for (const key in HistoryKey) {
+            //@ts-ignore the key is one of the HistoryKeys, trust me
             this.history.set(key, [])
         }
 

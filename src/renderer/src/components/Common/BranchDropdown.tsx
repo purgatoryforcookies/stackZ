@@ -109,11 +109,11 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
             <CustomToolTip message={`${errors}`} hidden={!errors}>
                 {errors ? (
                     <ExclamationTriangleIcon
-                        className={`w-4 h-4 text-orange-500 transition-opacity duration-500 ${Boolean(errors) ? 'opacity-100' : 'opacity-0'}`}
+                        className={`w-4 h-4 text-orange-500 transition-opacity duration-500 ${errors ? 'opacity-100' : 'opacity-0'}`}
                     />
                 ) : (
                     <CheckIcon
-                        className={`w-4 h-4 text-green-500 transition-opacity duration-500 ${Boolean(!loading) ? 'opacity-100' : 'opacity-0'}`}
+                        className={`w-4 h-4 text-green-500 transition-opacity duration-500 ${!loading ? 'opacity-100' : 'opacity-0'}`}
                     />
                 )}
             </CustomToolTip>
