@@ -43,7 +43,7 @@ function DetailHeader({ stack }: DetailHeaderProps) {
     if (!terminal) return null
 
     return (
-        <div className="h-full px-5">
+        <div className="h-full">
             <div className="">
                 {highlightedEnv ? (
                     <Badge className="text-md">{`${highlightedEnv[0]}=${highlightedEnv[1]}`}</Badge>
@@ -52,14 +52,14 @@ function DetailHeader({ stack }: DetailHeaderProps) {
             <div className="flex gap-8 pb-16 h-full overflow-auto pr-32" ref={bodyRef}>
                 {status?.cmd.command.env
                     ? status.cmd.command.env.map((record) => (
-                          <EnvList
-                              data={record}
-                              key={record.title}
-                              onSelection={handleHighligt}
-                              terminal={terminal}
-                              highlight={highlightedEnv}
-                          />
-                      ))
+                        <EnvList
+                            data={record}
+                            key={record.title}
+                            onSelection={handleHighligt}
+                            terminal={terminal}
+                            highlight={highlightedEnv}
+                        />
+                    ))
                     : null}
                 <div className="p-11">
                     <NewEnvList scroll={scroll} terminal={terminal} />
