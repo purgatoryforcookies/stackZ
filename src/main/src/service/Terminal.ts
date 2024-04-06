@@ -322,7 +322,7 @@ export class Terminal {
     }
 
     // TODO: implement the listeners from below into the functions above,
-    // this is otherwise unnessecary code
+    // this is otherwise unnessecary function declaration
     registerTerminalEvents() {
         this.socket.on(UtilityEvents.CWD, (arg: Utility2Props) => {
             console.log(`Changing cwd! new Cwd: ${arg.value}`)
