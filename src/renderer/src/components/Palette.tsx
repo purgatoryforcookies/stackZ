@@ -67,7 +67,7 @@ function Palette({ data }: PaletteProps) {
 
     return (
         <div className="h-full flex flex-col" ref={paletteRef}>
-            <div className="flex gap-3 justify-center py-4 flex-wrap px-4">
+            <div className="flex gap-3 justify-center p-4 flex-wrap">
                 {data.stack &&
                     Array.from(data.stack.values()).map((stack) => {
                         return (
@@ -110,36 +110,36 @@ function Palette({ data }: PaletteProps) {
                     )}
                 </Button>
             </div>
-            <div className="overflow-auto pb-20" style={{ scrollbarGutter: 'stable' }}>
+            <div className="overflow-auto pb-14" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
                     ? stack.palette
-                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                          .map((cmd) => {
-                              if (!cmd?.id) return null
-                              const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
-                              if (!engine) return null
-                              return isCompact ? (
-                                  <CommandSM
-                                      key={cmd.id}
-                                      data={cmd}
-                                      engine={engine}
-                                      selected={cmd.id === data.selectedTerminal}
-                                      handleDrag={handleDrag}
-                                      stack={data}
-                                      stackRunning={running}
-                                  />
-                              ) : (
-                                  <Command
-                                      key={cmd.id}
-                                      data={cmd}
-                                      engine={engine}
-                                      selected={cmd.id === data.selectedTerminal}
-                                      handleDrag={handleDrag}
-                                      stack={data}
-                                      stackRunning={running}
-                                  />
-                              )
-                          })
+                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                        .map((cmd) => {
+                            if (!cmd?.id) return null
+                            const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
+                            if (!engine) return null
+                            return isCompact ? (
+                                <CommandSM
+                                    key={cmd.id}
+                                    data={cmd}
+                                    engine={engine}
+                                    selected={cmd.id === data.selectedTerminal}
+                                    handleDrag={handleDrag}
+                                    stack={data}
+                                    stackRunning={running}
+                                />
+                            ) : (
+                                <Command
+                                    key={cmd.id}
+                                    data={cmd}
+                                    engine={engine}
+                                    selected={cmd.id === data.selectedTerminal}
+                                    handleDrag={handleDrag}
+                                    stack={data}
+                                    stackRunning={running}
+                                />
+                            )
+                        })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand stack={data} />

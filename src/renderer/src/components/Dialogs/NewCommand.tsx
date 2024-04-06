@@ -32,7 +32,6 @@ function NewCommand({ stack }: NewCommandProps) {
         if (!command) return
         if (command.title.length === 0) return
         const newCommand = await window.api.createCommand(command, stack.selectedStack)
-        console.log(newCommand)
         setOpen(false)
         setCommand(undefined)
         stack.addTerminal(newCommand)
