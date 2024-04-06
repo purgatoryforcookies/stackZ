@@ -53,14 +53,14 @@ function App(): JSX.Element {
                                 onResize={sizeHeader}
                                 ref={headerRef}
                                 collapsible
-                                className='p-2'
+                                className='p-2 pb-7'
                             >
-                                <Tabs defaultValue="monitor" data-theme={theme}>
+                                <Tabs defaultValue="environment" data-theme={theme} className='h-full pb-4'>
                                     <TabsList>
                                         <TabsTrigger value="environment">Environment</TabsTrigger>
                                         <TabsTrigger value="monitor">Monitor</TabsTrigger>
                                     </TabsList>
-                                    <TabsContent value="environment" className='pl-4'>
+                                    <TabsContent value="environment" className='pl-4 h-full pb-5'>
                                         <p className="text-muted-foreground text-sm">
                                             Terminal specific environment variables
                                         </p>

@@ -108,7 +108,7 @@ function EnvList({ data, terminal }: EnvListProps) {
                 </div>
             ) : (
                 <div
-                    className="flex flex-col gap-1 overflow-auto h-[100%] py-2 "
+                    className="flex flex-col gap-1 overflow-auto h-full py-2"
                     style={{ scrollbarGutter: 'stable' }}
                 >
                     {data.pairs

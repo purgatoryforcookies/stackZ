@@ -34,21 +34,18 @@ function DetailHeader({ stack }: DetailHeaderProps) {
     if (!terminal) return <p>Error</p>
 
     return (
-        <div className="h-full">
-
-            <div className="flex gap-8 pb-16 h-full overflow-auto pr-32" ref={bodyRef}>
-                {status?.cmd.command.env
-                    ? status.cmd.command.env.map((record) => (
-                        <EnvList
-                            data={record}
-                            key={record.title}
-                            terminal={terminal}
-                        />
-                    ))
-                    : null}
-                <div className="p-11">
-                    <NewEnvList scroll={scroll} terminal={terminal} />
-                </div>
+        <div className="flex gap-8 pb-16 pr-10 h-full" ref={bodyRef}>
+            {status?.cmd.command.env
+                ? status.cmd.command.env.map((record) => (
+                    <EnvList
+                        data={record}
+                        key={record.title}
+                        terminal={terminal}
+                    />
+                ))
+                : null}
+            <div className="p-11">
+                <NewEnvList scroll={scroll} terminal={terminal} />
             </div>
         </div>
     )
