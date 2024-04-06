@@ -39,6 +39,10 @@ export class HistoryService {
         return this.history.get(key)?.at(index)
     }
 
+    exists(key: keyof typeof HistoryKey, value: string) {
+        return this.history.get(key)?.includes(value)
+    }
+
     save() {
         Array.from(this.history.keys()).forEach((key) => {
             const hist = this.history.get(key as keyof typeof HistoryKey)

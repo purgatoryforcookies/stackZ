@@ -95,7 +95,7 @@ export class TerminalUIEngine {
         this.terminal.onKey((data) => {
             this.sendInput(data.key)
             if (this.isRunning) return
-
+            console.log("is running", this.isRunning, this.buffer)
             const isOutOfBoundsLeft = this.terminal.buffer.active.cursorX <= 2
             const isOutOfBoundsRigth =
                 this.terminal.buffer.active.cursorX - 1 > this.getCurrentTerminalLine().length
@@ -237,13 +237,8 @@ export class TerminalUIEngine {
     }
 
     changeSettingsMaybe() {
-        const cursorRow = this.terminal.buffer.active.cursorY
-        const currentRow = this.terminal.buffer.active
-            .getLine(cursorRow)
-            ?.translateToString(true, 2)
-        if (!currentRow) return
 
-        const [keyword, cmd] = currentRow.split(' ', 2)
+        const [keyword, cmd] = this.buffer.split(' ', 2)
 
         switch (keyword) {
             case 'cd':
@@ -267,7 +262,7 @@ export class TerminalUIEngine {
                 this.socket.emit('changeCommand', {
                     stack: this.stackId,
                     terminal: this.terminalId,
-                    value: currentRow
+                    value: this.buffer
                 })
                 break
         }

@@ -257,13 +257,19 @@ export class Terminal {
     }
 
     updateCwd(value: string) {
+        if (!this.history.exists('CWD', value)) {
+            this.history.store('CWD', 'cd ' + this.settings.command.cwd)
+        }
         const newPath = path.normalize(value.trim())
         this.settings.command.cwd = newPath
-        this.history.store('CWD', 'cd ' + newPath) //hack, could this not be hardcoded here
+        this.history.store('CWD', 'cd ' + newPath)
         this.ping()
     }
 
     updateCommand(value: string) {
+        if (!this.history.exists('CMD', value)) {
+            this.history.store('CMD', this.settings.command.cmd)
+        }
         const newCommand = value.trim()
         this.settings.command.cmd = newCommand
         this.history.store('CMD', newCommand)
@@ -273,7 +279,7 @@ export class Terminal {
     changeShell(newShell: string | undefined) {
         const resolvedShell = this.chooseShell(newShell)
         this.settings.command.shell = resolvedShell
-        this.history.store('SHELL', 'shell ' + newShell) //hack, could this not be hardcoded here
+        this.history.store('SHELL', 'shell ' + newShell)
         this.ping()
     }
 
