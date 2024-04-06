@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Record from '@renderer/components/Common/ListItem'
 import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
@@ -13,24 +13,14 @@ type EnvListProps = {
         order: number
         disabled: string[]
     }
-    onSelection: (e: string[]) => void
-    highlight: string[] | null
     terminal: TerminalUIEngine
 }
 
-function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
-    const [minimized, setMinimized] = useState<boolean>(false)
-    const [hidden, setHidden] = useState<boolean>(false)
+function EnvList({ data, terminal }: EnvListProps) {
+    const [minimized, setMinimized] = useState<boolean>(data.order === 0 ? true : false)
+    const [hidden, setHidden] = useState<boolean>(data.order === 0 ? true : false)
     const [editMode, setEditMode] = useState<boolean>(false)
 
-    const handleClik = (
-        key: string | undefined,
-        e: React.MouseEvent<HTMLDivElement, MouseEvent>
-    ) => {
-        if ((e.target as HTMLElement).nodeName === 'INPUT') return
-
-        onSelection([key ?? '', key ? data.pairs[key] || '' : ''])
-    }
 
     const handleMute = () => {
         terminal.socket.emit(UtilityEvents.ENVMUTE, {
@@ -56,13 +46,6 @@ function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
             order: data.order
         })
     }
-
-    useEffect(() => {
-        if (data.order === 0) {
-            setHidden(true)
-            setMinimized(true)
-        }
-    }, [])
 
     return (
         <div
@@ -130,20 +113,18 @@ function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
                 >
                     {data.pairs
                         ? Object.keys(data.pairs).map((key: string) => (
-                              <Record
-                                  key={key} //react component key
-                                  newRecord={false}
-                                  editMode={editMode}
-                                  terminal={terminal}
-                                  orderId={data.order}
-                                  minimized={minimized}
-                                  keyv={key}
-                                  muted={data.disabled.includes(key)}
-                                  value={data.pairs[key]}
-                                  onClick={handleClik}
-                                  highlight={highlight ? highlight[0] === key : false}
-                              />
-                          ))
+                            <Record
+                                key={key} //react component key
+                                newRecord={false}
+                                editMode={editMode}
+                                terminal={terminal}
+                                orderId={data.order}
+                                minimized={minimized}
+                                keyv={key}
+                                muted={data.disabled.includes(key)}
+                                value={data.pairs[key]}
+                            />
+                        ))
                         : null}
                     {editMode ? (
                         <Record
@@ -151,7 +132,6 @@ function EnvList({ data, onSelection, terminal, highlight }: EnvListProps) {
                             terminal={terminal}
                             orderId={data.order}
                             minimized={minimized}
-                            onClick={() => {}}
                             editMode={editMode}
                         />
                     ) : null}

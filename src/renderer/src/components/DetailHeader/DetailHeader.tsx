@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { ClientEvents, Status, UtilityEvents } from '@t'
 import EnvList from '../Common/EnvList'
 import { NewEnvList } from '../Dialogs/NewEnvList'
-import { Badge } from '@renderer/@/ui/badge'
 import { IUseStack } from '@renderer/hooks/useStack'
 
 type DetailHeaderProps = {
@@ -11,7 +10,6 @@ type DetailHeaderProps = {
 
 function DetailHeader({ stack }: DetailHeaderProps) {
     const [status, setStatus] = useState<Status | null>(null)
-    const [highlightedEnv, setHighlightedEnv] = useState<string[] | null>(null)
     const bodyRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -25,13 +23,6 @@ function DetailHeader({ stack }: DetailHeaderProps) {
         if (status && status.stackId !== stack.selectedStack) setStatus(null)
     }, [stack])
 
-    const handleHighligt = (e: string[]) => {
-        if (e[0] === highlightedEnv?.[0]) {
-            setHighlightedEnv(null)
-            return
-        }
-        // setHighlightedEnv(e)
-    }
 
     const scroll = () => {
         setTimeout(() => {
@@ -40,24 +31,18 @@ function DetailHeader({ stack }: DetailHeaderProps) {
     }
 
     const terminal = stack.terminals?.get(stack.selectedStack)?.get(stack.selectedTerminal)
-    if (!terminal) return null
+    if (!terminal) return <p>Error</p>
 
     return (
         <div className="h-full">
-            <div className="">
-                {highlightedEnv ? (
-                    <Badge className="text-md">{`${highlightedEnv[0]}=${highlightedEnv[1]}`}</Badge>
-                ) : null}
-            </div>
+
             <div className="flex gap-8 pb-16 h-full overflow-auto pr-32" ref={bodyRef}>
                 {status?.cmd.command.env
                     ? status.cmd.command.env.map((record) => (
                         <EnvList
                             data={record}
                             key={record.title}
-                            onSelection={handleHighligt}
                             terminal={terminal}
-                            highlight={highlightedEnv}
                         />
                     ))
                     : null}

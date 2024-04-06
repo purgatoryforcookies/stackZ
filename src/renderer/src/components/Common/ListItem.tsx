@@ -15,7 +15,6 @@ type ListItemProps = {
 interface RecordProps extends ListItemProps {
     keyv?: string
     value?: string
-    onClick: (key: string | undefined, e) => void
     editMode: boolean
     muted?: boolean
     highlight?: boolean
@@ -29,7 +28,6 @@ type FieldProps = {
     placeholder?: string
     muted?: boolean
     minimized?: boolean
-    highlight?: boolean
 }
 
 export const Field = ({
@@ -39,16 +37,13 @@ export const Field = ({
     variant,
     placeholder,
     minimized,
-    highlight
 }: FieldProps) => {
     const style = `rounded-full py-1
-    ${
-        variant === 'primary'
+    ${variant === 'primary'
             ? `px-3 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
-            : `px-3  truncate text-secondary ${
-                  highlight ? 'bg-orange-900 text-white' : 'bg-primary'
-              }`
-    }`
+            : `px-3  truncate text-secondary bg-primary
+            }`
+        }`
 
     if (disabled) return <p className={style}>{value}</p>
 
@@ -78,13 +73,11 @@ const Record = ({
     terminal,
     keyv,
     value,
-    onClick,
     editMode,
     newRecord,
     orderId,
     minimized,
     muted,
-    highlight
 }: RecordProps) => {
     const [newRecordOpen, setNewRecordOpen] = useState(false)
     const [keyValue, setKeyValue] = useState<string | undefined>(keyv)
@@ -123,7 +116,6 @@ const Record = ({
     return (
         <div
             className={`text-sm relative px-1 ${muted ? 'brightness-50' : ''}`}
-            onClick={(e) => onClick(keyValue, e)}
             onContextMenu={handleMute}
         >
             {editMode && !newRecordOpen && !newRecord ? (
@@ -161,7 +153,6 @@ const Record = ({
                             muted={muted}
                             variant="secondary"
                             placeholder="VALUE"
-                            highlight={highlight}
                         />
                     ) : null}
                 </form>
