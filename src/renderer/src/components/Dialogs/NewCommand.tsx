@@ -2,7 +2,6 @@ import { FormEvent, useContext, useState } from 'react'
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -33,7 +32,6 @@ function NewCommand({ stack }: NewCommandProps) {
         if (!command) return
         if (command.title.length === 0) return
         const newCommand = await window.api.createCommand(command, stack.selectedStack)
-        console.log(newCommand)
         setOpen(false)
         setCommand(undefined)
         stack.addTerminal(newCommand)
@@ -62,12 +60,10 @@ function NewCommand({ stack }: NewCommandProps) {
             <DialogContent data-theme={theme}>
                 <DialogHeader>
                     <DialogTitle>New Command</DialogTitle>
-                    <DialogDescription>Create new</DialogDescription>
                 </DialogHeader>
                 <form
                     onSubmit={handleSave}
                     className="flex gap-5 text-secondary-foreground flex-col"
-                    onReset={() => setCommand(undefined)}
                 >
                     <div className="grid gap-4 py-2 w-full">
                         <div className="grid grid-cols-4 items-center gap-4">

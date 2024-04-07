@@ -73,6 +73,7 @@ export class Palette {
         console.log(`Removing terminal ${terminalId}, ${this.settings.id}`)
         this.terminals.delete(terminalId)
         this.settings.palette = this.settings.palette?.filter((pal) => pal.id !== terminalId)
+        this.reIndexOrders()
     }
     installStackSocket(socket: Socket) {
         this.socket = socket
@@ -211,7 +212,17 @@ export class Palette {
         const item = updatedArray.splice(objectIndex, 1)[0]
         updatedArray.splice(arg.newOrder - 1, 0, item)
 
-        this.settings.palette = updatedArray.map((term, i) => {
+        this.settings.palette = updatedArray
+        this.reIndexOrders()
+    }
+
+    /**
+     * Cleans up execution orders of the stack.
+     * Can be called independently any time 
+     */
+    reIndexOrders = () => {
+
+        this.settings.palette = this.settings.palette!.map((term, i) => {
             return { ...term, executionOrder: i + 1 }
         })
 
@@ -221,7 +232,7 @@ export class Palette {
             .sort((a, b) => a.settings.executionOrder! - b.settings.executionOrder!)
             .forEach((t) => {
                 newExecOrder += 1
-                if (t.settings.id !== arg.terminalId) t.settings.executionOrder = newExecOrder
+                t.settings.executionOrder = newExecOrder
             })
     }
 

@@ -121,6 +121,12 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         selectTerminal(cmd.id)
     }
 
+    const reIndexOrder = (arr: Cmd[]) => {
+        return arr.map((term, i) => {
+            return { ...term, executionOrder: i + 1 }
+        })
+    }
+
     /**
      *  Updates the execution order of a terminal
      */
@@ -143,9 +149,7 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         updatedArray.splice(newOrder - 1, 0, item)
 
         //set the new palette and remap execution orders now that the object was moved
-        selected.palette = updatedArray.map((term, i) => {
-            return { ...term, executionOrder: i + 1 }
-        })
+        selected.palette = reIndexOrder(updatedArray)
 
         setStack(newStack)
 
@@ -159,6 +163,12 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
             const palette = newStack.get(d.stack)?.palette
             if (palette) {
                 newStack.get(d.stack)!.palette = palette.filter((pal) => pal.id !== d.terminal)
+
+                const oldPalette = newStack.get(d.stack)?.palette
+                if (!oldPalette) throw new Error("No palette found")
+
+                newStack.get(d.stack)!.palette = reIndexOrder(oldPalette.filter((pal) => pal.id !== d.terminal))
+
             }
             setStack(newStack)
         }

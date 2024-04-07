@@ -1,5 +1,5 @@
 import { readFile, writeFileSync, existsSync } from 'fs'
-import { Environment } from '../../../types'
+import { Environment, TPorts } from '../../../types'
 import { ZodTypeAny, z } from 'zod'
 
 export const readJsonFile = <T extends z.ZodTypeAny>(
@@ -30,9 +30,6 @@ const createJsonFileTemplate = (path: string, schema: ZodTypeAny) => {
     writeFileSync(path, JSON.stringify(template))
 }
 
-export const parseVariables = () => {
-    return []
-}
 
 /**
  * Factory sorts envs into order and adds host environments
@@ -54,7 +51,7 @@ export const envFactory = (args: Environment[] | undefined) => {
         allenvs = allenvs.concat(hostEnv)
     }
 
-    return allenvs.sort((a, b) => a.order - b.order)
+    return allenvs
 }
 
 export const mapEnvs = (obj: Environment[]) => {
@@ -83,12 +80,42 @@ export const resolveDefaultCwd = () => {
     return '~'
 }
 
-// eslint-disable-next-line
-export const debounce = (fn: Function, ms = 300) => {
-    let timeoutId: ReturnType<typeof setTimeout>
-    // eslint-disable-next-line
-    return function (this: any, ...args: any[]) {
-        clearTimeout(timeoutId)
-        timeoutId = setTimeout(() => fn.apply(this, args), ms)
-    }
+export const parsePowershellTCPMessage = (message: string) => {
+
+    const linesInArray = message.split('\n').slice(3)
+    const groupedLines2 = new Map<string, Map<number, TPorts[]>>()
+
+    linesInArray.forEach(item => {
+        const trimmed = trimShellTable(item)
+        if (!trimmed) return
+
+        const obj = {
+            localAddress: trimmed[0],
+            localPort: Number(trimmed[1]),
+            remoteAddress: trimmed[2],
+            remotePort: Number(trimmed[3]),
+            state: trimmed[4],
+            pid: Number(trimmed[5]),
+            process: trimmed[6],
+            protocol: 'TCP'
+        }
+
+
+        if (!groupedLines2.has(obj.process)) {
+            groupedLines2.set(obj.process, new Map())
+        }
+        if (!groupedLines2.get(obj.process)?.has(obj.localPort)) {
+            groupedLines2.get(obj.process)?.set(obj.localPort, [])
+        }
+
+        groupedLines2.get(obj.process)?.get(obj.localPort)?.push(obj)
+    })
+
+    return groupedLines2
+}
+
+const trimShellTable = (row: string) => {
+    if (row.length < 10) return
+    return row.split(' ').filter(i => i.length > 0 && i !== '\r')
+
 }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { Input } from '@renderer/@/ui/input'
 import { useTaalasmaa } from '@renderer/hooks/useTaalasmaa'
-import { CaretLeftIcon } from '@radix-ui/react-icons'
+import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
 
 type TerminalUIProps = {
     engine: TerminalUIEngine | undefined
@@ -40,14 +40,14 @@ function TerminalUI({ engine }: TerminalUIProps) {
                 }}
                 className="absolute top-1 right-1 z-10"
             >
-                <CaretLeftIcon
+                <MagnifyingGlassIcon
                     className="absolute top-2 right-1 size-5 z-10 text-white hover:cursor-pointer"
                     onClick={() => setSearchOpen(!searchOpen)}
                 />
                 <Input
                     type="text"
-                    className={`text-white truncate transition-width duration-500 ease-in-out backdrop-blur-lg ${searchOpen ? 'w-[1rem]' : 'w-[20rem]'}`}
-                    placeholder="Highlight..."
+                    className={`text-white truncate transition-width duration-500 ease-in-out backdrop-blur-lg ${!searchOpen ? 'w-[1.8rem]' : 'w-[20rem]'}`}
+                    placeholder={searchOpen ? "Highlight..." : ''}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     onBlur={() => {
