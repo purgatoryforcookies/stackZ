@@ -206,10 +206,12 @@ export type TPorts = {
     remotePort: number
     localAddress: string
     remoteAddress: string
-    created: string
 }
 
 export type Processes = {
     process: string
-    ports: TPorts[]
+    byPort: {
+        number: number,
+        ports: TPorts[]
+    }[]
 }[]

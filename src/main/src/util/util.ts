@@ -83,7 +83,7 @@ export const resolveDefaultCwd = () => {
 export const parsePowershellTCPMessage = (message: string) => {
 
     const linesInArray = message.split('\n').slice(3)
-    const groupedLines = new Map<string, TPorts[]>()
+    const groupedLines2 = new Map<string, Map<number, TPorts[]>>()
 
     linesInArray.forEach(item => {
         const trimmed = trimShellTable(item)
@@ -95,19 +95,23 @@ export const parsePowershellTCPMessage = (message: string) => {
             remoteAddress: trimmed[2],
             remotePort: Number(trimmed[3]),
             state: trimmed[4],
-            created: trimmed[5] + "-" + trimmed[6],
-            pid: Number(trimmed[7]),
-            process: trimmed[8],
+            pid: Number(trimmed[5]),
+            process: trimmed[6],
             protocol: 'TCP'
         }
 
-        if (!groupedLines.has(obj.process)) {
-            groupedLines.set(obj.process, [])
+
+        if (!groupedLines2.has(obj.process)) {
+            groupedLines2.set(obj.process, new Map())
         }
-        groupedLines.get(obj.process)?.push(obj)
+        if (!groupedLines2.get(obj.process)?.has(obj.localPort)) {
+            groupedLines2.get(obj.process)?.set(obj.localPort, [])
+        }
+
+        groupedLines2.get(obj.process)?.get(obj.localPort)?.push(obj)
     })
 
-    return groupedLines
+    return groupedLines2
 }
 
 const trimShellTable = (row: string) => {

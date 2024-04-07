@@ -1,13 +1,13 @@
 import { Badge } from "@renderer/@/ui/badge"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@renderer/@/ui/hover-card"
 import PortCard from "./PortCard"
-import { TPorts } from "@t"
+import { Processes } from "@t"
 
 
 
 type PortStripProps = {
     name: string
-    ports: TPorts[]
+    ports: Processes[0]['byPort']
     color: string
 }
 function PortStrip({ name, ports, color }: PortStripProps) {
@@ -17,14 +17,14 @@ function PortStrip({ name, ports, color }: PortStripProps) {
             <h1 className="text-secondary-foreground" >{name}</h1>
             <div className="flex gap-2">
                 {ports.map((port) => (
-                    <HoverCard key={port.process} openDelay={0.2} closeDelay={0.3}>
+                    <HoverCard key={port.number} openDelay={0.2} closeDelay={0.3}>
                         <HoverCardTrigger>
-                            <Badge className='text-sm' style={{ backgroundColor: color }}>
-                                {port.localPort}
+                            <Badge className='text-sm border-full' style={{ backgroundColor: color }}>
+                                {port.number}
                             </Badge>
                         </HoverCardTrigger>
-                        <HoverCardContent className="w-full">
-                            <PortCard port={port} />
+                        <HoverCardContent className="w-full p-1">
+                            <PortCard port={port.ports} />
                         </HoverCardContent>
                     </HoverCard>
                 ))}

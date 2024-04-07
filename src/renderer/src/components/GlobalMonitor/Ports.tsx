@@ -17,16 +17,20 @@ function Ports() {
 
     return (
 
-        <ScrollArea className=" whitespace-nowrap rounded-md border" >
-            <div className="flex w-max space-x-4 p-4">
-
-                {processes ? processes.map((process, i) => (
-
-                    <PortStrip name={process.process} ports={process.ports} color={selectColor(i)} />
-                )) : <p className="text-white text-lg">Loading...</p>}
+        <div className="">
+            <div className="text-secondary-foreground">
+                TCP Ports in use
             </div>
-            <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+            <ScrollArea className=" whitespace-nowrap rounded-md border" >
+                <div className="flex w-max space-x-1 p-2 mb-2">
+                    {processes ? processes.map((process, i) => (
+
+                        <PortStrip key={process.process} name={process.process} ports={process.byPort} color={selectColor(i)} />
+                    )) : <p className="text-white text-lg">Loading...</p>}
+                </div>
+                <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+        </div>
 
     )
 }
