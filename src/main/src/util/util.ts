@@ -1,5 +1,5 @@
 import { readFile, writeFileSync, existsSync } from 'fs'
-import { Environment } from '../../../types'
+import { Environment, TPorts } from '../../../types'
 import { ZodTypeAny, z } from 'zod'
 
 export const readJsonFile = <T extends z.ZodTypeAny>(
@@ -78,4 +78,40 @@ export const resolveDefaultCwd = () => {
         }
     }
     return '~'
+}
+
+export const parsePowershellTCPMessage = (message: string) => {
+
+    const linesInArray = message.split('\n').slice(3)
+    const groupedLines = new Map<string, TPorts[]>()
+
+    linesInArray.forEach(item => {
+        const trimmed = trimShellTable(item)
+        if (!trimmed) return
+
+        const obj = {
+            localAddress: trimmed[0],
+            localPort: Number(trimmed[1]),
+            remoteAddress: trimmed[2],
+            remotePort: Number(trimmed[3]),
+            state: trimmed[4],
+            created: trimmed[5] + "-" + trimmed[6],
+            pid: Number(trimmed[7]),
+            process: trimmed[8],
+            protocol: 'TCP'
+        }
+
+        if (!groupedLines.has(obj.process)) {
+            groupedLines.set(obj.process, [])
+        }
+        groupedLines.get(obj.process)?.push(obj)
+    })
+
+    return groupedLines
+}
+
+const trimShellTable = (row: string) => {
+    if (row.length < 10) return
+    return row.split(' ').filter(i => i.length > 0 && i !== '\r')
+
 }

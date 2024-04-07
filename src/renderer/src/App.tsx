@@ -12,7 +12,7 @@ import { useResizable } from './hooks/useResizable'
 import { ImperativePanelHandle } from 'react-resizable-panels'
 import BranchDropdown from './components/Common/BranchDropdown'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './@/ui/tabs'
-import PortStrip from './components/Common/PortStrip'
+import Ports from './components/GlobalMonitor/Ports'
 
 export const ThemeContext = createContext('aurora')
 
@@ -55,7 +55,7 @@ function App(): JSX.Element {
                                 collapsible
                                 className='p-2 pb-7'
                             >
-                                <Tabs defaultValue="environment" data-theme={theme} className='h-full pb-4'>
+                                <Tabs defaultValue="monitor" data-theme={theme} className='h-full pb-4'>
                                     <TabsList>
                                         <TabsTrigger value="environment">Environment</TabsTrigger>
                                         <TabsTrigger value="monitor">Monitor</TabsTrigger>
@@ -67,10 +67,7 @@ function App(): JSX.Element {
                                         <DetailHeader stack={stack} />
                                     </TabsContent>
                                     <TabsContent value="monitor" className='pl-4'>
-                                        <p className="text-muted-foreground text-sm">
-                                            Global monitor
-                                        </p>
-                                        <PortStrip />
+                                        <Ports />
                                     </TabsContent>
                                 </Tabs>
 

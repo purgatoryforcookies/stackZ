@@ -196,3 +196,20 @@ type PickStartsWith<T extends object, S extends string> = {
     // eslint-disable-next-line
     [K in keyof T as K extends `${S}${infer _R}` ? K : never]: T[K]
 }
+
+export type TPorts = {
+    process: string
+    pid: number
+    state: string
+    localPort: number
+    protocol: string
+    remotePort: number
+    localAddress: string
+    remoteAddress: string
+    created: string
+}
+
+export type Processes = {
+    process: string
+    ports: TPorts[]
+}[]
