@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
 import { parsePowershellTCPMessage } from '../util/util'
-import { Processes } from 'src/types'
+import { Processes } from '../../../types'
 
 
 export class MonitorService {
