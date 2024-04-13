@@ -80,13 +80,13 @@ export const resolveDefaultCwd = () => {
     return '~'
 }
 
-export const parsePowershellTCPMessage = (message: string) => {
+export const parsePSTCPMessage = (message: string) => {
 
     const linesInArray = message.split('\n').slice(3)
     const groupedLines2 = new Map<string, Map<number, TPorts[]>>()
 
     linesInArray.forEach(item => {
-        const trimmed = trimShellTable(item)
+        const trimmed = trimShellTableRow(item)
         if (!trimmed) return
 
         const obj = {
@@ -114,7 +114,44 @@ export const parsePowershellTCPMessage = (message: string) => {
     return groupedLines2
 }
 
-const trimShellTable = (row: string) => {
+//TODO: this and tcp one can be made into one.
+export const parsePSUDPMessage = (message: string) => {
+    const linesInArray = message.split('\n').slice(3)
+
+
+    const groupedLines2 = new Map<string, Map<number, TPorts[]>>()
+
+    linesInArray.forEach(item => {
+        const trimmed = trimShellTableRow(item)
+        if (!trimmed) return
+
+        const obj: TPorts = {
+            localAddress: trimmed[0],
+            localPort: Number(trimmed[1]),
+            remoteAddress: null,
+            remotePort: null,
+            state: null,
+            pid: Number(trimmed[2]),
+            process: trimmed[3],
+            protocol: 'UDP'
+        }
+
+        if (!groupedLines2.has(obj.process)) {
+            groupedLines2.set(obj.process, new Map())
+        }
+        if (!groupedLines2.get(obj.process)?.has(obj.localPort)) {
+            groupedLines2.get(obj.process)?.set(obj.localPort, [])
+        }
+
+        groupedLines2.get(obj.process)?.get(obj.localPort)?.push(obj)
+    })
+    return groupedLines2
+
+}
+
+
+
+const trimShellTableRow = (row: string) => {
     if (row.length < 10) return
     return row.split(' ').filter(i => i.length > 0 && i !== '\r')
 

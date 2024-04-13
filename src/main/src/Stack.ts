@@ -79,7 +79,15 @@ export class Stack {
                 }
             } else {
                 client.on('m_ports', async (akw) => {
-                    akw(await this.monitor.activePortsTCP())
+                    await Promise.all([
+                        this.monitor.activePortsTCP(),
+                        this.monitor.activePortsUDP()
+                    ]).then(results => {
+                        akw({
+                            tcp: results[0],
+                            udp: results[1]
+                        })
+                    })
                 })
             }
         })

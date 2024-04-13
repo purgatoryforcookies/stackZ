@@ -177,6 +177,11 @@ export type NewCommandPayload = {
     cwd?: string
 }
 
+export type MonitorPortsResponse = {
+    tcp: Processes,
+    udp: Processes
+}
+
 export type StoreType = {
     paletteWidths: {
         header: number
@@ -200,12 +205,12 @@ type PickStartsWith<T extends object, S extends string> = {
 export type TPorts = {
     process: string
     pid: number
-    state: string
+    state: string | null
     localPort: number
-    protocol: string
-    remotePort: number
     localAddress: string
-    remoteAddress: string
+    protocol: string
+    remotePort: number | null
+    remoteAddress: string | null
 }
 
 export type Processes = {
