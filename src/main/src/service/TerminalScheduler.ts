@@ -1,10 +1,9 @@
 import { exec } from 'child_process'
 import { Terminal } from './Terminal'
-import { ClientEvents } from '../../../types'
+import { ClientEvents, Cmd } from '../../../types'
 
 type StartJob = {
-    t_delay: number | undefined
-    t_healthCheck: string | undefined
+    t_metasettings: Cmd['metaSettings']
     t_terminal: Terminal
     interval: number
     limit: number
@@ -43,15 +42,14 @@ export class TerminalScheduler {
             .forEach((term) => {
                 const settings = term.settings
 
-                if (settings.health?.delay && settings.health?.healthCheck) {
+                if (settings.metaSettings?.delay && settings.metaSettings?.healthCheck) {
                     term.sendToClient(
                         `[Warning]: terminal ${term.settings.id} has both delay and healthcheck present. Scheduler was desinged to have only one of them. The delay will be used and hc ignored \n\r`
                     )
                 }
 
                 this.jobs.push({
-                    t_delay: settings.health?.delay,
-                    t_healthCheck: settings.health?.healthCheck,
+                    t_metasettings: term.settings.metaSettings,
                     t_terminal: term,
                     interval: HC_INTERVAL_MS,
                     limit: HC_LIMIT,
@@ -68,16 +66,16 @@ export class TerminalScheduler {
 
         for (let i = 0; i < this.jobs.length; i++) {
             const job = this.jobs[i]
-            if (!job.t_delay && !job.t_healthCheck) {
+            if (!job.t_metasettings?.delay && !job.t_metasettings?.healthCheck) {
                 this.start(job)
                 continue
             }
 
             job.t_terminal.reserve()
-            if (job.t_delay) {
+            if (job.t_metasettings.delay) {
                 job.job_timer = setTimeout(() => {
                     this.start(job)
-                }, job.t_delay)
+                }, job.t_metasettings.delay)
                 continue
             }
 
@@ -89,12 +87,12 @@ export class TerminalScheduler {
                     clearInterval(job.job_timer)
                     this.start(job)
                 }
-                if (!job.t_healthCheck) {
+                if (!job.t_metasettings?.healthCheck) {
                     clearInterval(job.job_timer)
                     this.start(job)
                     return
                 }
-                exec(job.t_healthCheck, (error) => {
+                exec(job.t_metasettings?.healthCheck, (error) => {
                     if (error) {
                         if (job.limit < 10 || job.limit % 10 === 0) {
                             job.t_terminal.sendToClient(

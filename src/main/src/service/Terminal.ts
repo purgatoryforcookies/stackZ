@@ -1,11 +1,9 @@
 import {
     ClientEvents,
     Cmd,
-    CommandMetaSetting,
     Environment,
     EnvironmentEditProps,
     Status,
-    Utility2Props,
     UtilityEvents,
     UtilityProps
 } from '../../../types'
@@ -173,15 +171,21 @@ export class Terminal {
     }
 
     stop() {
-        try {
-            const code = this.win ? undefined : 'SIGHUP'
-            this.isRunning = false
-            this.ptyProcess?.kill(code)
-        } catch {
-            //swallow
+
+        if (this.settings.metaSettings?.ctrlc) {
+            this.write('\x03')
+        } else {
+            try {
+                const code = this.win ? undefined : 'SIGHUP'
+                this.isRunning = false
+                this.ptyProcess?.kill(code)
+            } catch {
+                //swallow
+            }
         }
         this.ping()
         this.stackPing()
+
     }
 
     ping() {
@@ -267,10 +271,11 @@ export class Terminal {
     }
 
     updateCommand(value: string) {
-        if (!this.history.exists('CMD', value)) {
+        const newCommand = value.trim()
+
+        if (!this.history.exists('CMD', newCommand)) {
             this.history.store('CMD', this.settings.command.cmd)
         }
-        const newCommand = value.trim()
         this.settings.command.cmd = newCommand
         this.history.store('CMD', newCommand)
         this.ping()
@@ -280,6 +285,11 @@ export class Terminal {
         const resolvedShell = this.chooseShell(newShell)
         this.settings.command.shell = resolvedShell
         this.history.store('SHELL', 'shell ' + newShell)
+        this.ping()
+    }
+
+    changeTitle(title: string) {
+        this.settings.title = title
         this.ping()
     }
 
@@ -318,29 +328,35 @@ export class Terminal {
         this.ping()
     }
 
-    setMetaSettings(settings: CommandMetaSetting) {
-        this.settings.metaSettings = settings
-        this.ping()
-    }
-    setHealthSettings(settings: Cmd['health']) {
-        this.settings.health = settings
+    setMetaSettings(name: string, value: string | boolean | number | undefined) {
+
+        if (!this.settings.metaSettings) {
+            this.settings.metaSettings = {}
+        }
+        this.settings.metaSettings[name] = value
         this.ping()
     }
 
-    // TODO: implement the listeners from below into the functions above,
-    // this is otherwise unnessecary function declaration
     registerTerminalEvents() {
-        this.socket.on(UtilityEvents.CWD, (arg: Utility2Props) => {
-            console.log(`Changing cwd! new Cwd: ${arg.value}`)
-            this.updateCwd(arg.value)
+        this.socket.on(UtilityEvents.CWD, (arg: string, akw) => {
+            console.log(`Changing cwd! new Cwd: ${arg}`)
+            this.updateCwd(arg)
+            akw(this.getState())
         })
-        this.socket.on(UtilityEvents.CMD, (arg: Utility2Props) => {
-            console.log(`Changing command! new CMD: ${arg.value}`)
-            this.updateCommand(arg.value)
+        this.socket.on(UtilityEvents.CMD, (arg: string, akw) => {
+            console.log(`Changing command! new CMD: ${arg}`)
+            this.updateCommand(arg)
+            if (akw) akw(this.getState())
         })
-        this.socket.on(UtilityEvents.SHELL, (arg: Utility2Props) => {
-            console.log(`Changing shell! new shell: ${arg.value}`)
-            this.changeShell(arg.value)
+        this.socket.on(UtilityEvents.SHELL, (arg: string, akw) => {
+            console.log(`Changing shell! new shell: ${arg}`)
+            this.changeShell(arg)
+            if (akw) akw(this.getState())
+        })
+        this.socket.on(UtilityEvents.TITLE, (arg: string, akw) => {
+            console.log(`Changing title! new title: ${arg}`)
+            this.changeTitle(arg)
+            if (akw) akw(this.getState())
         })
         this.socket.on(UtilityEvents.INPUT, (args) => {
             if (!args.data) return
@@ -355,11 +371,9 @@ export class Terminal {
         this.socket.on(UtilityEvents.ENVDELETE, (args: UtilityProps) => {
             this.removeEnv(args)
         })
-        this.socket.on(UtilityEvents.CMDMETASETTINGS, (args: { settings: CommandMetaSetting }) => {
-            this.setMetaSettings(args.settings)
-        })
-        this.socket.on(UtilityEvents.HEALTHSETTINGS, (args: { health: Cmd['health'] }) => {
-            this.setHealthSettings(args.health)
+        this.socket.on(UtilityEvents.CMDMETASETTINGS, (name: string, value, akw) => {
+            this.setMetaSettings(name, value)
+            akw(this.getState())
         })
         this.socket.on(UtilityEvents.ENVLIST, (args: { value: string }) => {
             if (!args.value) return
@@ -374,6 +388,12 @@ export class Terminal {
         this.socket.on(UtilityEvents.STATE, () => {
             this.ping()
         })
+
+        this.socket.on('retrieve_settings', (akw) => {
+            akw(this.getState())
+        })
+
+
         this.socket.on('history', (feed: string, step: number, akw) => {
             const keyword = feed.split(' ', 2)[0]
             switch (keyword) {

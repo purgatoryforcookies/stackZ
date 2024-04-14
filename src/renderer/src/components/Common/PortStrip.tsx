@@ -17,7 +17,7 @@ function PortStrip({ name, ports, color }: PortStripProps) {
             <h1 className="text-secondary-foreground" >{name}</h1>
             <div className="flex gap-2">
                 {ports.map((port) => (
-                    <HoverCard key={port.number} openDelay={0.8} closeDelay={0.7}>
+                    <HoverCard key={port.number} >
                         <HoverCardTrigger>
                             <Badge className='text-sm border-full' style={{ backgroundColor: color }}>
                                 {port.number}

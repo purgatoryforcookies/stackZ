@@ -242,28 +242,16 @@ export class TerminalUIEngine {
 
         switch (keyword) {
             case 'cd':
-                this.socket.emit('changeCwd', {
-                    stack: this.stackId,
-                    terminal: this.terminalId,
-                    value: cmd
-                })
+                this.socket.emit('changeCwd', cmd)
                 break
             case 'shell':
-                this.socket.emit('changeShell', {
-                    stack: this.stackId,
-                    terminal: this.terminalId,
-                    value: cmd
-                })
+                this.socket.emit('changeShell', cmd)
                 break
             case 'clear':
                 this.clear()
                 break
             default:
-                this.socket.emit('changeCommand', {
-                    stack: this.stackId,
-                    terminal: this.terminalId,
-                    value: this.buffer
-                })
+                this.socket.emit('changeCommand', this.buffer)
                 break
         }
     }

@@ -18,7 +18,7 @@ type CommandSettingsProps = {
 
 function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
     const [settings, setSettings] = useState<CommandMetaSetting | undefined>(data.cmd.metaSettings)
-    const [health, setHealth] = useState<Cmd['health'] | undefined>(data.cmd.health)
+    const [health, setHealth] = useState<Cmd['metaSettings'] | undefined>(data.cmd.metaSettings)
     const [tab, setTab] = useState<string | undefined>('off')
     const commandRef = useRef<HTMLDivElement>(null)
     const { w } = useTaalasmaa(commandRef)
@@ -34,7 +34,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
     }
 
     const handleHealthSettings = (name?: string, value?: number | string) => {
-        let newHealth: Cmd['health'] = {}
+        let newHealth: Cmd['metaSettings'] = {}
 
         if (typeof value === 'number' && name) {
             newHealth[name] = Number(value)
@@ -51,11 +51,11 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
 
     useEffect(() => {
         engine.socket.on(ClientEvents.TERMINALSTATE, (d: Status) => {
-            setHealth(d.cmd.health)
+            setHealth(d.cmd.metaSettings)
             setSettings(d.cmd.metaSettings)
 
-            if (d.cmd.health?.delay) setTab('time')
-            else if (d.cmd.health?.healthCheck) setTab('health')
+            if (d.cmd.metaSettings?.delay) setTab('time')
+            else if (d.cmd.metaSettings?.healthCheck) setTab('health')
             else setTab('off')
         })
 

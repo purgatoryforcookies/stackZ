@@ -27,13 +27,11 @@ export const stackSchema = z.array(
                     metaSettings: z
                         .object({
                             loose: z.boolean().default(false).optional(),
-                            rerun: z.boolean().default(false).optional()
-                        })
-                        .optional(),
-                    health: z
-                        .object({
+                            rerun: z.boolean().default(false).optional(),
+                            ctrlc: z.boolean().default(false).optional(),
                             delay: z.number().optional(),
-                            healthCheck: z.string().optional()
+                            healthCheck: z.string().optional(),
+                            halt: z.boolean().default(false).optional(),
                         })
                         .optional(),
                     command: z.object({
@@ -87,6 +85,7 @@ export enum UtilityEvents {
     CWD = 'changeCwd',
     CMD = 'changeCommand',
     SHELL = 'changeShell',
+    TITLE = 'title',
     INPUT = 'input',
     RESIZE = 'resize',
     REORDER = 'reOrder'

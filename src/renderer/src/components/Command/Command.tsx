@@ -2,8 +2,6 @@ import { ClientEvents, Cmd, Status, UtilityEvents } from '@t'
 import { useEffect, useState } from 'react'
 import { Button } from '@renderer/@/ui/button'
 import {
-    ChevronDownIcon,
-    ChevronUpIcon,
     CornerBottomLeftIcon,
     CornerBottomRightIcon,
     CornerTopLeftIcon,
@@ -16,10 +14,10 @@ import {
     SymbolIcon,
     TimerIcon
 } from '@radix-ui/react-icons'
-import CommandSettings from '../Common/CommandSettings'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import Draggable, { DraggableData } from 'react-draggable'
 import { IUseStack } from '@renderer/hooks/useStack'
+import CommandSettings2 from '../Common/CommandSettings2'
 
 type CommandProps = {
     data: Exclude<Cmd, undefined>
@@ -38,7 +36,6 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
         isRunning: false,
         cwd: data.command.cwd
     })
-    const [expanded, setExpanded] = useState<boolean>(false)
     const [hcHeartBeat, setHcHeartBeat] = useState<number>()
 
     useEffect(() => {
@@ -151,20 +148,8 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                             </div>
                         </div>
 
-                        <div
-                            className={`transition-height duration-500 ease-in-out flex items-end `}
-                        >
-                            <CommandSettings expanded={expanded} data={ping} engine={engine} />
-                        </div>
-                        <div
-                            className="flex justify-center w-full hover:scale-125 hover:cursor-pointer "
-                            onClick={() => setExpanded(!expanded)}
-                        >
-                            {expanded ? (
-                                <ChevronUpIcon className="h-4 w-4" />
-                            ) : (
-                                <ChevronDownIcon className="h-4 w-4 text-white/50" />
-                            )}
+                        <div className='absolute right-0 top-0'>
+                            <CommandSettings2 engine={engine} />
                         </div>
                         <span className="absolute right-10 bottom-1 text-[0.7rem] text-white/30 flex gap-2">
                             {ping.cmd.metaSettings?.rerun ? (
@@ -173,21 +158,21 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                             {ping.cmd.metaSettings?.loose ? (
                                 <EyeNoneIcon className="h-4 w-4" />
                             ) : null}
-                            {ping.cmd.health?.delay ? (
+                            {ping.cmd.metaSettings?.delay ? (
                                 <span className="flex relative">
                                     <TimerIcon
                                         className={`h-4 w-4 
                                     ${ping.reserved ? 'text-primary brightness-110' : ''}
                                     `}
                                     />
-                                    {ping.cmd.health.delay ? (
+                                    {ping.cmd.metaSettings.delay ? (
                                         <span className="absolute left-[14.5px] bottom-2">
-                                            {ping.cmd.health.delay / 1000}
+                                            {ping.cmd.metaSettings.delay / 1000}
                                         </span>
                                     ) : null}
                                 </span>
                             ) : null}
-                            {ping.cmd.health?.healthCheck ? (
+                            {ping.cmd.metaSettings?.healthCheck ? (
                                 <span className="flex relative">
                                     <HeartIcon
                                         className={`h-4 w-4 
