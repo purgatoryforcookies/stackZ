@@ -14,6 +14,7 @@ import { ITerminalDimensions } from 'xterm-addon-fit'
 import { Socket } from 'socket.io'
 import { IPingFunction, ISaveFuntion } from '../Palette'
 import { HistoryService } from './HistoryService'
+import { TerminalScheduler } from './TerminalScheduler'
 
 export class Terminal {
     settings: Cmd
@@ -22,6 +23,7 @@ export class Terminal {
     ptyProcess: IPty | null
     isRunning: boolean
     isAboutToRun: boolean
+    scheduler: TerminalScheduler | null
     win: boolean
     rows: number | undefined
     cols: number | undefined
@@ -44,6 +46,7 @@ export class Terminal {
         this.win = process.platform === 'win32' ? true : false
         this.ptyProcess = null
         this.isRunning = false
+        this.scheduler = null
         this.stackPing = stackPing
         this.registerTerminalEvents()
         this.save = save
@@ -133,6 +136,14 @@ export class Terminal {
 
                 if (this.settings.metaSettings?.rerun) {
                     this.start()
+                    if (this.scheduler) {
+                        this.sendToClient("[Warning]: Restarting halting terminal\r\n")
+                    }
+                }
+                if (this.scheduler) {
+                    this.sendToClient(`[Info]: Releasing stack halt on exit. Code ${data.exitCode}\r\n`)
+                    this.scheduler.unhalt()
+                    this.scheduler = null
                 }
                 this.ping()
                 this.stackPing()
@@ -150,6 +161,11 @@ export class Terminal {
         this.prompt()
     }
 
+    /**
+     * Sets a flag for the instance to indicate
+     * that this terminal is about to run, once its healthcheck
+     * and delays are done. 
+     */
     reserve() {
         this.isAboutToRun = true
         this.ping()
@@ -157,6 +173,9 @@ export class Terminal {
     unReserve() {
         this.isAboutToRun = false
         this.ping()
+    }
+    registerScheduler(sched: TerminalScheduler) {
+        this.scheduler = sched
     }
 
     resize(dims: ITerminalDimensions) {

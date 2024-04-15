@@ -29,9 +29,13 @@ const HC_LIMIT = 240
  */
 export class TerminalScheduler {
     jobs: StartJob[]
+    haltActive: boolean = false
 
     constructor(terminals: Map<string, Terminal>) {
         this.jobs = []
+
+        console.log(Array.from(terminals.values()).map(o => [o.settings.executionOrder, o.settings.command.cmd]))
+
         Array.from(terminals.values())
             .sort((a, b) => {
                 if (a.settings.executionOrder && b.settings.executionOrder) {
@@ -40,13 +44,6 @@ export class TerminalScheduler {
                 return -1
             })
             .forEach((term) => {
-                const settings = term.settings
-
-                if (settings.metaSettings?.delay && settings.metaSettings?.healthCheck) {
-                    term.sendToClient(
-                        `[Warning]: terminal ${term.settings.id} has both delay and healthcheck present. Scheduler was desinged to have only one of them. The delay will be used and hc ignored \n\r`
-                    )
-                }
 
                 this.jobs.push({
                     t_metasettings: term.settings.metaSettings,
@@ -61,60 +58,91 @@ export class TerminalScheduler {
         this.set()
     }
 
-    set() {
+    async set() {
         if (this.jobs.length === 0) return
+        this.jobs.forEach(j => j.t_terminal.reserve())
 
         for (let i = 0; i < this.jobs.length; i++) {
             const job = this.jobs[i]
-            if (!job.t_metasettings?.delay && !job.t_metasettings?.healthCheck) {
-                this.start(job)
-                continue
+            if (!job.t_metasettings?.delay && !job.t_metasettings?.healthCheck && !job.t_metasettings?.halt) {
+                if (!this.haltActive) {
+                    this.start(job)
+                    continue
+                }
             }
 
-            job.t_terminal.reserve()
-            if (job.t_metasettings.delay) {
+
+            if (this.haltActive) {
+                i -= 1
+                await new Promise<void>((r) => setTimeout(() => {
+                    r()
+                }, HC_INTERVAL_MS))
+                continue
+            }
+            if (job.t_metasettings?.halt) {
+                job.t_terminal.registerScheduler(this)
+                this.haltActive = true
+            }
+
+            if (job.t_metasettings?.delay) {
                 job.job_timer = setTimeout(() => {
-                    this.start(job)
-                }, job.t_metasettings.delay)
-                continue
-            }
-
-            job.job_timer = setInterval(() => {
-                job.limit -= 1
-                job.t_terminal.socket.emit(ClientEvents.HEARTBEAT, job.limit)
-
-                if (job.limit === 0) {
-                    clearInterval(job.job_timer)
-                    this.start(job)
-                }
-                if (!job.t_metasettings?.healthCheck) {
-                    clearInterval(job.job_timer)
-                    this.start(job)
-                    return
-                }
-                exec(job.t_metasettings?.healthCheck, (error) => {
-                    if (error) {
-                        if (job.limit < 10 || job.limit % 10 === 0) {
-                            job.t_terminal.sendToClient(
-                                `[Warning]: Healthcheck not passing, ${job.limit} attempts left until terminal start\n\r`
-                            )
-                        }
+                    if (job.t_metasettings?.healthCheck) {
+                        this.startHealtcheck(job)
                     } else {
                         this.start(job)
-                        clearInterval(job.job_timer)
                     }
-                })
-            }, HC_INTERVAL_MS)
+                }, job.t_metasettings.delay);
+                continue
+            }
+
+            if (job.t_metasettings?.healthCheck) {
+                this.startHealtcheck(job)
+                continue
+            }
+
         }
     }
 
+    startHealtcheck(job: StartJob) {
+
+        job.job_timer = setInterval(() => {
+            job.limit -= 1
+            job.t_terminal.socket.emit(ClientEvents.HEARTBEAT, job.limit)
+
+            if (job.limit === 0) {
+                clearInterval(job.job_timer)
+                this.start(job)
+            }
+            if (!job.t_metasettings?.healthCheck) {
+                clearInterval(job.job_timer)
+                this.start(job)
+                return
+            }
+            exec(job.t_metasettings?.healthCheck, (error) => {
+                if (error) {
+                    if (job.limit < 10 || job.limit % 10 === 0) {
+                        job.t_terminal.sendToClient(
+                            `[Warning]: Healthcheck not passing, ${job.limit} attempts left until terminal start\n\r`
+                        )
+                    }
+                } else {
+                    this.start(job)
+                    clearInterval(job.job_timer)
+                }
+
+            })
+        }, HC_INTERVAL_MS)
+    }
+
     start(job: StartJob) {
+
         job.t_terminal.start()
         job.hasRun = true
         job.t_terminal.unReserve()
     }
 
     stop() {
+        this.haltActive = false
         if (this.jobs.length > 0) {
             this.jobs.forEach((j) => {
                 if (j.job_timer) {
@@ -124,8 +152,13 @@ export class TerminalScheduler {
                     clearTimeout(j.job_timer)
                 }
                 j.t_terminal.stop()
+                j.t_terminal.unReserve()
             })
         }
         this.jobs = []
+    }
+
+    unhalt() {
+        this.haltActive = false
     }
 }

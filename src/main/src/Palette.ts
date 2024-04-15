@@ -218,22 +218,25 @@ export class Palette {
 
     /**
      * Cleans up execution orders of the stack.
+     * This copies the order from settings and shifts terminal
+     * instances to the same order. 
      * Can be called independently any time 
      */
     reIndexOrders = () => {
-
+        console.log("Reindex requested", Array.from(this.terminals.values()).map(o => [o.settings.executionOrder, o.settings.command.cmd]))
         this.settings.palette = this.settings.palette!.map((term, i) => {
             return { ...term, executionOrder: i + 1 }
         })
 
-        // and for the terminal instances
-        let newExecOrder = 0
         Array.from(this.terminals.values())
             .sort((a, b) => a.settings.executionOrder! - b.settings.executionOrder!)
-            .forEach((t) => {
-                newExecOrder += 1
-                t.settings.executionOrder = newExecOrder
+            .forEach(a => {
+                const settings = this.settings.palette?.find(i => i.id === a.settings.id)
+                if (!settings) throw new Error('Reindexin failed. Could not find settings.')
+                a.settings.executionOrder = settings.executionOrder
+
             })
+        console.log("After reindex", Array.from(this.terminals.values()).map(o => [o.settings.executionOrder, o.settings.command.cmd]))
     }
 
     rename(newName: string) {

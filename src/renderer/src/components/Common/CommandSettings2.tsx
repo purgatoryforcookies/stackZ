@@ -40,8 +40,8 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                         id="cwd"
                         name="cwd"
                         className="col-span-3"
-                        value={settings?.cwd}
-                        onChange={(e) => onChange('cwd', e.target.value)}
+                        defaultValue={settings?.cwd}
+                        onBlur={(e) => onChange('cwd', e.target.value)}
                     />
                     <Label htmlFor="command" className="text-right p-1">
                         Command
@@ -50,8 +50,8 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                         id="command"
                         name="command"
                         className="col-span-3"
-                        value={settings?.cmd.command.cmd}
-                        onChange={(e) => onChange('cmd', e.target.value)}
+                        defaultValue={settings?.cmd.command.cmd}
+                        onBlur={(e) => onChange('cmd', e.target.value)}
                     />
                     <div className="flex justify-between gap-3">
                         <div>
@@ -61,8 +61,8 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                             <Input
                                 id="shell"
                                 name="shell"
-                                value={settings?.cmd.command.shell}
-                                onChange={(e) => onChange('shell', e.target.value)}
+                                defaultValue={settings?.cmd.command.shell}
+                                onBlur={(e) => onChange('shell', e.target.value)}
                             />
                         </div>
                         <div className="w-full">
@@ -72,8 +72,8 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                             <Input
                                 id="notes"
                                 name="title"
-                                value={settings?.cmd.title}
-                                onChange={(e) => onChange('title', e.target.value)}
+                                defaultValue={settings?.cmd.title}
+                                onBlur={(e) => onChange('title', e.target.value)}
                             />
                         </div>
                     </div>
@@ -115,8 +115,8 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                                 className="w-full"
                                 name="healthCheck"
                                 placeholder="curl --fail https://google.com || exit 1"
-                                value={settings?.cmd.metaSettings?.healthCheck}
-                                onChange={onMetaChange}
+                                defaultValue={settings?.cmd.metaSettings?.healthCheck}
+                                onBlur={onMetaChange}
                             />
                         </div>
                     </div>

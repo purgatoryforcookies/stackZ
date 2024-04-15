@@ -9,6 +9,7 @@ import {
     Cross2Icon,
     EyeNoneIcon,
     HeartIcon,
+    MixIcon,
     MoveIcon,
     ReloadIcon,
     SymbolIcon,
@@ -152,6 +153,9 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                             <CommandSettings2 engine={engine} />
                         </div>
                         <span className="absolute right-10 bottom-1 text-[0.7rem] text-white/30 flex gap-2">
+                            {ping.cmd.metaSettings?.halt ? (
+                                <MixIcon className="h-4 w-4" />
+                            ) : null}
                             {ping.cmd.metaSettings?.rerun ? (
                                 <SymbolIcon className="h-4 w-4" />
                             ) : null}
