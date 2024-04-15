@@ -143,7 +143,9 @@ export class Terminal {
                 if (this.scheduler) {
                     this.sendToClient(`[Info]: Releasing stack halt on exit. Code ${data.exitCode}\r\n`)
                     this.scheduler.unhalt()
+                    this.socket.emit(ClientEvents.HALTBEAT, false)
                     this.scheduler = null
+
                 }
                 this.ping()
                 this.stackPing()
@@ -176,6 +178,7 @@ export class Terminal {
     }
     registerScheduler(sched: TerminalScheduler) {
         this.scheduler = sched
+
     }
 
     resize(dims: ITerminalDimensions) {

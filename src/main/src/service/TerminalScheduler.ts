@@ -21,11 +21,17 @@ const HC_LIMIT = 240
  * - Right order
  * - Delay the start by given time if delay attribute is present
  * - Delay the start with a command if healthCheck attribute is present
+ * - Wait halt terminal to exit (assuming it exits) before proceeding to next one
  *
  * Scheduler can be stopped by calling stop(). All timers will be cleared and stack startup
  * aborted.
  *
- * If healthcheck fails to compute (bad command), it will count as a failed healthcheck.
+ * If healthcheck fails to compute (bad command), it will count as a failed healthcheck. 
+ * After n retries, it starts the terminal process anyways
+ * 
+ * For halting terminals, gives the scheduler briefly for the halting terminal instance. 
+ * Terminal instance then resets the scheduler state after it exits and stack
+ * can continue to proceed. 
  */
 export class TerminalScheduler {
     jobs: StartJob[]
@@ -77,11 +83,13 @@ export class TerminalScheduler {
                 await new Promise<void>((r) => setTimeout(() => {
                     r()
                 }, HC_INTERVAL_MS))
+
                 continue
             }
             if (job.t_metasettings?.halt) {
                 job.t_terminal.registerScheduler(this)
                 this.haltActive = true
+                job.t_terminal.socket.emit(ClientEvents.HALTBEAT, true)
             }
 
             if (job.t_metasettings?.delay) {
@@ -99,6 +107,8 @@ export class TerminalScheduler {
                 this.startHealtcheck(job)
                 continue
             }
+
+            this.start(job)
 
         }
     }
@@ -160,5 +170,6 @@ export class TerminalScheduler {
 
     unhalt() {
         this.haltActive = false
+
     }
 }

@@ -143,21 +143,21 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
                             {ping.cmd.metaSettings?.loose ? (
                                 <EyeNoneIcon className="h-4 w-4" />
                             ) : null}
-                            {ping.cmd.health?.delay ? (
+                            {ping.cmd.metaSettings?.delay ? (
                                 <span className="flex relative">
                                     <TimerIcon
                                         className={`h-4 w-4 
                                     ${ping.reserved ? 'text-primary brightness-110' : ''}
                                     `}
                                     />
-                                    {ping.cmd.health.delay ? (
+                                    {ping.cmd.metaSettings?.delay ? (
                                         <span className="absolute left-[14.5px] bottom-2">
-                                            {ping.cmd.health.delay / 1000}
+                                            {ping.cmd.metaSettings?.delay / 1000}
                                         </span>
                                     ) : null}
                                 </span>
                             ) : null}
-                            {ping.cmd.health?.healthCheck ? (
+                            {ping.cmd.metaSettings?.healthCheck ? (
                                 <span className="flex relative">
                                     <HeartIcon
                                         className={`h-4 w-4 

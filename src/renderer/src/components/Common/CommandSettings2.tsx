@@ -6,7 +6,7 @@ import { ThemeContext } from "@renderer/App"
 import { TerminalUIEngine } from "@renderer/service/TerminalUIEngine"
 import { useContext } from "react"
 import { CustomToolTip } from "./CustomTooltip"
-import { CheckIcon, InfoCircledIcon, ReloadIcon } from "@radix-ui/react-icons"
+import { CheckIcon, HamburgerMenuIcon, InfoCircledIcon, ReloadIcon } from "@radix-ui/react-icons"
 import useCommandSettings from "@renderer/hooks/useCommandSettings"
 
 type CommandSettingsProps = {
@@ -22,8 +22,12 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
 
     return (
         <Sheet>
-            <SheetTrigger>Open</SheetTrigger>
-            <SheetContent side={'left'} data-theme={theme} className="sm:max-w-none w-[40rem]">
+            <SheetTrigger>
+                <HamburgerMenuIcon className={`h-4 w-4 moveHandle
+                            text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`} />
+            </SheetTrigger>
+            <SheetContent side={'left'} data-theme={theme} className="sm:max-w-none w-[40rem]"
+                onOpenAutoFocus={(e) => e.preventDefault()}>
                 <SheetHeader>
                     <SheetTitle>Terminal Settings</SheetTitle>
                     <SheetDescription>

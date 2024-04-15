@@ -38,6 +38,8 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
         cwd: data.command.cwd
     })
     const [hcHeartBeat, setHcHeartBeat] = useState<number>()
+    const [ishalting, setIsHalting] = useState<false>(false)
+
 
     useEffect(() => {
         engine.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
@@ -46,6 +48,10 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
 
         engine.socket.on(ClientEvents.HEARTBEAT, (d: number) => {
             setHcHeartBeat(d)
+        })
+        engine.socket.on(ClientEvents.HALTBEAT, (d) => {
+            setIsHalting(d)
+            console.log(d)
         })
         engine.socket.emit(UtilityEvents.STATE)
 
@@ -103,6 +109,7 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                             {ping.cwd}
                         </span>
                         <span className="flex items-center gap-2">
+                            <CommandSettings2 engine={engine} />
                             <MoveIcon
                                 className={`h-4 w-4 moveHandle
                             ${stackRunning ? 'text-muted' : 'text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`}
@@ -127,7 +134,7 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                                 <span>notes: {ping.cmd.title}</span>
                             </div>
 
-                            <div className="flex items-center relative top-2 right-12">
+                            <div className="flex items-center relative bottom-1 right-12">
                                 <div>
                                     <Button
                                         variant={'ghost'}
@@ -149,12 +156,14 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                             </div>
                         </div>
 
-                        <div className='absolute right-0 top-0'>
-                            <CommandSettings2 engine={engine} />
+                        <div className='absolute bottom-0 left-[50%]'>
+
                         </div>
                         <span className="absolute right-10 bottom-1 text-[0.7rem] text-white/30 flex gap-2">
                             {ping.cmd.metaSettings?.halt ? (
-                                <MixIcon className="h-4 w-4" />
+                                <MixIcon className={`h-4 w-4 
+                                ${ishalting ? 'text-primary brightness-110' : ''}`}
+                                />
                             ) : null}
                             {ping.cmd.metaSettings?.rerun ? (
                                 <SymbolIcon className="h-4 w-4" />

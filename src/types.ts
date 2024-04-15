@@ -95,7 +95,8 @@ export enum ClientEvents {
     DELTERMINAL = 'terminalDelete',
     STACKSTATE = 'stackState',
     TERMINALSTATE = 'terminalState',
-    HEARTBEAT = 'heartbeat'
+    HEARTBEAT = 'heartbeat',
+    HALTBEAT = 'haltbeat'
 }
 
 export enum GitEvents {

@@ -196,9 +196,11 @@ export class Palette {
         return this.settings
     }
 
+    /**
+     * for updating the settings, which will be used almost all other places, than running the terminal.
+     * The terminal instace contains the settings also, and they need to be updated separetly
+     */
     reOrderExecution(arg: { terminalId: string; newOrder: number }) {
-        // for updating the settings, which will be used almost all other places, than running the terminal.
-        // The terminal instace contains the settings also, and they need to be updated separetly
 
         const oldPalette = this.settings.palette
         if (!oldPalette) return
@@ -223,11 +225,11 @@ export class Palette {
      * Can be called independently any time 
      */
     reIndexOrders = () => {
-        console.log("Reindex requested", Array.from(this.terminals.values()).map(o => [o.settings.executionOrder, o.settings.command.cmd]))
+
+
         this.settings.palette = this.settings.palette!.map((term, i) => {
             return { ...term, executionOrder: i + 1 }
         })
-
         Array.from(this.terminals.values())
             .sort((a, b) => a.settings.executionOrder! - b.settings.executionOrder!)
             .forEach(a => {
@@ -236,7 +238,6 @@ export class Palette {
                 a.settings.executionOrder = settings.executionOrder
 
             })
-        console.log("After reindex", Array.from(this.terminals.values()).map(o => [o.settings.executionOrder, o.settings.command.cmd]))
     }
 
     rename(newName: string) {
