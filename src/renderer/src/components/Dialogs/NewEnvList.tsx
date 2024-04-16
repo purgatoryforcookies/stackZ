@@ -1,4 +1,4 @@
-import { PlusIcon } from '@radix-ui/react-icons'
+import { Cross1Icon, FileIcon, PlusIcon } from '@radix-ui/react-icons'
 import { Button } from '@renderer/@/ui/button'
 import {
     Dialog,
@@ -23,22 +23,45 @@ type NewEnvListProps = {
 
 export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
     const [title, setTitle] = useState<string>('')
+    const [file, setFile] = useState<File | null>(null)
     const [open, setOpen] = useState<boolean>(false)
+    const [dragover, setDragover] = useState<boolean>(false)
 
     const theme = useContext(ThemeContext)
 
-    const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        terminal.socket.emit(UtilityEvents.ENVLIST, { value: title })
+        let buf: ArrayBuffer | null = null
+        if (file) buf = await file.arrayBuffer()
+        terminal.socket.emit(UtilityEvents.ENVLIST, { value: title, fromFile: buf })
         setTitle('')
         scroll()
         setOpen(false)
     }
 
+
+    const handleFileChange = async (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        setDragover(false)
+        const fileGrab = event.dataTransfer?.files[0];
+        if (fileGrab) {
+            setFile(fileGrab)
+            setOpen(true)
+        }
+    };
+
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <PlusIcon className="h-8 w-8 hover:cursor-pointer hover:text-primary text-secondary-foreground" />
+                <div
+                    onDrop={handleFileChange}
+                    onDragEnter={() => setDragover(true)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDragLeave={() => setDragover(false)}
+                    className={`size-32 flex items-center justify-center animate-in animate-out ${dragover ? 'border-2' : ''}`}>
+                    <PlusIcon className="h-8 w-8 hover:cursor-pointer hover:text-primary text-secondary-foreground" />
+                </div>
             </DialogTrigger>
             <DialogContent data-theme={theme}>
                 <DialogHeader>
@@ -63,10 +86,17 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
                             />
                         </div>
                     </div>
-                    <DialogFooter className="w-full">
-                        <Button type="submit" disabled={title.length === 0}>
-                            Save
-                        </Button>
+                    <DialogFooter className="relative">
+                        <div className='flex items-center'>
+                            {file ? <span className='flex gap-1 absolute left-0'>
+                                <FileIcon className="h-4 w-4" />
+                                {file?.name}
+                                <Cross1Icon className="h-4 w-4 hover:cursor-pointer" onClick={() => setFile(null)} />
+                            </span> : null}
+                            <Button type="submit" disabled={title.length === 0}>
+                                Save
+                            </Button>
+                        </div>
                     </DialogFooter>
                 </form>
             </DialogContent>

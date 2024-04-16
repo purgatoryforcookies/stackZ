@@ -8,7 +8,7 @@ import {
     UtilityProps
 } from '../../../types'
 import { spawn, IPty } from 'node-pty'
-import { envFactory, haveThesameElements, mapEnvs } from '../util/util'
+import { envFactory, haveThesameElements, mapEnvs, parseBufferToEnvironment } from '../util/util'
 import path from 'path'
 import { ITerminalDimensions } from 'xterm-addon-fit'
 import { Socket } from 'socket.io'
@@ -315,20 +315,20 @@ export class Terminal {
         this.ping()
     }
 
-    addEnvList(value: string) {
+    addEnvList(value: string, variables: Record<string, string>) {
         if (!value) return
         if (this.settings.command.env!.some((env) => env.title === value)) {
             value += ' (1)'
         }
 
         const newEnv: Environment = {
-            pairs: {},
+            pairs: variables,
             title: value,
             order: Math.max(...this.settings.command.env!.map((env) => env.order)) + 1,
             disabled: []
         }
 
-        this.settings.command.env!.push(newEnv)
+        this.settings.command.env?.push(newEnv)
         this.ping()
     }
 
@@ -397,9 +397,11 @@ export class Terminal {
             this.setMetaSettings(name, value)
             akw(this.getState())
         })
-        this.socket.on(UtilityEvents.ENVLIST, (args: { value: string }) => {
+        this.socket.on(UtilityEvents.ENVLIST, (args: { value: string, fromFile: ArrayBuffer | undefined }) => {
             if (!args.value) return
-            this.addEnvList(args.value)
+
+            const environment = parseBufferToEnvironment(args.fromFile)
+            this.addEnvList(args.value, environment)
         })
         this.socket.on(UtilityEvents.ENVEDIT, (args: EnvironmentEditProps) => {
             this.editVariable(args)

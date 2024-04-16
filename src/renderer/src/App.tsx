@@ -55,7 +55,7 @@ function App(): JSX.Element {
                                 collapsible
                                 className='p-2 pb-7'
                             >
-                                <Tabs defaultValue="monitor" data-theme={theme} className='h-full pb-4'>
+                                <Tabs defaultValue="environment" data-theme={theme} className='h-full pb-4'>
                                     <TabsList>
                                         <TabsTrigger value="environment">Environment</TabsTrigger>
                                         <TabsTrigger value="monitor">Monitor</TabsTrigger>
