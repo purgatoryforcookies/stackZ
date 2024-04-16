@@ -12,9 +12,11 @@ import {
 import { Input } from '@renderer/@/ui/input'
 import { Label } from '@renderer/@/ui/label'
 import { ThemeContext } from '@renderer/App'
+import { useDebounce } from '@renderer/hooks/useDebounce'
+import useLocalStorage from '@renderer/hooks/useLocalStorage'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { UtilityEvents } from '@t'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 type NewEnvListProps = {
     scroll: () => void
@@ -50,6 +52,30 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
         }
     };
 
+    const { read, write } = useLocalStorage()
+
+    useEffect(() => {
+
+        let timestamp = read('since')
+        if (!timestamp) {
+            const now = new Date().toISOString()
+            write('since', now)
+            timestamp = now
+        }
+        const today = new Date()
+        const since = new Date(timestamp)
+        if (today.getMilliseconds() - since.getMilliseconds() > 1000 * 60 * 60 * 4) {
+            console.log('4 hours')
+            setDragover(true)
+            setTimeout(() => {
+                setDragover(false)
+            }, 4000);
+        }
+
+    }, [])
+
+
+    const handleEnter = useDebounce(dragover, 300)
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -59,8 +85,21 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
                     onDragEnter={() => setDragover(true)}
                     onDragOver={(e) => e.preventDefault()}
                     onDragLeave={() => setDragover(false)}
-                    className={`size-32 flex items-center justify-center animate-in animate-out ${dragover ? 'border-2' : ''}`}>
-                    <PlusIcon className="h-8 w-8 hover:cursor-pointer hover:text-primary text-secondary-foreground" />
+                    className='size-32'
+                >
+
+                    <div className={`
+                     inline-block
+                    bg-[length:400%_400%] p-[1px] 
+                    ${!handleEnter ? 'bg-transparent' : 'animate-pulse bg-gradient-to-r from-[#FFF9D4] via-[#DACE81] to-[#E1E1E1]'}
+                    z-10 size-32 rounded-[7.5px]`}>
+                        <span className={`
+                        ${!handleEnter ? 'bg-transparent' : 'bg-gradient'}
+                        flex rounded-[7px] t px-5 py-3 font-bold text-white h-full w-full items-center justify-center`}>
+                            <PlusIcon className=" h-8 w-8 hover:cursor-pointer hover:text-primary text-secondary-foreground" />
+                        </span>
+                    </div>
+
                 </div>
             </DialogTrigger>
             <DialogContent data-theme={theme}>
@@ -100,6 +139,6 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
                     </DialogFooter>
                 </form>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     )
 }
