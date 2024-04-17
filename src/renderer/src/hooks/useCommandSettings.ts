@@ -16,7 +16,6 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
 
         engine.socket.emit(UtilityEvents.CMDMETASETTINGS,
             name, value, (data: Status) => {
-                console.log(data.cmd.metaSettings)
                 setSettings(data)
 
                 setIsLoading(false)
@@ -60,7 +59,6 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
     useEffect(() => {
 
         engine.socket.emit('retrieve_settings', (data: Status) => {
-            console.log(data)
             setSettings(data)
         })
 

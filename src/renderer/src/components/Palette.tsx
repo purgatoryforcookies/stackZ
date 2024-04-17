@@ -1,6 +1,5 @@
 import { ClientEvents, Cmd, StackStatus, UtilityEvents } from '@t'
 import { useEffect, useRef, useState } from 'react'
-import { Badge } from '@renderer/@/ui/badge'
 import NewCommand from './Dialogs/NewCommand'
 import Command from './Command/Command'
 import { Button } from '@renderer/@/ui/button'
@@ -10,6 +9,7 @@ import { DraggableData } from 'react-draggable'
 import { IUseStack } from '@renderer/hooks/useStack'
 import { useTaalasmaa } from '@renderer/hooks/useTaalasmaa'
 import CommandSM from './Command/CommandSM'
+import RadioBadge from './Common/RadioBadge'
 
 type PaletteProps = {
     data: IUseStack
@@ -18,16 +18,21 @@ type PaletteProps = {
 const W_LIMIT_FOR_SM = 320
 
 function Palette({ data }: PaletteProps) {
-    const [running, setRunning] = useState<boolean>(false)
+    const [running, setRunning] = useState(false)
     const paletteRef = useRef<HTMLDivElement>(null)
 
     const { w } = useTaalasmaa(paletteRef)
+
 
     useEffect(() => {
         const socket = data.stackSocket?.get(data.selectedStack)
         if (!socket) return
 
         socket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
+
+            if (d.stack !== data.selectedStack) {
+                setRunning(false)
+            }
             setRunning(d.isRunning || d.isReserved)
         })
 
@@ -65,30 +70,15 @@ function Palette({ data }: PaletteProps) {
     }
     const isCompact = w && w < W_LIMIT_FOR_SM
 
+
     return (
         <div className="h-full flex flex-col" ref={paletteRef}>
             <div className="flex gap-3 justify-center p-4 flex-wrap">
                 {data.stack &&
-                    Array.from(data.stack.values()).map((stack) => {
-                        return (
-                            <Badge
-                                key={stack.id}
-                                onClick={() => {
-                                    let firstTerminalId = ''
-                                    const firstOneOnStack = data.stack?.get(stack.id)?.palette
-                                    if (!firstOneOnStack) firstTerminalId = 'gibberish'
-                                    else firstTerminalId = firstOneOnStack[0]?.id
-                                    data.selectStack(stack.id)
-                                    data.selectTerminal(firstTerminalId)
-                                }}
-                                variant={data.selectedStack === stack.id ? 'default' : 'outline'}
-                                className={`hover:bg-primary hover:text-background text-nowrap
-                                hover:cursor-pointer`}
-                            >
-                                {stack.stackName}
-                            </Badge>
-                        )
-                    })}
+                    Array.from(data.stack.values()).map((stack) =>
+                        <RadioBadge key={stack.id} stack={data} id={stack.id} />
+                    )
+                }
                 <NewStack set={data.addStack} />
             </div>
             <div

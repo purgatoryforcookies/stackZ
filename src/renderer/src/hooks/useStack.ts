@@ -22,7 +22,7 @@ export interface IUseStack {
     askForResize: () => void
     renameStack: (newName: string) => void
     selectedStack: string
-    selectedTerminal: string
+    selectedTerminal: string,
 }
 
 export const useStack = (SOCKET_HOST: string): IUseStack => {
@@ -33,6 +33,9 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
 
     const [selectedStack, selectStack] = useState<string>('a')
     const [selectedTerminal, selectTerminal] = useState<string>('a')
+
+
+
 
     const fetchTerminals = async () => {
         setLoading(true)
@@ -211,6 +214,6 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         askForResize,
         renameStack,
         selectedStack,
-        selectedTerminal
+        selectedTerminal,
     }
 }

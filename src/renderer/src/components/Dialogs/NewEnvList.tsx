@@ -64,26 +64,25 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
         }
         const today = new Date()
         const since = new Date(timestamp)
-        if (today.getMilliseconds() - since.getMilliseconds() > 1000 * 60 * 60 * 4) {
-            console.log('4 hours')
+        if (today.getSeconds() - since.getSeconds() > 60 * 60 * 24) {
             setDragover(true)
             setTimeout(() => {
                 setDragover(false)
             }, 4000);
+            write('since', new Date().toISOString())
         }
 
-    }, [])
+    }, [terminal])
 
 
-    const handleEnter = useDebounce(dragover, 300)
+    const handleEnter = useDebounce(dragover, 40)
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <div
                     onDrop={handleFileChange}
-                    onDragEnter={() => setDragover(true)}
-                    onDragOver={(e) => e.preventDefault()}
+                    onDragOver={() => setDragover(true)}
                     onDragLeave={() => setDragover(false)}
                     className='size-32'
                 >
@@ -97,6 +96,7 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
                         ${!handleEnter ? 'bg-transparent' : 'bg-gradient'}
                         flex rounded-[7px] t px-5 py-3 font-bold text-white h-full w-full items-center justify-center`}>
                             <PlusIcon className=" h-8 w-8 hover:cursor-pointer hover:text-primary text-secondary-foreground" />
+                            {handleEnter ? <span className="text-secondary-foreground ">Dropzone</span> : null}
                         </span>
                     </div>
 

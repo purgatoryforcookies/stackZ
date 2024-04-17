@@ -9,6 +9,7 @@ import {
     EyeNoneIcon,
     HeartIcon,
     LapTimerIcon,
+    MixIcon,
     MoveIcon,
     PlayIcon,
     ReloadIcon,
@@ -37,6 +38,7 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
         cwd: data.command.cwd
     })
     const [hcHeartBeat, setHcHeartBeat] = useState<number>()
+    const [ishalting, setIsHalting] = useState<false>(false)
 
     useEffect(() => {
         engine.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
@@ -45,6 +47,9 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
 
         engine.socket.on(ClientEvents.HEARTBEAT, (d: number) => {
             setHcHeartBeat(d)
+        })
+        engine.socket.on(ClientEvents.HALTBEAT, (d) => {
+            setIsHalting(d)
         })
         engine.socket.emit(UtilityEvents.STATE)
 
@@ -137,6 +142,11 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
                         </div>
 
                         <span className="text-[0.7rem] text-white/30 flex gap-2 justify-end pr-10 pb-1">
+                            {ping.cmd.metaSettings?.halt ? (
+                                <MixIcon className={`h-4 w-4 
+                                ${ishalting ? 'text-primary brightness-110' : ''}`}
+                                />
+                            ) : null}
                             {ping.cmd.metaSettings?.rerun ? (
                                 <SymbolIcon className="h-4 w-4" />
                             ) : null}

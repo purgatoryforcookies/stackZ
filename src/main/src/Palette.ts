@@ -78,6 +78,9 @@ export class Palette {
     installStackSocket(socket: Socket) {
         this.socket = socket
 
+        this.server.on(UtilityEvents.STACKSTATE, () => {
+            this.pingState()
+        })
         socket.on(UtilityEvents.STACKSTATE, () => {
             this.pingState()
         })
@@ -184,8 +187,10 @@ export class Palette {
             isReserved: terminalStates.some((term) => term.reserved),
             state: terminalStates
         }
-        if (!this.socket) return
-        this.socket.emit(ClientEvents.STACKSTATE, state)
+        // if (!this.socket) return
+        this.socket!.emit(ClientEvents.STACKSTATE, state)
+        this.server!.emit(ClientEvents.STACKSTATE, state)
+
     }
 
     pingAll() {

@@ -212,7 +212,8 @@ export class Terminal {
 
     ping() {
         this.socket.emit(ClientEvents.TERMINALSTATE, this.getState())
-        this.save()
+        // this.save()
+
     }
 
     getState(): Status {

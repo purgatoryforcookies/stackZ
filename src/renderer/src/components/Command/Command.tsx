@@ -51,7 +51,6 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
         })
         engine.socket.on(ClientEvents.HALTBEAT, (d) => {
             setIsHalting(d)
-            console.log(d)
         })
         engine.socket.emit(UtilityEvents.STATE)
 
