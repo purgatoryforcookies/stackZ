@@ -26,13 +26,12 @@ function Palette({ data }: PaletteProps) {
 
     useEffect(() => {
         const socket = data.stackSocket?.get(data.selectedStack)
-        if (!socket) return
 
+        if (!socket) {
+            console.error('No socket for stack')
+            return
+        }
         socket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
-
-            if (d.stack !== data.selectedStack) {
-                setRunning(false)
-            }
             setRunning(d.isRunning || d.isReserved)
         })
 
@@ -40,7 +39,7 @@ function Palette({ data }: PaletteProps) {
         return () => {
             socket.off(ClientEvents.STACKSTATE)
         }
-    }, [data])
+    }, [data.selectedStack])
 
     const toggleStack = () => {
         if (running) {

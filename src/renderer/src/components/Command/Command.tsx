@@ -98,7 +98,7 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                     </div>
                 ) : null}
                 <div
-                    className="m-2 overflow-hidden rounded-md"
+                    className="m-1 overflow-hidden rounded-md"
                     onClick={() => {
                         stack.selectTerminal(engine.terminalId)
                     }}

@@ -40,8 +40,8 @@ export const Field = ({
 }: FieldProps) => {
     const style = `rounded-full py-1
     ${variant === 'primary'
-            ? `px-3 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
-            : `px-3  truncate text-secondary bg-primary
+            ? `px-3 text-secondary-foreground bg-transparent bg-[length:_150%_50%] ${minimized ? 'truncate' : ''}`
+            : `px-3  truncate text-primary-secondary bg-primary
             }`
         }`
 
@@ -121,7 +121,7 @@ const Record = ({
             {editMode && !newRecordOpen && !newRecord ? (
                 <Cross1Icon
                     onClick={handleDelete}
-                    className="absolute left-3 top-2 w-4 h-4 hover:text-red-600 hover:cursor-pointer hover:scale-110"
+                    className="absolute left-[13px] top-[9px] w-4 h-4 hover:text-red-600 hover:cursor-pointer hover:scale-110"
                 />
             ) : null}
             {newRecord && !newRecordOpen ? (

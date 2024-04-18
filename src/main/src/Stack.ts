@@ -78,6 +78,7 @@ export class Stack {
                     palette.initTerminal(client, String(remoteTerminalID))
                 }
             } else {
+                console.log(`General client connected ${client.id}`)
                 client.on('m_ports', async (akw) => {
                     await Promise.all([
                         this.monitor.activePortsTCP(),
@@ -89,6 +90,7 @@ export class Stack {
                         })
                     })
                 })
+
             }
         })
     }

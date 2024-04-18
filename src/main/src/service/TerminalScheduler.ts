@@ -40,8 +40,6 @@ export class TerminalScheduler {
     constructor(terminals: Map<string, Terminal>) {
         this.jobs = []
 
-        console.log(Array.from(terminals.values()).map(o => [o.settings.executionOrder, o.settings.command.cmd]))
-
         Array.from(terminals.values())
             .sort((a, b) => {
                 if (a.settings.executionOrder && b.settings.executionOrder) {

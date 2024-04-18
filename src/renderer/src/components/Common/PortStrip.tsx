@@ -19,7 +19,7 @@ function PortStrip({ name, ports, color }: PortStripProps) {
                 {ports.map((port) => (
                     <HoverCard key={port.number} >
                         <HoverCardTrigger>
-                            <Badge className='text-sm border-full' style={{ backgroundColor: color }}>
+                            <Badge className='text-sm border-full text-[#0c0a0b]' style={{ backgroundColor: color }}>
                                 {port.number}
                             </Badge>
                         </HoverCardTrigger>

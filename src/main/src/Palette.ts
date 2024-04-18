@@ -20,7 +20,7 @@ export interface ISaveFuntion {
 }
 
 export interface IPingFunction {
-    (): void
+    (message?: string): void
 }
 
 export class Palette {
@@ -78,9 +78,6 @@ export class Palette {
     installStackSocket(socket: Socket) {
         this.socket = socket
 
-        this.server.on(UtilityEvents.STACKSTATE, () => {
-            this.pingState()
-        })
         socket.on(UtilityEvents.STACKSTATE, () => {
             this.pingState()
         })
@@ -170,6 +167,7 @@ export class Palette {
     }
 
     pingState() {
+
         const terminalStates = [...this.terminals.values()].map((term) => {
             return {
                 id: term.settings.id,
@@ -188,8 +186,9 @@ export class Palette {
             state: terminalStates
         }
         // if (!this.socket) return
-        this.socket!.emit(ClientEvents.STACKSTATE, state)
-        this.server!.emit(ClientEvents.STACKSTATE, state)
+        // this.server?.emit(ClientEvents.STACKSTATE, "state")
+        this.socket?.emit(ClientEvents.STACKSTATE, state)
+        this.socket?.emit('badge', state)
 
     }
 

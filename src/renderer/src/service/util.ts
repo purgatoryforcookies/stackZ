@@ -11,5 +11,5 @@ export const debounce = (fn: Function, ms = 300) => {
 
 export function selectColor(number: number) {
     const hue = number * 25;
-    return `hsl(${hue},100%,74%)`;
+    return `hsl(${hue},50%,40%)`;
 }

@@ -26,6 +26,7 @@ function App(): JSX.Element {
         paletteRef,
         headerRef
     )
+
     return (
         <ThemeContext.Provider value={theme!}>
             {storedWidth ? (

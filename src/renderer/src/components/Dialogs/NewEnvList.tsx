@@ -42,11 +42,14 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
     }
 
 
-    const handleFileChange = async (event: React.DragEvent<HTMLDivElement>) => {
+    const handleFileChange = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
         setDragover(false)
         const fileGrab = event.dataTransfer?.files[0];
         if (fileGrab) {
+
+
+
             setFile(fileGrab)
             setOpen(true)
         }
@@ -90,11 +93,11 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
                     <div className={`
                      inline-block
                     bg-[length:400%_400%] p-[1px] 
-                    ${!handleEnter ? 'bg-transparent' : 'animate-pulse bg-gradient-to-r from-[#FFF9D4] via-[#DACE81] to-[#E1E1E1]'}
+                    ${!handleEnter ? 'bg-transparent' : 'animate-pulse bg-gradient-to-r from-[#fbfaf6cc] via-[#eeedebd3] to-gradient'}
                     z-10 size-32 rounded-[7.5px]`}>
                         <span className={`
                         ${!handleEnter ? 'bg-transparent' : 'bg-gradient'}
-                        flex rounded-[7px] t px-5 py-3 font-bold text-white h-full w-full items-center justify-center`}>
+                        bg-[length:100%_110%]   flex rounded-[7px] px-5 py-3 font-bold text-white h-full w-full items-center justify-center`}>
                             <PlusIcon className=" h-8 w-8 hover:cursor-pointer hover:text-primary text-secondary-foreground" />
                             {handleEnter ? <span className="text-secondary-foreground ">Dropzone</span> : null}
                         </span>

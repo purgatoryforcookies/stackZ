@@ -95,7 +95,6 @@ export class TerminalUIEngine {
         this.terminal.onKey((data) => {
             this.sendInput(data.key)
             if (this.isRunning) return
-            console.log("is running", this.isRunning, this.buffer)
             const isOutOfBoundsLeft = this.terminal.buffer.active.cursorX <= 2
             const isOutOfBoundsRigth =
                 this.terminal.buffer.active.cursorX - 1 > this.getCurrentTerminalLine().length

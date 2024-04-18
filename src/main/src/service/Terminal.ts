@@ -145,11 +145,11 @@ export class Terminal {
                     this.scheduler.unhalt()
                     this.socket.emit(ClientEvents.HALTBEAT, false)
                     this.scheduler = null
-
                 }
                 this.ping()
                 this.stackPing()
             })
+
             this.ping()
             this.stackPing()
         } catch (e) {
@@ -362,22 +362,22 @@ export class Terminal {
 
     registerTerminalEvents() {
         this.socket.on(UtilityEvents.CWD, (arg: string, akw) => {
-            console.log(`Changing cwd! new Cwd: ${arg}`)
+            console.log(`[New cwd]: ${arg}`)
             this.updateCwd(arg)
             akw(this.getState())
         })
         this.socket.on(UtilityEvents.CMD, (arg: string, akw) => {
-            console.log(`Changing command! new CMD: ${arg}`)
+            console.log(`[New cmd]: ${arg}`)
             this.updateCommand(arg)
             if (akw) akw(this.getState())
         })
         this.socket.on(UtilityEvents.SHELL, (arg: string, akw) => {
-            console.log(`Changing shell! new shell: ${arg}`)
+            console.log(`[New shell]: ${arg}`)
             this.changeShell(arg)
             if (akw) akw(this.getState())
         })
         this.socket.on(UtilityEvents.TITLE, (arg: string, akw) => {
-            console.log(`Changing title! new title: ${arg}`)
+            console.log(`[New title]: ${arg}`)
             this.changeTitle(arg)
             if (akw) akw(this.getState())
         })
