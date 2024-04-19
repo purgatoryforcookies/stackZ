@@ -43,13 +43,13 @@ function RadioBadge({ stack, id }: { stack: IUseStack, id: string }) {
             variant={isSelect ? 'default' : 'outline'}
             className={` text-nowrap
             ${running && !isSelect ? 'animate-border  bg-gradient-to-r' : isSelect ? 'bg-primary' : ''}
-            from-[#eeede968] via-[#f8f6e772] to-gradient p-0  hover:cursor-pointer bg-[length:_200%_2500%]
-            flex justify-center items-center
+            from-[#eeede968] via-[#f8f6e772] to-gradient hover:cursor-pointer bg-[length:_200%_2500%]
+             h-[22px]  p-0 flex justify-center items-center
             `}
         >
             <span className={`${isSelect ? 'bg-primary' : running ? 'bg-gradient' : 'bg-transparent'}
-            w-[96%] h-[95%] text-center rounded-[4px] px-4 py-0 flex justify-center items-center bg-[length:_800%_800%]
-            relative top-[0px] right-[0px]
+              text-center rounded-[4px] px-2 h-[90%] w-[97%] bg-[length:_800%_800%] flex justify-center items-center
+            
             `}>
                 {stack.stack?.get(id)?.stackName}
             </span>

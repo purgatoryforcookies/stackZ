@@ -39,10 +39,17 @@ export const parseBufferToEnvironment = (buf?: ArrayBuffer) => {
     const envir = {}
 
     decoded.forEach(row => {
-        const [key, value] = row.split("=")
-        const betterValue = value.replace(/["]+/g, '').trim()
+        if (!row) return
+        try {
+            if (row.startsWith("#")) return
+            if (row.length < 2) return
+            const [key, value] = row.split("=")
+            const betterValue = value.replace(/["]+/g, '').trim()
+            envir[key.trim()] = betterValue
+        } catch {
+            // swallow
+        }
 
-        envir[key.trim()] = betterValue
     })
 
     return envir
