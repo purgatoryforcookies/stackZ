@@ -3,6 +3,7 @@ import {
     Cmd,
     Environment,
     EnvironmentEditProps,
+    HistoryKey,
     Status,
     UtilityEvents,
     UtilityProps
@@ -212,7 +213,7 @@ export class Terminal {
 
     ping() {
         this.socket.emit(ClientEvents.TERMINALSTATE, this.getState())
-        // this.save()
+        this.save()
 
     }
 
@@ -352,9 +353,12 @@ export class Terminal {
     }
 
     setMetaSettings(name: string, value: string | boolean | number | undefined) {
-
+        console.log(`Setting meta ${name} - ${value}`)
         if (!this.settings.metaSettings) {
             this.settings.metaSettings = {}
+        }
+        if (name === 'healthCheck' && typeof value === 'string') {
+            if (value.length > 0) this.history.store("HEALTH", value)
         }
         this.settings.metaSettings[name] = value
         this.ping()
@@ -419,22 +423,20 @@ export class Terminal {
         })
 
 
-        this.socket.on('history', (feed: string, step: number, akw) => {
-            const keyword = feed.split(' ', 2)[0]
-            switch (keyword) {
-                case 'cd':
-                    if (step === 0) akw('cd ' + this.settings.command.cwd, step)
-                    akw(this.history.get('CWD', step))
-                    break
-                case 'shell':
-                    if (step === 0) akw('shell ' + this.settings.command.shell, step)
-                    akw(this.history.get('SHELL', step))
-                    break
-                default:
-                    if (step === 0) akw(this.settings.command.cmd, step)
-                    akw(this.history.get('CMD', step))
-                    break
+        this.socket.on('history', (key: keyof typeof HistoryKey,
+            { feed, step }: { feed?: string, step?: number },
+            akw) => {
+
+            if (feed) {
+                akw(this.history.search(key, feed))
+                return
             }
+            if (step) {
+                akw(this.history.get(key, step))
+                return
+            }
+            return
+
         })
         this.socket.emit('hello')
         this.stackPing()

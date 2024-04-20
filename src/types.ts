@@ -160,7 +160,8 @@ export enum Panels {
 export enum HistoryKey {
     CWD,
     CMD,
-    SHELL
+    SHELL,
+    HEALTH
 }
 
 export type MkdirError = {

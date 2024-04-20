@@ -18,7 +18,7 @@ export class HistoryService {
             this.history.set(key, [])
         }
 
-        this.limit = 5
+        this.limit = 20
 
         Array.from(this.history.keys()).forEach((key) => {
             this.readFromDisk(dirPath, key)
@@ -29,6 +29,8 @@ export class HistoryService {
         const mem = this.history.get(key)
         if (!mem) throw new Error(`Invalid Key ${String(key)}`)
 
+        if (mem.includes(value)) return
+
         if (mem.length > this.limit) mem.pop()
         mem.unshift(value)
         this.history.set(key, mem)
@@ -38,6 +40,17 @@ export class HistoryService {
     get(key: keyof typeof HistoryKey, index: number = 0) {
         return this.history.get(key)?.at(index)
     }
+
+    search(key: keyof typeof HistoryKey, value: string): string[] {
+        if (!value) return []
+
+        const all = this.history.get(key)
+
+        if (!all) return []
+
+        return all.filter(o => o.toLowerCase().includes(value.toLowerCase()))
+    }
+
 
     exists(key: keyof typeof HistoryKey, value: string) {
         return this.history.get(key)?.includes(value)

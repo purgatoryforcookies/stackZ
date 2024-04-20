@@ -43,16 +43,15 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
 
 
     const handleFileChange = (event: React.DragEvent<HTMLDivElement>) => {
+
         event.preventDefault()
         setDragover(false)
         const fileGrab = event.dataTransfer?.files[0];
+        console.log(fileGrab)
         if (fileGrab) {
-
-
-
             setFile(fileGrab)
-            setOpen(true)
         }
+        setOpen(true)
     };
 
     const { read, write } = useLocalStorage()
@@ -78,14 +77,14 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
     }, [terminal])
 
 
-    const handleEnter = useDebounce(dragover, 40)
+    const handleEnter = useDebounce(dragover, 100)
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <div
                     onDrop={handleFileChange}
-                    onDragOver={() => setDragover(true)}
+                    onDragOver={(e) => { e.preventDefault(), setDragover(true) }}
                     onDragLeave={() => setDragover(false)}
                     className='size-32'
                 >

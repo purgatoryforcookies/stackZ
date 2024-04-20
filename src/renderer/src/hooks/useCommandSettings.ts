@@ -8,19 +8,27 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
     const [settings, setSettings] = useState<Status>()
     const [isLoading, setIsLoading] = useState(false)
 
-
-
-    const onMetaChange = (e: { target: { name: string, value: string | boolean | number } }) => {
+    const onMetaChange = (e: { target: { name: string, value?: string | boolean | number } }) => {
         setIsLoading(true)
         const { name, value } = e.target
 
-        engine.socket.emit(UtilityEvents.CMDMETASETTINGS,
-            name, value, (data: Status) => {
-                setSettings(data)
+        if (!value) {
+            engine.socket.emit(UtilityEvents.CMDMETASETTINGS,
+                name, undefined, (data: Status) => {
+                    setSettings(data)
 
-                setIsLoading(false)
-            }
-        )
+                    setIsLoading(false)
+                }
+            )
+        } else {
+            engine.socket.emit(UtilityEvents.CMDMETASETTINGS,
+                name, value, (data: Status) => {
+                    setSettings(data)
+
+                    setIsLoading(false)
+                }
+            )
+        }
 
     }
 
@@ -52,12 +60,10 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
                 })
                 break
         }
-
     }
 
 
     useEffect(() => {
-
         engine.socket.emit('retrieve_settings', (data: Status) => {
             setSettings(data)
         })

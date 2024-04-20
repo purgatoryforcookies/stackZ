@@ -8,8 +8,9 @@ import { useContext } from "react"
 import { CustomToolTip } from "./CustomTooltip"
 import { CheckIcon, HamburgerMenuIcon, InfoCircledIcon, ReloadIcon } from "@radix-ui/react-icons"
 import useCommandSettings from "@renderer/hooks/useCommandSettings"
+import InputWithMagic from "./InputWithMagic"
 
-type CommandSettingsProps = {
+export type CommandSettingsProps = {
     engine: TerminalUIEngine
 }
 
@@ -111,17 +112,8 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                         </div>
                         <div className="w-full">
 
-                            <Label htmlFor="healthcheck" className="text-right p-1">
-                                Healthcheck
-                            </Label>
-                            <Input
-                                id="healthcheck"
-                                className="w-full"
-                                name="healthCheck"
-                                placeholder="curl --fail https://google.com || exit 1"
-                                defaultValue={settings?.cmd.metaSettings?.healthCheck}
-                                onBlur={onMetaChange}
-                            />
+                            <InputWithMagic engine={engine} />
+
                         </div>
                     </div>
                     <div className="h-4"></div>

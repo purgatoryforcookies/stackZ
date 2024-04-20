@@ -16,8 +16,6 @@ function RadioBadge({ stack, id }: { stack: IUseStack, id: string }) {
         if (!socket) return
 
         socket.on('badge', (d: StackStatus) => {
-            console.log('RadioBadge')
-
             setRunning(d.isRunning || d.isReserved)
         })
 

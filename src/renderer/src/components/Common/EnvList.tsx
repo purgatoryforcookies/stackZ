@@ -5,6 +5,8 @@ import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
 import { UtilityEvents } from '@t'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
+import { CustomToolTip } from './CustomTooltip'
+import { GoInfo } from 'react-icons/go'
 
 type EnvListProps = {
     data: {
@@ -54,7 +56,17 @@ function EnvList({ data, terminal }: EnvListProps) {
         ${editMode ? 'max-w-[100%]' : ''}
         `}
         >
-            <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
+
+            {data.order === 0 ?
+                <CustomToolTip message='This environment is editable, but not persistent for the long run' >
+                    <h1 className="text-center text-foreground text-nowrap flex items-center gap-1">
+                        {data.title} <GoInfo className="w-4 h-4 text-white/50" />
+                    </h1>
+                </CustomToolTip>
+                : <h1 className="text-center text-foreground text-nowrap">
+                    {data.title}
+                </h1>}
+
             <Separator className="my-2" />
             <div className="flex gap-1 justify-center mb-2">
                 <Badge

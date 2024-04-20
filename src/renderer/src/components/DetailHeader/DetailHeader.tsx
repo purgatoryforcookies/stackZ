@@ -36,7 +36,7 @@ function DetailHeader({ stack }: DetailHeaderProps) {
     return (
         <div className="flex gap-8 pb-16 pr-10 h-full" ref={bodyRef}>
             {status?.cmd.command.env
-                ? status.cmd.command.env.map((record) => (
+                ? status.cmd.command.env.sort((a, b) => a.order - b.order).map((record) => (
                     <EnvList
                         data={record}
                         key={record.title}
