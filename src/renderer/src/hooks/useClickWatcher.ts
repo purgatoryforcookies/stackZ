@@ -25,9 +25,9 @@ export const useClickWatcher = (ref: React.RefObject<HTMLDivElement>,
             }
         };
 
-        document.addEventListener('click', handleClickOutside, true);
+        document.addEventListener('click', handleClickOutside, false);
         return () => {
-            document.removeEventListener('click', handleClickOutside, true);
+            document.removeEventListener('click', handleClickOutside, false);
         };
 
     }, [ref, states]);

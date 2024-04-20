@@ -6,7 +6,7 @@ import { ThemeContext } from "@renderer/App"
 import { TerminalUIEngine } from "@renderer/service/TerminalUIEngine"
 import { useContext } from "react"
 import { CustomToolTip } from "./CustomTooltip"
-import { CheckIcon, HamburgerMenuIcon, InfoCircledIcon, ReloadIcon } from "@radix-ui/react-icons"
+import { CheckIcon, HamburgerMenuIcon, InfoCircledIcon, LinkBreak2Icon, ReloadIcon } from "@radix-ui/react-icons"
 import useCommandSettings from "@renderer/hooks/useCommandSettings"
 import InputWithMagic from "./InputWithMagic"
 
@@ -18,8 +18,8 @@ export type CommandSettingsProps = {
 function CommandSettings2({ engine }: CommandSettingsProps) {
     const theme = useContext(ThemeContext)
 
-    const { settings, onMetaChange, onChange, isLoading } = useCommandSettings(engine)
-
+    const tools = useCommandSettings(engine)
+    const { settings, onMetaChange, onChange, isLoading, isPending, setIsPending } = tools
 
     return (
         <Sheet>
@@ -35,17 +35,19 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                     </SheetDescription>
                 </SheetHeader>
                 <div className="h-5"></div>
+
                 <div>
                     <h2 className="text-white/50 m-1 mb-3">General</h2>
-
                     <Label htmlFor="cwd" className="text-right p-1">
                         Cwd
                     </Label>
                     <Input
                         id="cwd"
+                        tabIndex={1}
                         name="cwd"
                         className="col-span-3"
                         defaultValue={settings?.cwd}
+                        onChange={() => setIsPending(true)}
                         onBlur={(e) => onChange('cwd', e.target.value)}
                     />
                     <Label htmlFor="command" className="text-right p-1">
@@ -53,9 +55,11 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                     </Label>
                     <Input
                         id="command"
+                        tabIndex={2}
                         name="command"
                         className="col-span-3"
                         defaultValue={settings?.cmd.command.cmd}
+                        onChange={() => setIsPending(true)}
                         onBlur={(e) => onChange('cmd', e.target.value)}
                     />
                     <div className="flex justify-between gap-3">
@@ -67,6 +71,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                                 id="shell"
                                 name="shell"
                                 defaultValue={settings?.cmd.command.shell}
+                                onChange={() => setIsPending(true)}
                                 onBlur={(e) => onChange('shell', e.target.value)}
                             />
                         </div>
@@ -78,6 +83,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                                 id="notes"
                                 name="title"
                                 defaultValue={settings?.cmd.title}
+                                onChange={() => setIsPending(true)}
                                 onBlur={(e) => onChange('title', e.target.value)}
                             />
                         </div>
@@ -91,7 +97,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                         <div>
 
                             <Label htmlFor="delay" className="text-right p-1">
-                                Delay s
+                                Delay
                             </Label>
                             <Input
                                 id="delay"
@@ -112,7 +118,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                         </div>
                         <div className="w-full">
 
-                            <InputWithMagic engine={engine} />
+                            <InputWithMagic engine={engine} tools={tools} />
 
                         </div>
                     </div>
@@ -122,7 +128,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                     <div className="flex items-center space-x-2">
 
                         <Checkbox
-                            checked={settings?.cmd.metaSettings?.halt}
+                            checked={settings?.cmd.metaSettings?.halt || false}
                             onCheckedChange={(e) => onMetaChange({
                                 target: {
                                     name: 'halt',
@@ -148,7 +154,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
 
                     <div className="flex items-center space-x-2">
                         <Checkbox
-                            checked={settings?.cmd.metaSettings?.loose}
+                            checked={settings?.cmd.metaSettings?.loose || false}
                             onCheckedChange={(e) => onMetaChange({
                                 target: {
                                     name: 'loose',
@@ -163,7 +169,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                             </CustomToolTip>
                         </Label>
                         <Checkbox
-                            checked={settings?.cmd.metaSettings?.rerun}
+                            checked={settings?.cmd.metaSettings?.rerun || false}
                             onCheckedChange={(e) => onMetaChange({
                                 target: {
                                     name: 'rerun',
@@ -178,7 +184,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                             </CustomToolTip>
                         </Label>
                         <Checkbox
-                            checked={settings?.cmd.metaSettings?.ctrlc}
+                            checked={settings?.cmd.metaSettings?.ctrlc || false}
                             onCheckedChange={(e) => onMetaChange({
                                 target: {
                                     name: 'ctrlc',
@@ -198,7 +204,9 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                         <div className="h-10"></div>
                         <div className="flex justify-end gap-3">
                             {isLoading ? <ReloadIcon className="h-4 w-4 animate-spin" />
-                                : <CheckIcon className="h-4 w-4" />}
+                                : isPending
+                                    ? <LinkBreak2Icon className="h-4 w-4 text-orange-600" />
+                                    : <CheckIcon className="h-4 w-4" />}
                         </div>
                     </div>
                 </div>

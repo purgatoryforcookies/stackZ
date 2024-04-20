@@ -99,9 +99,14 @@ export class TerminalUIEngine {
         })
 
         this.terminal.attachCustomKeyEventHandler((e) => {
-            if (e.type === 'keyup' && !this.isRunning) {
-                if (e.code === 'Enter') {
-                    window.api.startTerminal(this.stackId, this.terminalId)
+            if (e.type === 'keyup') {
+                if (e.code === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    if (!this.isRunning) {
+                        window.api.startTerminal(this.stackId, this.terminalId)
+                    }
+                    else {
+                        window.api.stopTerminal(this.stackId, this.terminalId)
+                    }
                     return false
                 }
             }
@@ -132,11 +137,13 @@ export class TerminalUIEngine {
         this.hostdiv = element
         if (this.hostdiv.hasChildNodes()) element.innerHTML = ''
         this.terminal.open(this.hostdiv)
+        this.terminal.focus()
         this.mounted = true
         this.resize()
         this.socket.on(ClientEvents.TERMINALSTATE, (data: Status) => {
             this.isRunning = data.isRunning
         })
+
         return this
     }
 

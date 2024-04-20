@@ -358,9 +358,17 @@ export class Terminal {
             this.settings.metaSettings = {}
         }
         if (name === 'healthCheck' && typeof value === 'string') {
-            if (value.length > 0) this.history.store("HEALTH", value)
+            const trimmed = value.trim()
+            if (trimmed.length > 3) this.history.store("HEALTH", trimmed)
+            this.settings.metaSettings[name] = trimmed
+
+        } else {
+            if (typeof value === 'undefined' || value === null) {
+                delete this.settings.metaSettings[name]
+            } else {
+                this.settings.metaSettings[name] = value
+            }
         }
-        this.settings.metaSettings[name] = value
         this.ping()
     }
 

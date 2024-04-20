@@ -161,7 +161,7 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                         <span className="absolute right-10 bottom-1 text-[0.7rem] text-white/30 flex gap-2">
                             {ping.cmd.metaSettings?.halt ? (
                                 <MixIcon className={`h-4 w-4 
-                                ${ishalting ? 'text-primary brightness-110' : ''}`}
+                                ${ishalting ? 'text-primary brightness-120' : ''}`}
                                 />
                             ) : null}
                             {ping.cmd.metaSettings?.rerun ? (
@@ -174,7 +174,7 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                                 <span className="flex relative">
                                     <TimerIcon
                                         className={`h-4 w-4 
-                                    ${ping.reserved ? 'text-primary brightness-110' : ''}
+                                    ${ping.reserved ? 'text-primary brightness-120' : ''}
                                     `}
                                     />
                                     {ping.cmd.metaSettings.delay ? (
@@ -188,7 +188,7 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                                 <span className="flex relative">
                                     <HeartIcon
                                         className={`h-4 w-4 
-                                    ${hcHeartBeat ? 'text-primary brightness-110' : ''}
+                                    ${hcHeartBeat ? 'text-primary brightness-120' : ''}
                                     `}
                                     />
                                     {hcHeartBeat ? (

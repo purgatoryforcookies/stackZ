@@ -7,6 +7,17 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
 
     const [settings, setSettings] = useState<Status>()
     const [isLoading, setIsLoading] = useState(false)
+    const [isPending, setIsPending] = useState(false)
+
+    const uxDelayedLoading = () => setTimeout(() => {
+        setIsLoading(false)
+    }, 350);
+
+    const finishUp = (data: Status) => {
+        setSettings(data)
+        uxDelayedLoading()
+        setIsPending(false)
+    }
 
     const onMetaChange = (e: { target: { name: string, value?: string | boolean | number } }) => {
         setIsLoading(true)
@@ -15,17 +26,15 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
         if (!value) {
             engine.socket.emit(UtilityEvents.CMDMETASETTINGS,
                 name, undefined, (data: Status) => {
-                    setSettings(data)
-
-                    setIsLoading(false)
+                    if (!data) return
+                    finishUp(data)
                 }
             )
         } else {
             engine.socket.emit(UtilityEvents.CMDMETASETTINGS,
                 name, value, (data: Status) => {
-                    setSettings(data)
-
-                    setIsLoading(false)
+                    if (!data) return
+                    finishUp(data)
                 }
             )
         }
@@ -37,26 +46,22 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
         switch (name) {
             case 'cwd':
                 engine.socket.emit(UtilityEvents.CWD, value, (data: Status) => {
-                    setSettings(data)
-                    setIsLoading(false)
+                    finishUp(data)
                 })
                 break
             case 'cmd':
                 engine.socket.emit(UtilityEvents.CMD, value, (data: Status) => {
-                    setSettings(data)
-                    setIsLoading(false)
+                    finishUp(data)
                 })
                 break
             case 'shell':
                 engine.socket.emit(UtilityEvents.SHELL, value, (data: Status) => {
-                    setSettings(data)
-                    setIsLoading(false)
+                    finishUp(data)
                 })
                 break
             case 'title':
                 engine.socket.emit(UtilityEvents.TITLE, value, (data: Status) => {
-                    setSettings(data)
-                    setIsLoading(false)
+                    finishUp(data)
                 })
                 break
         }
@@ -64,14 +69,16 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
 
 
     useEffect(() => {
+        setIsLoading(true)
         engine.socket.emit('retrieve_settings', (data: Status) => {
-            setSettings(data)
+            if (!data) return
+            finishUp(data)
         })
 
     }, [engine])
 
 
-    return { settings, onMetaChange, onChange, isLoading }
+    return { settings, onMetaChange, onChange, isLoading, isPending, setIsPending }
 
 
 }
