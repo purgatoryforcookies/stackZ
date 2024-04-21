@@ -167,7 +167,6 @@ export class Palette {
     }
 
     pingState() {
-
         const terminalStates = [...this.terminals.values()].map((term) => {
             return {
                 id: term.settings.id,
@@ -189,7 +188,6 @@ export class Palette {
         // this.server?.emit(ClientEvents.STACKSTATE, "state")
         this.socket?.emit(ClientEvents.STACKSTATE, state)
         this.socket?.emit('badge', state)
-
     }
 
     pingAll() {
@@ -205,7 +203,6 @@ export class Palette {
      * The terminal instace contains the settings also, and they need to be updated separetly
      */
     reOrderExecution(arg: { terminalId: string; newOrder: number }) {
-
         const oldPalette = this.settings.palette
         if (!oldPalette) return
 
@@ -225,22 +222,19 @@ export class Palette {
     /**
      * Cleans up execution orders of the stack.
      * This copies the order from settings and shifts terminal
-     * instances to the same order. 
-     * Can be called independently any time 
+     * instances to the same order.
+     * Can be called independently any time
      */
     reIndexOrders = () => {
-
-
         this.settings.palette = this.settings.palette!.map((term, i) => {
             return { ...term, executionOrder: i + 1 }
         })
         Array.from(this.terminals.values())
             .sort((a, b) => a.settings.executionOrder! - b.settings.executionOrder!)
-            .forEach(a => {
-                const settings = this.settings.palette?.find(i => i.id === a.settings.id)
+            .forEach((a) => {
+                const settings = this.settings.palette?.find((i) => i.id === a.settings.id)
                 if (!settings) throw new Error('Reindexin failed. Could not find settings.')
                 a.settings.executionOrder = settings.executionOrder
-
             })
     }
 

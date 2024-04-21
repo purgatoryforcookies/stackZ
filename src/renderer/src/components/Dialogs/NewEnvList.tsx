@@ -41,23 +41,20 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
         setOpen(false)
     }
 
-
     const handleFileChange = (event: React.DragEvent<HTMLDivElement>) => {
-
         event.preventDefault()
         setDragover(false)
-        const fileGrab = event.dataTransfer?.files[0];
+        const fileGrab = event.dataTransfer?.files[0]
         console.log(fileGrab)
         if (fileGrab) {
             setFile(fileGrab)
         }
         setOpen(true)
-    };
+    }
 
     const { read, write } = useLocalStorage()
 
     useEffect(() => {
-
         let timestamp = read('since')
         if (!timestamp) {
             const now = new Date().toISOString()
@@ -70,12 +67,10 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
             setDragover(true)
             setTimeout(() => {
                 setDragover(false)
-            }, 4000);
+            }, 4000)
             write('since', new Date().toISOString())
         }
-
     }, [terminal])
-
 
     const handleEnter = useDebounce(dragover, 100)
 
@@ -84,24 +79,30 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
             <DialogTrigger asChild>
                 <div
                     onDrop={handleFileChange}
-                    onDragOver={(e) => { e.preventDefault(), setDragover(true) }}
+                    onDragOver={(e) => {
+                        e.preventDefault(), setDragover(true)
+                    }}
                     onDragLeave={() => setDragover(false)}
-                    className='size-32'
+                    className="size-32"
                 >
-
-                    <div className={`
+                    <div
+                        className={`
                      inline-block
                     bg-[length:400%_400%] p-[1px] 
                     ${!handleEnter ? 'bg-transparent' : 'animate-pulse bg-gradient-to-r from-[#fbfaf6cc] via-[#eeedebd3] to-gradient'}
-                    z-10 size-32 rounded-[7.5px]`}>
-                        <span className={`
+                    z-10 size-32 rounded-[7.5px]`}
+                    >
+                        <span
+                            className={`
                         ${!handleEnter ? 'bg-transparent' : 'bg-gradient'}
-                        bg-[length:100%_110%]   flex rounded-[7px] px-5 py-3 font-bold text-white h-full w-full items-center justify-center`}>
+                        bg-[length:100%_110%]   flex rounded-[7px] px-5 py-3 font-bold text-white h-full w-full items-center justify-center`}
+                        >
                             <PlusIcon className=" h-8 w-8 hover:cursor-pointer hover:text-primary text-secondary-foreground" />
-                            {handleEnter ? <span className="text-secondary-foreground ">Dropzone</span> : null}
+                            {handleEnter ? (
+                                <span className="text-secondary-foreground ">Dropzone</span>
+                            ) : null}
                         </span>
                     </div>
-
                 </div>
             </DialogTrigger>
             <DialogContent data-theme={theme}>
@@ -128,12 +129,17 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
                         </div>
                     </div>
                     <DialogFooter className="relative">
-                        <div className='flex items-center'>
-                            {file ? <span className='flex gap-1 absolute left-0'>
-                                <FileIcon className="h-4 w-4" />
-                                {file?.name}
-                                <Cross1Icon className="h-4 w-4 hover:cursor-pointer" onClick={() => setFile(null)} />
-                            </span> : null}
+                        <div className="flex items-center">
+                            {file ? (
+                                <span className="flex gap-1 absolute left-0">
+                                    <FileIcon className="h-4 w-4" />
+                                    {file?.name}
+                                    <Cross1Icon
+                                        className="h-4 w-4 hover:cursor-pointer"
+                                        onClick={() => setFile(null)}
+                                    />
+                                </span>
+                            ) : null}
                             <Button type="submit" disabled={title.length === 0}>
                                 Save
                             </Button>
@@ -141,6 +147,6 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
                     </DialogFooter>
                 </form>
             </DialogContent>
-        </Dialog >
+        </Dialog>
     )
 }

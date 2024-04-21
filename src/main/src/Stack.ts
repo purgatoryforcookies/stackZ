@@ -80,7 +80,7 @@ export class Stack {
             } else {
                 console.log(`General client connected ${client.id}`)
                 client.on('clearHistory', (akw) => {
-                    console.log("Clearing history service")
+                    console.log('Clearing history service')
                     this.history.reboot()
                     akw()
                 })
@@ -89,14 +89,13 @@ export class Stack {
                     await Promise.all([
                         this.monitor.activePortsTCP(),
                         this.monitor.activePortsUDP()
-                    ]).then(results => {
+                    ]).then((results) => {
                         akw({
                             tcp: results[0],
                             udp: results[1]
                         })
                     })
                 })
-
             }
         })
     }
@@ -184,17 +183,16 @@ export class Stack {
     /**
      * Save takes a deepcopy of the stack and filters out any
      * OS Environments from the commands.
-     * 
+     *
      * The OS Envs get repopulated at each save thus making them not persistent
      * (which is a good thing)
-     * 
+     *
      */
     save = (onExport = false) => {
-
         const toBeSaved: PaletteStack[] = JSON.parse(JSON.stringify(this.raw))
-        toBeSaved.forEach(stack => {
-            stack.palette?.forEach(pal => {
-                pal.command.env = pal.command.env?.filter(o => o.order > 0)
+        toBeSaved.forEach((stack) => {
+            stack.palette?.forEach((pal) => {
+                pal.command.env = pal.command.env?.filter((o) => o.order > 0)
             })
         })
 

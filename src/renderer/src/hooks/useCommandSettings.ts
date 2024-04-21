@@ -1,22 +1,19 @@
-import { TerminalUIEngine } from "../service/TerminalUIEngine"
-import { CommandMetaSetting, Status, UtilityEvents } from "@t"
-import { useEffect, useState } from "react"
-
-
+import { TerminalUIEngine } from '../service/TerminalUIEngine'
+import { CommandMetaSetting, Status, UtilityEvents } from '@t'
+import { useEffect, useState } from 'react'
 
 type CommandBaseSettings = 'cwd' | 'cmd' | 'shell' | 'title'
 type OnChangeType = keyof CommandMetaSetting | CommandBaseSettings
 
-
 const useCommandSettings = (engine: TerminalUIEngine) => {
-
     const [settings, setSettings] = useState<Status>()
     const [isLoading, setIsLoading] = useState(false)
     const [isPending, setIsPending] = useState(false)
 
-    const uxDelayedLoading = () => setTimeout(() => {
-        setIsLoading(false)
-    }, 350);
+    const uxDelayedLoading = () =>
+        setTimeout(() => {
+            setIsLoading(false)
+        }, 350)
 
     const finishUp = (data: Status) => {
         setSettings(data)
@@ -48,12 +45,10 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
                 })
                 break
             default:
-                engine.socket.emit(UtilityEvents.CMDMETASETTINGS,
-                    name, value, (data: Status) => {
-                        if (!data) return
-                        finishUp(data)
-                    }
-                )
+                engine.socket.emit(UtilityEvents.CMDMETASETTINGS, name, value, (data: Status) => {
+                    if (!data) return
+                    finishUp(data)
+                })
         }
     }
 
@@ -63,16 +58,9 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
             if (!data) return
             finishUp(data)
         })
-
     }, [engine])
 
-
     return { settings, onChange, isLoading, isPending, setIsPending }
-
-
 }
 
-
 export default useCommandSettings
-
-

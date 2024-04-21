@@ -82,7 +82,7 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
             onStop={(_, d) => handleDrag(d, data, engine.stackId)}
             disabled={stackRunning}
         >
-            <div className='p-1 m-2 rounded-lg' >
+            <div className="p-1 m-2 rounded-lg">
                 {selected ? (
                     <div>
                         <CornerTopRightIcon className="absolute right-0 top-0 size-6 text-primary" />
@@ -139,7 +139,8 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
 
                         <span className="text-[0.7rem] text-white/30 flex gap-2 justify-end pr-10 pb-1">
                             {ping.cmd.metaSettings?.halt ? (
-                                <MixIcon className={`h-4 w-4 
+                                <MixIcon
+                                    className={`h-4 w-4 
                                 ${ishalting ? 'text-primary brightness-110' : ''}`}
                                 />
                             ) : null}

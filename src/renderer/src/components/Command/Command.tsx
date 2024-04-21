@@ -20,7 +20,6 @@ import Draggable, { DraggableData } from 'react-draggable'
 import { IUseStack } from '@renderer/hooks/useStack'
 import CommandSettings from '../Common/CommandSettings2'
 
-
 type CommandProps = {
     data: Exclude<Cmd, undefined>
     handleDrag: (data: DraggableData, terminal: Cmd, stack?: string) => void
@@ -40,7 +39,6 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
     })
     const [hcHeartBeat, setHcHeartBeat] = useState<number>()
     const [ishalting, setIsHalting] = useState<false>(false)
-
 
     useEffect(() => {
         engine.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
@@ -85,7 +83,7 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
             onStop={(_, d) => handleDrag(d, data, engine.stackId)}
             disabled={stackRunning}
         >
-            <div className='p-1 m-2 rounded-lg' >
+            <div className="p-1 m-2 rounded-lg">
                 {selected ? (
                     <div>
                         <CornerTopRightIcon className="absolute right-0 top-0 size-6 text-primary" />
@@ -152,12 +150,11 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                             </div>
                         </div>
 
-                        <div className='absolute bottom-0 left-[50%]'>
-
-                        </div>
+                        <div className="absolute bottom-0 left-[50%]"></div>
                         <span className="absolute right-10 bottom-1 text-[0.7rem] text-white/30 flex gap-2">
                             {ping.cmd.metaSettings?.halt ? (
-                                <MixIcon className={`h-4 w-4 
+                                <MixIcon
+                                    className={`h-4 w-4 
                                 ${ishalting ? 'text-primary brightness-120' : ''}`}
                                 />
                             ) : null}

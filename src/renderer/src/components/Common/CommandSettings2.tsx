@@ -1,19 +1,31 @@
-import { Checkbox } from "@renderer/@/ui/checkbox"
-import { Input } from "@renderer/@/ui/input"
-import { Label } from "@renderer/@/ui/label"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@renderer/@/ui/sheet"
-import { ThemeContext } from "@renderer/App"
-import { TerminalUIEngine } from "@renderer/service/TerminalUIEngine"
-import { useContext } from "react"
-import { CustomToolTip } from "./CustomTooltip"
-import { CheckIcon, HamburgerMenuIcon, InfoCircledIcon, LinkBreak2Icon, ReloadIcon } from "@radix-ui/react-icons"
-import useCommandSettings from "@renderer/hooks/useCommandSettings"
-import InputWithMagic from "./InputWithMagic"
+import { Checkbox } from '@renderer/@/ui/checkbox'
+import { Input } from '@renderer/@/ui/input'
+import { Label } from '@renderer/@/ui/label'
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger
+} from '@renderer/@/ui/sheet'
+import { ThemeContext } from '@renderer/App'
+import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
+import { useContext } from 'react'
+import { CustomToolTip } from './CustomTooltip'
+import {
+    CheckIcon,
+    HamburgerMenuIcon,
+    InfoCircledIcon,
+    LinkBreak2Icon,
+    ReloadIcon
+} from '@radix-ui/react-icons'
+import useCommandSettings from '@renderer/hooks/useCommandSettings'
+import InputWithMagic from './InputWithMagic'
 
 export type CommandSettingsProps = {
     engine: TerminalUIEngine
 }
-
 
 function CommandSettings({ engine }: CommandSettingsProps) {
     const theme = useContext(ThemeContext)
@@ -24,34 +36,43 @@ function CommandSettings({ engine }: CommandSettingsProps) {
     return (
         <Sheet>
             <SheetTrigger>
-                <HamburgerMenuIcon className={`h-4 w-4 moveHandle
-                            text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`} />
+                <HamburgerMenuIcon
+                    className={`h-4 w-4 moveHandle
+                            text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`}
+                />
             </SheetTrigger>
-            <SheetContent side={'left'} data-theme={theme} className="sm:max-w-none w-[40rem]"
-                onOpenAutoFocus={(e) => e.preventDefault()}>
+            <SheetContent
+                side={'left'}
+                data-theme={theme}
+                className="sm:max-w-none w-[40rem]"
+                onOpenAutoFocus={(e) => e.preventDefault()}
+            >
                 <SheetHeader>
                     <SheetTitle>Terminal Settings</SheetTitle>
-                    <SheetDescription>
-                    </SheetDescription>
+                    <SheetDescription></SheetDescription>
                 </SheetHeader>
                 <div className="h-5"></div>
 
                 <div>
                     <h2 className="text-white/50 m-1 mb-3">General</h2>
 
-                    <InputWithMagic engine={engine}
+                    <InputWithMagic
+                        engine={engine}
                         tools={tools}
                         title="Cwd"
-                        defaultValue={settings?.cmd.command.cwd || ""}
-                        valueKey='cwd'
-                        historyKey="CWD" />
+                        defaultValue={settings?.cmd.command.cwd || ''}
+                        valueKey="cwd"
+                        historyKey="CWD"
+                    />
 
-                    <InputWithMagic engine={engine}
+                    <InputWithMagic
+                        engine={engine}
                         tools={tools}
                         title="Command"
-                        defaultValue={settings?.cmd.command.cmd || ""}
-                        valueKey='cmd'
-                        historyKey="CMD" />
+                        defaultValue={settings?.cmd.command.cmd || ''}
+                        valueKey="cmd"
+                        historyKey="CMD"
+                    />
                     <div className="flex justify-between gap-3">
                         <div>
                             <Label htmlFor="shell" className="text-right p-1">
@@ -60,7 +81,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                             <Input
                                 id="shell"
                                 name="shell"
-                                defaultValue={settings?.cmd.command.shell || ""}
+                                defaultValue={settings?.cmd.command.shell || ''}
                                 onChange={() => setIsPending(true)}
                                 onBlur={(e) => onChange('shell', e.target.value)}
                             />
@@ -72,7 +93,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                             <Input
                                 id="notes"
                                 name="title"
-                                defaultValue={settings?.cmd.title || ""}
+                                defaultValue={settings?.cmd.title || ''}
                                 onChange={() => setIsPending(true)}
                                 onBlur={(e) => onChange('title', e.target.value)}
                             />
@@ -85,7 +106,6 @@ function CommandSettings({ engine }: CommandSettingsProps) {
 
                     <div className="flex gap-2">
                         <div>
-
                             <Label htmlFor="delay" className="text-right p-1">
                                 Delay
                             </Label>
@@ -96,31 +116,32 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                                 name="delay"
                                 min={0}
                                 step={1}
-                                value={settings?.cmd.metaSettings?.delay ? settings?.cmd.metaSettings?.delay / 1000 : ""}
+                                value={
+                                    settings?.cmd.metaSettings?.delay
+                                        ? settings?.cmd.metaSettings?.delay / 1000
+                                        : ''
+                                }
                                 onChange={(e) => onChange('delay', Number(e.target.value) * 1000)}
                                 placeholder="seconds"
                             />
                         </div>
                         <div className="w-full">
-
-                            <InputWithMagic engine={engine}
+                            <InputWithMagic
+                                engine={engine}
                                 tools={tools}
                                 title="Healthcheck"
-                                defaultValue={settings?.cmd.metaSettings?.healthCheck || ""}
-                                valueKey='healthCheck'
-                                historyKey="HEALTH" />
-
+                                defaultValue={settings?.cmd.metaSettings?.healthCheck || ''}
+                                valueKey="healthCheck"
+                                historyKey="HEALTH"
+                            />
                         </div>
                     </div>
                     <div className="h-4"></div>
 
-
                     <div className="flex items-center space-x-2">
-
                         <Checkbox
                             checked={settings?.cmd.metaSettings?.halt || false}
                             onCheckedChange={(e) => onChange('halt', e)}
-
                         />
                         <Label htmlFor="halt" className="flex items-center gap-2">
                             Halt until exit
@@ -129,7 +150,6 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                             </CustomToolTip>
                         </Label>
                     </div>
-
                 </div>
                 <div className="h-10"></div>
 
@@ -173,16 +193,18 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                     <div>
                         <div className="h-10"></div>
                         <div className="flex justify-end gap-3">
-                            {isLoading ? <ReloadIcon className="h-4 w-4 animate-spin" />
-                                : isPending
-                                    ? <LinkBreak2Icon className="h-4 w-4 text-orange-600" />
-                                    : <CheckIcon className="h-4 w-4" />}
+                            {isLoading ? (
+                                <ReloadIcon className="h-4 w-4 animate-spin" />
+                            ) : isPending ? (
+                                <LinkBreak2Icon className="h-4 w-4 text-orange-600" />
+                            ) : (
+                                <CheckIcon className="h-4 w-4" />
+                            )}
                         </div>
                     </div>
                 </div>
-
             </SheetContent>
-        </Sheet >
+        </Sheet>
     )
 }
 

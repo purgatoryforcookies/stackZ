@@ -2,14 +2,12 @@ import { exec } from 'child_process'
 import { parsePSTCPMessage, parsePSUDPMessage } from '../util/util'
 import { Processes } from '../../../types'
 
-
 export class MonitorService {
     constructor() {
         this.activePortsUDP()
     }
 
     async activePortsTCP() {
-
         const command = [
             'Get-NetTCPConnection -state Listen |',
             'select-object',
@@ -32,8 +30,7 @@ export class MonitorService {
             const processes: Processes = []
             const keys = [...groupedProcesses.keys()]
 
-            keys.forEach(key => {
-
+            keys.forEach((key) => {
                 const p = groupedProcesses.get(key)
                 if (!p) throw new Error(`${key} does not exist in grouped processes`)
 
@@ -41,10 +38,10 @@ export class MonitorService {
 
                 const innerKeys = [...p.keys()]
 
-                innerKeys.forEach(byPort => {
-
+                innerKeys.forEach((byPort) => {
                     const innerP = p.get(byPort)
-                    if (!innerP) throw new Error(`${byPort} does not exist in inner grouped processes`)
+                    if (!innerP)
+                        throw new Error(`${byPort} does not exist in inner grouped processes`)
 
                     tmp_ports.push({
                         number: byPort,
@@ -55,7 +52,6 @@ export class MonitorService {
                     process: key,
                     byPort: tmp_ports
                 })
-
             })
 
             processes.sort((a, b) => {
@@ -64,16 +60,14 @@ export class MonitorService {
             })
 
             return processes
-
         } catch (error) {
             console.log(error)
             return []
         }
     }
 
-    // TODO: combine functions from this and tcp into one. 
+    // TODO: combine functions from this and tcp into one.
     async activePortsUDP() {
-
         const command = [
             'Get-NetUDPEndpoint |',
             ' select LocalAddress,LocalPort,OwningProcess,',
@@ -95,8 +89,7 @@ export class MonitorService {
             const processes: Processes = []
             const keys = [...groupedProcesses.keys()]
 
-            keys.forEach(key => {
-
+            keys.forEach((key) => {
                 const p = groupedProcesses.get(key)
                 if (!p) throw new Error(`${key} does not exist in grouped processes`)
 
@@ -104,10 +97,10 @@ export class MonitorService {
 
                 const innerKeys = [...p.keys()]
 
-                innerKeys.forEach(byPort => {
-
+                innerKeys.forEach((byPort) => {
                     const innerP = p.get(byPort)
-                    if (!innerP) throw new Error(`${byPort} does not exist in inner grouped processes`)
+                    if (!innerP)
+                        throw new Error(`${byPort} does not exist in inner grouped processes`)
 
                     tmp_ports.push({
                         number: byPort,
@@ -118,7 +111,6 @@ export class MonitorService {
                     process: key,
                     byPort: tmp_ports
                 })
-
             })
 
             processes.sort((a, b) => {
@@ -127,16 +119,9 @@ export class MonitorService {
             })
 
             return processes
-
         } catch (error) {
             console.log(error)
             return []
         }
     }
-
-
-
-
-
-
 }

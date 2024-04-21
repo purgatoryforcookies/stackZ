@@ -1,10 +1,9 @@
-import { useState } from "react"
-
+import { useState } from 'react'
 
 /**
  * Hook for walking a list infinitely with arrow, pgup/pdgown, tab keys.
  * Enter fires all the functions provided.
- * 
+ *
  * @param list Array of elements
  * @param offset Offsets the current element selected
  * @param actions Array of void functions
@@ -13,24 +12,25 @@ import { useState } from "react"
  * @returns Infinity list getter
  * @returns Normalized offset which takes into account short lists
  */
-function useListWalker<T>(list: T[], offset: number, ...actions: ((...params: any[]) => void)[]) {
-
+function useListWalker<T>(
+    list: T[],
+    offset: number,
+    ...actions: ((...params: unknown[]) => void)[]
+) {
     const [index, setIndex] = useState(0)
 
     const LIST_OFFSET = list.length > offset ? offset : 0
 
     const limit = list.length
 
-    const infiniteIndex = index + LIST_OFFSET > limit - 1
-        ? index + LIST_OFFSET - limit
-        : index + LIST_OFFSET
+    const infiniteIndex =
+        index + LIST_OFFSET > limit - 1 ? index + LIST_OFFSET - limit : index + LIST_OFFSET
 
     const infinityList = () => {
         return [...list.slice(index), ...list.slice(0, index)]
     }
 
     const update = (e: React.KeyboardEvent<HTMLInputElement>) => {
-
         switch (e.key) {
             case 'ArrowUp':
                 e.preventDefault()
@@ -50,12 +50,11 @@ function useListWalker<T>(list: T[], offset: number, ...actions: ((...params: an
                 setIndex(index >= limit - 1 ? 0 : index + 3)
                 break
             case 'Enter':
-                actions?.forEach(act => act())
+                actions?.forEach((act) => act())
                 break
             default:
                 setIndex(0)
         }
-
     }
 
     return { infiniteIndex, update, infinityList, OFFSET: LIST_OFFSET }

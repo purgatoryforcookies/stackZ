@@ -1,26 +1,23 @@
-
-import useCommandSettings from "../hooks/useCommandSettings";
-import { TerminalUIEngine } from "../service/TerminalUIEngine";
-import io from 'socket.io-client';
-import InputWithMagic from "../components/Common/InputWithMagic";
-import { render, renderHook } from '@testing-library/react';
+import useCommandSettings from '../hooks/useCommandSettings'
+import { TerminalUIEngine } from '../service/TerminalUIEngine'
+import io from 'socket.io-client'
+import InputWithMagic from '../components/Common/InputWithMagic'
+import { render, renderHook } from '@testing-library/react'
 
 jest.mock('socket.io-client', () => {
-    const emit = jest.fn();
-    const on = jest.fn();
-    const socket = { emit, on };
-    return jest.fn(() => socket);
+    const emit = jest.fn()
+    const on = jest.fn()
+    const socket = { emit, on }
+    return jest.fn(() => socket)
 })
-let socket = io('http://localhost:3123');
+const socket = io('http://localhost:3123')
 
-describe("InputWithMagic", () => {
-
-
+describe('InputWithMagic', () => {
     afterEach(() => {
-        jest.restoreAllMocks();
-    });
+        jest.restoreAllMocks()
+    })
 
-    const engine = new TerminalUIEngine("stackId", "terminalId", "http://localhost:3123")
+    const engine = new TerminalUIEngine('stackId', 'terminalId', 'http://localhost:3123')
     engine.socket = socket
     const tools = renderHook(() => useCommandSettings(engine))
 
@@ -32,10 +29,7 @@ describe("InputWithMagic", () => {
         done()
     })
 
-
-
-
-    it("should render correctly", async () => {
+    it('should render correctly', async () => {
         const { findAllByTestId } = render(
             <InputWithMagic
                 tools={tools.result.current}
@@ -45,16 +39,8 @@ describe("InputWithMagic", () => {
                 valueKey="cmd"
                 historyKey="CMD"
             />
-        );
+        )
 
         expect((await findAllByTestId('magickInput')).length).toBe(1)
-
-    });
-
-
-
+    })
 })
-
-
-
-

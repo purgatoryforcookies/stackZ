@@ -2,13 +2,16 @@
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
   "include": [
     "electron.vite.config.*",
-    "src/preload/*",
-    "src/main/**/*",
-    "src/types.ts",
+    "src/main",
+    "src/types.ts"
+  ],
+  "exclude": [
+    "src/renderer/**/*"
   ],
   "compilerOptions": {
     "composite": true,
     "isolatedModules": true,
+    "skipLibCheck": true,
     "strictPropertyInitialization": false,
     "strict": true,
     "noEmit": true,
@@ -16,6 +19,7 @@
     "types": [
       "electron-vite/node",
       "jest",
+      "./src/preload",
     ]
   }
 }

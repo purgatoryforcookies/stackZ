@@ -54,24 +54,27 @@ function App(): JSX.Element {
                                 onResize={sizeHeader}
                                 ref={headerRef}
                                 collapsible
-                                className='p-2 pb-7'
+                                className="p-2 pb-7"
                             >
-                                <Tabs defaultValue="environment" data-theme={theme} className='h-full pb-4'>
+                                <Tabs
+                                    defaultValue="environment"
+                                    data-theme={theme}
+                                    className="h-full pb-4"
+                                >
                                     <TabsList>
                                         <TabsTrigger value="environment">Environment</TabsTrigger>
                                         <TabsTrigger value="monitor">Monitor</TabsTrigger>
                                     </TabsList>
-                                    <TabsContent value="environment" className='pl-4 h-full pb-5'>
+                                    <TabsContent value="environment" className="pl-4 h-full pb-5">
                                         <p className="text-muted-foreground text-sm">
                                             Terminal specific environment variables
                                         </p>
                                         <DetailHeader stack={stack} />
                                     </TabsContent>
-                                    <TabsContent value="monitor" className='pl-4'>
+                                    <TabsContent value="monitor" className="pl-4">
                                         <Ports />
                                     </TabsContent>
                                 </Tabs>
-
                             </ResizablePanel>
                         </ResizablePanelGroup>
                     </ResizablePanel>
@@ -87,10 +90,11 @@ function App(): JSX.Element {
                         className="text-secondary-foreground"
                     >
                         <div
-                            className={`p-1 ${w < 450
-                                ? 'flex flex-col-reverse justify-center items-center gap-2'
-                                : 'grid grid-cols-3 grid-rows-1'
-                                }`}
+                            className={`p-1 ${
+                                w < 450
+                                    ? 'flex flex-col-reverse justify-center items-center gap-2'
+                                    : 'grid grid-cols-3 grid-rows-1'
+                            }`}
                         >
                             <BranchDropdown stack={stack} />
                             <span className="font-semibold text-lg text-center">Terminals</span>

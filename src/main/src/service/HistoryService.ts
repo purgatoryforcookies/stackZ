@@ -51,11 +51,10 @@ export class HistoryService {
         const all = this.history.get(key) ?? []
 
         return {
-            stackz: all.filter(o => o.toLowerCase().includes(value.toLowerCase())),
-            host: this.hostHistory.filter(o => o.toLowerCase().includes(value.toLowerCase()))
+            stackz: all.filter((o) => o.toLowerCase().includes(value.toLowerCase())),
+            host: this.hostHistory.filter((o) => o.toLowerCase().includes(value.toLowerCase()))
         }
     }
-
 
     exists(key: keyof typeof HistoryKey, value: string) {
         return this.history.get(key)?.includes(value)
@@ -82,21 +81,19 @@ export class HistoryService {
     }
 
     async loadWinHostHistory() {
-
         const command = [
-            "cat $env:USERPROFILE\\AppData",
-            "\\Roaming\\Microsoft",
-            "\\Windows\\PowerShell\\PSReadLine",
-            "\\ConsoleHost_history.txt"
+            'cat $env:USERPROFILE\\AppData',
+            '\\Roaming\\Microsoft',
+            '\\Windows\\PowerShell\\PSReadLine',
+            '\\ConsoleHost_history.txt'
         ]
 
-        const result = await executePowerShellScript(command.join(""))
+        const result = await executePowerShellScript(command.join(''))
 
         if (result) {
-            const arrayed = result.split("\n").map(i => i.replaceAll('\r', ''))
+            const arrayed = result.split('\n').map((i) => i.replaceAll('\r', ''))
             this.hostHistory = [...new Set(arrayed)]
         }
-
     }
 
     async readFromDisk(basePath: string, key: keyof typeof HistoryKey) {

@@ -103,8 +103,7 @@ export class TerminalUIEngine {
                 if (e.code === 'Enter' && (e.metaKey || e.ctrlKey)) {
                     if (!this.isRunning) {
                         window.api.startTerminal(this.stackId, this.terminalId)
-                    }
-                    else {
+                    } else {
                         window.api.stopTerminal(this.stackId, this.terminalId)
                     }
                     return false
@@ -112,8 +111,6 @@ export class TerminalUIEngine {
             }
             return true
         })
-
-
     }
 
     ping() {

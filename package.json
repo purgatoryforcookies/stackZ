@@ -1,7 +1,7 @@
 {
     "name": "stackz",
-    "version": "1.0.3",
-    "description": "Easy way to start your development environment",
+    "version": "1.0.4",
+    "description": "Way to store development environments",
     "main": "./out/main/index.js",
     "license": "GPL-3.0",
     "author": "purgatoryforcookies",
@@ -83,6 +83,7 @@
         "electron-vite": "^1.0.27",
         "eslint": "^8.47.0",
         "eslint-plugin-react": "^7.33.2",
+        "identity-obj-proxy": "^3.0.0",
         "jest": "^29.7.0",
         "jest-environment-jsdom": "^29.7.0",
         "postcss": "^8.4.33",

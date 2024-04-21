@@ -35,7 +35,6 @@ function General({ setTheme }: GeneralProps) {
         fetchStore()
     }, [open])
 
-
     const onClear = () => {
         if (deleteConfirmation) {
             baseSocket.emit('clearHistory', () => {
@@ -49,7 +48,6 @@ function General({ setTheme }: GeneralProps) {
             setDeleteConfirmation(true)
         }
     }
-
 
     return (
         <>
@@ -163,7 +161,7 @@ function General({ setTheme }: GeneralProps) {
 
             <div className="py-4">
                 <div className="flex items-center gap-4">
-                    <Label className='w-14 mr-4'>stacks.json</Label>
+                    <Label className="w-14 mr-4">stacks.json</Label>
                     <Button variant={'outline'} disabled>
                         <ArrowUpIcon className="mr-2 h-4 w-4" />
                         Export
@@ -180,7 +178,7 @@ function General({ setTheme }: GeneralProps) {
             </div>
             <div className="py-2">
                 <div className="flex items-center gap-4">
-                    <Label className='w-12 mr-4'>Clear</Label>
+                    <Label className="w-12 mr-4">Clear</Label>
                     <Button
                         variant={deleteConfirmation ? 'destructive' : 'link'}
                         onClick={onClear}
@@ -188,9 +186,13 @@ function General({ setTheme }: GeneralProps) {
                         onBlur={() => setDeleteConfirmation(false)}
                         className={`w-28 ${deleteConfirmation ? '' : 'text-secondary-foreground/50'}`}
                     >
-                        <CustomToolTip message='History service provides command completion for stack settings. Clears StackZ history, does not affect host.'>
-                            <p className='flex items-center gap-2'>
-                                {success ? 'Done.' : deleteConfirmation ? 'Really?' : 'History Service'}
+                        <CustomToolTip message="History service provides command completion for stack settings. Clears StackZ history, does not affect host.">
+                            <p className="flex items-center gap-2">
+                                {success
+                                    ? 'Done.'
+                                    : deleteConfirmation
+                                      ? 'Really?'
+                                      : 'History Service'}
                                 <GoInfo className="size-4" />
                             </p>
                         </CustomToolTip>

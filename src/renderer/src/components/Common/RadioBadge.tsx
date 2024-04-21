@@ -1,15 +1,12 @@
-import { Badge } from "@renderer/@/ui/badge"
-import { IUseStack } from "@renderer/hooks/useStack"
-import { StackStatus } from "@t"
-import { useEffect, useState } from "react"
-
+import { Badge } from '@renderer/@/ui/badge'
+import { IUseStack } from '@renderer/hooks/useStack'
+import { StackStatus } from '@t'
+import { useEffect, useState } from 'react'
 
 // Line 46 bg-transparent -> something else to get a border
 
-function RadioBadge({ stack, id }: { stack: IUseStack, id: string }) {
-
+function RadioBadge({ stack, id }: { stack: IUseStack; id: string }) {
     const [running, setRunning] = useState(false)
-
 
     useEffect(() => {
         const socket = stack.stackSocket?.get(id)
@@ -22,13 +19,11 @@ function RadioBadge({ stack, id }: { stack: IUseStack, id: string }) {
         return () => {
             socket.off('badge')
         }
-
     }, [])
 
     const isSelect = stack.selectedStack === id
 
     return (
-
         <Badge
             onClick={() => {
                 let firstTerminalId = ''
@@ -45,16 +40,15 @@ function RadioBadge({ stack, id }: { stack: IUseStack, id: string }) {
              h-[22px] p-0 flex justify-center items-center
             `}
         >
-            <span className={`${isSelect ? 'bg-primary' : running ? 'bg-gradient' : 'bg-transparent'}
+            <span
+                className={`${isSelect ? 'bg-primary' : running ? 'bg-gradient' : 'bg-transparent'}
               text-center rounded-[4px] px-2 h-[90%] w-[92%] bg-[length:_800%_800%] flex justify-center items-center
             
-            `}>
+            `}
+            >
                 {stack.stack?.get(id)?.stackName}
             </span>
-
-        </Badge >
-
-
+        </Badge>
     )
 }
 

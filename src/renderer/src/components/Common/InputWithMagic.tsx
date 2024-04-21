@@ -1,33 +1,37 @@
-import { Input } from "../../@/ui/input"
-import { Label } from "../../@/ui/label"
-import useCommandSettings from "../../hooks/useCommandSettings"
-import React, { useRef, useState } from "react"
-import { TerminalUIEngine } from "../../service/TerminalUIEngine"
-import { ScrollArea } from "../../@/ui/scroll-area"
-import useListWalker from "../../hooks/useListWalker"
-import { HistoryBook, HistoryKey } from "@t"
-
+import { Input } from '../../@/ui/input'
+import { Label } from '../../@/ui/label'
+import useCommandSettings from '../../hooks/useCommandSettings'
+import React, { useRef, useState } from 'react'
+import { TerminalUIEngine } from '../../service/TerminalUIEngine'
+import { ScrollArea } from '../../@/ui/scroll-area'
+import useListWalker from '../../hooks/useListWalker'
+import { HistoryBook, HistoryKey } from '@t'
 
 type InputWithMagicProps = {
     engine: TerminalUIEngine
-    tools: ReturnType<typeof useCommandSettings>,
-    title: string,
-    valueKey: 'healthCheck' | 'cmd' | 'cwd' | 'shell',
-    historyKey: keyof typeof HistoryKey,
+    tools: ReturnType<typeof useCommandSettings>
+    title: string
+    valueKey: 'healthCheck' | 'cmd' | 'cwd' | 'shell'
+    historyKey: keyof typeof HistoryKey
     defaultValue: string
 }
 
 const LIST_OFFSET = 2
 
-
 /**
  * Input element with search. Makes a list of search results based on input.
  * The list can be navigated with arrow, pgup, and pgdown keys.
  * Uses the HistoryService.
- * 
+ *
  */
-function InputWithMagic({ engine, tools, title, valueKey, historyKey, defaultValue }: InputWithMagicProps) {
-
+function InputWithMagic({
+    engine,
+    tools,
+    title,
+    valueKey,
+    historyKey,
+    defaultValue
+}: InputWithMagicProps) {
     const inpRef = useRef<HTMLInputElement>(null)
     const { onChange, setIsPending } = tools
 
@@ -35,7 +39,6 @@ function InputWithMagic({ engine, tools, title, valueKey, historyKey, defaultVal
     const [inputBox, setInputBox] = useState<string>(defaultValue)
 
     const handleSubmit = (e: React.FocusEvent<HTMLInputElement>) => {
-
         if (e.relatedTarget?.nodeName === 'LI') return
 
         if (inputBox !== defaultValue) {
@@ -51,28 +54,26 @@ function InputWithMagic({ engine, tools, title, valueKey, historyKey, defaultVal
         setSearchList([])
         setIsPending(true)
     }
-    const { update, infinityList, infiniteIndex, OFFSET }
-        = useListWalker(searchList, LIST_OFFSET, handleListSelect)
-
+    const { update, infinityList, infiniteIndex, OFFSET } = useListWalker(
+        searchList,
+        LIST_OFFSET,
+        handleListSelect
+    )
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
         setInputBox(e.target.value.trimStart())
-        if (e.target.value === "") {
+        if (e.target.value === '') {
             setSearchList([])
         }
         setIsPending(true)
 
-        engine.socket.emit('history', historyKey,
-            { feed: e.target.value },
-            (data: HistoryBook) => {
-                if (data.host.length === 0
-                    && data.stackz.length === 0) {
-                    setSearchList([])
-                    return
-                }
-                setSearchList(data.host.concat(data.stackz))
-            })
+        engine.socket.emit('history', historyKey, { feed: e.target.value }, (data: HistoryBook) => {
+            if (data.host.length === 0 && data.stackz.length === 0) {
+                setSearchList([])
+                return
+            }
+            setSearchList(data.host.concat(data.stackz))
+        })
     }
 
     const handleSelect = (value: string) => {
@@ -82,7 +83,7 @@ function InputWithMagic({ engine, tools, title, valueKey, historyKey, defaultVal
     }
 
     return (
-        <div className="relative" >
+        <div className="relative">
             <Label htmlFor={valueKey} className="text-right p-1">
                 {title}
             </Label>
@@ -95,25 +96,32 @@ function InputWithMagic({ engine, tools, title, valueKey, historyKey, defaultVal
                 onBlur={handleSubmit}
                 onKeyDown={update}
                 onChange={handleChange}
-                value={inputBox || ""}
+                value={inputBox || ''}
                 placeholder="curl --fail https://google.com || exit 1"
             />
-            {searchList.length > 0 ? <ul className="absolute  min-w-full max-w-[190%] p-1 rounded-sm max-h-[20rem] overflow-auto z-10" >
-                <ScrollArea test-id={'historyBook'} className="bg-foreground text-muted rounded-sm w-max">
-                    {infinityList().map((item, idx) => {
-                        return <li
-                            tabIndex={1}
-                            role="button"
-                            test-id={'historyItem'}
-                            key={idx}
-                            className={`hover:cursor-pointer hover:outline hover:outline-1 pl-1 pr-2 ${idx + infiniteIndex - OFFSET === infiniteIndex ? 'bg-primary text-primary-foreground' : ''}`}
-                            onClick={() => handleSelect(item)}
-                        >{idx - OFFSET + infiniteIndex} - {item}</li>
-                    }
-                    )}
-                </ScrollArea>
-            </ul> : null}
-
+            {searchList.length > 0 ? (
+                <ul className="absolute  min-w-full max-w-[190%] p-1 rounded-sm max-h-[20rem] overflow-auto z-10">
+                    <ScrollArea
+                        test-id={'historyBook'}
+                        className="bg-foreground text-muted rounded-sm w-max"
+                    >
+                        {infinityList().map((item, idx) => {
+                            return (
+                                <li
+                                    tabIndex={1}
+                                    role="button"
+                                    test-id={'historyItem'}
+                                    key={idx}
+                                    className={`hover:cursor-pointer hover:outline hover:outline-1 pl-1 pr-2 ${idx + infiniteIndex - OFFSET === infiniteIndex ? 'bg-primary text-primary-foreground' : ''}`}
+                                    onClick={() => handleSelect(item)}
+                                >
+                                    {idx - OFFSET + infiniteIndex} - {item}
+                                </li>
+                            )
+                        })}
+                    </ScrollArea>
+                </ul>
+            ) : null}
         </div>
     )
 }

@@ -31,7 +31,7 @@ export const stackSchema = z.array(
                             ctrlc: z.boolean().default(false).optional(),
                             delay: z.number().optional(),
                             healthCheck: z.string().optional(),
-                            halt: z.boolean().default(false).optional(),
+                            halt: z.boolean().default(false).optional()
                         })
                         .optional(),
                     command: z.object({
@@ -179,7 +179,7 @@ export type NewCommandPayload = {
 }
 
 export type MonitorPortsResponse = {
-    tcp: Processes,
+    tcp: Processes
     udp: Processes
 }
 
@@ -217,12 +217,12 @@ export type TPorts = {
 export type Processes = {
     process: string
     byPort: {
-        number: number,
+        number: number
         ports: TPorts[]
     }[]
 }[]
 
 export type HistoryBook = {
-    stackz: string[],
+    stackz: string[]
     host: string[]
 }

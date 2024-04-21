@@ -138,11 +138,13 @@ export class Terminal {
                 if (this.settings.metaSettings?.rerun) {
                     this.start()
                     if (this.scheduler) {
-                        this.sendToClient("[Warning]: Restarting halting terminal\r\n")
+                        this.sendToClient('[Warning]: Restarting halting terminal\r\n')
                     }
                 }
                 if (this.scheduler) {
-                    this.sendToClient(`[Info]: Releasing stack halt on exit. Code ${data.exitCode}\r\n`)
+                    this.sendToClient(
+                        `[Info]: Releasing stack halt on exit. Code ${data.exitCode}\r\n`
+                    )
                     this.scheduler.unhalt()
                     this.socket.emit(ClientEvents.HALTBEAT, false)
                     this.scheduler = null
@@ -167,7 +169,7 @@ export class Terminal {
     /**
      * Sets a flag for the instance to indicate
      * that this terminal is about to run, once its healthcheck
-     * and delays are done. 
+     * and delays are done.
      */
     reserve() {
         this.isAboutToRun = true
@@ -179,7 +181,6 @@ export class Terminal {
     }
     registerScheduler(sched: TerminalScheduler) {
         this.scheduler = sched
-
     }
 
     resize(dims: ITerminalDimensions) {
@@ -194,7 +195,6 @@ export class Terminal {
     }
 
     stop() {
-
         if (this.settings.metaSettings?.ctrlc) {
             this.write('\x03')
         } else {
@@ -208,13 +208,11 @@ export class Terminal {
         }
         this.ping()
         this.stackPing()
-
     }
 
     ping() {
         this.socket.emit(ClientEvents.TERMINALSTATE, this.getState())
         this.save()
-
     }
 
     getState(): Status {
@@ -297,7 +295,6 @@ export class Terminal {
     }
 
     updateCommand(value: string | null) {
-
         if (!value) return
         const newCommand = value.trim()
 
@@ -363,9 +360,8 @@ export class Terminal {
         }
         if (name === 'healthCheck' && typeof value === 'string') {
             const trimmed = value.trim()
-            if (trimmed.length > 3) this.history.store("HEALTH", trimmed)
+            if (trimmed.length > 3) this.history.store('HEALTH', trimmed)
             this.settings.metaSettings[name] = trimmed
-
         } else {
             if (typeof value === 'undefined' || value === null) {
                 delete this.settings.metaSettings[name]
@@ -414,12 +410,15 @@ export class Terminal {
             this.setMetaSettings(name, value)
             akw(this.getState())
         })
-        this.socket.on(UtilityEvents.ENVLIST, (args: { value: string, fromFile: ArrayBuffer | undefined }) => {
-            if (!args.value) return
+        this.socket.on(
+            UtilityEvents.ENVLIST,
+            (args: { value: string; fromFile: ArrayBuffer | undefined }) => {
+                if (!args.value) return
 
-            const environment = parseBufferToEnvironment(args.fromFile)
-            this.addEnvList(args.value, environment)
-        })
+                const environment = parseBufferToEnvironment(args.fromFile)
+                this.addEnvList(args.value, environment)
+            }
+        )
         this.socket.on(UtilityEvents.ENVEDIT, (args: EnvironmentEditProps) => {
             this.editVariable(args)
         })
@@ -434,22 +433,24 @@ export class Terminal {
             akw(this.getState())
         })
 
-
-        this.socket.on('history', (key: keyof typeof HistoryKey,
-            { feed, step }: { feed?: string, step?: number },
-            akw) => {
-
-            if (feed) {
-                akw(this.history.search(key, feed))
+        this.socket.on(
+            'history',
+            (
+                key: keyof typeof HistoryKey,
+                { feed, step }: { feed?: string; step?: number },
+                akw
+            ) => {
+                if (feed) {
+                    akw(this.history.search(key, feed))
+                    return
+                }
+                if (step) {
+                    akw(this.history.get(key, step))
+                    return
+                }
                 return
             }
-            if (step) {
-                akw(this.history.get(key, step))
-                return
-            }
-            return
-
-        })
+        )
         this.socket.emit('hello')
         this.stackPing()
     }

@@ -26,12 +26,12 @@ const HC_LIMIT = 240
  * Scheduler can be stopped by calling stop(). All timers will be cleared and stack startup
  * aborted.
  *
- * If healthcheck fails to compute (bad command), it will count as a failed healthcheck. 
+ * If healthcheck fails to compute (bad command), it will count as a failed healthcheck.
  * After n retries, it starts the terminal process anyways
- * 
- * For halting terminals, gives the scheduler briefly for the halting terminal instance. 
+ *
+ * For halting terminals, gives the scheduler briefly for the halting terminal instance.
  * Terminal instance then resets the scheduler state after it exits and stack
- * can continue to proceed. 
+ * can continue to proceed.
  */
 export class TerminalScheduler {
     jobs: StartJob[]
@@ -48,7 +48,6 @@ export class TerminalScheduler {
                 return -1
             })
             .forEach((term) => {
-
                 this.jobs.push({
                     t_metasettings: term.settings.metaSettings,
                     t_terminal: term,
@@ -64,23 +63,28 @@ export class TerminalScheduler {
 
     async set() {
         if (this.jobs.length === 0) return
-        this.jobs.forEach(j => j.t_terminal.reserve())
+        this.jobs.forEach((j) => j.t_terminal.reserve())
 
         for (let i = 0; i < this.jobs.length; i++) {
             const job = this.jobs[i]
-            if (!job.t_metasettings?.delay && !job.t_metasettings?.healthCheck && !job.t_metasettings?.halt) {
+            if (
+                !job.t_metasettings?.delay &&
+                !job.t_metasettings?.healthCheck &&
+                !job.t_metasettings?.halt
+            ) {
                 if (!this.haltActive) {
                     this.start(job)
                     continue
                 }
             }
 
-
             if (this.haltActive) {
                 i -= 1
-                await new Promise<void>((r) => setTimeout(() => {
-                    r()
-                }, HC_INTERVAL_MS))
+                await new Promise<void>((r) =>
+                    setTimeout(() => {
+                        r()
+                    }, HC_INTERVAL_MS)
+                )
 
                 continue
             }
@@ -97,7 +101,7 @@ export class TerminalScheduler {
                     } else {
                         this.start(job)
                     }
-                }, job.t_metasettings.delay);
+                }, job.t_metasettings.delay)
                 continue
             }
 
@@ -107,12 +111,10 @@ export class TerminalScheduler {
             }
 
             this.start(job)
-
         }
     }
 
     startHealtcheck(job: StartJob) {
-
         job.job_timer = setInterval(() => {
             job.limit -= 1
             job.t_terminal.socket.emit(ClientEvents.HEARTBEAT, job.limit)
@@ -137,13 +139,11 @@ export class TerminalScheduler {
                     this.start(job)
                     clearInterval(job.job_timer)
                 }
-
             })
         }, HC_INTERVAL_MS)
     }
 
     start(job: StartJob) {
-
         job.t_terminal.start()
         job.hasRun = true
         job.t_terminal.unReserve()
@@ -168,6 +168,5 @@ export class TerminalScheduler {
 
     unhalt() {
         this.haltActive = false
-
     }
 }
