@@ -18,7 +18,8 @@ import {
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import Draggable, { DraggableData } from 'react-draggable'
 import { IUseStack } from '@renderer/hooks/useStack'
-import CommandSettings2 from '../Common/CommandSettings2'
+import CommandSettings from '../Common/CommandSettings2'
+
 
 type CommandProps = {
     data: Exclude<Cmd, undefined>
@@ -108,7 +109,7 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                             {ping.cwd}
                         </span>
                         <span className="flex items-center gap-2">
-                            <CommandSettings2 engine={engine} />
+                            <CommandSettings engine={engine} />
                             <MoveIcon
                                 className={`h-4 w-4 moveHandle
                             ${stackRunning ? 'text-muted' : 'text-secondary-foreground hover:scale-125 hover:cursor-pointer'}`}

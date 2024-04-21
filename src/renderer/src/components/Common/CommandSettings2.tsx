@@ -15,7 +15,7 @@ export type CommandSettingsProps = {
 }
 
 
-function CommandSettings2({ engine }: CommandSettingsProps) {
+function CommandSettings({ engine }: CommandSettingsProps) {
     const theme = useContext(ThemeContext)
 
     const tools = useCommandSettings(engine)
@@ -186,4 +186,4 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
     )
 }
 
-export default CommandSettings2
+export default CommandSettings
