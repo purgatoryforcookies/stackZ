@@ -9,6 +9,7 @@ import {
     EyeNoneIcon,
     HeartIcon,
     LapTimerIcon,
+    MixIcon,
     MoveIcon,
     PlayIcon,
     ReloadIcon,
@@ -37,6 +38,7 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
         cwd: data.command.cwd
     })
     const [hcHeartBeat, setHcHeartBeat] = useState<number>()
+    const [ishalting, setIsHalting] = useState<false>(false)
 
     useEffect(() => {
         engine.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
@@ -45,6 +47,9 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
 
         engine.socket.on(ClientEvents.HEARTBEAT, (d: number) => {
             setHcHeartBeat(d)
+        })
+        engine.socket.on(ClientEvents.HALTBEAT, (d) => {
+            setIsHalting(d)
         })
         engine.socket.emit(UtilityEvents.STATE)
 
@@ -77,17 +82,13 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
             onStop={(_, d) => handleDrag(d, data, engine.stackId)}
             disabled={stackRunning}
         >
-            <div
-                className={`
-            p-1 m-2 rounded-md
-            ${selected ? 'bg-card' : ''}`}
-            >
+            <div className="p-1 m-2 rounded-lg">
                 {selected ? (
                     <div>
-                        <CornerTopRightIcon className="absolute right-0 top-0 h-5 w-5 text-primary" />
-                        <CornerBottomRightIcon className="absolute right-0 bottom-0 h-5 w-5 text-primary" />
-                        <CornerBottomLeftIcon className="absolute left-0 bottom-0 h-5 w-5 text-primary" />
-                        <CornerTopLeftIcon className="absolute left-0 top-0 h-5 w-5 text-primary" />
+                        <CornerTopRightIcon className="absolute right-0 top-0 size-6 text-primary" />
+                        <CornerBottomRightIcon className="absolute right-0 bottom-0 size-6 text-primary" />
+                        <CornerBottomLeftIcon className="absolute left-0 bottom-0 size-6 text-primary" />
+                        <CornerTopLeftIcon className="absolute left-0 top-0 size-6 text-primary" />
                     </div>
                 ) : null}
                 <div
@@ -137,27 +138,33 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
                         </div>
 
                         <span className="text-[0.7rem] text-white/30 flex gap-2 justify-end pr-10 pb-1">
+                            {ping.cmd.metaSettings?.halt ? (
+                                <MixIcon
+                                    className={`h-4 w-4 
+                                ${ishalting ? 'text-primary brightness-110' : ''}`}
+                                />
+                            ) : null}
                             {ping.cmd.metaSettings?.rerun ? (
                                 <SymbolIcon className="h-4 w-4" />
                             ) : null}
                             {ping.cmd.metaSettings?.loose ? (
                                 <EyeNoneIcon className="h-4 w-4" />
                             ) : null}
-                            {ping.cmd.health?.delay ? (
+                            {ping.cmd.metaSettings?.delay ? (
                                 <span className="flex relative">
                                     <TimerIcon
                                         className={`h-4 w-4 
                                     ${ping.reserved ? 'text-primary brightness-110' : ''}
                                     `}
                                     />
-                                    {ping.cmd.health.delay ? (
+                                    {ping.cmd.metaSettings?.delay ? (
                                         <span className="absolute left-[14.5px] bottom-2">
-                                            {ping.cmd.health.delay / 1000}
+                                            {ping.cmd.metaSettings?.delay / 1000}
                                         </span>
                                     ) : null}
                                 </span>
                             ) : null}
-                            {ping.cmd.health?.healthCheck ? (
+                            {ping.cmd.metaSettings?.healthCheck ? (
                                 <span className="flex relative">
                                     <HeartIcon
                                         className={`h-4 w-4 

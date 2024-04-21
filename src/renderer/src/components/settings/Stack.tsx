@@ -114,7 +114,7 @@ function Stack({ stack, close }: { stack: IUseStack; close: () => void }) {
                         onBlur={() => setDeleteConfirmation(false)}
                         className={`w-28 ${deleteConfirmation ? '' : 'text-secondary-foreground/50'}`}
                     >
-                        {deleteConfirmation ? 'Confirm?' : 'Delete Stack'}
+                        {deleteConfirmation ? 'Really?' : 'Delete Stack'}
                     </Button>
                     <Button variant={'default'} onClick={handleSave} className="w-28">
                         Save changes

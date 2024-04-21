@@ -1,4 +1,4 @@
-import { PlusIcon } from '@radix-ui/react-icons'
+import { Cross1Icon, FileIcon, PlusIcon } from '@radix-ui/react-icons'
 import { Button } from '@renderer/@/ui/button'
 import {
     Dialog,
@@ -12,9 +12,11 @@ import {
 import { Input } from '@renderer/@/ui/input'
 import { Label } from '@renderer/@/ui/label'
 import { ThemeContext } from '@renderer/App'
+import { useDebounce } from '@renderer/hooks/useDebounce'
+import useLocalStorage from '@renderer/hooks/useLocalStorage'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { UtilityEvents } from '@t'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 type NewEnvListProps = {
     scroll: () => void
@@ -23,22 +25,85 @@ type NewEnvListProps = {
 
 export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
     const [title, setTitle] = useState<string>('')
+    const [file, setFile] = useState<File | null>(null)
     const [open, setOpen] = useState<boolean>(false)
+    const [dragover, setDragover] = useState<boolean>(false)
 
     const theme = useContext(ThemeContext)
 
-    const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        terminal.socket.emit(UtilityEvents.ENVLIST, { value: title })
+        let buf: ArrayBuffer | null = null
+        if (file) buf = await file.arrayBuffer()
+        terminal.socket.emit(UtilityEvents.ENVLIST, { value: title, fromFile: buf })
         setTitle('')
         scroll()
         setOpen(false)
     }
 
+    const handleFileChange = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        setDragover(false)
+        const fileGrab = event.dataTransfer?.files[0]
+        console.log(fileGrab)
+        if (fileGrab) {
+            setFile(fileGrab)
+        }
+        setOpen(true)
+    }
+
+    const { read, write } = useLocalStorage()
+
+    useEffect(() => {
+        let timestamp = read('since')
+        if (!timestamp) {
+            const now = new Date().toISOString()
+            write('since', now)
+            timestamp = now
+        }
+        const today = new Date()
+        const since = new Date(timestamp)
+        if (today.getSeconds() - since.getSeconds() > 60 * 60 * 24) {
+            setDragover(true)
+            setTimeout(() => {
+                setDragover(false)
+            }, 4000)
+            write('since', new Date().toISOString())
+        }
+    }, [terminal])
+
+    const handleEnter = useDebounce(dragover, 100)
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <PlusIcon className="h-8 w-8 hover:cursor-pointer hover:text-primary text-secondary-foreground" />
+                <div
+                    onDrop={handleFileChange}
+                    onDragOver={(e) => {
+                        e.preventDefault(), setDragover(true)
+                    }}
+                    onDragLeave={() => setDragover(false)}
+                    className="size-32"
+                >
+                    <div
+                        className={`
+                     inline-block
+                    bg-[length:400%_400%] p-[1px] 
+                    ${!handleEnter ? 'bg-transparent' : 'animate-pulse bg-gradient-to-r from-[#fbfaf6cc] via-[#eeedebd3] to-gradient'}
+                    z-10 size-32 rounded-[7.5px]`}
+                    >
+                        <span
+                            className={`
+                        ${!handleEnter ? 'bg-transparent' : 'bg-gradient'}
+                        bg-[length:100%_110%]   flex rounded-[7px] px-5 py-3 font-bold text-white h-full w-full items-center justify-center`}
+                        >
+                            <PlusIcon className=" h-8 w-8 hover:cursor-pointer hover:text-primary text-secondary-foreground" />
+                            {handleEnter ? (
+                                <span className="text-secondary-foreground ">Dropzone</span>
+                            ) : null}
+                        </span>
+                    </div>
+                </div>
             </DialogTrigger>
             <DialogContent data-theme={theme}>
                 <DialogHeader>
@@ -63,10 +128,22 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
                             />
                         </div>
                     </div>
-                    <DialogFooter className="w-full">
-                        <Button type="submit" disabled={title.length === 0}>
-                            Save
-                        </Button>
+                    <DialogFooter className="relative">
+                        <div className="flex items-center">
+                            {file ? (
+                                <span className="flex gap-1 absolute left-0">
+                                    <FileIcon className="h-4 w-4" />
+                                    {file?.name}
+                                    <Cross1Icon
+                                        className="h-4 w-4 hover:cursor-pointer"
+                                        onClick={() => setFile(null)}
+                                    />
+                                </span>
+                            ) : null}
+                            <Button type="submit" disabled={title.length === 0}>
+                                Save
+                            </Button>
+                        </div>
                     </DialogFooter>
                 </form>
             </DialogContent>

@@ -165,10 +165,11 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
                 newStack.get(d.stack)!.palette = palette.filter((pal) => pal.id !== d.terminal)
 
                 const oldPalette = newStack.get(d.stack)?.palette
-                if (!oldPalette) throw new Error("No palette found")
+                if (!oldPalette) throw new Error('No palette found')
 
-                newStack.get(d.stack)!.palette = reIndexOrder(oldPalette.filter((pal) => pal.id !== d.terminal))
-
+                newStack.get(d.stack)!.palette = reIndexOrder(
+                    oldPalette.filter((pal) => pal.id !== d.terminal)
+                )
             }
             setStack(newStack)
         }

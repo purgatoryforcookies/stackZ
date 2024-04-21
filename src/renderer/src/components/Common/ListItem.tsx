@@ -36,14 +36,15 @@ export const Field = ({
     onChange,
     variant,
     placeholder,
-    minimized,
+    minimized
 }: FieldProps) => {
     const style = `rounded-full py-1
-    ${variant === 'primary'
-            ? `px-3 text-secondary-foreground bg-transparent ${minimized ? 'truncate' : ''}`
-            : `px-3  truncate text-secondary bg-primary
+    ${
+        variant === 'primary'
+            ? `px-3 text-secondary-foreground bg-transparent bg-[length:_150%_50%] ${minimized ? 'truncate' : ''}`
+            : `px-3  truncate text-primary-secondary bg-primary
             }`
-        }`
+    }`
 
     if (disabled) return <p className={style}>{value}</p>
 
@@ -52,7 +53,7 @@ export const Field = ({
             type="text"
             className={`${style} h-9 w-[20rem] ${variant === 'primary' ? 'pl-8' : ''}`}
             onChange={(e) => onChange(e.target.value)}
-            defaultValue={value}
+            defaultValue={value || ''}
             placeholder={placeholder}
             autoFocus={variant === 'primary' && !value}
         />
@@ -77,7 +78,7 @@ const Record = ({
     newRecord,
     orderId,
     minimized,
-    muted,
+    muted
 }: RecordProps) => {
     const [newRecordOpen, setNewRecordOpen] = useState(false)
     const [keyValue, setKeyValue] = useState<string | undefined>(keyv)
@@ -121,7 +122,7 @@ const Record = ({
             {editMode && !newRecordOpen && !newRecord ? (
                 <Cross1Icon
                     onClick={handleDelete}
-                    className="absolute left-3 top-2 w-4 h-4 hover:text-red-600 hover:cursor-pointer hover:scale-110"
+                    className="absolute left-[13px] top-[9px] w-4 h-4 hover:text-red-600 hover:cursor-pointer hover:scale-110"
                 />
             ) : null}
             {newRecord && !newRecordOpen ? (

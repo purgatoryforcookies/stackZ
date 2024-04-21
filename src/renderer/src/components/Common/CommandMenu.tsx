@@ -118,6 +118,14 @@ export function CommandMenu({ stack, toggle }: CommandMenuProps) {
                         Hide/show palette
                         <CommandShortcut>Alt+Z</CommandShortcut>
                     </CommandItem>
+                    <CommandItem
+                        onSelect={() =>
+                            window.api.startTerminal(stack.selectedStack, stack.selectedTerminal)
+                        }
+                    >
+                        Start selected terminal
+                        <CommandShortcut>CTRL+ENTER</CommandShortcut>
+                    </CommandItem>
                 </CommandGroup>
                 <Separator />
                 <Separator />

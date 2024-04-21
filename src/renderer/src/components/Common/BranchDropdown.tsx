@@ -51,7 +51,6 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
         // For UX reasons
         setTimeout(() => {
             socket.emit(GitEvents.SWITCHBRANCH, branch, (errors: string[]) => {
-                console.log(errors)
                 if (errors.length > 0) setErrors(errors)
                 else setSelected(branch)
                 setLoading(false)
@@ -94,7 +93,11 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
                     <SelectGroup>
                         {!loading && options
                             ? options.map((option) => (
-                                  <SelectItem key={option} value={option}>
+                                  <SelectItem
+                                      key={option}
+                                      value={option}
+                                      disabled={errors?.length ? true : false}
+                                  >
                                       {option}
                                   </SelectItem>
                               ))

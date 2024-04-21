@@ -1,9 +1,7 @@
-import { Badge } from "@renderer/@/ui/badge"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@renderer/@/ui/hover-card"
-import PortCard from "./PortCard"
-import { Processes } from "@t"
-
-
+import { Badge } from '@renderer/@/ui/badge'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@renderer/@/ui/hover-card'
+import PortCard from './PortCard'
+import { Processes } from '@t'
 
 type PortStripProps = {
     name: string
@@ -11,15 +9,17 @@ type PortStripProps = {
     color: string
 }
 function PortStrip({ name, ports, color }: PortStripProps) {
-
     return (
         <div className="px-3 flex flex-col gap-1 justify-center items-center w-fit">
-            <h1 className="text-secondary-foreground" >{name}</h1>
+            <h1 className="text-secondary-foreground">{name}</h1>
             <div className="flex gap-2">
                 {ports.map((port) => (
-                    <HoverCard key={port.number} openDelay={0.2} closeDelay={0.3}>
+                    <HoverCard key={port.number}>
                         <HoverCardTrigger>
-                            <Badge className='text-sm border-full' style={{ backgroundColor: color }}>
+                            <Badge
+                                className="text-sm border-full text-[#0c0a0b]"
+                                style={{ backgroundColor: color }}
+                            >
                                 {port.number}
                             </Badge>
                         </HoverCardTrigger>

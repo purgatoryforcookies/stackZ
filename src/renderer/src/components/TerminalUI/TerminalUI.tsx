@@ -47,7 +47,7 @@ function TerminalUI({ engine }: TerminalUIProps) {
                 <Input
                     type="text"
                     className={`text-white truncate transition-width duration-500 ease-in-out backdrop-blur-lg ${!searchOpen ? 'w-[1.8rem]' : 'w-[20rem]'}`}
-                    placeholder={searchOpen ? "Highlight..." : ''}
+                    placeholder={searchOpen ? 'Highlight...' : ''}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     onBlur={() => {

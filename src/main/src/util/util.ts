@@ -1,6 +1,7 @@
 import { readFile, writeFileSync, existsSync } from 'fs'
 import { Environment, TPorts } from '../../../types'
 import { ZodTypeAny, z } from 'zod'
+import { exec } from 'child_process'
 
 export const readJsonFile = <T extends z.ZodTypeAny>(
     path: string,
@@ -30,6 +31,30 @@ const createJsonFileTemplate = (path: string, schema: ZodTypeAny) => {
     writeFileSync(path, JSON.stringify(template))
 }
 
+export const parseBufferToEnvironment = (buf?: ArrayBuffer) => {
+    if (!buf) return {}
+    const enc = new TextDecoder('utf-8')
+    const decoded = enc.decode(buf).split('\n')
+
+    const envir = {}
+
+    decoded.forEach((row) => {
+        if (!row) return
+        try {
+            if (row.startsWith('#')) return
+            if (row.length < 2) return
+            const [key, value] = row.split('=')
+            const betterValue = value.replace(/["]+/g, '').trim()
+            envir[key.trim()] = betterValue
+        } catch {
+            // swallow
+        }
+    })
+
+    return envir
+}
+
+parseBufferToEnvironment()
 
 /**
  * Factory sorts envs into order and adds host environments
@@ -80,13 +105,12 @@ export const resolveDefaultCwd = () => {
     return '~'
 }
 
-export const parsePowershellTCPMessage = (message: string) => {
-
+export const parsePSTCPMessage = (message: string) => {
     const linesInArray = message.split('\n').slice(3)
     const groupedLines2 = new Map<string, Map<number, TPorts[]>>()
 
-    linesInArray.forEach(item => {
-        const trimmed = trimShellTable(item)
+    linesInArray.forEach((item) => {
+        const trimmed = trimShellTableRow(item)
         if (!trimmed) return
 
         const obj = {
@@ -99,7 +123,6 @@ export const parsePowershellTCPMessage = (message: string) => {
             process: trimmed[6],
             protocol: 'TCP'
         }
-
 
         if (!groupedLines2.has(obj.process)) {
             groupedLines2.set(obj.process, new Map())
@@ -114,8 +137,58 @@ export const parsePowershellTCPMessage = (message: string) => {
     return groupedLines2
 }
 
-const trimShellTable = (row: string) => {
-    if (row.length < 10) return
-    return row.split(' ').filter(i => i.length > 0 && i !== '\r')
+//TODO: this and tcp one can be made into one.
+export const parsePSUDPMessage = (message: string) => {
+    const linesInArray = message.split('\n').slice(3)
 
+    const groupedLines2 = new Map<string, Map<number, TPorts[]>>()
+
+    linesInArray.forEach((item) => {
+        const trimmed = trimShellTableRow(item)
+        if (!trimmed) return
+
+        const obj: TPorts = {
+            localAddress: trimmed[0],
+            localPort: Number(trimmed[1]),
+            remoteAddress: null,
+            remotePort: null,
+            state: null,
+            pid: Number(trimmed[2]),
+            process: trimmed[3],
+            protocol: 'UDP'
+        }
+
+        if (!groupedLines2.has(obj.process)) {
+            groupedLines2.set(obj.process, new Map())
+        }
+        if (!groupedLines2.get(obj.process)?.has(obj.localPort)) {
+            groupedLines2.get(obj.process)?.set(obj.localPort, [])
+        }
+
+        groupedLines2.get(obj.process)?.get(obj.localPort)?.push(obj)
+    })
+    return groupedLines2
+}
+
+const trimShellTableRow = (row: string) => {
+    if (row.length < 10) return
+    return row.split(' ').filter((i) => i.length > 0 && i !== '\r')
+}
+
+export const executePowerShellScript = async (script: string) => {
+    try {
+        const data: string = await new Promise((res, rej) => {
+            exec(script, { shell: 'powershell.exe' }, (err, stdout) => {
+                if (err) {
+                    rej(err)
+                }
+                res(stdout)
+            })
+        })
+
+        return data
+    } catch (error) {
+        console.log(error)
+        return ''
+    }
 }

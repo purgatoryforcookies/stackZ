@@ -78,8 +78,23 @@ export class Stack {
                     palette.initTerminal(client, String(remoteTerminalID))
                 }
             } else {
+                console.log(`General client connected ${client.id}`)
+                client.on('clearHistory', (akw) => {
+                    console.log('Clearing history service')
+                    this.history.reboot()
+                    akw()
+                })
+
                 client.on('m_ports', async (akw) => {
-                    akw(await this.monitor.activePortsTCP())
+                    await Promise.all([
+                        this.monitor.activePortsTCP(),
+                        this.monitor.activePortsUDP()
+                    ]).then((results) => {
+                        akw({
+                            tcp: results[0],
+                            udp: results[1]
+                        })
+                    })
                 })
             }
         })
@@ -165,21 +180,24 @@ export class Stack {
         return
     }
 
+    /**
+     * Save takes a deepcopy of the stack and filters out any
+     * OS Environments from the commands.
+     *
+     * The OS Envs get repopulated at each save thus making them not persistent
+     * (which is a good thing)
+     *
+     */
     save = (onExport = false) => {
-        const toModify: PaletteStack[] = onExport ? JSON.parse(JSON.stringify(this.raw)) : this.raw
-
-        toModify.forEach((palette) => {
-            const p = this.palettes.get(palette.id)
-            if (p) {
-                palette = p.settings
-            }
-            if (p?.settings.env && onExport) {
-                // TODO omit os envs on export and not on save
-            }
+        const toBeSaved: PaletteStack[] = JSON.parse(JSON.stringify(this.raw))
+        toBeSaved.forEach((stack) => {
+            stack.palette?.forEach((pal) => {
+                pal.command.env = pal.command.env?.filter((o) => o.order > 0)
+            })
         })
 
         const filename = onExport ? 'commands_exported.json' : this.path
 
-        this.store.save(filename, this.raw)
+        this.store.save(filename, toBeSaved)
     }
 }

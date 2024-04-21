@@ -5,6 +5,8 @@ import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
 import { UtilityEvents } from '@t'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
+import { CustomToolTip } from './CustomTooltip'
+import { GoInfo } from 'react-icons/go'
 
 type EnvListProps = {
     data: {
@@ -20,7 +22,6 @@ function EnvList({ data, terminal }: EnvListProps) {
     const [minimized, setMinimized] = useState<boolean>(data.order === 0 ? true : false)
     const [hidden, setHidden] = useState<boolean>(data.order === 0 ? true : false)
     const [editMode, setEditMode] = useState<boolean>(false)
-
 
     const handleMute = () => {
         terminal.socket.emit(UtilityEvents.ENVMUTE, {
@@ -54,7 +55,16 @@ function EnvList({ data, terminal }: EnvListProps) {
         ${editMode ? 'max-w-[100%]' : ''}
         `}
         >
-            <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
+            {data.order === 0 ? (
+                <CustomToolTip message="This environment is editable, but not persistent for the long run">
+                    <h1 className="text-center text-foreground text-nowrap flex items-center gap-1">
+                        {data.title} <GoInfo className="w-4 h-4 text-white/50" />
+                    </h1>
+                </CustomToolTip>
+            ) : (
+                <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
+            )}
+
             <Separator className="my-2" />
             <div className="flex gap-1 justify-center mb-2">
                 <Badge
@@ -113,18 +123,18 @@ function EnvList({ data, terminal }: EnvListProps) {
                 >
                     {data.pairs
                         ? Object.keys(data.pairs).map((key: string) => (
-                            <Record
-                                key={key} //react component key
-                                newRecord={false}
-                                editMode={editMode}
-                                terminal={terminal}
-                                orderId={data.order}
-                                minimized={minimized}
-                                keyv={key}
-                                muted={data.disabled.includes(key)}
-                                value={data.pairs[key]}
-                            />
-                        ))
+                              <Record
+                                  key={key} //react component key
+                                  newRecord={false}
+                                  editMode={editMode}
+                                  terminal={terminal}
+                                  orderId={data.order}
+                                  minimized={minimized}
+                                  keyv={key}
+                                  muted={data.disabled.includes(key)}
+                                  value={data.pairs[key]}
+                              />
+                          ))
                         : null}
                     {editMode ? (
                         <Record

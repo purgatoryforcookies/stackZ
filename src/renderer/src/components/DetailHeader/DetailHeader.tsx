@@ -23,7 +23,6 @@ function DetailHeader({ stack }: DetailHeaderProps) {
         if (status && status.stackId !== stack.selectedStack) setStatus(null)
     }, [stack])
 
-
     const scroll = () => {
         setTimeout(() => {
             bodyRef.current!.scroll({ left: bodyRef.current!.scrollWidth, behavior: 'smooth' })
@@ -36,13 +35,11 @@ function DetailHeader({ stack }: DetailHeaderProps) {
     return (
         <div className="flex gap-8 pb-16 pr-10 h-full" ref={bodyRef}>
             {status?.cmd.command.env
-                ? status.cmd.command.env.map((record) => (
-                    <EnvList
-                        data={record}
-                        key={record.title}
-                        terminal={terminal}
-                    />
-                ))
+                ? status.cmd.command.env
+                      .sort((a, b) => a.order - b.order)
+                      .map((record) => (
+                          <EnvList data={record} key={record.title} terminal={terminal} />
+                      ))
                 : null}
             <div className="p-11">
                 <NewEnvList scroll={scroll} terminal={terminal} />

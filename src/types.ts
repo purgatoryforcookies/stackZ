@@ -27,13 +27,11 @@ export const stackSchema = z.array(
                     metaSettings: z
                         .object({
                             loose: z.boolean().default(false).optional(),
-                            rerun: z.boolean().default(false).optional()
-                        })
-                        .optional(),
-                    health: z
-                        .object({
+                            rerun: z.boolean().default(false).optional(),
+                            ctrlc: z.boolean().default(false).optional(),
                             delay: z.number().optional(),
-                            healthCheck: z.string().optional()
+                            healthCheck: z.string().optional(),
+                            halt: z.boolean().default(false).optional()
                         })
                         .optional(),
                     command: z.object({
@@ -87,6 +85,7 @@ export enum UtilityEvents {
     CWD = 'changeCwd',
     CMD = 'changeCommand',
     SHELL = 'changeShell',
+    TITLE = 'title',
     INPUT = 'input',
     RESIZE = 'resize',
     REORDER = 'reOrder'
@@ -96,7 +95,8 @@ export enum ClientEvents {
     DELTERMINAL = 'terminalDelete',
     STACKSTATE = 'stackState',
     TERMINALSTATE = 'terminalState',
-    HEARTBEAT = 'heartbeat'
+    HEARTBEAT = 'heartbeat',
+    HALTBEAT = 'haltbeat'
 }
 
 export enum GitEvents {
@@ -160,7 +160,8 @@ export enum Panels {
 export enum HistoryKey {
     CWD,
     CMD,
-    SHELL
+    SHELL,
+    HEALTH
 }
 
 export type MkdirError = {
@@ -175,6 +176,11 @@ export type NewCommandPayload = {
     command?: string
     shell?: string
     cwd?: string
+}
+
+export type MonitorPortsResponse = {
+    tcp: Processes
+    udp: Processes
 }
 
 export type StoreType = {
@@ -200,18 +206,23 @@ type PickStartsWith<T extends object, S extends string> = {
 export type TPorts = {
     process: string
     pid: number
-    state: string
+    state: string | null
     localPort: number
-    protocol: string
-    remotePort: number
     localAddress: string
-    remoteAddress: string
+    protocol: string
+    remotePort: number | null
+    remoteAddress: string | null
 }
 
 export type Processes = {
     process: string
     byPort: {
-        number: number,
+        number: number
         ports: TPorts[]
     }[]
 }[]
+
+export type HistoryBook = {
+    stackz: string[]
+    host: string[]
+}
