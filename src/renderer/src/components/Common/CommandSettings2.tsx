@@ -19,7 +19,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
     const theme = useContext(ThemeContext)
 
     const tools = useCommandSettings(engine)
-    const { settings, onMetaChange, onChange, isLoading, isPending, setIsPending } = tools
+    const { settings, onChange, isLoading, isPending, setIsPending } = tools
 
     return (
         <Sheet>
@@ -38,30 +38,20 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
 
                 <div>
                     <h2 className="text-white/50 m-1 mb-3">General</h2>
-                    <Label htmlFor="cwd" className="text-right p-1">
-                        Cwd
-                    </Label>
-                    <Input
-                        id="cwd"
-                        tabIndex={1}
-                        name="cwd"
-                        className="col-span-3"
-                        defaultValue={settings?.cwd}
-                        onChange={() => setIsPending(true)}
-                        onBlur={(e) => onChange('cwd', e.target.value)}
-                    />
-                    <Label htmlFor="command" className="text-right p-1">
-                        Command
-                    </Label>
-                    <Input
-                        id="command"
-                        tabIndex={2}
-                        name="command"
-                        className="col-span-3"
-                        defaultValue={settings?.cmd.command.cmd}
-                        onChange={() => setIsPending(true)}
-                        onBlur={(e) => onChange('cmd', e.target.value)}
-                    />
+
+                    <InputWithMagic engine={engine}
+                        tools={tools}
+                        title="Cwd"
+                        defaultValue={settings?.cmd.command.cwd || ""}
+                        valueKey='cwd'
+                        historyKey="CWD" />
+
+                    <InputWithMagic engine={engine}
+                        tools={tools}
+                        title="Command"
+                        defaultValue={settings?.cmd.command.cmd || ""}
+                        valueKey='cmd'
+                        historyKey="CMD" />
                     <div className="flex justify-between gap-3">
                         <div>
                             <Label htmlFor="shell" className="text-right p-1">
@@ -70,7 +60,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                             <Input
                                 id="shell"
                                 name="shell"
-                                defaultValue={settings?.cmd.command.shell}
+                                defaultValue={settings?.cmd.command.shell || ""}
                                 onChange={() => setIsPending(true)}
                                 onBlur={(e) => onChange('shell', e.target.value)}
                             />
@@ -82,7 +72,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                             <Input
                                 id="notes"
                                 name="title"
-                                defaultValue={settings?.cmd.title}
+                                defaultValue={settings?.cmd.title || ""}
                                 onChange={() => setIsPending(true)}
                                 onBlur={(e) => onChange('title', e.target.value)}
                             />
@@ -106,19 +96,19 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                                 name="delay"
                                 min={0}
                                 step={1}
-                                value={settings?.cmd.metaSettings?.delay ? settings?.cmd.metaSettings?.delay / 1000 : undefined}
-                                onChange={(e) => onMetaChange({
-                                    target: {
-                                        name: 'delay',
-                                        value: Number(e.target.value) * 1000
-                                    }
-                                })}
+                                value={settings?.cmd.metaSettings?.delay ? settings?.cmd.metaSettings?.delay / 1000 : ""}
+                                onChange={(e) => onChange('delay', Number(e.target.value) * 1000)}
                                 placeholder="seconds"
                             />
                         </div>
                         <div className="w-full">
 
-                            <InputWithMagic engine={engine} tools={tools} />
+                            <InputWithMagic engine={engine}
+                                tools={tools}
+                                title="Healthcheck"
+                                defaultValue={settings?.cmd.metaSettings?.healthCheck || ""}
+                                valueKey='healthCheck'
+                                historyKey="HEALTH" />
 
                         </div>
                     </div>
@@ -129,12 +119,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
 
                         <Checkbox
                             checked={settings?.cmd.metaSettings?.halt || false}
-                            onCheckedChange={(e) => onMetaChange({
-                                target: {
-                                    name: 'halt',
-                                    value: e
-                                }
-                            })}
+                            onCheckedChange={(e) => onChange('halt', e)}
 
                         />
                         <Label htmlFor="halt" className="flex items-center gap-2">
@@ -155,12 +140,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                     <div className="flex items-center space-x-2">
                         <Checkbox
                             checked={settings?.cmd.metaSettings?.loose || false}
-                            onCheckedChange={(e) => onMetaChange({
-                                target: {
-                                    name: 'loose',
-                                    value: e
-                                }
-                            })}
+                            onCheckedChange={(e) => onChange('loose', e)}
                         />
                         <Label htmlFor="loose" className="flex items-center gap-2">
                             Loose terminal
@@ -170,12 +150,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                         </Label>
                         <Checkbox
                             checked={settings?.cmd.metaSettings?.rerun || false}
-                            onCheckedChange={(e) => onMetaChange({
-                                target: {
-                                    name: 'rerun',
-                                    value: e
-                                }
-                            })}
+                            onCheckedChange={(e) => onChange('rerun', e)}
                         />
                         <Label htmlFor="rerun" className="flex items-center gap-2">
                             Rerun on exit
@@ -185,12 +160,7 @@ function CommandSettings2({ engine }: CommandSettingsProps) {
                         </Label>
                         <Checkbox
                             checked={settings?.cmd.metaSettings?.ctrlc || false}
-                            onCheckedChange={(e) => onMetaChange({
-                                target: {
-                                    name: 'ctrlc',
-                                    value: e
-                                }
-                            })}
+                            onCheckedChange={(e) => onChange('ctrlc', e)}
                         />
                         <Label htmlFor="ctrlc" className="flex items-center gap-2">
                             Send CTRL-C on exit

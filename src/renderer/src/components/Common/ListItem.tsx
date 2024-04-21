@@ -52,7 +52,7 @@ export const Field = ({
             type="text"
             className={`${style} h-9 w-[20rem] ${variant === 'primary' ? 'pl-8' : ''}`}
             onChange={(e) => onChange(e.target.value)}
-            defaultValue={value}
+            defaultValue={value || ""}
             placeholder={placeholder}
             autoFocus={variant === 'primary' && !value}
         />

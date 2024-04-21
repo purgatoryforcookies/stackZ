@@ -1,62 +1,69 @@
 import { Input } from "@renderer/@/ui/input"
 import { Label } from "@renderer/@/ui/label"
 import useCommandSettings from "@renderer/hooks/useCommandSettings"
-import React, { useEffect, useRef, useState } from "react"
-import { useClickWatcher } from "@renderer/hooks/useClickWatcher"
-import useListWalker from "@renderer/hooks/useListWalker"
+import React, { useRef, useState } from "react"
 import { TerminalUIEngine } from "@renderer/service/TerminalUIEngine"
+import { ScrollArea } from "@renderer/@/ui/scroll-area"
+import useListWalker from "@renderer/hooks/useListWalker"
+import { HistoryKey } from "@t"
 
 
 type InputWithMagicProps = {
     engine: TerminalUIEngine
-    tools: ReturnType<typeof useCommandSettings>
+    tools: ReturnType<typeof useCommandSettings>,
+    title: string,
+    valueKey: 'healthCheck' | 'cmd' | 'cwd' | 'shell',
+    historyKey: keyof typeof HistoryKey,
+    defaultValue: string
 }
+
+const LIST_OFFSET = 2
 
 
 /**
- * Input element with search. Makes a list of search results.
+ * Input element with search. Makes a list of search results based on input.
+ * The list can be navigated with arrow, pgup, and pgdown keys.
+ * Uses the HistoryService.
+ * 
  */
-function InputWithMagic({ engine, tools }: InputWithMagicProps) {
+function InputWithMagic({ engine, tools, title, valueKey, historyKey, defaultValue }: InputWithMagicProps) {
 
     const inpRef = useRef<HTMLInputElement>(null)
-    const { settings, onMetaChange, setIsPending } = tools
+    const { onChange, setIsPending } = tools
 
     const [searchList, setSearchList] = useState<string[]>([])
-    const [inputBox, setInputBox] = useState<string>('')
+    const [inputBox, setInputBox] = useState<string>(defaultValue)
 
+    const handleSubmit = (e: React.FocusEvent<HTMLInputElement>) => {
 
-    const handleSubmit = () => {
-        if (inputBox !== settings?.cmd.metaSettings?.healthCheck && inputBox) {
-            onMetaChange({ target: { name: 'healthCheck', value: inputBox } })
+        if (e.relatedTarget?.nodeName === 'LI') return
+
+        if (inputBox !== defaultValue) {
+            onChange(valueKey, inputBox)
         } else {
             setIsPending(false)
         }
-
         setSearchList([])
     }
-    useClickWatcher(inpRef, handleSubmit)
-
 
     const handleListSelect = () => {
-        if (searchList[index] === undefined) return
-        setInputBox(searchList[index])
+        setInputBox(searchList[infiniteIndex])
         setSearchList([])
         setIsPending(true)
     }
-    const { index } = useListWalker(handleListSelect)
-
+    const { update, infinityList, infiniteIndex, OFFSET }
+        = useListWalker(searchList, LIST_OFFSET, handleListSelect)
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-        setInputBox(e.target.value)
+        setInputBox(e.target.value.trimStart())
         if (e.target.value === "") {
             setSearchList([])
-            onMetaChange({ target: { name: 'healthCheck', value: "" } })
         }
         setIsPending(true)
 
-        engine.socket.emit('history', 'HEALTH',
+        engine.socket.emit('history', historyKey,
             { feed: e.target.value },
             (data: string[]) => {
                 if (!data || data.length === 0) {
@@ -64,17 +71,8 @@ function InputWithMagic({ engine, tools }: InputWithMagicProps) {
                     return
                 }
                 setSearchList(data)
-
             })
     }
-
-    useEffect(() => {
-        setSearchList([])
-    }, [settings])
-
-    useEffect(() => {
-        setInputBox(settings?.cmd.metaSettings?.healthCheck || '')
-    }, [])
 
     const handleSelect = (value: string) => {
         setInputBox(value)
@@ -84,27 +82,35 @@ function InputWithMagic({ engine, tools }: InputWithMagicProps) {
 
     return (
         <div className="relative" >
-            <Label htmlFor="healthcheck" className="text-right p-1">
-                Healthcheck
+            <Label htmlFor={valueKey} className="text-right p-1">
+                {title}
             </Label>
             <Input
-                id="healthcheck"
+                id={valueKey}
                 ref={inpRef}
                 className="w-full"
-                name="healthCheck"
-                value={inputBox}
-                placeholder="curl --fail https://google.com || exit 1"
+                name={valueKey}
+                onBlur={handleSubmit}
+                onKeyDown={update}
                 onChange={handleChange}
+                value={inputBox || ""}
+                placeholder="curl --fail https://google.com || exit 1"
             />
-            {searchList.length > 0 ? <ul className="absolute bg-primary w-full p-1 rounded-sm" >
-                {searchList.map((item, idx) => (
-                    <li
-                        key={idx}
-                        className={`hover:cursor-pointer hover:bg-card pl-1 ${idx === index ? 'bg-primary text-background' : ''}`}
-                        onClick={() => handleSelect(item)}
-                    >{item}</li>
-                ))}
+            {searchList.length > 0 ? <ul className="absolute w-full p-1 rounded-sm max-h-[20rem] overflow-auto z-10" >
+                <ScrollArea className="bg-foreground text-muted rounded-sm">
+                    {infinityList().map((item, idx) => {
+                        return <li
+                            tabIndex={1}
+                            role="button"
+                            key={idx}
+                            className={`hover:cursor-pointer hover:outline hover:outline-1 pl-1 ${idx + infiniteIndex - OFFSET === infiniteIndex ? 'bg-primary text-primary-foreground' : ''}`}
+                            onClick={() => handleSelect(item)}
+                        >{idx - OFFSET + infiniteIndex} - {item}</li>
+                    }
+                    )}
+                </ScrollArea>
             </ul> : null}
+
         </div>
     )
 }

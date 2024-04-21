@@ -15,22 +15,24 @@ export const useClickWatcher = (ref: React.RefObject<HTMLDivElement>,
     }
 
     useEffect(() => {
+
         const handleClickOutside = (event: any) => {
 
             if (ref.current && !ref.current.contains(event.target as HTMLDivElement)) {
-                if (document.activeElement !== ref.current)
+                if (document.activeElement !== ref.current) {
                     states.forEach(func => {
                         func()
                     })
+                }
             }
         };
 
-        document.addEventListener('click', handleClickOutside, false);
+        document.addEventListener('click', handleClickOutside, true);
         return () => {
-            document.removeEventListener('click', handleClickOutside, false);
+            document.removeEventListener('click', handleClickOutside, true);
         };
 
-    }, [ref, states]);
+    }, [ref]);
 
     return { dispatcher } as const
 }

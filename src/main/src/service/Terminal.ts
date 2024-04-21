@@ -286,11 +286,13 @@ export class Terminal {
 
     updateCwd(value: string) {
         if (!this.history.exists('CWD', value)) {
-            this.history.store('CWD', 'cd ' + this.settings.command.cwd)
+            if (this.settings.command.cwd) {
+                this.history.store('CWD', this.settings.command.cwd)
+            }
         }
         const newPath = path.normalize(value.trim())
         this.settings.command.cwd = newPath
-        this.history.store('CWD', 'cd ' + newPath)
+        this.history.store('CWD', newPath)
         this.ping()
     }
 

@@ -137,7 +137,7 @@ function CommandSettings({ expanded, engine, data }: CommandSettingsProps) {
                                         disabled={data.reserved || data.isRunning}
                                         autoComplete="off"
                                         placeholder="curl --fail https://google.com || exit 1"
-                                        defaultValue={health?.healthCheck}
+                                        defaultValue={health?.healthCheck || ""}
                                         onChange={(e) =>
                                             handleHealthSettings(e.target.name, e.target.value)
                                         }
