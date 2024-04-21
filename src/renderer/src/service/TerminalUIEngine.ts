@@ -72,7 +72,7 @@ export class TerminalUIEngine {
         return this
     }
 
-    async startListening() {
+    startListening() {
         this.socket = io(this.host, {
             query: { stack: this.stackId, id: this.terminalId }
         })

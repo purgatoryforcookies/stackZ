@@ -8,6 +8,9 @@ import { RadioGroup, RadioGroupItem } from '@renderer/@/ui/radio-group'
 import { useContext, useEffect, useState } from 'react'
 import { ThemeContext } from '@renderer/App'
 import { StoreType } from '@t'
+import { baseSocket } from '@renderer/service/socket'
+import { CustomToolTip } from '../Common/CustomTooltip'
+import { GoInfo } from 'react-icons/go'
 
 type GeneralProps = {
     setTheme: (name: string) => void
@@ -18,6 +21,8 @@ function General({ setTheme }: GeneralProps) {
 
     const [defShell, setDefShell] = useState<string>()
     const [defCwd, setDefCwd] = useState<string>()
+    const [deleteConfirmation, setDeleteConfirmation] = useState(false)
+    const [success, setSuccess] = useState(false)
 
     useEffect(() => {
         const fetchStore = async () => {
@@ -29,6 +34,22 @@ function General({ setTheme }: GeneralProps) {
         }
         fetchStore()
     }, [open])
+
+
+    const onClear = () => {
+        if (deleteConfirmation) {
+            baseSocket.emit('clearHistory', () => {
+                setSuccess(true)
+                setTimeout(() => {
+                    setSuccess(false)
+                    setDeleteConfirmation(false)
+                }, 2000)
+            })
+        } else {
+            setDeleteConfirmation(true)
+        }
+    }
+
 
     return (
         <>
@@ -140,9 +161,9 @@ function General({ setTheme }: GeneralProps) {
                 </div>
             </div>
 
-            <div className="py-8">
+            <div className="py-4">
                 <div className="flex items-center gap-4">
-                    <Label>stacks.json</Label>
+                    <Label className='w-14 mr-4'>stacks.json</Label>
                     <Button variant={'outline'} disabled>
                         <ArrowUpIcon className="mr-2 h-4 w-4" />
                         Export
@@ -154,6 +175,25 @@ function General({ setTheme }: GeneralProps) {
                     <Button variant={'outline'} onClick={window.store.openFileLocation}>
                         <FileTextIcon className="mr-2 h-4 w-4" />
                         Open
+                    </Button>
+                </div>
+            </div>
+            <div className="py-2">
+                <div className="flex items-center gap-4">
+                    <Label className='w-12 mr-4'>Clear</Label>
+                    <Button
+                        variant={deleteConfirmation ? 'destructive' : 'link'}
+                        onClick={onClear}
+                        tabIndex={-1}
+                        onBlur={() => setDeleteConfirmation(false)}
+                        className={`w-28 ${deleteConfirmation ? '' : 'text-secondary-foreground/50'}`}
+                    >
+                        <CustomToolTip message='History service provides command completion for stack settings. Clears StackZ history, does not affect host.'>
+                            <p className='flex items-center gap-2'>
+                                {success ? 'Done.' : deleteConfirmation ? 'Really?' : 'History Service'}
+                                <GoInfo className="size-4" />
+                            </p>
+                        </CustomToolTip>
                     </Button>
                 </div>
             </div>

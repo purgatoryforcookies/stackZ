@@ -79,6 +79,12 @@ export class Stack {
                 }
             } else {
                 console.log(`General client connected ${client.id}`)
+                client.on('clearHistory', (akw) => {
+                    console.log("Clearing history service")
+                    this.history.reboot()
+                    akw()
+                })
+
                 client.on('m_ports', async (akw) => {
                     await Promise.all([
                         this.monitor.activePortsTCP(),

@@ -82,17 +82,13 @@ function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: 
             onStop={(_, d) => handleDrag(d, data, engine.stackId)}
             disabled={stackRunning}
         >
-            <div
-                className={`
-            p-1 m-2 rounded-md
-            ${selected ? 'bg-card' : ''}`}
-            >
+            <div className='p-1 m-2 rounded-lg' >
                 {selected ? (
                     <div>
-                        <CornerTopRightIcon className="absolute right-0 top-0 h-5 w-5 text-primary" />
-                        <CornerBottomRightIcon className="absolute right-0 bottom-0 h-5 w-5 text-primary" />
-                        <CornerBottomLeftIcon className="absolute left-0 bottom-0 h-5 w-5 text-primary" />
-                        <CornerTopLeftIcon className="absolute left-0 top-0 h-5 w-5 text-primary" />
+                        <CornerTopRightIcon className="absolute right-0 top-0 size-6 text-primary" />
+                        <CornerBottomRightIcon className="absolute right-0 bottom-0 size-6 text-primary" />
+                        <CornerBottomLeftIcon className="absolute left-0 bottom-0 size-6 text-primary" />
+                        <CornerTopLeftIcon className="absolute left-0 top-0 size-6 text-primary" />
                     </div>
                 ) : null}
                 <div

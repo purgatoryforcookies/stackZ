@@ -20,5 +20,13 @@ module.exports = {
         react: {
             version: 'detect'
         }
-    }
+    },
+    overrides: [
+        {
+            "files": ["*.test.tsx"],
+            "rules": {
+                "jest/expect-expect": "off"
+            }
+        }
+    ]
 }

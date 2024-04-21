@@ -1,7 +1,8 @@
-import { HistoryKey, MkdirError } from '../../../types'
+import { HistoryBook, HistoryKey, MkdirError } from '../../../types'
 import { readFile, access, constants, writeFileSync, mkdirSync, writeFile } from 'fs'
 import { join } from 'path'
 import { app } from 'electron'
+import { executePowerShellScript } from '../util/util'
 
 // app is not available during testing with the current suite
 // setting path to repo root fixes the issue
@@ -9,10 +10,12 @@ const dirPath = join(app?.getPath('userData') || '', './history')
 
 export class HistoryService {
     private history: Map<keyof typeof HistoryKey, string[]>
+    private hostHistory: string[]
     private limit: number
 
     constructor() {
         this.history = new Map()
+        this.hostHistory = []
         for (const key in HistoryKey) {
             //@ts-ignore the key is one of the HistoryKeys, trust me
             this.history.set(key, [])
@@ -23,6 +26,7 @@ export class HistoryService {
         Array.from(this.history.keys()).forEach((key) => {
             this.readFromDisk(dirPath, key)
         })
+        this.loadWinHostHistory()
     }
 
     store(key: keyof typeof HistoryKey, value: string) {
@@ -41,14 +45,15 @@ export class HistoryService {
         return this.history.get(key)?.at(index)
     }
 
-    search(key: keyof typeof HistoryKey, value: string): string[] {
-        if (!value) return []
+    search(key: keyof typeof HistoryKey, value: string): HistoryBook {
+        if (!value) throw new Error('Value not provided')
 
-        const all = this.history.get(key)
+        const all = this.history.get(key) ?? []
 
-        if (!all) return []
-
-        return all.filter(o => o.toLowerCase().includes(value.toLowerCase()))
+        return {
+            stackz: all.filter(o => o.toLowerCase().includes(value.toLowerCase())),
+            host: this.hostHistory.filter(o => o.toLowerCase().includes(value.toLowerCase()))
+        }
     }
 
 
@@ -67,6 +72,31 @@ export class HistoryService {
                 }
             })
         })
+    }
+
+    reboot() {
+        Array.from(this.history.keys()).forEach((key) => {
+            this.history.set(key, [])
+        })
+        this.save()
+    }
+
+    async loadWinHostHistory() {
+
+        const command = [
+            "cat $env:USERPROFILE\\AppData",
+            "\\Roaming\\Microsoft",
+            "\\Windows\\PowerShell\\PSReadLine",
+            "\\ConsoleHost_history.txt"
+        ]
+
+        const result = await executePowerShellScript(command.join(""))
+
+        if (result) {
+            const arrayed = result.split("\n").map(i => i.replaceAll('\r', ''))
+            this.hostHistory = [...new Set(arrayed)]
+        }
+
     }
 
     async readFromDisk(basePath: string, key: keyof typeof HistoryKey) {

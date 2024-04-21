@@ -1,9 +1,6 @@
 module.exports = {
-    transform: {
-        '^.+\\.ts?$': 'ts-jest'
-    },
-    watchPathIgnorePatterns: ['src/main/tests/fixtures'],
-    moduleNameMapper: {
-        '^@t$': '<rootDir>/src/types'
-    }
+    projects: [
+        '<rootDir>/jest.main.config.js',
+        '<rootDir>/jest.renderer.config.js',
+    ],
 }

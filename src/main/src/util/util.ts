@@ -1,6 +1,7 @@
 import { readFile, writeFileSync, existsSync } from 'fs'
 import { Environment, TPorts } from '../../../types'
 import { ZodTypeAny, z } from 'zod'
+import { exec } from 'child_process'
 
 export const readJsonFile = <T extends z.ZodTypeAny>(
     path: string,
@@ -180,5 +181,31 @@ export const parsePSUDPMessage = (message: string) => {
 const trimShellTableRow = (row: string) => {
     if (row.length < 10) return
     return row.split(' ').filter(i => i.length > 0 && i !== '\r')
+
+}
+
+
+export const executePowerShellScript = async (script: string) => {
+
+
+    try {
+        const data: string = await new Promise((res, rej) => {
+            exec(script, { shell: 'powershell.exe' }, (err, stdout) => {
+                if (err) {
+                    rej(err)
+                }
+                res(stdout)
+            })
+        })
+
+        return data
+
+    } catch (error) {
+        console.log(error)
+        return ''
+    }
+
+
+
 
 }

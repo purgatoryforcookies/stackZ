@@ -1,4 +1,4 @@
-import { TerminalUIEngine } from "@renderer/service/TerminalUIEngine"
+import { TerminalUIEngine } from "../service/TerminalUIEngine"
 import { CommandMetaSetting, Status, UtilityEvents } from "@t"
 import { useEffect, useState } from "react"
 

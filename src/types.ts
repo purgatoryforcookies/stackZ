@@ -221,3 +221,8 @@ export type Processes = {
         ports: TPorts[]
     }[]
 }[]
+
+export type HistoryBook = {
+    stackz: string[],
+    host: string[]
+}

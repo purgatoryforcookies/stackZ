@@ -1,11 +1,11 @@
-import { Input } from "@renderer/@/ui/input"
-import { Label } from "@renderer/@/ui/label"
-import useCommandSettings from "@renderer/hooks/useCommandSettings"
+import { Input } from "../../@/ui/input"
+import { Label } from "../../@/ui/label"
+import useCommandSettings from "../../hooks/useCommandSettings"
 import React, { useRef, useState } from "react"
-import { TerminalUIEngine } from "@renderer/service/TerminalUIEngine"
-import { ScrollArea } from "@renderer/@/ui/scroll-area"
-import useListWalker from "@renderer/hooks/useListWalker"
-import { HistoryKey } from "@t"
+import { TerminalUIEngine } from "../../service/TerminalUIEngine"
+import { ScrollArea } from "../../@/ui/scroll-area"
+import useListWalker from "../../hooks/useListWalker"
+import { HistoryBook, HistoryKey } from "@t"
 
 
 type InputWithMagicProps = {
@@ -65,12 +65,13 @@ function InputWithMagic({ engine, tools, title, valueKey, historyKey, defaultVal
 
         engine.socket.emit('history', historyKey,
             { feed: e.target.value },
-            (data: string[]) => {
-                if (!data || data.length === 0) {
+            (data: HistoryBook) => {
+                if (data.host.length === 0
+                    && data.stackz.length === 0) {
                     setSearchList([])
                     return
                 }
-                setSearchList(data)
+                setSearchList(data.host.concat(data.stackz))
             })
     }
 
@@ -87,6 +88,7 @@ function InputWithMagic({ engine, tools, title, valueKey, historyKey, defaultVal
             </Label>
             <Input
                 id={valueKey}
+                data-testid={'magickInput'}
                 ref={inpRef}
                 className="w-full"
                 name={valueKey}
@@ -96,14 +98,15 @@ function InputWithMagic({ engine, tools, title, valueKey, historyKey, defaultVal
                 value={inputBox || ""}
                 placeholder="curl --fail https://google.com || exit 1"
             />
-            {searchList.length > 0 ? <ul className="absolute w-full p-1 rounded-sm max-h-[20rem] overflow-auto z-10" >
-                <ScrollArea className="bg-foreground text-muted rounded-sm">
+            {searchList.length > 0 ? <ul className="absolute  min-w-full max-w-[190%] p-1 rounded-sm max-h-[20rem] overflow-auto z-10" >
+                <ScrollArea test-id={'historyBook'} className="bg-foreground text-muted rounded-sm w-max">
                     {infinityList().map((item, idx) => {
                         return <li
                             tabIndex={1}
                             role="button"
+                            test-id={'historyItem'}
                             key={idx}
-                            className={`hover:cursor-pointer hover:outline hover:outline-1 pl-1 ${idx + infiniteIndex - OFFSET === infiniteIndex ? 'bg-primary text-primary-foreground' : ''}`}
+                            className={`hover:cursor-pointer hover:outline hover:outline-1 pl-1 pr-2 ${idx + infiniteIndex - OFFSET === infiniteIndex ? 'bg-primary text-primary-foreground' : ''}`}
                             onClick={() => handleSelect(item)}
                         >{idx - OFFSET + infiniteIndex} - {item}</li>
                     }

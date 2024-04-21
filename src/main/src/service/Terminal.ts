@@ -296,7 +296,9 @@ export class Terminal {
         this.ping()
     }
 
-    updateCommand(value: string) {
+    updateCommand(value: string | null) {
+
+        if (!value) return
         const newCommand = value.trim()
 
         if (!this.history.exists('CMD', newCommand)) {
