@@ -1,5 +1,5 @@
 import { exec } from 'child_process'
-import { Terminal } from './Terminal'
+import { Terminal } from '../Terminal'
 import { ClientEvents, Cmd } from '../../../types'
 
 type StartJob = {

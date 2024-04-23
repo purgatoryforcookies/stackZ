@@ -23,6 +23,7 @@ import {
 import useCommandSettings from '@renderer/hooks/useCommandSettings'
 import InputWithMagic from './InputWithMagic'
 
+
 export type CommandSettingsProps = {
     engine: TerminalUIEngine
 }
@@ -35,6 +36,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
 
     return (
         <Sheet>
+
             <SheetTrigger>
                 <HamburgerMenuIcon
                     className={`h-4 w-4 moveHandle

@@ -9,7 +9,7 @@ import {
     StackStatus,
     UtilityEvents
 } from '../../types'
-import { Terminal } from './service/Terminal'
+import { Terminal } from './Terminal'
 import { Server, Socket } from 'socket.io'
 import { store } from './stores/Store'
 import { HistoryService } from './service/HistoryService'

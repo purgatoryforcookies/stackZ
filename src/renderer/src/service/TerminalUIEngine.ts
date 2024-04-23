@@ -3,7 +3,9 @@ import { ClientEvents, Status, UtilityEvents } from '../../../types'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import { SearchAddon } from '@xterm/addon-search'
+
 import 'xterm/css/xterm.css'
+import { WebLinksAddon } from '@xterm/addon-web-links'
 
 export class TerminalUIEngine {
     private terminal = new Terminal({
@@ -24,6 +26,7 @@ export class TerminalUIEngine {
     terminalId: string
     private fitAddon: FitAddon
     private searchAddon: SearchAddon
+    private weblinkAddon: WebLinksAddon
     private hostdiv: HTMLElement
     private buffer: string
     private searchWord: string
@@ -32,11 +35,13 @@ export class TerminalUIEngine {
     constructor(stackId: string, terminalId: string, host: string) {
         this.fitAddon = new FitAddon()
         this.searchAddon = new SearchAddon()
+        this.weblinkAddon = new WebLinksAddon()
         this.stackId = stackId
         this.terminalId = terminalId
         this.host = host
         this.terminal.loadAddon(this.fitAddon)
         this.terminal.loadAddon(this.searchAddon)
+        this.terminal.loadAddon(this.weblinkAddon);
         this.searchWord = ''
         this.buffer = ''
         this.isRunning = false
@@ -95,10 +100,10 @@ export class TerminalUIEngine {
 
         this.terminal.onKey((data) => {
             this.sendInput(data.key)
-            if (this.isRunning) return
         })
 
         this.terminal.attachCustomKeyEventHandler((e) => {
+
             if (e.type === 'keyup') {
                 if (e.code === 'Enter' && (e.metaKey || e.ctrlKey)) {
                     if (!this.isRunning) {
@@ -109,8 +114,19 @@ export class TerminalUIEngine {
                     return false
                 }
             }
+            if (e.code === 'KeyV' && (e.metaKey || e.ctrlKey)) {
+                if (e.type === 'keyup') {
+                    this.paste()
+                }
+                return false
+            }
             return true
         })
+    }
+
+    async paste() {
+        const clip = await navigator.clipboard.readText()
+        this.sendInput(clip)
     }
 
     ping() {
@@ -127,7 +143,7 @@ export class TerminalUIEngine {
 
     prompt() {
         this.sendInput(this.buffer)
-        this.terminal.write(`\r\n$ `)
+        this.terminal.write(`\r\n`)
     }
 
     attachTo(element: HTMLElement) {

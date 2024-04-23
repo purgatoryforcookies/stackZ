@@ -7,15 +7,15 @@ import {
     Status,
     UtilityEvents,
     UtilityProps
-} from '../../../types'
+} from '../../types'
 import { spawn, IPty } from 'node-pty'
-import { envFactory, haveThesameElements, mapEnvs, parseBufferToEnvironment } from '../util/util'
+import { envFactory, haveThesameElements, mapEnvs, parseBufferToEnvironment } from './util/util'
 import path from 'path'
 import { ITerminalDimensions } from 'xterm-addon-fit'
 import { Socket } from 'socket.io'
-import { IPingFunction, ISaveFuntion } from '../Palette'
-import { HistoryService } from './HistoryService'
-import { TerminalScheduler } from './TerminalScheduler'
+import { IPingFunction, ISaveFuntion } from './Palette'
+import { HistoryService } from './service/HistoryService'
+import { TerminalScheduler } from './service/TerminalScheduler'
 
 export class Terminal {
     settings: Cmd
@@ -31,6 +31,7 @@ export class Terminal {
     stackPing: IPingFunction
     save: ISaveFuntion
     history: HistoryService
+    counter: number
 
     constructor(
         stackId: string,
@@ -52,6 +53,7 @@ export class Terminal {
         this.registerTerminalEvents()
         this.save = save
         this.history = history
+        this.counter = 0
     }
 
     chooseShell(shell?: string) {
@@ -126,13 +128,18 @@ export class Terminal {
 
             this.ptyProcess.onData((data) => {
                 this.sendToClient(data)
+                if (data.includes('\n')) {
+                    this.counter += 1
+                }
+                console.log(this.counter)
             })
             this.ptyProcess.onExit((data) => {
                 this.isRunning = false
+                this.counter = 0
                 this.sendToClient(`Exiting with status ${data.exitCode} ${data.signal ?? ''}\r\n`)
 
                 const divider = Array(10).fill('-').join('')
-                this.sendToClient(`${divider}\r\n$ `)
+                this.sendToClient(`${divider}\r\n`)
                 this.stop()
 
                 if (this.settings.metaSettings?.rerun) {
