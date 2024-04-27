@@ -5,14 +5,14 @@ export const CustomToolTip = ({
     message,
     hidden
 }: {
-    children: JSX.Element
+    children: React.ReactNode
     message: string
     hidden?: boolean
 }) => {
     return (
         <TooltipProvider>
             <Tooltip>
-                <TooltipTrigger asChild>{children}</TooltipTrigger>
+                <TooltipTrigger >{children}</TooltipTrigger>
                 {!hidden ? (
                     <TooltipContent>
                         <p className="text-bold text-[0.8rem]">{message}</p>

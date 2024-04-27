@@ -70,6 +70,7 @@
         "@electron-toolkit/eslint-config-prettier": "^1.0.1",
         "@electron-toolkit/eslint-config-ts": "^1.0.0",
         "@electron-toolkit/tsconfig": "^1.0.1",
+        "@svgr/rollup": "^8.1.0",
         "@testing-library/jest-dom": "^6.4.2",
         "@testing-library/react": "^15.0.2",
         "@types/jest": "^29.5.11",

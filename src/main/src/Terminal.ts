@@ -1,6 +1,7 @@
 import {
     ClientEvents,
     Cmd,
+    CommandMetaSetting,
     Environment,
     EnvironmentEditProps,
     HistoryKey,
@@ -16,6 +17,7 @@ import { Socket } from 'socket.io'
 import { IPingFunction, ISaveFuntion } from './Palette'
 import { HistoryService } from './service/HistoryService'
 import { TerminalScheduler } from './service/TerminalScheduler'
+import { YesSequencer } from './service/YesSequencer'
 
 export class Terminal {
     settings: Cmd
@@ -31,6 +33,7 @@ export class Terminal {
     stackPing: IPingFunction
     save: ISaveFuntion
     history: HistoryService
+    yesSequence: YesSequencer
     counter: number
 
     constructor(
@@ -53,6 +56,7 @@ export class Terminal {
         this.registerTerminalEvents()
         this.save = save
         this.history = history
+        this.yesSequence = new YesSequencer()
         this.counter = 0
     }
 
@@ -119,6 +123,9 @@ export class Terminal {
                 rows: this.rows,
                 cols: this.cols
             })
+            if (this.settings.metaSettings?.sequencing) {
+                this.yesSequence.bind(this.ptyProcess, this.settings.metaSettings.sequencing)
+            }
 
             this.isRunning = true
 
@@ -128,14 +135,19 @@ export class Terminal {
 
             this.ptyProcess.onData((data) => {
                 this.sendToClient(data)
-                if (data.includes('\n')) {
-                    this.counter += 1
-                }
-                console.log(this.counter)
+                this.yesSequence.trace(data)
             })
             this.ptyProcess.onExit((data) => {
                 this.isRunning = false
-                this.counter = 0
+
+                if (this.yesSequence.isBound() && this.yesSequence.registry) {
+                    if (this.settings.metaSettings?.sequencing) {
+                        if (this.settings.metaSettings.sequencing.length === 0) {
+                            this.settings.metaSettings.sequencing = [...this.yesSequence.registry]
+                        }
+                    }
+                }
+                this.yesSequence.reset()
                 this.sendToClient(`Exiting with status ${data.exitCode} ${data.signal ?? ''}\r\n`)
 
                 const divider = Array(10).fill('-').join('')
@@ -243,6 +255,10 @@ export class Terminal {
     writeFromClient(data: string) {
         if (data.length === 0) return
         this.write(data)
+
+        if (this.yesSequence.isBound()) {
+            this.yesSequence.register()
+        }
     }
 
     write(data: string) {
@@ -360,22 +376,41 @@ export class Terminal {
         this.ping()
     }
 
-    setMetaSettings(name: string, value: string | boolean | number | undefined) {
+    setMetaSettings(name: string, value: string | boolean | number |
+        Exclude<CommandMetaSetting['sequencing'], undefined>[0] | undefined) {
         console.log(`Setting meta ${name} - ${value}`)
+
         if (!this.settings.metaSettings) {
             this.settings.metaSettings = {}
         }
+        if (typeof value === 'undefined' || value === null) {
+            delete this.settings.metaSettings[name]
+            if (Object.keys(this.settings.metaSettings).length === 0) {
+                delete this.settings.metaSettings
+            }
+            return
+        }
+
         if (name === 'healthCheck' && typeof value === 'string') {
             const trimmed = value.trim()
             if (trimmed.length > 3) this.history.store('HEALTH', trimmed)
             this.settings.metaSettings[name] = trimmed
-        } else {
-            if (typeof value === 'undefined' || value === null) {
-                delete this.settings.metaSettings[name]
-            } else {
-                this.settings.metaSettings[name] = value
-            }
+
         }
+        if (name === 'sequencing' && typeof value === 'object') {
+
+            if (!this.settings.metaSettings.sequencing) {
+                this.settings.metaSettings.sequencing = []
+            }
+            this.settings.metaSettings.sequencing.map(item => {
+                if (item.index !== value.index) return item
+                item.echo = value.echo
+                return item
+            })
+        } else {
+            this.settings.metaSettings[name] = value
+        }
+
         this.ping()
     }
 

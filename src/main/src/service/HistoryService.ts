@@ -26,7 +26,7 @@ export class HistoryService {
         Array.from(this.history.keys()).forEach((key) => {
             this.readFromDisk(dirPath, key)
         })
-        this.loadWinHostHistory()
+        this.loadHostHistory()
     }
 
     store(key: keyof typeof HistoryKey, value: string) {
@@ -80,7 +80,7 @@ export class HistoryService {
         this.save()
     }
 
-    async loadWinHostHistory() {
+    async loadHostHistory() {
 
 
         if (process.platform !== 'win32') {

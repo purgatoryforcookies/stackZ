@@ -31,7 +31,12 @@ export const stackSchema = z.array(
                             ctrlc: z.boolean().default(false).optional(),
                             delay: z.number().optional(),
                             healthCheck: z.string().optional(),
-                            halt: z.boolean().default(false).optional()
+                            halt: z.boolean().default(false).optional(),
+                            sequencing: z.array(z.object({
+                                index: z.number(),
+                                echo: z.string().optional(),
+                                message: z.string().optional()
+                            })).optional(),
                         })
                         .optional(),
                     command: z.object({

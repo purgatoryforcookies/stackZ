@@ -9,6 +9,7 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
     const [settings, setSettings] = useState<Status>()
     const [isLoading, setIsLoading] = useState(false)
     const [isPending, setIsPending] = useState(false)
+    const [open, setOpen] = useState(false)
 
     const uxDelayedLoading = () =>
         setTimeout(() => {
@@ -21,7 +22,8 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
         setIsPending(false)
     }
 
-    const onChange = (name: OnChangeType, value?: string | boolean | number) => {
+    const onChange = (name: OnChangeType, value?: string |
+        Exclude<CommandMetaSetting['sequencing'], undefined>[0] | [] | boolean | number) => {
         setIsLoading(true)
         switch (name) {
             case 'cwd':
@@ -58,9 +60,9 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
             if (!data) return
             finishUp(data)
         })
-    }, [engine])
+    }, [engine, open])
 
-    return { settings, onChange, isLoading, isPending, setIsPending }
+    return { settings, onChange, isLoading, isPending, setIsPending, open, setOpen }
 }
 
 export default useCommandSettings
