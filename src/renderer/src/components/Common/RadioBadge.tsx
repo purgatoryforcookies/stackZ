@@ -42,7 +42,7 @@ function RadioBadge({ stack, id }: { stack: IUseStack; id: string }) {
         >
             <span
                 className={`${isSelect ? 'bg-primary' : running ? 'bg-gradient' : 'bg-transparent'}
-              text-center rounded-[4px] px-2 h-[90%] w-[92%] bg-[length:_800%_800%] flex justify-center items-center
+              text-center rounded-[4px] px-2 h-[90%] w-[97%] bg-[length:_800%_800%] flex justify-center items-center
             
             `}
             >

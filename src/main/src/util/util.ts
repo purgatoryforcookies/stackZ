@@ -175,10 +175,10 @@ const trimShellTableRow = (row: string) => {
     return row.split(' ').filter((i) => i.length > 0 && i !== '\r')
 }
 
-export const executePowerShellScript = async (script: string) => {
+export const executeScript = async (script: string, shell: string) => {
     try {
         const data: string = await new Promise((res, rej) => {
-            exec(script, { shell: 'powershell.exe' }, (err, stdout) => {
+            exec(script, { shell: shell }, (err, stdout) => {
                 if (err) {
                     rej(err)
                 }
