@@ -1,5 +1,6 @@
 import { IPty } from 'node-pty'
 import { CommandMetaSetting } from 'src/types'
+import { executeScript } from '../util/util'
 
 
 /**
@@ -19,6 +20,8 @@ export class YesSequencer {
     cache: string[] = []
     cacheLimit = 2
     registry: Exclude<CommandMetaSetting['sequencing'], undefined>
+    garbage: number[] = []
+
 
     constructor() {
         this.counter = 0
@@ -38,31 +41,37 @@ export class YesSequencer {
 
         const weHave = this.sequence.find(i => i.index === this.counter)
         if (!weHave) return
+        if (this.garbage.includes(weHave.index)) return
+        this.garbage.push(weHave.index)
 
+        const weDo = weHave.echo
+        let output = ''
+        if (weDo) {
+            output = await executeScript(weDo, process.platform === 'win32' ? 'powershell.exe' : 'bash', true)
+            if (!output) {
+                output = await executeScript('echo ' + weDo, process.platform === 'win32' ? 'powershell.exe' : 'bash', true)
+            }
+        }
 
-        await new Promise<void>((r) =>
-            setTimeout(() => {
-                const weDo = weHave.echo
-                if (weDo) {
-                    this.ptyProcess?.write(Array(weDo.length).fill('*').join(''))
-                    this.ptyProcess?.write('\r\n')
-                }
-                r()
-            }, 800))
-
+        setTimeout(() => {
+            if (output) {
+                this.ptyProcess?.write(output)
+            }
+            this.ptyProcess?.write('\r')
+        }, 600)
     }
 
     trace(line: string) {
         if (!this.isBound()) return
-        // skip also if we have a sequence
 
         if (line.includes('\n')) {
             this.increment()
         }
-        this.cache.push(line)
+        this.cache.push(line.toString())
         if (this.cache.length > this.cacheLimit) {
             this.cache.shift()
         }
+
         this.play()
     }
 
@@ -72,7 +81,9 @@ export class YesSequencer {
         }
         this.registry.push({
             index: this.counter,
-            message: this.cache[1].split('\x1B')[0]
+            message: this.cache[1]
+                .replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')
+                .slice(-30)
         })
     }
 
@@ -80,6 +91,7 @@ export class YesSequencer {
         this.counter = 0
         this.ptyProcess = null
         this.registry = []
+        this.garbage = []
     }
 
     bind(process: IPty | null, sequence: CommandMetaSetting['sequencing']) {

@@ -147,6 +147,7 @@ export class Terminal {
                         }
                     }
                 }
+
                 this.yesSequence.reset()
                 this.sendToClient(`Exiting with status ${data.exitCode} ${data.signal ?? ''}\r\n`)
 

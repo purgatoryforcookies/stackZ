@@ -22,8 +22,8 @@ import {
 } from '@radix-ui/react-icons'
 import useCommandSettings from '@renderer/hooks/useCommandSettings'
 import InputWithMagic from './InputWithMagic'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@renderer/@/ui/dialog'
-import { Button } from '@renderer/@/ui/button'
+import Sequencing from '../Dialogs/Sequencing'
+
 
 
 export type CommandSettingsProps = {
@@ -48,7 +48,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
             <SheetContent
                 side={'left'}
                 data-theme={theme}
-                className="sm:max-w-none w-[40rem]"
+                className="sm:max-w-none w-[50rem] overflow-auto"
                 onOpenAutoFocus={(e) => e.preventDefault()}
             >
                 <SheetHeader>
@@ -226,66 +226,30 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                         />
                         <Label htmlFor="sequencing" className="flex items-center gap-2">
                             Yes sequencing
-                            <Dialog>
-                                <CustomToolTip message="Similar to linux yes(1).">
-                                    <DialogTrigger asChild>
-
-                                        <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
-                                    </DialogTrigger>
-                                </CustomToolTip>
-                                <DialogContent data-theme={theme}>
-                                    <DialogHeader>
-                                        <DialogTitle className='flex items-center'>Yes sequencing - Kinda like
-                                            <Button variant={'link'} className='text-md 
-                                                text-secondary-foreground 
-                                                flex flex-col
-                                                relative top-[1px] right-3
-                                                '>
-                                                <p>linux(1)</p>
-                                            </Button>
-                                        </DialogTitle>
-                                        <DialogDescription>
-                                            This is how you use it:
-                                            <div className='text-[0.8rem] flex flex-col p-1'>
-                                                {['Enable it from the checkbox.',
-                                                    'Run the command and do the dance manually.',
-                                                    'Come back here and fill in the dance steps.'
-                                                ].map((step, i) => (
-                                                    <span key={i} className="flex gap-1">
-                                                        <CheckIcon className="h-4 w-4" />
-                                                        <span>{step}</span>
-                                                    </span>
-                                                ))}
-                                            </div>
-                                            <p className=''>
-                                                After setup, these steps are then given to the terminal on next runs.
-                                            </p>
-                                        </DialogDescription>
-
-                                    </DialogHeader>
-
-                                </DialogContent>
-                            </Dialog>
+                            <Sequencing />
                         </Label>
 
                     </div>
                     <div className="h-3"></div>
-                    {settings?.cmd.metaSettings?.sequencing
-                        && settings.cmd.metaSettings.sequencing.map(seq => (
-                            <div className='flex items-center'>
-                                <Input
-                                    id="shell"
-                                    name="shell"
-                                    placeholder={seq.message}
-                                    defaultValue={seq.echo || ''}
-                                    onChange={() => setIsPending(true)}
-                                    onBlur={(e) => onChange('sequencing', { ...seq, echo: e.target.value })}
-                                />
-                                <Label htmlFor="shell" className="text-right p-1">
-                                    :{seq.index}
-                                </Label>
-                            </div>
-                        ))}
+                    <div className='flex flex-col gap-2'>
+                        {settings?.cmd.metaSettings?.sequencing
+                            && settings.cmd.metaSettings.sequencing.map((seq, i) => (
+                                <div className='flex items-center'>
+                                    <Input
+                                        id={seq.index.toString()}
+                                        tabIndex={i}
+                                        name={seq.index.toString()}
+                                        placeholder={seq.message}
+                                        defaultValue={seq.echo || ''}
+                                        onChange={() => setIsPending(true)}
+                                        onBlur={(e) => onChange('sequencing', { ...seq, echo: e.target.value })}
+                                    />
+                                    <Label htmlFor={seq.index.toString()} className="text-right p-1">
+                                        :{seq.index}
+                                    </Label>
+                                </div>
+                            ))}
+                    </div>
                 </div>
 
 

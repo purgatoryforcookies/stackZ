@@ -10,7 +10,7 @@ import { HistoryBook, HistoryKey } from '@t'
 type InputWithMagicProps = {
     engine: TerminalUIEngine
     tools: ReturnType<typeof useCommandSettings>
-    title: string
+    title?: string
     valueKey: 'healthCheck' | 'cmd' | 'cwd' | 'shell'
     historyKey: keyof typeof HistoryKey
     defaultValue: string
@@ -84,9 +84,9 @@ function InputWithMagic({
 
     return (
         <div className="relative">
-            <Label htmlFor={valueKey} className="text-right p-1">
+            {title ? <Label htmlFor={valueKey} className="text-right p-1">
                 {title}
-            </Label>
+            </Label> : null}
             <Input
                 id={valueKey}
                 data-testid={'magickInput'}

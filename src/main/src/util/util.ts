@@ -175,7 +175,7 @@ const trimShellTableRow = (row: string) => {
     return row.split(' ').filter((i) => i.length > 0 && i !== '\r')
 }
 
-export const executeScript = async (script: string, shell: string) => {
+export const executeScript = async (script: string, shell: string, silent = false) => {
     try {
         const data: string = await new Promise((res, rej) => {
             exec(script, { shell: shell }, (err, stdout) => {
@@ -188,7 +188,9 @@ export const executeScript = async (script: string, shell: string) => {
 
         return data
     } catch (error) {
-        console.log(error)
+        if (!silent) {
+            console.log(error)
+        }
         return ''
     }
 }
