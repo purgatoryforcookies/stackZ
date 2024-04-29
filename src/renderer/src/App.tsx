@@ -67,7 +67,7 @@ function App(): JSX.Element {
                                         <TabsTrigger value="environment">Environment</TabsTrigger>
                                         <TabsTrigger value="monitor">Monitor</TabsTrigger>
                                     </TabsList>
-                                    <TabsContent value="environment" className="pl-4 h-full pb-5">
+                                    <TabsContent value="environment" className="pl-4 h-full overflow-x-auto overflow-y-hidden">
                                         <p className="text-muted-foreground text-sm">
                                             Terminal specific environment variables
                                         </p>

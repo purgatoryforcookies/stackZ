@@ -3,13 +3,13 @@ import { FormEvent, useState } from 'react'
 import { Input } from '@renderer/@/ui/input'
 import { Cross1Icon } from '@radix-ui/react-icons'
 import { UtilityEvents } from '@t'
-import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
+import { Socket } from 'socket.io-client'
 
 type ListItemProps = {
     newRecord: boolean
     orderId: number
     minimized: boolean
-    terminal: TerminalUIEngine
+    socket: Socket | undefined
 }
 
 interface RecordProps extends ListItemProps {
@@ -39,12 +39,11 @@ export const Field = ({
     minimized
 }: FieldProps) => {
     const style = `rounded-full py-1
-    ${
-        variant === 'primary'
+    ${variant === 'primary'
             ? `px-3 text-secondary-foreground bg-transparent bg-[length:_150%_50%] ${minimized ? 'truncate' : ''}`
             : `px-3  truncate text-primary-secondary bg-primary
             }`
-    }`
+        }`
 
     if (disabled) return <p className={style}>{value}</p>
 
@@ -71,7 +70,7 @@ export const Field = ({
  * @param {string} minimized - Renders without value field
  */
 const Record = ({
-    terminal,
+    socket,
     keyv,
     value,
     editMode,
@@ -87,7 +86,7 @@ const Record = ({
 
     const handleMute = () => {
         if (editMode) return
-        terminal.socket.emit(UtilityEvents.ENVMUTE, {
+        socket?.emit(UtilityEvents.ENVMUTE, {
             value: keyValue,
             order: orderId
         })
@@ -97,7 +96,7 @@ const Record = ({
         e.preventDefault()
 
         if (newRecordOpen && (!keyValue || !valueValue)) return
-        terminal.socket.emit(UtilityEvents.ENVEDIT, {
+        socket?.emit(UtilityEvents.ENVEDIT, {
             order: orderId,
             key: keyValue,
             previousKey: keyPreviousValue,
@@ -108,7 +107,7 @@ const Record = ({
     }
 
     const handleDelete = () => {
-        terminal.socket.emit(UtilityEvents.ENVDELETE, {
+        socket?.emit(UtilityEvents.ENVDELETE, {
             order: orderId,
             value: keyValue
         })

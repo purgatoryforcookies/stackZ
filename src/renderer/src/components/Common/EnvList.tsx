@@ -4,9 +4,9 @@ import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
 import { UtilityEvents } from '@t'
-import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { CustomToolTip } from './CustomTooltip'
 import { GoInfo } from 'react-icons/go'
+import { Socket } from 'socket.io-client'
 
 type EnvListProps = {
     data: {
@@ -15,16 +15,16 @@ type EnvListProps = {
         order: number
         disabled: string[]
     }
-    terminal: TerminalUIEngine
+    socket: Socket | undefined
 }
 
-function EnvList({ data, terminal }: EnvListProps) {
+function EnvList({ data, socket }: EnvListProps) {
     const [minimized, setMinimized] = useState<boolean>(data.order === 0 ? true : false)
     const [hidden, setHidden] = useState<boolean>(data.order === 0 ? true : false)
     const [editMode, setEditMode] = useState<boolean>(false)
 
     const handleMute = () => {
-        terminal.socket.emit(UtilityEvents.ENVMUTE, {
+        socket?.emit(UtilityEvents.ENVMUTE, {
             order: data.order
         })
     }
@@ -43,20 +43,20 @@ function EnvList({ data, terminal }: EnvListProps) {
     }
 
     const handleDelete = () => {
-        terminal.socket.emit(UtilityEvents.ENVLISTDELETE, {
+        socket?.emit(UtilityEvents.ENVLISTDELETE, {
             order: data.order
         })
     }
 
     return (
         <div
-            className={`p-7 py-4
+            className={`p-7 py-4 mb-8
         ${minimized && editMode ? '' : 'max-w-[35rem]'}
         ${editMode ? 'max-w-[100%]' : ''}
         `}
         >
             {data.order === 0 ? (
-                <CustomToolTip message="This environment is editable, but not persistent for the long run">
+                <CustomToolTip message="This environment is editable, but not persistent.">
                     <h1 className="text-center text-foreground text-nowrap flex items-center gap-1">
                         {data.title} <GoInfo className="w-4 h-4 text-white/50" />
                     </h1>
@@ -123,23 +123,23 @@ function EnvList({ data, terminal }: EnvListProps) {
                 >
                     {data.pairs
                         ? Object.keys(data.pairs).map((key: string) => (
-                              <Record
-                                  key={key} //react component key
-                                  newRecord={false}
-                                  editMode={editMode}
-                                  terminal={terminal}
-                                  orderId={data.order}
-                                  minimized={minimized}
-                                  keyv={key}
-                                  muted={data.disabled.includes(key)}
-                                  value={data.pairs[key]}
-                              />
-                          ))
+                            <Record
+                                key={key} //react component key
+                                newRecord={false}
+                                editMode={editMode}
+                                socket={socket}
+                                orderId={data.order}
+                                minimized={minimized}
+                                keyv={key}
+                                muted={data.disabled.includes(key)}
+                                value={data.pairs[key]}
+                            />
+                        ))
                         : null}
                     {editMode ? (
                         <Record
                             newRecord={true}
-                            terminal={terminal}
+                            socket={socket}
                             orderId={data.order}
                             minimized={minimized}
                             editMode={editMode}

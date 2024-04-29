@@ -34,15 +34,22 @@ function DetailHeader({ stack }: DetailHeaderProps) {
 
     return (
         <div className="flex gap-8 pb-16 pr-10 h-full" ref={bodyRef}>
+            <div className='border-2 flex'>
+
+                {status?.stackEnv ? status.stackEnv.map((record) =>
+                    <EnvList data={record} key={record.title} socket={terminal.socket} />) : null}
+
+            </div>
+
             {status?.cmd.command.env
                 ? status.cmd.command.env
-                      .sort((a, b) => a.order - b.order)
-                      .map((record) => (
-                          <EnvList data={record} key={record.title} terminal={terminal} />
-                      ))
+                    .sort((a, b) => a.order - b.order)
+                    .map((record) => (
+                        <EnvList data={record} key={record.title} socket={terminal.socket} />
+                    ))
                 : null}
             <div className="p-11">
-                <NewEnvList scroll={scroll} terminal={terminal} />
+                <NewEnvList scroll={scroll} terminal={terminal} stack={stack} />
             </div>
         </div>
     )

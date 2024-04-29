@@ -1,5 +1,4 @@
 import { InfoCircledIcon } from "@radix-ui/react-icons"
-import { Button } from "@renderer/@/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@renderer/@/ui/dialog"
 import { CustomToolTip } from "../Common/CustomTooltip"
 import { useContext } from "react"
@@ -11,7 +10,7 @@ function Sequencing() {
 
     return (
         <Dialog>
-            <CustomToolTip message="Similar to linux yes(1).">
+            <CustomToolTip message="Similar to linux yes(1). Click to read more...">
                 <DialogTrigger asChild>
 
                     <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
@@ -19,14 +18,7 @@ function Sequencing() {
             </CustomToolTip>
             <DialogContent data-theme={theme}>
                 <DialogHeader>
-                    <DialogTitle className='flex items-center'>Yes sequencing - Kinda like
-                        <Button variant={'link'} className='text-md 
-                                                text-secondary-foreground 
-                                                flex flex-col
-                                                relative top-[1px] right-3
-                                                '>
-                            <p>linux(1)</p>
-                        </Button>
+                    <DialogTitle className='flex items-center pb-3'>Yes sequencing - Similar to linux yes(1)
                     </DialogTitle>
                     <DialogDescription>
                         This is how you use it:
@@ -47,12 +39,16 @@ function Sequencing() {
                         <div className=' my-3'>
                             Tip:
                             <p className=''>
-                                You can provide either a string or, a command returning a string, into the steps.
+                                You can provide either a string or a command returning a string, into a step.
                             </p>
                             <p className=''>
                                 This is useful for passwords and secrets stored in external services (for e.g. Aws Secrets Manager)
                             </p>
+                            <p className='text-red-500 pt-5'>
+                                Keep in mind, values you fill in to the steps will be stored plaintext in stacks.json file.
+                            </p>
                         </div>
+
                     </DialogDescription>
 
                 </DialogHeader>

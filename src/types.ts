@@ -112,6 +112,7 @@ export enum GitEvents {
 
 export type Status = {
     stackId: string
+    stackEnv: Environment[] | undefined
     reserved: boolean
     cmd: Cmd
     isRunning: boolean
@@ -132,8 +133,6 @@ export type StackStatus = {
 }
 
 export type EnvironmentEditProps = {
-    stack: string
-    terminal: string
     order: number
     key: string
     previousKey?: string
@@ -142,10 +141,8 @@ export type EnvironmentEditProps = {
 }
 
 export type UtilityProps = {
-    stack: string
-    terminal: string
     order: number
-    value?: string
+    value: string
 }
 export type Utility2Props = {
     stack: string
@@ -155,7 +152,10 @@ export type Utility2Props = {
 export type StackDefaultsProps = PickStartsWith<PaletteStack, 'default'>
 
 export type UpdateCwdProps = Pick<EnvironmentEditProps, 'order' | 'value'>
-export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'terminal' | 'order'>
+export type RemoveEnvListProps = {
+    terminal: string
+    order: number
+}
 
 export enum Panels {
     Details,
