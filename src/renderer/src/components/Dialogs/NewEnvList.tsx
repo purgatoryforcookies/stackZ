@@ -18,7 +18,6 @@ import { useDebounce } from '@renderer/hooks/useDebounce'
 import useLocalStorage from '@renderer/hooks/useLocalStorage'
 import { IUseStack } from '@renderer/hooks/useStack'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
-import { UtilityEvents } from '@t'
 import { useContext, useEffect, useState } from 'react'
 
 type NewEnvListProps = {
@@ -41,11 +40,9 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
         let buf: ArrayBuffer | null = null
         if (file) buf = await file.arrayBuffer()
         if (global) {
-            stack.stackSocket
-                .get(stack.selectedStack)
-                ?.emit(UtilityEvents.ENVLIST, { value: title, fromFile: buf })
+            terminal.socket.emit('environmentList', { value: title, fromFile: buf, id: stack.selectedStack })
         } else {
-            terminal.socket.emit(UtilityEvents.ENVLIST, { value: title, fromFile: buf })
+            terminal.socket.emit('environmentList', { value: title, fromFile: buf })
         }
         setTitle('')
         scroll()

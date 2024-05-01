@@ -1,5 +1,5 @@
-import { Socket, io } from 'socket.io-client'
-import { ClientEvents, Status, UtilityEvents } from '../../../types'
+import { io } from 'socket.io-client'
+import { CustomClientSocket } from '../../../types'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import { SearchAddon } from '@xterm/addon-search'
@@ -17,7 +17,7 @@ export class TerminalUIEngine {
         allowProposedApi: true,
         convertEol: false
     })
-    socket: Socket
+    socket: CustomClientSocket
     private mounted = false
     private isConnected = false
     private isRunning: boolean
@@ -30,7 +30,6 @@ export class TerminalUIEngine {
     private hostdiv: HTMLElement
     private buffer: string
     private searchWord: string
-    private step: number
 
     constructor(stackId: string, terminalId: string, host: string) {
         this.fitAddon = new FitAddon()
@@ -45,7 +44,6 @@ export class TerminalUIEngine {
         this.searchWord = ''
         this.buffer = ''
         this.isRunning = false
-        this.step = 0
     }
 
     isMounted() {
@@ -71,8 +69,10 @@ export class TerminalUIEngine {
 
     resize() {
         this.fitAddon.fit()
-        this.socket.emit(UtilityEvents.RESIZE, {
-            value: this.fitAddon.proposeDimensions()
+        const newDims = this.fitAddon.proposeDimensions()
+        if (!newDims) return this
+        this.socket.emit('resize', {
+            value: newDims
         })
         return this
     }
@@ -92,7 +92,7 @@ export class TerminalUIEngine {
         })
 
         this.socket.on('error', (err) => {
-            this.rawWrite(`Error ${this.socket.id} ${err.message}`)
+            this.rawWrite(`Error ${this.socket.id} ${err}`)
             this.prompt()
             this.rawWrite(`-----------------------------`)
             this.prompt()
@@ -153,7 +153,7 @@ export class TerminalUIEngine {
         this.terminal.focus()
         this.mounted = true
         this.resize()
-        this.socket.on(ClientEvents.TERMINALSTATE, (data: Status) => {
+        this.socket.on('terminalState', (data) => {
             this.isRunning = data.isRunning
         })
 
@@ -167,7 +167,6 @@ export class TerminalUIEngine {
     detach() {
         this.hostdiv.innerHTML = ''
         this.mounted = false
-        this.socket.off(ClientEvents.STACKSTATE)
     }
 
     dispose() {
@@ -177,16 +176,6 @@ export class TerminalUIEngine {
         this.socket.disconnect()
         this.mounted = false
         this.isConnected = false
-    }
-
-    getHistory(dir: 1 | -1) {
-        this.socket.emit('history', null, this.step, (data: string) => {
-            if (!data) {
-                this.step = 0
-                return
-            }
-            dir === 1 ? (this.step += 1) : (this.step -= 1)
-        })
     }
 
     getCurrentTerminalLine() {

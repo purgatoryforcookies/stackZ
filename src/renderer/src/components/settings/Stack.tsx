@@ -2,7 +2,7 @@ import { Button } from '@renderer/@/ui/button'
 import { Input } from '@renderer/@/ui/input'
 import { Label } from '@renderer/@/ui/label'
 import { IUseStack } from '@renderer/hooks/useStack'
-import { ClientEvents, StackDefaultsProps, StackStatus, UtilityEvents } from '@t'
+import { StackDefaultsProps } from '@t'
 import { useEffect, useState } from 'react'
 
 function Stack({ stack, close }: { stack: IUseStack; close: () => void }) {
@@ -15,15 +15,15 @@ function Stack({ stack, close }: { stack: IUseStack; close: () => void }) {
     useEffect(() => {
         stack.stackSocket
             .get(stack.selectedStack)
-            ?.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
+            ?.on('stackState', (d) => {
                 setDefCwd(d.cwd)
                 setDefShell(d.shell)
                 setDefCommand(d.cmd)
             })
-        stack.stackSocket.get(stack.selectedStack)?.emit(UtilityEvents.STACKSTATE)
+        stack.stackSocket.get(stack.selectedStack)?.emit('stackState')
 
         return () => {
-            stack.stackSocket.get(stack.selectedStack)?.off(ClientEvents.STACKSTATE)
+            stack.stackSocket.get(stack.selectedStack)?.off('stackState')
         }
     }, [])
 
@@ -33,13 +33,13 @@ function Stack({ stack, close }: { stack: IUseStack; close: () => void }) {
             defaultShell: defShell,
             defaultCommand: defCommand
         }
-        stack.stackSocket.get(stack.selectedStack)?.emit(UtilityEvents.STACKDEFAULTS, newDefaults)
+        stack.stackSocket.get(stack.selectedStack)?.emit('stackDefaults', newDefaults)
     }
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         stack.stackSocket
             .get(stack.selectedStack)
-            ?.emit(UtilityEvents.STACKNAME, { name: e.target.value })
+            ?.emit('stackName', { name: e.target.value })
         stack.renameStack(e.target.value)
         setName(e.target.value)
     }

@@ -31,7 +31,7 @@ const createJsonFileTemplate = (path: string, schema: ZodTypeAny) => {
     writeFileSync(path, JSON.stringify(template))
 }
 
-export const parseBufferToEnvironment = (buf?: ArrayBuffer) => {
+export const parseBufferToEnvironment = (buf: ArrayBuffer | null) => {
     if (!buf) return {}
     const enc = new TextDecoder('utf-8')
     const decoded = enc.decode(buf).split('\n')
@@ -54,7 +54,6 @@ export const parseBufferToEnvironment = (buf?: ArrayBuffer) => {
     return envir
 }
 
-parseBufferToEnvironment()
 
 /**
  * Factory sorts envs into order and adds host environments

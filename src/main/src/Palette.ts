@@ -1,20 +1,19 @@
 import { v4 as uuidv4 } from 'uuid'
 import {
-    ClientEvents,
     Cmd,
-    GitEvents,
+    CustomServerSocket,
     NewCommandPayload,
     PaletteStack,
     StackDefaultsProps,
     StackStatus,
-    UtilityEvents,
 } from '../../types'
 import { Terminal } from './Terminal'
-import { Server, Socket } from 'socket.io'
+import { Server } from 'socket.io'
 import { store } from './stores/Store'
 import { HistoryService } from './service/HistoryService'
 import { GitService } from './service/GitService'
 import { EnvironmentService } from './service/EnvironmentService'
+
 
 export interface ISaveFuntion {
     (onExport?: boolean): void
@@ -28,7 +27,7 @@ export class Palette {
     settings: PaletteStack
     terminals: Map<string, Terminal>
     server: Server
-    socket: Socket | null
+    socket: CustomServerSocket | null
     isRunning: boolean
     save: ISaveFuntion
     history: HistoryService
@@ -54,7 +53,7 @@ export class Palette {
         this.environment.register(this.settings.id, this.settings.env, true)
     }
 
-    async initTerminal(socket: Socket, remoteTerminalID: string) {
+    async initTerminal(socket: CustomServerSocket, remoteTerminalID: string) {
         const terminal = this.settings.palette?.find((palette) => palette.id === remoteTerminalID)
 
         if (terminal) {
@@ -80,31 +79,31 @@ export class Palette {
         this.settings.palette = this.settings.palette?.filter((pal) => pal.id !== terminalId)
         this.reIndexOrders()
     }
-    installStackSocket(socket: Socket) {
+    installStackSocket(socket: CustomServerSocket) {
         this.socket = socket
 
-        socket.on(UtilityEvents.STACKSTATE, () => {
+        socket.on('stackState', () => {
             this.pingState()
         })
-        socket.on(UtilityEvents.REORDER, (arg: { terminalId: string; newOrder: number }) => {
+        socket.on('reOrder', (arg) => {
             this.reOrderExecution(arg)
         })
-        socket.on(UtilityEvents.STACKDEFAULTS, (arg: StackDefaultsProps) => {
+        socket.on('stackDefaults', (arg) => {
             this.updateDefaults(arg)
         })
-        socket.on(UtilityEvents.STACKNAME, (arg: { name: string }) => {
+        socket.on('stackName', (arg) => {
             this.rename(arg.name)
         })
 
-        socket.on(GitEvents.PULL, async (akw) => {
-            const errors = await this.git.pull().catch((r) => r)
+        socket.on('gitPull', async (akw) => {
+            const errors = await this.git.pull()
             akw(errors)
         })
-        socket.on(GitEvents.GETBRANCHES, async (akw) => {
-            const branches = await this.git.getBranches().catch((r) => r)
+        socket.on('gitGetBranches', async (akw) => {
+            const branches = await this.git.getBranches()
             akw(branches)
         })
-        socket.on(GitEvents.SWITCHBRANCH, async (branch, akw) => {
+        socket.on('gitSwitchBranch', async (branch, akw) => {
             const errors = await this.git.switchBranch(branch)
             akw(errors)
         })
@@ -194,8 +193,8 @@ export class Palette {
         }
         // if (!this.socket) return
         // this.server?.emit(ClientEvents.STACKSTATE, "state")
-        this.socket?.emit(ClientEvents.STACKSTATE, state)
-        this.socket?.emit('badge', state)
+        this.socket?.emit('stackState', state)
+        this.socket?.emit('badgeHeartBeat', state)
     }
 
     pingAll() {

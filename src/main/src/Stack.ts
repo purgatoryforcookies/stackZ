@@ -1,16 +1,16 @@
 import { v4 as uuidv4 } from 'uuid'
-import { NewCommandPayload, PaletteStack } from '../../types'
+import { CustomServer, NewCommandPayload, PaletteStack } from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './stores/DataStore'
 import { ZodTypeAny } from 'zod'
-import { Server } from 'socket.io'
 import { TerminalScheduler } from './service/TerminalScheduler'
 import { HistoryService } from './service/HistoryService'
 import { MonitorService } from './service/MonitorService'
 
+
 export class Stack {
     path: string
-    server: Server
+    server: CustomServer
     raw: PaletteStack[]
     palettes: Map<string, Palette>
     store: DataStore
@@ -18,7 +18,7 @@ export class Stack {
     history: HistoryService
     monitor: MonitorService
 
-    constructor(jsonPath: string, server: Server, schema: ZodTypeAny) {
+    constructor(jsonPath: string, server: CustomServer, schema: ZodTypeAny) {
         this.path = jsonPath
         this.server = server
         this.raw = []

@@ -3,10 +3,9 @@ import Record from '@renderer/components/Common/ListItem'
 import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
-import { UtilityEvents } from '@t'
 import { CustomToolTip } from './CustomTooltip'
 import { GoInfo } from 'react-icons/go'
-import { Socket } from 'socket.io-client'
+import { CustomClientSocket } from '@t'
 
 type EnvListProps = {
     data: {
@@ -15,7 +14,7 @@ type EnvListProps = {
         order: number
         disabled: string[]
     }
-    socket: Socket | undefined
+    socket: CustomClientSocket | undefined
 }
 
 function EnvList({ data, socket }: EnvListProps) {
@@ -24,7 +23,7 @@ function EnvList({ data, socket }: EnvListProps) {
     const [editMode, setEditMode] = useState<boolean>(false)
 
     const handleMute = () => {
-        socket?.emit(UtilityEvents.ENVMUTE, {
+        socket?.emit('environmentMute', {
             order: data.order
         })
     }
@@ -43,7 +42,7 @@ function EnvList({ data, socket }: EnvListProps) {
     }
 
     const handleDelete = () => {
-        socket?.emit(UtilityEvents.ENVLISTDELETE, {
+        socket?.emit('environmentListDelete', {
             order: data.order
         })
     }

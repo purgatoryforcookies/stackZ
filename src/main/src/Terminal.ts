@@ -1,29 +1,28 @@
 import {
-    ClientEvents,
     Cmd,
-    CommandMetaSetting,
+    CustomServerSocket,
     EnvironmentEditProps,
     HistoryKey,
+    MetaSettingPayload,
     Status,
-    UtilityEvents,
     UtilityProps
 } from '../../types'
 import { spawn, IPty } from 'node-pty'
 import { parseBufferToEnvironment } from './util/util'
 import path from 'path'
 import { ITerminalDimensions } from 'xterm-addon-fit'
-import { Socket } from 'socket.io'
 import { IPingFunction, ISaveFuntion } from './Palette'
 import { HistoryService } from './service/HistoryService'
 import { TerminalScheduler } from './service/TerminalScheduler'
 import { YesSequencer } from './service/YesSequencer'
 import { EnvironmentService } from './service/EnvironmentService'
 
+
 export class Terminal {
     settings: Cmd
     stackId: string
     environment: EnvironmentService
-    socket: Socket
+    socket: CustomServerSocket
     ptyProcess: IPty | null
     isRunning: boolean
     isAboutToRun: boolean
@@ -40,7 +39,7 @@ export class Terminal {
     constructor(
         stackId: string,
         cmd: Cmd,
-        socket: Socket,
+        socket: CustomServerSocket,
         stackPing: IPingFunction,
         save: ISaveFuntion,
         history: HistoryService
@@ -170,7 +169,7 @@ export class Terminal {
                         `[Info]: Releasing stack halt on exit. Code ${data.exitCode}\r\n`
                     )
                     this.scheduler.unhalt()
-                    this.socket.emit(ClientEvents.HALTBEAT, false)
+                    this.socket.emit('haltBeat', false)
                     this.scheduler = null
                 }
                 this.ping()
@@ -235,7 +234,7 @@ export class Terminal {
     }
 
     ping() {
-        this.socket.emit(ClientEvents.TERMINALSTATE, this.getState())
+        this.socket.emit('terminalState', this.getState())
         this.save()
     }
 
@@ -315,8 +314,7 @@ export class Terminal {
         this.ping()
     }
 
-    setMetaSettings(name: string, value: string | boolean | number |
-        Exclude<CommandMetaSetting['sequencing'], undefined>[0] | undefined) {
+    setMetaSettings(name: string, value: MetaSettingPayload) {
         console.log(`Setting meta ${name} - ${value}`)
 
         if (!this.settings.metaSettings) {
@@ -336,7 +334,7 @@ export class Terminal {
             this.settings.metaSettings[name] = trimmed
 
         }
-        if (name === 'sequencing' && typeof value === 'object') {
+        if (name === 'sequencing' && typeof value === 'object' && !Array.isArray(value)) {
 
             if (!this.settings.metaSettings.sequencing) {
                 this.settings.metaSettings.sequencing = []
@@ -354,88 +352,77 @@ export class Terminal {
     }
 
     registerTerminalEvents() {
-        this.socket.on(UtilityEvents.CWD, (arg: string, akw) => {
+        this.socket.on('changeCwd', (arg: string, akw) => {
             console.log(`[New cwd]: ${arg}`)
             this.updateCwd(arg)
             akw(this.getState())
         })
-        this.socket.on(UtilityEvents.CMD, (arg: string, akw) => {
+        this.socket.on('changeCommand', (arg: string, akw) => {
             console.log(`[New cmd]: ${arg}`)
             this.updateCommand(arg)
             if (akw) akw(this.getState())
         })
-        this.socket.on(UtilityEvents.SHELL, (arg: string, akw) => {
+        this.socket.on('changeShell', (arg: string, akw) => {
             console.log(`[New shell]: ${arg}`)
             this.changeShell(arg)
             if (akw) akw(this.getState())
         })
-        this.socket.on(UtilityEvents.TITLE, (arg: string, akw) => {
+        this.socket.on('changeTitle', (arg: string, akw) => {
             console.log(`[New title]: ${arg}`)
             this.changeTitle(arg)
             if (akw) akw(this.getState())
         })
-        this.socket.on(UtilityEvents.INPUT, (args) => {
+        this.socket.on('input', (args) => {
             if (!args.data) return
             this.writeFromClient(args.data)
         })
-        this.socket.on(UtilityEvents.RESIZE, (args: { value: ITerminalDimensions }) => {
+        this.socket.on('resize', (args) => {
             this.resize(args.value)
         })
-        this.socket.on(UtilityEvents.CMDMETASETTINGS, (name: string, value, akw) => {
+        this.socket.on('commandMetaSetting', (name, value, akw) => {
             this.setMetaSettings(name, value)
             akw(this.getState())
         })
 
 
-        this.socket.on(UtilityEvents.ENVLISTDELETE, (args: UtilityProps) => {
+        this.socket.on('environmentListDelete', (args) => {
             this.environment.removeViaOrder(this.settings.id, args.order)
             this.ping()
         })
-        this.socket.on(UtilityEvents.ENVDELETE, (args: UtilityProps) => {
+        this.socket.on('environmentDelete', (args: UtilityProps) => {
+            if (!args.value) return
             this.environment.remove(this.settings.id, args.value, args.order)
             this.ping()
         })
-        this.socket.on(
-            UtilityEvents.ENVLIST,
-            (args: { value: string; fromFile: ArrayBuffer | undefined }) => {
-                if (!args.value) return
-                const environment = parseBufferToEnvironment(args.fromFile)
-                this.environment.addOrder(this.settings.id, args.value, environment)
-                this.ping()
-            }
+        this.socket.on('environmentList', (args) => {
+            if (!args.value) return
+            const environment = parseBufferToEnvironment(args.fromFile)
+            this.environment.addOrder(args.id || this.settings.id, args.value, environment)
+            this.ping()
+        }
         )
-        this.socket.on(UtilityEvents.ENVEDIT, (args: EnvironmentEditProps) => {
+        this.socket.on('environmentEdit', (args: EnvironmentEditProps) => {
             const { order, value, key, previousKey } = args
             this.environment.edit(this.settings.id, order, value, key, previousKey)
             this.ping()
         })
-        this.socket.on(UtilityEvents.ENVMUTE, (arg: UtilityProps) => {
+        this.socket.on('environmentMute', (arg) => {
             this.environment.mute(this.settings.id, arg.order, arg.value)
             this.ping()
         })
 
-
-        this.socket.on(UtilityEvents.STATE, () => {
+        this.socket.on('state', () => {
             this.ping()
         })
 
-        this.socket.on('retrieve_settings', (akw) => {
+        this.socket.on('retrieveSettings', (akw) => {
             akw(this.getState())
         })
 
-        this.socket.on(
-            'history',
-            (
-                key: keyof typeof HistoryKey,
-                { feed, step }: { feed?: string; step?: number },
-                akw
-            ) => {
+        this.socket.on('history',
+            (key: keyof typeof HistoryKey, feed: string, akw) => {
                 if (feed) {
                     akw(this.history.search(key, feed))
-                    return
-                }
-                if (step) {
-                    akw(this.history.get(key, step))
                     return
                 }
                 return

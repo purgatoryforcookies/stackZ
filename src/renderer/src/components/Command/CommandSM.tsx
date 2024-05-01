@@ -1,4 +1,4 @@
-import { ClientEvents, Cmd, Status, UtilityEvents } from '@t'
+import { Cmd, Status } from '@t'
 import { useEffect, useState } from 'react'
 import { Button } from '@renderer/@/ui/button'
 import {
@@ -32,32 +32,33 @@ type CommandProps = {
 function CommandSM({ data, engine, stack, selected, handleDrag, stackRunning }: CommandProps) {
     const [ping, setPing] = useState<Status>({
         stackId: engine.stackId,
+        stackEnv: [],
         reserved: false,
         cmd: data,
         isRunning: false,
         cwd: data.command.cwd
     })
     const [hcHeartBeat, setHcHeartBeat] = useState<number>()
-    const [ishalting, setIsHalting] = useState<false>(false)
+    const [ishalting, setIsHalting] = useState<boolean>(false)
 
     useEffect(() => {
-        engine.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
+        engine.socket.on('terminalState', (d) => {
             setPing(d)
         })
 
-        engine.socket.on(ClientEvents.HEARTBEAT, (d: number) => {
+        engine.socket.on('heartBeat', (d) => {
             setHcHeartBeat(d)
         })
-        engine.socket.on(ClientEvents.HALTBEAT, (d) => {
+        engine.socket.on('haltBeat', (d) => {
             setIsHalting(d)
         })
-        engine.socket.emit(UtilityEvents.STATE)
+        engine.socket.emit('state')
 
         return () => {
-            engine.socket.off(ClientEvents.TERMINALSTATE)
-            engine.socket.off(ClientEvents.HEARTBEAT)
+            engine.socket.off('terminalState')
+            engine.socket.off('heartBeat')
         }
-    }, [engine, selected, data])
+    }, [data, engine, selected])
 
     const handleState = async (delRecord = false) => {
         if (delRecord) {

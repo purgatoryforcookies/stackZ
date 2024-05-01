@@ -67,7 +67,7 @@ function InputWithMagic({
         }
         setIsPending(true)
 
-        engine.socket.emit('history', historyKey, { feed: e.target.value }, (data: HistoryBook) => {
+        engine.socket.emit('history', historyKey, e.target.value, (data: HistoryBook) => {
             if (data.host.length === 0 && data.stackz.length === 0) {
                 setSearchList([])
                 return

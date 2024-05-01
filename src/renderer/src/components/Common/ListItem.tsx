@@ -2,14 +2,13 @@ import { GoPlus } from 'react-icons/go'
 import { FormEvent, useState } from 'react'
 import { Input } from '@renderer/@/ui/input'
 import { Cross1Icon } from '@radix-ui/react-icons'
-import { UtilityEvents } from '@t'
-import { Socket } from 'socket.io-client'
+import { CustomClientSocket } from '@t'
 
 type ListItemProps = {
     newRecord: boolean
     orderId: number
     minimized: boolean
-    socket: Socket | undefined
+    socket: CustomClientSocket | undefined
 }
 
 interface RecordProps extends ListItemProps {
@@ -85,8 +84,8 @@ const Record = ({
     const [valueValue, setValueValue] = useState<string | undefined>(value)
 
     const handleMute = () => {
-        if (editMode) return
-        socket?.emit(UtilityEvents.ENVMUTE, {
+        if (editMode || !keyValue) return
+        socket?.emit('environmentMute', {
             value: keyValue,
             order: orderId
         })
@@ -95,8 +94,8 @@ const Record = ({
     const handleEdits = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        if (newRecordOpen && (!keyValue || !valueValue)) return
-        socket?.emit(UtilityEvents.ENVEDIT, {
+        if (newRecordOpen || (!keyValue || !valueValue)) return
+        socket?.emit('environmentEdit', {
             order: orderId,
             key: keyValue,
             previousKey: keyPreviousValue,
@@ -107,7 +106,8 @@ const Record = ({
     }
 
     const handleDelete = () => {
-        socket?.emit(UtilityEvents.ENVDELETE, {
+        if (!keyValue) return
+        socket?.emit('environmentDelete', {
             order: orderId,
             value: keyValue
         })

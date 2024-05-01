@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ClientEvents, Status, UtilityEvents } from '@t'
+import { Status } from '@t'
 import EnvList from '../Common/EnvList'
 import { NewEnvList } from '../Dialogs/NewEnvList'
 import { IUseStack } from '@renderer/hooks/useStack'
@@ -15,10 +15,10 @@ function DetailHeader({ stack }: DetailHeaderProps) {
     useEffect(() => {
         const terminal = stack.terminals?.get(stack.selectedStack)?.get(stack.selectedTerminal)
         if (!terminal) return
-        terminal.socket.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
+        terminal.socket.on('terminalState', (d) => {
             setStatus(d)
         })
-        terminal.socket.emit(UtilityEvents.STATE)
+        terminal.socket.emit('state')
 
         if (status && status.stackId !== stack.selectedStack) setStatus(null)
     }, [stack])
