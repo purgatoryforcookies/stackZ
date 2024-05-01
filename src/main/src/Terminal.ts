@@ -1,11 +1,9 @@
 import {
     Cmd,
     CustomServerSocket,
-    EnvironmentEditProps,
     HistoryKey,
     MetaSettingPayload,
     Status,
-    UtilityProps
 } from '../../types'
 import { spawn, IPty } from 'node-pty'
 import { parseBufferToEnvironment } from './util/util'
@@ -386,12 +384,12 @@ export class Terminal {
 
 
         this.socket.on('environmentListDelete', (args) => {
-            this.environment.removeViaOrder(this.settings.id, args.order)
+            this.environment.removeViaOrder(args.id || this.settings.id, args.order)
             this.ping()
         })
-        this.socket.on('environmentDelete', (args: UtilityProps) => {
+        this.socket.on('environmentDelete', (args) => {
             if (!args.value) return
-            this.environment.remove(this.settings.id, args.value, args.order)
+            this.environment.remove(args.id || this.settings.id, args.value, args.order)
             this.ping()
         })
         this.socket.on('environmentList', (args) => {
@@ -401,13 +399,13 @@ export class Terminal {
             this.ping()
         }
         )
-        this.socket.on('environmentEdit', (args: EnvironmentEditProps) => {
+        this.socket.on('environmentEdit', (args) => {
             const { order, value, key, previousKey } = args
-            this.environment.edit(this.settings.id, order, value, key, previousKey)
+            this.environment.edit(args.id || this.settings.id, order, value, key, previousKey)
             this.ping()
         })
         this.socket.on('environmentMute', (arg) => {
-            this.environment.mute(this.settings.id, arg.order, arg.value)
+            this.environment.mute(arg.id || this.settings.id, arg.order, arg.value)
             this.ping()
         })
 

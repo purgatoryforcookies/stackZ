@@ -234,7 +234,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                     <div className='flex flex-col gap-2'>
                         {settings?.cmd.metaSettings?.sequencing
                             && settings.cmd.metaSettings.sequencing.map((seq, i) => (
-                                <div className='flex items-center'>
+                                <div key={seq.index} className='flex items-center'>
                                     <Input
                                         id={seq.index.toString()}
                                         tabIndex={i}

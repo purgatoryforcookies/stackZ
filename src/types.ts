@@ -106,8 +106,8 @@ export interface ClientToServerEvents {
     history: (key: keyof typeof HistoryKey, feed: string, callback: (data: HistoryBook) => void) => void
 
     environmentEdit: (args: EnvironmentEditProps) => void
+    environmentList: (args: { value: string; fromFile: ArrayBuffer | null, id?: string | null }) => void
     environmentMute: (arg: UtilityProps) => void
-    environmentList: (args: { value: string; fromFile: ArrayBuffer | null, id?: string }) => void
     environmentListDelete: (args: UtilityProps) => void
     environmentDelete: (args: UtilityProps) => void
 
@@ -163,11 +163,13 @@ export type EnvironmentEditProps = {
     previousKey?: string
     value: string
     enabled: boolean
+    id?: string | null
 }
 
 export type UtilityProps = {
     order: number
     value?: string
+    id?: string | null
 }
 export type Utility2Props = {
     stack: string

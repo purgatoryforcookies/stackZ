@@ -129,7 +129,6 @@ export class EnvironmentService {
             throw new Error('Empty environment is not a possible configuration')
         }
 
-        console.log(reduced)
         return reduced
     }
 

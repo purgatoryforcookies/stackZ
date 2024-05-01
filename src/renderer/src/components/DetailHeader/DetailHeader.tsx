@@ -3,6 +3,7 @@ import { Status } from '@t'
 import EnvList from '../Common/EnvList'
 import { NewEnvList } from '../Dialogs/NewEnvList'
 import { IUseStack } from '@renderer/hooks/useStack'
+import { Separator } from '@renderer/@/ui/separator'
 
 type DetailHeaderProps = {
     stack: IUseStack
@@ -34,18 +35,26 @@ function DetailHeader({ stack }: DetailHeaderProps) {
 
     return (
         <div className="flex gap-8 pb-16 pr-10 h-full" ref={bodyRef}>
-            <div className='border-2 flex'>
 
-                {status?.stackEnv ? status.stackEnv.map((record) =>
-                    <EnvList data={record} key={record.title} socket={terminal.socket} />) : null}
+            {status?.stackEnv ? status.stackEnv
+                .sort((a, b) => a.order - b.order)
+                .map((record) =>
+                    <EnvList id={stack.selectedStack} data={record}
+                        key={record.title} socket={terminal.socket} />) : null}
 
-            </div>
+            {status?.stackEnv ?
+                <div className='flex'>
+                    <p className='text-secondary-foreground/30 pr-2 text-[0.8rem] tracking-wide'>Stack</p>
+                    <Separator orientation='vertical' />
+                    <p className='text-secondary-foreground/30 pl-2 text-[0.8rem] tracking-wide'>Terminal</p>
+                </div> : null}
 
             {status?.cmd.command.env
                 ? status.cmd.command.env
                     .sort((a, b) => a.order - b.order)
                     .map((record) => (
-                        <EnvList data={record} key={record.title} socket={terminal.socket} />
+                        <EnvList id={stack.selectedTerminal} data={record}
+                            key={record.title} socket={terminal.socket} />
                     ))
                 : null}
             <div className="p-11">

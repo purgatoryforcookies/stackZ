@@ -10,8 +10,8 @@ export const CustomToolTip = ({
     hidden?: boolean
 }) => {
     return (
-        <TooltipProvider>
-            <Tooltip>
+        <TooltipProvider >
+            <Tooltip >
                 <TooltipTrigger >{children}</TooltipTrigger>
                 {!hidden ? (
                     <TooltipContent>

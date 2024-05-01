@@ -39,11 +39,12 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
         e.preventDefault()
         let buf: ArrayBuffer | null = null
         if (file) buf = await file.arrayBuffer()
-        if (global) {
-            terminal.socket.emit('environmentList', { value: title, fromFile: buf, id: stack.selectedStack })
-        } else {
-            terminal.socket.emit('environmentList', { value: title, fromFile: buf })
-        }
+        terminal.socket.emit('environmentList', {
+            value: title,
+            fromFile: buf,
+            id: global ? stack.selectedStack : null
+        })
+
         setTitle('')
         scroll()
         setOpen(false)
@@ -53,7 +54,6 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
         event.preventDefault()
         setDragover(false)
         const fileGrab = event.dataTransfer?.files[0]
-        console.log(fileGrab)
         if (fileGrab) {
             setFile(fileGrab)
         }

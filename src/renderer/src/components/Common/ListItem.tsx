@@ -17,6 +17,7 @@ interface RecordProps extends ListItemProps {
     editMode: boolean
     muted?: boolean
     highlight?: boolean
+    id: string
 }
 
 type FieldProps = {
@@ -76,7 +77,8 @@ const Record = ({
     newRecord,
     orderId,
     minimized,
-    muted
+    muted,
+    id
 }: RecordProps) => {
     const [newRecordOpen, setNewRecordOpen] = useState(false)
     const [keyValue, setKeyValue] = useState<string | undefined>(keyv)
@@ -87,20 +89,23 @@ const Record = ({
         if (editMode || !keyValue) return
         socket?.emit('environmentMute', {
             value: keyValue,
-            order: orderId
+            order: orderId,
+            id: id
         })
     }
 
     const handleEdits = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        if (newRecordOpen || (!keyValue || !valueValue)) return
+        if (newRecordOpen && (!keyValue || !valueValue)) return
+        if (!keyValue || !valueValue) return
         socket?.emit('environmentEdit', {
             order: orderId,
             key: keyValue,
             previousKey: keyPreviousValue,
             value: valueValue,
-            enabled: true
+            enabled: true,
+            id: id
         })
         setNewRecordOpen(false)
     }
@@ -109,7 +114,8 @@ const Record = ({
         if (!keyValue) return
         socket?.emit('environmentDelete', {
             order: orderId,
-            value: keyValue
+            value: keyValue,
+            id: id
         })
     }
 

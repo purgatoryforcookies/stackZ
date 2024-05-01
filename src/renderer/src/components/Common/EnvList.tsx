@@ -15,16 +15,18 @@ type EnvListProps = {
         disabled: string[]
     }
     socket: CustomClientSocket | undefined
+    id: string
 }
 
-function EnvList({ data, socket }: EnvListProps) {
-    const [minimized, setMinimized] = useState<boolean>(data.order === 0 ? true : false)
-    const [hidden, setHidden] = useState<boolean>(data.order === 0 ? true : false)
+function EnvList({ data, socket, id }: EnvListProps) {
+    const [minimized, setMinimized] = useState<boolean>(false)
+    const [hidden, setHidden] = useState<boolean>(false)
     const [editMode, setEditMode] = useState<boolean>(false)
 
     const handleMute = () => {
         socket?.emit('environmentMute', {
-            order: data.order
+            order: data.order,
+            id: id
         })
     }
 
@@ -43,7 +45,8 @@ function EnvList({ data, socket }: EnvListProps) {
 
     const handleDelete = () => {
         socket?.emit('environmentListDelete', {
-            order: data.order
+            order: data.order,
+            id: id
         })
     }
 
@@ -54,16 +57,19 @@ function EnvList({ data, socket }: EnvListProps) {
         ${editMode ? 'max-w-[100%]' : ''}
         `}
         >
-            {data.order === 0 ? (
-                <CustomToolTip message="This environment is editable, but not persistent.">
-                    <h1 className="text-center text-foreground text-nowrap flex items-center gap-1">
-                        {data.title} <GoInfo className="w-4 h-4 text-white/50" />
-                    </h1>
-                </CustomToolTip>
-            ) : (
-                <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
-            )}
+            <div className='flex justify-center'>
 
+                {data.title === 'OS Environment' ? (
+                    <CustomToolTip message="This environment is editable, but not persistent.">
+                        <h1 className="text-center text-foreground text-nowrap flex items-center gap-1">
+                            {data.title} <GoInfo className="w-4 h-4 text-white/50" />
+                        </h1>
+                    </CustomToolTip>
+                ) : (
+                    <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
+                )}
+
+            </div>
             <Separator className="my-2" />
             <div className="flex gap-1 justify-center mb-2">
                 <Badge
@@ -124,6 +130,7 @@ function EnvList({ data, socket }: EnvListProps) {
                         ? Object.keys(data.pairs).map((key: string) => (
                             <Record
                                 key={key} //react component key
+                                id={id}
                                 newRecord={false}
                                 editMode={editMode}
                                 socket={socket}
@@ -138,6 +145,7 @@ function EnvList({ data, socket }: EnvListProps) {
                     {editMode ? (
                         <Record
                             newRecord={true}
+                            id={id}
                             socket={socket}
                             orderId={data.order}
                             minimized={minimized}
