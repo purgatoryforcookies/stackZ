@@ -2,11 +2,10 @@
 import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import react from '@vitejs/plugin-react'
-import svgr from '@svgr/rollup'
 
 export default defineConfig({
     main: {
-        plugins: [externalizeDepsPlugin()]
+        plugins: [externalizeDepsPlugin()],
     },
     preload: {
         resolve: {
@@ -23,8 +22,6 @@ export default defineConfig({
                 '@t': resolve('src/types.ts')
             }
         },
-        plugins: [
-            react(),
-            svgr(),]
+        plugins: [react()]
     }
 })
