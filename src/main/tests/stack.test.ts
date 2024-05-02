@@ -1,8 +1,8 @@
 import { Server } from 'socket.io'
 import { Stack } from '../src/Stack'
-import { ClientEvents, StackStatus, Status, UtilityEvents, stackSchema } from '../../types'
+import { CustomClientSocket, stackSchema } from '../../types'
 import { existsSync, unlinkSync } from 'fs'
-import { Socket, io } from 'socket.io-client'
+import { io } from 'socket.io-client'
 import { join } from 'path'
 
 const testServer = new Server({
@@ -10,6 +10,22 @@ const testServer = new Server({
         origin: '*'
     }
 })
+
+/**
+ * Mocking both of these here because 
+ * 1. They hang and take time
+ * 2. They should be tested separetly.
+ */
+jest.mock('../src/service/MonitorService', () => {
+    return {
+        MonitorService: jest.fn(() => { })
+    }
+});
+jest.mock('../src/service/HistoryService', () => {
+    return {
+        HistoryService: jest.fn(() => { })
+    }
+});
 
 const filepath = join(__dirname, './testStack1.json')
 
@@ -20,7 +36,9 @@ describe('stack', () => {
     const stack = new Stack(filepath, testServer, stackSchema)
     const testTerminalNames = ['terminal1', 'terminal2', 'terminal3', 'terminal4']
     const testStacks: Map<string, string[]> = new Map()
-    const uiSockets: Socket[] = []
+    const uiSockets: CustomClientSocket[] = []
+
+
 
     beforeAll(async () => {
         await stack.load()
@@ -118,7 +136,7 @@ describe('stack', () => {
         // At this point each 3 stacks have 4 terminals
         // None of the terminals exist in anywhere else than in settings
         // The client asks for a terminal to be connected once it is
-        // Being shown in the UI, so we need to make that happen somehow.
+        // Being shown in the UI, so we need to make that happen.
 
         // Lets pretend to be a ui's terminal engine and connect with sockets
 
@@ -167,8 +185,8 @@ describe('stack', () => {
 
     it.todo('Starts and stops each terminal')
 
-    describe('Socket events :)', () => {
-        const stackMockSockets: Socket[] = []
+    describe('Socket events', () => {
+        const stackMockSockets: CustomClientSocket[] = []
 
         beforeAll(async () => {
             Array.from(testStacks.keys()).forEach((id) => {
@@ -195,7 +213,7 @@ describe('stack', () => {
             let stackCounter = 0
 
             stackMockSockets.forEach((socket) => {
-                socket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
+                socket.on('stackState', (d) => {
                     expect(d.stack).toBeDefined()
                     expect(d.state.length).toBe(4)
                     expect(d.state[0].id).toBeDefined()
@@ -206,14 +224,14 @@ describe('stack', () => {
                         done()
                     }
                 })
-                socket.emit(UtilityEvents.STACKSTATE)
+                socket.emit('stackState')
             })
         }, 1000)
 
         it("Emits individial terminals state with given id's", (done) => {
             let terminalCounter = 0
             for (const sock of uiSockets) {
-                sock.on(ClientEvents.TERMINALSTATE, (d: Exclude<Status, undefined>) => {
+                sock.on('terminalState', (d) => {
                     expect(d.isRunning).toBeDefined()
                     expect(d.cmd).toBeDefined()
                     expect(d.stackId).toBeDefined()
@@ -225,7 +243,7 @@ describe('stack', () => {
                     }
                 })
 
-                sock.emit(UtilityEvents.STATE)
+                sock.emit('state')
             }
         }, 1000)
 

@@ -1,5 +1,5 @@
 import { IPty } from 'node-pty'
-import { CommandMetaSetting } from 'src/types'
+import { CommandMetaSetting } from '../../../types'
 import { executeScript } from '../util/util'
 
 

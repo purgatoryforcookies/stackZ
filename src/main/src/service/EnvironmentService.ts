@@ -1,4 +1,4 @@
-import { Environment } from "src/types"
+import { Environment } from "../../../types"
 import { envFactory, haveThesameElements } from "../util/util"
 
 

@@ -5,9 +5,12 @@ import InputWithMagic from '../components/Common/InputWithMagic'
 import { render, renderHook } from '@testing-library/react'
 
 jest.mock('socket.io-client', () => {
-    const emit = jest.fn()
-    const on = jest.fn()
-    const socket = { emit, on }
+
+    const socket = {
+        emit: jest.fn(),
+        on: jest.fn()
+    }
+
     return jest.fn(() => socket)
 })
 const socket = io('http://localhost:3123')
@@ -21,15 +24,15 @@ describe('InputWithMagic', () => {
     engine.socket = socket
     const tools = renderHook(() => useCommandSettings(engine))
 
-    it('Sockets should', function (done) {
-        expect(socket.emit).toHaveBeenCalledWith('retrieve_settings', expect.any(Function))
+    it('Sockets should retrieve their settings', function (done) {
+        expect(socket.emit).toHaveBeenCalledWith('retrieveSettings', expect.any(Function))
 
         expect(tools).toBeDefined()
 
         done()
     })
 
-    it('should render correctly', async () => {
+    it('should render', async () => {
         const { findAllByTestId } = render(
             <InputWithMagic
                 tools={tools.result.current}
