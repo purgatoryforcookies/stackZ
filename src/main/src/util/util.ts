@@ -60,6 +60,7 @@ export const parseBufferToEnvironment = (buf: ArrayBuffer | null) => {
  * into the settings, if they dont already exist.
  */
 export const envFactory = (args: Environment[] | undefined) => {
+
     const hostEnv: Environment = {
         title: 'OS Environment',
         pairs: process.env as Record<string, string>,

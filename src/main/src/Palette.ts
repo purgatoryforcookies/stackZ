@@ -78,6 +78,7 @@ export class Palette {
         this.terminals.delete(terminalId)
         this.settings.palette = this.settings.palette?.filter((pal) => pal.id !== terminalId)
         this.reIndexOrders()
+        this.environment.unregister(terminalId)
     }
     installStackSocket(socket: CustomServerSocket) {
         this.socket = socket
@@ -191,8 +192,7 @@ export class Palette {
             isReserved: terminalStates.some((term) => term.reserved),
             state: terminalStates
         }
-        // if (!this.socket) return
-        // this.server?.emit(ClientEvents.STACKSTATE, "state")
+
         this.socket?.emit('stackState', state)
         this.socket?.emit('badgeHeartBeat', state)
     }

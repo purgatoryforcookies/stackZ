@@ -119,7 +119,7 @@ export class Terminal {
                         ? 'xterm-256color'
                         : `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd,
-                env: this.environment.bake([this.settings.id]),
+                env: this.environment.bake([this.stackId, this.settings.id]),
                 useConpty: false,
                 rows: this.rows,
                 cols: this.cols

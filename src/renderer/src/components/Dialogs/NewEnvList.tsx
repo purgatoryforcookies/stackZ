@@ -149,7 +149,7 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
                                     onCheckedChange={(e) => setGlobal(e)}
                                 />
                                 <Label htmlFor="sequencing" className="flex items-center gap-2">
-                                    Stack global
+                                    Stack environment
                                 </Label>
                             </div>
                             {file ? (

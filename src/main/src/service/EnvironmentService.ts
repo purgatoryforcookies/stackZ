@@ -18,8 +18,9 @@ export class EnvironmentService {
     }
 
     register(id: string, env?: Environment[], omitOS = false) {
-
-        if (omitOS && env) {
+        console.log('Registering', id, omitOS)
+        if (omitOS) {
+            if (!env) return
             this.store.set(id, env)
             return
         }
@@ -55,8 +56,11 @@ export class EnvironmentService {
     addOrder(id: string, title: string, variables: Record<string, string>) {
         if (!title) return
 
-        const target = this.store.get(id)
-        if (!target) throw new Error('Addin list failed. No environment found')
+        let target = this.store.get(id)
+        if (!target) {
+            this.register(id, [])
+            target = []
+        }
 
         if (target.some((env) => env.title === title)) {
             title += ' (1)'
@@ -65,11 +69,12 @@ export class EnvironmentService {
         const newEnv: Environment = {
             pairs: variables,
             title: title,
-            order: Math.max(...target.map((env) => env.order)) + 1,
+            order: target.length === 0 ? 0 : target.length + 1,
             disabled: []
         }
-
         target.push(newEnv)
+        console.log(target)
+        this.store.set(id, target)
     }
 
     removeViaOrder(id: string, order: number) {
@@ -88,6 +93,9 @@ export class EnvironmentService {
     }
 
 
+    /**
+     * Edits or adds a key-value pair to given set.
+     */
     edit(id: string, order: number, value: string, key: string, prevKey?: string) {
         if (key.trim().length == 0) return
 
@@ -128,7 +136,6 @@ export class EnvironmentService {
         if (Object.keys(reduced).length === 0) {
             throw new Error('Empty environment is not a possible configuration')
         }
-
         return reduced
     }
 

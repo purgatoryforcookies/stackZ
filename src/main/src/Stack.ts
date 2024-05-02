@@ -6,6 +6,7 @@ import { ZodTypeAny } from 'zod'
 import { TerminalScheduler } from './service/TerminalScheduler'
 import { HistoryService } from './service/HistoryService'
 import { MonitorService } from './service/MonitorService'
+import { EnvironmentService } from './service/EnvironmentService'
 
 
 export class Stack {
@@ -17,6 +18,7 @@ export class Stack {
     scheduler: Map<string, TerminalScheduler>
     history: HistoryService
     monitor: MonitorService
+    environment: EnvironmentService
 
     constructor(jsonPath: string, server: CustomServer, schema: ZodTypeAny) {
         this.path = jsonPath
@@ -27,6 +29,7 @@ export class Stack {
         this.scheduler = new Map<string, TerminalScheduler>()
         this.history = new HistoryService()
         this.monitor = new MonitorService()
+        this.environment = EnvironmentService.get()
     }
 
     async load() {
@@ -190,8 +193,11 @@ export class Stack {
      */
     save = (onExport = false) => {
         const toBeSaved: PaletteStack[] = JSON.parse(JSON.stringify(this.raw))
+
         toBeSaved.forEach((stack) => {
+            stack.env = this.environment.store.get(stack.id)
             stack.palette?.forEach((pal) => {
+                pal.command.env = this.environment.store.get(pal.id)
                 pal.command.env = pal.command.env?.filter((o) => o.order > 0)
             })
         })
