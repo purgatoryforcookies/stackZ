@@ -5,16 +5,11 @@ import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
 import { CustomToolTip } from './CustomTooltip'
 import { GoInfo } from 'react-icons/go'
-import { CustomClientSocket } from '@t'
+import { Cmd, CustomClientSocket } from '@t'
 
 type EnvListProps = {
-    data: {
-        title: string
-        pairs: Record<string, string | undefined>
-        order: number
-        disabled: string[]
-    }
-    socket: CustomClientSocket | undefined
+    data: Exclude<Cmd['command']['env'], undefined>[0]
+    socket: CustomClientSocket
     id: string
 }
 
@@ -24,7 +19,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
     const [editMode, setEditMode] = useState<boolean>(false)
 
     const handleMute = () => {
-        socket?.emit('environmentMute', {
+        socket.emit('environmentMute', {
             order: data.order,
             id: id
         })
@@ -44,7 +39,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
     }
 
     const handleDelete = () => {
-        socket?.emit('environmentListDelete', {
+        socket.emit('environmentListDelete', {
             order: data.order,
             id: id
         })

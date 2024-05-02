@@ -378,6 +378,7 @@ export class Terminal {
             this.resize(args.value)
         })
         this.socket.on('commandMetaSetting', (name, value, akw) => {
+            console.log(name, value)
             this.setMetaSettings(name, value)
             akw(this.getState())
         })

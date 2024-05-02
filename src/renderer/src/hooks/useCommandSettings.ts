@@ -25,37 +25,34 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
     const onChange = (name: OnChangeType, value?: string |
         Exclude<CommandMetaSetting['sequencing'], undefined>[0] | [] | boolean | number) => {
         setIsLoading(true)
-        if (typeof value === 'string') {
 
-            switch (name) {
-                case 'cwd':
-                    engine.socket.emit('changeCwd', value, (data) => {
-                        finishUp(data)
-                    })
-                    break
-                case 'cmd':
-                    engine.socket.emit('changeCommand', value, (data) => {
-                        finishUp(data)
-                    })
-                    break
-                case 'shell':
-                    engine.socket.emit('changeShell', value, (data) => {
-                        finishUp(data)
-                    })
-                    break
-                case 'title':
-                    engine.socket.emit('changeTitle', value, (data) => {
-                        finishUp(data)
-                    })
-                    break
-            }
+        switch (name) {
+            case 'cwd':
+                engine.socket.emit('changeCwd', value as string, (data) => {
+                    finishUp(data)
+                })
+                break
+            case 'cmd':
+                engine.socket.emit('changeCommand', value as string, (data) => {
+                    finishUp(data)
+                })
+                break
+            case 'shell':
+                engine.socket.emit('changeShell', value as string, (data) => {
+                    finishUp(data)
+                })
+                break
+            case 'title':
+                engine.socket.emit('changeTitle', value as string, (data) => {
+                    finishUp(data)
+                })
+                break
+            default:
+                engine.socket.emit('commandMetaSetting', name, value, (data) => {
+                    if (!data) return
+                    finishUp(data)
+                })
 
-        } else {
-
-            engine.socket.emit('commandMetaSetting', name, value, (data) => {
-                if (!data) return
-                finishUp(data)
-            })
         }
     }
 
