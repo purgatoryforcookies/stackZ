@@ -5,5 +5,5 @@ StackZ's purpose is to make it easy to pick up and start an environment for deve
 
 Switching between differrent projects becomes faster and easier, letting you get into it with less.
 
-[Docs](https://purgatoryforcookies.github.io/stackz)
+[Docs](https://purgatoryforcookies.github.io/stackZ)
 

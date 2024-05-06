@@ -1,4 +1,3 @@
-import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import tailwindPlugin from './plugins/tailwind-plugin.cjs';
@@ -8,25 +7,16 @@ const config: Config = {
   tagline: 'Little helper for your environment setups.',
   favicon: 'img/favicon.ico',
   plugins: [tailwindPlugin],
-
-  // Set the production url of your site here
   url: 'https://github.com',
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/stackz/',
+  baseUrl: '/stackZ/',
   trailingSlash: false,
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'purgatoryforcookies', // Usually your GitHub org/user name.
-  projectName: 'stackZ', // Usually your repo name.
+  organizationName: 'purgatoryforcookies',
+  projectName: 'stackZ',
   deploymentBranch: 'master',
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
-  // Even if you don't use internationalization, you can use this field to set
-  // useful metadata like html lang. For example, if your site is Chinese, you
-  // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
@@ -47,7 +37,9 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
+    colorMode: {
+      defaultMode: 'dark',
+    },
     navbar: {
       title: 'StackZ',
       logo: {
