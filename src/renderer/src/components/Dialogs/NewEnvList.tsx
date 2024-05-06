@@ -1,5 +1,7 @@
+import { CheckedState } from '@radix-ui/react-checkbox'
 import { Cross1Icon, FileIcon, PlusIcon } from '@radix-ui/react-icons'
 import { Button } from '@renderer/@/ui/button'
+import { Checkbox } from '@renderer/@/ui/checkbox'
 import {
     Dialog,
     DialogContent,
@@ -14,20 +16,22 @@ import { Label } from '@renderer/@/ui/label'
 import { ThemeContext } from '@renderer/App'
 import { useDebounce } from '@renderer/hooks/useDebounce'
 import useLocalStorage from '@renderer/hooks/useLocalStorage'
+import { IUseStack } from '@renderer/hooks/useStack'
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
-import { UtilityEvents } from '@t'
 import { useContext, useEffect, useState } from 'react'
 
 type NewEnvListProps = {
     scroll: () => void
     terminal: TerminalUIEngine
+    stack: IUseStack
 }
 
-export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
+export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
     const [title, setTitle] = useState<string>('')
     const [file, setFile] = useState<File | null>(null)
     const [open, setOpen] = useState<boolean>(false)
     const [dragover, setDragover] = useState<boolean>(false)
+    const [global, setGlobal] = useState<CheckedState>(false)
 
     const theme = useContext(ThemeContext)
 
@@ -35,7 +39,12 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
         e.preventDefault()
         let buf: ArrayBuffer | null = null
         if (file) buf = await file.arrayBuffer()
-        terminal.socket.emit(UtilityEvents.ENVLIST, { value: title, fromFile: buf })
+        terminal.socket.emit('environmentList', {
+            value: title,
+            fromFile: buf,
+            id: global ? stack.selectedStack : null
+        })
+
         setTitle('')
         scroll()
         setOpen(false)
@@ -45,7 +54,6 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
         event.preventDefault()
         setDragover(false)
         const fileGrab = event.dataTransfer?.files[0]
-        console.log(fileGrab)
         if (fileGrab) {
             setFile(fileGrab)
         }
@@ -54,6 +62,10 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
 
     const { read, write } = useLocalStorage()
 
+    /**
+     * Testing this out. Highlight the dropzone for user
+     * in semi-random times. 
+     */
     useEffect(() => {
         let timestamp = read('since')
         if (!timestamp) {
@@ -67,7 +79,7 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
             setDragover(true)
             setTimeout(() => {
                 setDragover(false)
-            }, 4000)
+            }, 10000)
             write('since', new Date().toISOString())
         }
     }, [terminal])
@@ -130,6 +142,16 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
                     </div>
                     <DialogFooter className="relative">
                         <div className="flex items-center">
+                            <div className='flex gap-1 pr-5'>
+                                <Checkbox
+                                    id='sequencing'
+                                    checked={global}
+                                    onCheckedChange={(e) => setGlobal(e)}
+                                />
+                                <Label htmlFor="sequencing" className="flex items-center gap-2">
+                                    Stack environment
+                                </Label>
+                            </div>
                             {file ? (
                                 <span className="flex gap-1 absolute left-0">
                                     <FileIcon className="h-4 w-4" />
@@ -144,6 +166,7 @@ export function NewEnvList({ scroll, terminal }: NewEnvListProps) {
                                 Save
                             </Button>
                         </div>
+
                     </DialogFooter>
                 </form>
             </DialogContent>

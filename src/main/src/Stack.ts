@@ -1,24 +1,26 @@
 import { v4 as uuidv4 } from 'uuid'
-import { NewCommandPayload, PaletteStack } from '../../types'
+import { CustomServer, NewCommandPayload, PaletteStack } from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './stores/DataStore'
 import { ZodTypeAny } from 'zod'
-import { Server } from 'socket.io'
 import { TerminalScheduler } from './service/TerminalScheduler'
 import { HistoryService } from './service/HistoryService'
 import { MonitorService } from './service/MonitorService'
+import { EnvironmentService } from './service/EnvironmentService'
+
 
 export class Stack {
     path: string
-    server: Server
+    server: CustomServer
     raw: PaletteStack[]
     palettes: Map<string, Palette>
     store: DataStore
     scheduler: Map<string, TerminalScheduler>
     history: HistoryService
     monitor: MonitorService
+    environment: EnvironmentService
 
-    constructor(jsonPath: string, server: Server, schema: ZodTypeAny) {
+    constructor(jsonPath: string, server: CustomServer, schema: ZodTypeAny) {
         this.path = jsonPath
         this.server = server
         this.raw = []
@@ -27,6 +29,7 @@ export class Stack {
         this.scheduler = new Map<string, TerminalScheduler>()
         this.history = new HistoryService()
         this.monitor = new MonitorService()
+        this.environment = EnvironmentService.get()
     }
 
     async load() {
@@ -190,8 +193,11 @@ export class Stack {
      */
     save = (onExport = false) => {
         const toBeSaved: PaletteStack[] = JSON.parse(JSON.stringify(this.raw))
+
         toBeSaved.forEach((stack) => {
+            stack.env = this.environment.store.get(stack.id)
             stack.palette?.forEach((pal) => {
+                pal.command.env = this.environment.store.get(pal.id)
                 pal.command.env = pal.command.env?.filter((o) => o.order > 0)
             })
         })

@@ -13,11 +13,12 @@ export const useTaalasmaa = (ref: RefObject<HTMLDivElement>) => {
         if (!ref.current) return
 
         const resizeObserver = new ResizeObserver(() => {
-            if (ref.current!.offsetWidth !== w) {
-                setW(ref.current!.offsetWidth)
+            if (!ref.current) return
+            if (ref.current.offsetWidth !== w) {
+                setW(ref.current.offsetWidth)
             }
-            if (ref.current!.offsetHeight !== h) {
-                setH(ref.current!.offsetHeight)
+            if (ref.current.offsetHeight !== h) {
+                setH(ref.current.offsetHeight)
             }
         })
 

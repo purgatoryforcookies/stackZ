@@ -1,5 +1,8 @@
+import { ITerminalDimensions } from 'xterm-addon-fit'
 import { TerminalUIEngine } from './renderer/src/service/TerminalUIEngine'
 import { z } from 'zod'
+import { Server, Socket } from 'socket.io'
+import { Socket as ClientSocket } from 'socket.io-client'
 
 export const stackSchema = z.array(
     z.object({
@@ -31,7 +34,12 @@ export const stackSchema = z.array(
                             ctrlc: z.boolean().default(false).optional(),
                             delay: z.number().optional(),
                             healthCheck: z.string().optional(),
-                            halt: z.boolean().default(false).optional()
+                            halt: z.boolean().default(false).optional(),
+                            sequencing: z.array(z.object({
+                                index: z.number(),
+                                echo: z.string().optional(),
+                                message: z.string().optional()
+                            })).optional(),
                         })
                         .optional(),
                     command: z.object({
@@ -70,43 +78,66 @@ export enum SelectionEvents {
     NEWSTACK = 'NEWSTACK'
 }
 
-export enum UtilityEvents {
-    STATE = 'state',
-    STACKSTATE = 'stackState',
-    ENVEDIT = 'environmentEdit',
-    ENVMUTE = 'environmentMute',
-    ENVLIST = 'environmentList',
-    ENVLISTDELETE = 'environmentListDelete',
-    ENVDELETE = 'environmentDelete',
-    CMDMETASETTINGS = 'commandMetaSetting',
-    HEALTHSETTINGS = 'commandHealthSetting',
-    STACKDEFAULTS = 'stackDefaults',
-    STACKNAME = 'stackName',
-    CWD = 'changeCwd',
-    CMD = 'changeCommand',
-    SHELL = 'changeShell',
-    TITLE = 'title',
-    INPUT = 'input',
-    RESIZE = 'resize',
-    REORDER = 'reOrder'
+
+export interface ServerToClientEvents {
+    hello: () => void
+    stackState: (state: StackStatus) => void
+    badgeHeartBeat: (state: StackStatus) => void
+    haltBeat: (beat: boolean) => void
+    heartBeat: (beat: number | undefined) => void
+    terminalState: (state: Status) => void
+    output: (data: string) => void
+    terminalDelete: (args: { stack: string, terminal: string }) => void
+    error: (err: string) => void
 }
 
-export enum ClientEvents {
-    DELTERMINAL = 'terminalDelete',
-    STACKSTATE = 'stackState',
-    TERMINALSTATE = 'terminalState',
-    HEARTBEAT = 'heartbeat',
-    HALTBEAT = 'haltbeat'
+export type MetaSettingPayload = string | boolean | number | [] |
+    Exclude<CommandMetaSetting['sequencing'], undefined>[0] | undefined
+
+type ChangeSettingEvent = (arg: string, callback: (state: Status) => void) => void
+type ChangeMetaSettingEvent = (name: string, value: MetaSettingPayload, callback: (state: Status) => void) => void
+
+export interface ClientToServerEvents {
+    state: () => void
+    stackState: () => void
+    stackDefaults: (arg: StackDefaultsProps) => void
+    stackName: (arg: { name: string }) => void
+    retrieveSettings: (callback: (state: Status) => void) => void
+    history: (key: keyof typeof HistoryKey, feed: string, callback: (data: HistoryBook) => void) => void
+
+    environmentEdit: (args: EnvironmentEditProps) => void
+    environmentList: (args: { value: string; fromFile: ArrayBuffer | null, id?: string | null }) => void
+    environmentMute: (arg: UtilityProps) => void
+    environmentListDelete: (args: UtilityProps) => void
+    environmentDelete: (args: UtilityProps) => void
+
+    commandMetaSetting: ChangeMetaSettingEvent
+    commandHealthSetting: () => void
+    changeCwd: ChangeSettingEvent
+    changeCommand: ChangeSettingEvent
+    changeShell: ChangeSettingEvent
+    changeTitle: ChangeSettingEvent
+    input: (args: { data: string }) => void
+    resize: (args: { value: ITerminalDimensions }) => void
+    reOrder: (arg: { terminalId: string; newOrder: number }) => void
+    gitPull: (callback: (errors: string[]) => void) => void
+    gitGetBranches: (callback: (branches: string[]) => void) => void
+    gitSwitchBranch: (branch: string, callback: (errors: string[]) => void) => void
+
+    clearHistory: (callback: () => void) => void
+    m_ports: (callback: (params: { tcp: Processes, udp: Processes }) => void) => void
+
+
 }
 
-export enum GitEvents {
-    GETBRANCHES = 'getBranches',
-    PULL = 'pull',
-    SWITCHBRANCH = 'switchBranch'
-}
+export type CustomServerSocket = Socket<ClientToServerEvents, ServerToClientEvents>
+export type CustomClientSocket = ClientSocket<ServerToClientEvents, ClientToServerEvents>
+export type CustomServer = Server<ClientToServerEvents, ServerToClientEvents>
+
 
 export type Status = {
     stackId: string
+    stackEnv: Environment[] | undefined
     reserved: boolean
     cmd: Cmd
     isRunning: boolean
@@ -127,20 +158,18 @@ export type StackStatus = {
 }
 
 export type EnvironmentEditProps = {
-    stack: string
-    terminal: string
     order: number
     key: string
     previousKey?: string
     value: string
     enabled: boolean
+    id?: string | null
 }
 
 export type UtilityProps = {
-    stack: string
-    terminal: string
     order: number
     value?: string
+    id?: string | null
 }
 export type Utility2Props = {
     stack: string
@@ -150,7 +179,10 @@ export type Utility2Props = {
 export type StackDefaultsProps = PickStartsWith<PaletteStack, 'default'>
 
 export type UpdateCwdProps = Pick<EnvironmentEditProps, 'order' | 'value'>
-export type RemoveEnvListProps = Pick<EnvironmentEditProps, 'terminal' | 'order'>
+export type RemoveEnvListProps = {
+    terminal: string
+    order: number
+}
 
 export enum Panels {
     Details,

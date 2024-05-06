@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
-import { Terminal } from './Terminal'
-import { ClientEvents, Cmd } from '../../../types'
+import { Terminal } from '../Terminal'
+import { Cmd } from '../../../types'
 
 type StartJob = {
     t_metasettings: Cmd['metaSettings']
@@ -91,7 +91,7 @@ export class TerminalScheduler {
             if (job.t_metasettings?.halt) {
                 job.t_terminal.registerScheduler(this)
                 this.haltActive = true
-                job.t_terminal.socket.emit(ClientEvents.HALTBEAT, true)
+                job.t_terminal.socket.emit('haltBeat', true)
             }
 
             if (job.t_metasettings?.delay) {
@@ -117,7 +117,7 @@ export class TerminalScheduler {
     startHealtcheck(job: StartJob) {
         job.job_timer = setInterval(() => {
             job.limit -= 1
-            job.t_terminal.socket.emit(ClientEvents.HEARTBEAT, job.limit)
+            job.t_terminal.socket.emit('heartBeat', job.limit)
 
             if (job.limit === 0) {
                 clearInterval(job.job_timer)
@@ -154,7 +154,7 @@ export class TerminalScheduler {
         if (this.jobs.length > 0) {
             this.jobs.forEach((j) => {
                 if (j.job_timer) {
-                    j.t_terminal.socket.emit(ClientEvents.HEARTBEAT, undefined)
+                    j.t_terminal.socket.emit('heartBeat', undefined)
                     j.t_terminal.unReserve()
                     clearInterval(j.job_timer)
                     clearTimeout(j.job_timer)

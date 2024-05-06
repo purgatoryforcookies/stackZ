@@ -3,29 +3,25 @@ import Record from '@renderer/components/Common/ListItem'
 import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
-import { UtilityEvents } from '@t'
-import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { CustomToolTip } from './CustomTooltip'
 import { GoInfo } from 'react-icons/go'
+import { Cmd, CustomClientSocket } from '@t'
 
 type EnvListProps = {
-    data: {
-        title: string
-        pairs: Record<string, string | undefined>
-        order: number
-        disabled: string[]
-    }
-    terminal: TerminalUIEngine
+    data: Exclude<Cmd['command']['env'], undefined>[0]
+    socket: CustomClientSocket
+    id: string
 }
 
-function EnvList({ data, terminal }: EnvListProps) {
-    const [minimized, setMinimized] = useState<boolean>(data.order === 0 ? true : false)
-    const [hidden, setHidden] = useState<boolean>(data.order === 0 ? true : false)
+function EnvList({ data, socket, id }: EnvListProps) {
+    const [minimized, setMinimized] = useState<boolean>(false)
+    const [hidden, setHidden] = useState<boolean>(false)
     const [editMode, setEditMode] = useState<boolean>(false)
 
     const handleMute = () => {
-        terminal.socket.emit(UtilityEvents.ENVMUTE, {
-            order: data.order
+        socket.emit('environmentMute', {
+            order: data.order,
+            id: id
         })
     }
 
@@ -43,28 +39,32 @@ function EnvList({ data, terminal }: EnvListProps) {
     }
 
     const handleDelete = () => {
-        terminal.socket.emit(UtilityEvents.ENVLISTDELETE, {
-            order: data.order
+        socket.emit('environmentListDelete', {
+            order: data.order,
+            id: id
         })
     }
 
     return (
         <div
-            className={`p-7 py-4
+            className={`p-7 py-4 mb-8
         ${minimized && editMode ? '' : 'max-w-[35rem]'}
         ${editMode ? 'max-w-[100%]' : ''}
         `}
         >
-            {data.order === 0 ? (
-                <CustomToolTip message="This environment is editable, but not persistent for the long run">
-                    <h1 className="text-center text-foreground text-nowrap flex items-center gap-1">
-                        {data.title} <GoInfo className="w-4 h-4 text-white/50" />
-                    </h1>
-                </CustomToolTip>
-            ) : (
-                <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
-            )}
+            <div className='flex justify-center'>
 
+                {data.title === 'OS Environment' ? (
+                    <CustomToolTip message="This environment is editable, but not persistent.">
+                        <h1 className="text-center text-foreground text-nowrap flex items-center gap-1">
+                            {data.title} <GoInfo className="w-4 h-4 text-white/50" />
+                        </h1>
+                    </CustomToolTip>
+                ) : (
+                    <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
+                )}
+
+            </div>
             <Separator className="my-2" />
             <div className="flex gap-1 justify-center mb-2">
                 <Badge
@@ -123,23 +123,25 @@ function EnvList({ data, terminal }: EnvListProps) {
                 >
                     {data.pairs
                         ? Object.keys(data.pairs).map((key: string) => (
-                              <Record
-                                  key={key} //react component key
-                                  newRecord={false}
-                                  editMode={editMode}
-                                  terminal={terminal}
-                                  orderId={data.order}
-                                  minimized={minimized}
-                                  keyv={key}
-                                  muted={data.disabled.includes(key)}
-                                  value={data.pairs[key]}
-                              />
-                          ))
+                            <Record
+                                key={key} //react component key
+                                id={id}
+                                newRecord={false}
+                                editMode={editMode}
+                                socket={socket}
+                                orderId={data.order}
+                                minimized={minimized}
+                                keyv={key}
+                                muted={data.disabled.includes(key)}
+                                value={data.pairs[key]}
+                            />
+                        ))
                         : null}
                     {editMode ? (
                         <Record
                             newRecord={true}
-                            terminal={terminal}
+                            id={id}
+                            socket={socket}
                             orderId={data.order}
                             minimized={minimized}
                             editMode={editMode}

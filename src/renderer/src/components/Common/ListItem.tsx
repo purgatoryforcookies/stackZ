@@ -2,14 +2,13 @@ import { GoPlus } from 'react-icons/go'
 import { FormEvent, useState } from 'react'
 import { Input } from '@renderer/@/ui/input'
 import { Cross1Icon } from '@radix-ui/react-icons'
-import { UtilityEvents } from '@t'
-import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
+import { CustomClientSocket } from '@t'
 
 type ListItemProps = {
     newRecord: boolean
     orderId: number
     minimized: boolean
-    terminal: TerminalUIEngine
+    socket: CustomClientSocket | undefined
 }
 
 interface RecordProps extends ListItemProps {
@@ -18,6 +17,7 @@ interface RecordProps extends ListItemProps {
     editMode: boolean
     muted?: boolean
     highlight?: boolean
+    id: string
 }
 
 type FieldProps = {
@@ -39,12 +39,11 @@ export const Field = ({
     minimized
 }: FieldProps) => {
     const style = `rounded-full py-1
-    ${
-        variant === 'primary'
+    ${variant === 'primary'
             ? `px-3 text-secondary-foreground bg-transparent bg-[length:_150%_50%] ${minimized ? 'truncate' : ''}`
             : `px-3  truncate text-primary-secondary bg-primary
             }`
-    }`
+        }`
 
     if (disabled) return <p className={style}>{value}</p>
 
@@ -71,14 +70,15 @@ export const Field = ({
  * @param {string} minimized - Renders without value field
  */
 const Record = ({
-    terminal,
+    socket,
     keyv,
     value,
     editMode,
     newRecord,
     orderId,
     minimized,
-    muted
+    muted,
+    id
 }: RecordProps) => {
     const [newRecordOpen, setNewRecordOpen] = useState(false)
     const [keyValue, setKeyValue] = useState<string | undefined>(keyv)
@@ -86,10 +86,11 @@ const Record = ({
     const [valueValue, setValueValue] = useState<string | undefined>(value)
 
     const handleMute = () => {
-        if (editMode) return
-        terminal.socket.emit(UtilityEvents.ENVMUTE, {
+        if (editMode || !keyValue) return
+        socket?.emit('environmentMute', {
             value: keyValue,
-            order: orderId
+            order: orderId,
+            id: id
         })
     }
 
@@ -97,20 +98,24 @@ const Record = ({
         e.preventDefault()
 
         if (newRecordOpen && (!keyValue || !valueValue)) return
-        terminal.socket.emit(UtilityEvents.ENVEDIT, {
+        if (!keyValue || !valueValue) return
+        socket?.emit('environmentEdit', {
             order: orderId,
             key: keyValue,
             previousKey: keyPreviousValue,
             value: valueValue,
-            enabled: true
+            enabled: true,
+            id: id
         })
         setNewRecordOpen(false)
     }
 
     const handleDelete = () => {
-        terminal.socket.emit(UtilityEvents.ENVDELETE, {
+        if (!keyValue) return
+        socket?.emit('environmentDelete', {
             order: orderId,
-            value: keyValue
+            value: keyValue,
+            id: id
         })
     }
 

@@ -28,6 +28,7 @@ function App(): JSX.Element {
     )
 
     return (
+
         <ThemeContext.Provider value={theme!}>
             {storedWidth ? (
                 <ResizablePanelGroup
@@ -52,23 +53,21 @@ function App(): JSX.Element {
                             <ResizablePanel
                                 defaultSize={storedWidth?.header}
                                 onResize={sizeHeader}
+                                minSize={0}
                                 ref={headerRef}
                                 collapsible
-                                className="p-2 pb-7"
+                                className="mt-2"
                             >
                                 <Tabs
                                     defaultValue="environment"
                                     data-theme={theme}
-                                    className="h-full pb-4"
+                                    className="h-full p-4"
                                 >
                                     <TabsList>
                                         <TabsTrigger value="environment">Environment</TabsTrigger>
                                         <TabsTrigger value="monitor">Monitor</TabsTrigger>
                                     </TabsList>
-                                    <TabsContent value="environment" className="pl-4 h-full pb-5">
-                                        <p className="text-muted-foreground text-sm">
-                                            Terminal specific environment variables
-                                        </p>
+                                    <TabsContent value="environment" className="pl-4 h-full overflow-x-auto overflow-y-hidden">
                                         <DetailHeader stack={stack} />
                                     </TabsContent>
                                     <TabsContent value="monitor" className="pl-4">
@@ -87,14 +86,13 @@ function App(): JSX.Element {
                         minSize={minW}
                         maxSize={95}
                         id="palette"
-                        className="text-secondary-foreground"
+                        className="text-secondary-foreground ml-2"
                     >
                         <div
-                            className={`p-1 ${
-                                w < 450
-                                    ? 'flex flex-col-reverse justify-center items-center gap-2'
-                                    : 'grid grid-cols-3 grid-rows-1'
-                            }`}
+                            className={`p-1 ${w < 450
+                                ? 'flex flex-col-reverse justify-center items-center gap-2'
+                                : 'grid grid-cols-3 grid-rows-1'
+                                }`}
                         >
                             <BranchDropdown stack={stack} />
                             <span className="font-semibold text-lg text-center">Terminals</span>

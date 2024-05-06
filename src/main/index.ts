@@ -1,7 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { socketServer } from './src/service/CommandService'
+import { socketServer } from './src/service/socket'
 import { store } from './src/stores/Store'
 import { Stack } from './src/Stack'
 import { stackSchema } from '../types'
@@ -10,14 +10,14 @@ import { exec } from 'child_process'
 const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
 const stack = new Stack(savedCommandsPath, socketServer, stackSchema)
 
-process.on('uncaughtException', (err) => {
-    if (err.message.includes('Pty seems to have been killed already')) {
-        // this might be fixed when moving stacks to individual sockets
-        console.log('Rare pty error swallowed')
-        return
-    }
-    throw err
-})
+// process.on('uncaughtException', (err) => {
+//     if (err.message.includes('Pty seems to have been killed already')) {
+//         // this might be fixed when moving stacks to individual sockets
+//         console.log('Rare pty error swallowed')
+//         return
+//     }
+//     throw err
+// })
 
 async function createWindow(): Promise<void> {
     await stack.load()

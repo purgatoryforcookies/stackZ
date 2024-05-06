@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/@/ui/tabs'
 import General from './General'
 import Stack from './Stack'
 import { IUseStack } from '@renderer/hooks/useStack'
+import packageJson from '../../../../../package.json'
 
 export type SettingsProps = {
     setTheme: (name: string) => void
@@ -22,9 +23,11 @@ export type SettingsProps = {
 }
 
 function Settings({ setTheme, stack }: SettingsProps) {
-    const [open, setOpen] = useState<boolean>(false)
+    const [open, setOpen] = useState<boolean>(true)
+    const [versions] = useState(window.electron.process.versions)
 
     const theme = useContext(ThemeContext)
+    console.log(import.meta.env)
 
     const handleShortCuts = (e: KeyboardEvent) => {
         switch (e.key) {
@@ -91,6 +94,9 @@ function Settings({ setTheme, stack }: SettingsProps) {
                 <SheetFooter>
                     <SheetClose asChild></SheetClose>
                 </SheetFooter>
+                <p className='absolute right-2 bottom-1 text-white/30 text-[0.7rem]'>
+                    {versions.node}-{packageJson.version}
+                </p>
             </SheetContent>
         </Sheet>
     )

@@ -1,5 +1,5 @@
 import { TerminalUIEngine } from '../service/TerminalUIEngine'
-import { CommandMetaSetting, Status, UtilityEvents } from '@t'
+import { CommandMetaSetting, Status } from '@t'
 import { useEffect, useState } from 'react'
 
 type CommandBaseSettings = 'cwd' | 'cmd' | 'shell' | 'title'
@@ -9,6 +9,7 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
     const [settings, setSettings] = useState<Status>()
     const [isLoading, setIsLoading] = useState(false)
     const [isPending, setIsPending] = useState(false)
+    const [open, setOpen] = useState(false)
 
     const uxDelayedLoading = () =>
         setTimeout(() => {
@@ -21,46 +22,50 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
         setIsPending(false)
     }
 
-    const onChange = (name: OnChangeType, value?: string | boolean | number) => {
+    const onChange = (name: OnChangeType, value?: string |
+        Exclude<CommandMetaSetting['sequencing'], undefined>[0] | [] | boolean | number) => {
         setIsLoading(true)
+
         switch (name) {
             case 'cwd':
-                engine.socket.emit(UtilityEvents.CWD, value, (data: Status) => {
+                engine.socket.emit('changeCwd', value as string, (data) => {
                     finishUp(data)
                 })
                 break
             case 'cmd':
-                engine.socket.emit(UtilityEvents.CMD, value, (data: Status) => {
+                engine.socket.emit('changeCommand', value as string, (data) => {
                     finishUp(data)
                 })
                 break
             case 'shell':
-                engine.socket.emit(UtilityEvents.SHELL, value, (data: Status) => {
+                engine.socket.emit('changeShell', value as string, (data) => {
                     finishUp(data)
                 })
                 break
             case 'title':
-                engine.socket.emit(UtilityEvents.TITLE, value, (data: Status) => {
+                engine.socket.emit('changeTitle', value as string, (data) => {
                     finishUp(data)
                 })
                 break
             default:
-                engine.socket.emit(UtilityEvents.CMDMETASETTINGS, name, value, (data: Status) => {
+                engine.socket.emit('commandMetaSetting', name, value, (data) => {
                     if (!data) return
                     finishUp(data)
                 })
+
         }
     }
 
+
     useEffect(() => {
         setIsLoading(true)
-        engine.socket.emit('retrieve_settings', (data: Status) => {
+        engine.socket.emit('retrieveSettings', (data) => {
             if (!data) return
             finishUp(data)
         })
-    }, [engine])
+    }, [engine, open])
 
-    return { settings, onChange, isLoading, isPending, setIsPending }
+    return { settings, onChange, isLoading, isPending, setIsPending, open, setOpen }
 }
 
 export default useCommandSettings

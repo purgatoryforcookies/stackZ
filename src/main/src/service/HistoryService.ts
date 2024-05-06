@@ -2,7 +2,7 @@ import { HistoryBook, HistoryKey, MkdirError } from '../../../types'
 import { readFile, access, constants, writeFileSync, mkdirSync, writeFile } from 'fs'
 import { join } from 'path'
 import { app } from 'electron'
-import { executePowerShellScript } from '../util/util'
+import { executeScript } from '../util/util'
 
 // app is not available during testing with the current suite
 // setting path to repo root fixes the issue
@@ -26,7 +26,7 @@ export class HistoryService {
         Array.from(this.history.keys()).forEach((key) => {
             this.readFromDisk(dirPath, key)
         })
-        this.loadWinHostHistory()
+        this.loadHostHistory()
     }
 
     store(key: keyof typeof HistoryKey, value: string) {
@@ -80,20 +80,32 @@ export class HistoryService {
         this.save()
     }
 
-    async loadWinHostHistory() {
-        const command = [
-            'cat $env:USERPROFILE\\AppData',
-            '\\Roaming\\Microsoft',
-            '\\Windows\\PowerShell\\PSReadLine',
-            '\\ConsoleHost_history.txt'
-        ]
+    async loadHostHistory() {
 
-        const result = await executePowerShellScript(command.join(''))
 
-        if (result) {
+        if (process.platform !== 'win32') {
+
+            const resultzsh = await executeScript('cat ~/.zsh_history', '/bin/bash')
+            const resultbash = await executeScript('cat ~/.bash_history', '/bin/bash')
+
+
+            const arrayedZsh = resultzsh.split('\n').map((i) => i.replaceAll('\r', '')).map(i => i.split(';', 2)[1])
+            const arrayedBash = resultbash.split('\n').map((i) => i.replaceAll('\r', ''))
+            const combined = [...new Set(arrayedBash), ...new Set(arrayedZsh)]
+            this.hostHistory = combined.filter(i => i)
+        }
+        else {
+            const command = [
+                'cat $env:USERPROFILE\\AppData',
+                '\\Roaming\\Microsoft',
+                '\\Windows\\PowerShell\\PSReadLine',
+                '\\ConsoleHost_history.txt'
+            ]
+            const result = await executeScript(command.join(''), 'powershell.exe')
             const arrayed = result.split('\n').map((i) => i.replaceAll('\r', ''))
             this.hostHistory = [...new Set(arrayed)]
         }
+
     }
 
     async readFromDisk(basePath: string, key: keyof typeof HistoryKey) {

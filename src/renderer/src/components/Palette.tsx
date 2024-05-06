@@ -1,4 +1,4 @@
-import { ClientEvents, Cmd, StackStatus, UtilityEvents } from '@t'
+import { Cmd } from '@t'
 import { useEffect, useRef, useState } from 'react'
 import NewCommand from './Dialogs/NewCommand'
 import Command from './Command/Command'
@@ -30,13 +30,13 @@ function Palette({ data }: PaletteProps) {
             console.error('No socket for stack')
             return
         }
-        socket.on(ClientEvents.STACKSTATE, (d: StackStatus) => {
+        socket.on('stackState', (d) => {
             setRunning(d.isRunning || d.isReserved)
         })
 
-        socket.emit(UtilityEvents.STACKSTATE)
+        socket.emit('stackState')
         return () => {
-            socket.off(ClientEvents.STACKSTATE)
+            socket.off('stackState')
         }
     }, [data.selectedStack])
 
@@ -99,33 +99,33 @@ function Palette({ data }: PaletteProps) {
             <div className="overflow-auto pb-14" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
                     ? stack.palette
-                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                          .map((cmd) => {
-                              if (!cmd?.id) return null
-                              const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
-                              if (!engine) return null
-                              return isCompact ? (
-                                  <CommandSM
-                                      key={cmd.id}
-                                      data={cmd}
-                                      engine={engine}
-                                      selected={cmd.id === data.selectedTerminal}
-                                      handleDrag={handleDrag}
-                                      stack={data}
-                                      stackRunning={running}
-                                  />
-                              ) : (
-                                  <Command
-                                      key={cmd.id}
-                                      data={cmd}
-                                      engine={engine}
-                                      selected={cmd.id === data.selectedTerminal}
-                                      handleDrag={handleDrag}
-                                      stack={data}
-                                      stackRunning={running}
-                                  />
-                              )
-                          })
+                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                        .map((cmd) => {
+                            if (!cmd?.id) return null
+                            const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
+                            if (!engine) return null
+                            return isCompact ? (
+                                <CommandSM
+                                    key={cmd.id}
+                                    data={cmd}
+                                    engine={engine}
+                                    selected={cmd.id === data.selectedTerminal}
+                                    handleDrag={handleDrag}
+                                    stack={data}
+                                    stackRunning={running}
+                                />
+                            ) : (
+                                <Command
+                                    key={cmd.id}
+                                    data={cmd}
+                                    engine={engine}
+                                    selected={cmd.id === data.selectedTerminal}
+                                    handleDrag={handleDrag}
+                                    stack={data}
+                                    stackRunning={running}
+                                />
+                            )
+                        })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand stack={data} />

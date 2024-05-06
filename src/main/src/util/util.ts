@@ -31,7 +31,7 @@ const createJsonFileTemplate = (path: string, schema: ZodTypeAny) => {
     writeFileSync(path, JSON.stringify(template))
 }
 
-export const parseBufferToEnvironment = (buf?: ArrayBuffer) => {
+export const parseBufferToEnvironment = (buf: ArrayBuffer | null) => {
     if (!buf) return {}
     const enc = new TextDecoder('utf-8')
     const decoded = enc.decode(buf).split('\n')
@@ -54,13 +54,13 @@ export const parseBufferToEnvironment = (buf?: ArrayBuffer) => {
     return envir
 }
 
-parseBufferToEnvironment()
 
 /**
  * Factory sorts envs into order and adds host environments
  * into the settings, if they dont already exist.
  */
 export const envFactory = (args: Environment[] | undefined) => {
+
     const hostEnv: Environment = {
         title: 'OS Environment',
         pairs: process.env as Record<string, string>,
@@ -175,10 +175,10 @@ const trimShellTableRow = (row: string) => {
     return row.split(' ').filter((i) => i.length > 0 && i !== '\r')
 }
 
-export const executePowerShellScript = async (script: string) => {
+export const executeScript = async (script: string, shell: string, silent = false) => {
     try {
         const data: string = await new Promise((res, rej) => {
-            exec(script, { shell: 'powershell.exe' }, (err, stdout) => {
+            exec(script, { shell: shell }, (err, stdout) => {
                 if (err) {
                     rej(err)
                 }
@@ -188,7 +188,9 @@ export const executePowerShellScript = async (script: string) => {
 
         return data
     } catch (error) {
-        console.log(error)
+        if (!silent) {
+            console.log(error)
+        }
         return ''
     }
 }

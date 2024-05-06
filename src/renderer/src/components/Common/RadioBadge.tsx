@@ -1,6 +1,5 @@
 import { Badge } from '@renderer/@/ui/badge'
 import { IUseStack } from '@renderer/hooks/useStack'
-import { StackStatus } from '@t'
 import { useEffect, useState } from 'react'
 
 // Line 46 bg-transparent -> something else to get a border
@@ -12,12 +11,12 @@ function RadioBadge({ stack, id }: { stack: IUseStack; id: string }) {
         const socket = stack.stackSocket?.get(id)
         if (!socket) return
 
-        socket.on('badge', (d: StackStatus) => {
+        socket.on('badgeHeartBeat', (d) => {
             setRunning(d.isRunning || d.isReserved)
         })
 
         return () => {
-            socket.off('badge')
+            socket.off('badgeHeartBeat')
         }
     }, [])
 
@@ -42,7 +41,11 @@ function RadioBadge({ stack, id }: { stack: IUseStack; id: string }) {
         >
             <span
                 className={`${isSelect ? 'bg-primary' : running ? 'bg-gradient' : 'bg-transparent'}
-              text-center rounded-[4px] px-2 h-[90%] w-[92%] bg-[length:_800%_800%] flex justify-center items-center
+              text-center rounded-[4px] px-2 
+              h-[calc(100%-2px)] 
+              w-[calc(100%-2px)] 
+              
+              bg-[length:_800%_800%] flex justify-center items-center
             
             `}
             >

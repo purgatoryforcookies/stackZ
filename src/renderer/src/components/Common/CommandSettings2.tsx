@@ -22,6 +22,9 @@ import {
 } from '@radix-ui/react-icons'
 import useCommandSettings from '@renderer/hooks/useCommandSettings'
 import InputWithMagic from './InputWithMagic'
+import Sequencing from '../Dialogs/Sequencing'
+
+
 
 export type CommandSettingsProps = {
     engine: TerminalUIEngine
@@ -31,10 +34,11 @@ function CommandSettings({ engine }: CommandSettingsProps) {
     const theme = useContext(ThemeContext)
 
     const tools = useCommandSettings(engine)
-    const { settings, onChange, isLoading, isPending, setIsPending } = tools
+    const { settings, onChange, isLoading, isPending, setIsPending, open, setOpen } = tools
 
     return (
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
+
             <SheetTrigger>
                 <HamburgerMenuIcon
                     className={`h-4 w-4 moveHandle
@@ -44,12 +48,24 @@ function CommandSettings({ engine }: CommandSettingsProps) {
             <SheetContent
                 side={'left'}
                 data-theme={theme}
-                className="sm:max-w-none w-[40rem]"
+                className="sm:max-w-none w-[50rem] overflow-auto"
                 onOpenAutoFocus={(e) => e.preventDefault()}
             >
                 <SheetHeader>
-                    <SheetTitle>Terminal Settings</SheetTitle>
-                    <SheetDescription></SheetDescription>
+                    <SheetTitle className='flex items-center'>Terminal Settings
+                        <div className="relative left-2 top-[2px] gap-3">
+                            {isLoading ? (
+                                <ReloadIcon className="h-4 w-4 animate-spin" />
+                            ) : isPending ? (
+                                <LinkBreak2Icon className="h-4 w-4 text-orange-600" />
+                            ) : (
+                                <CheckIcon className="h-4 w-4" />
+                            )}
+                        </div>
+                    </SheetTitle>
+                    <SheetDescription>
+
+                    </SheetDescription>
                 </SheetHeader>
                 <div className="h-5"></div>
 
@@ -189,20 +205,54 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                             </CustomToolTip>
                         </Label>
                     </div>
+                </div>
+                <div>
+                    <div className="h-10"></div>
 
-                    <div>
-                        <div className="h-10"></div>
-                        <div className="flex justify-end gap-3">
-                            {isLoading ? (
-                                <ReloadIcon className="h-4 w-4 animate-spin" />
-                            ) : isPending ? (
-                                <LinkBreak2Icon className="h-4 w-4 text-orange-600" />
-                            ) : (
-                                <CheckIcon className="h-4 w-4" />
-                            )}
-                        </div>
+                </div>
+
+
+                <div className="h-2"></div>
+
+                <div>
+                    <h2 className="text-white/50 m-1 mb-3">In beta</h2>
+                    <div className="h-4"></div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id='sequencing'
+                            checked={Boolean(settings?.cmd.metaSettings?.sequencing) || false}
+                            onCheckedChange={(e) => onChange('sequencing', e ? [] : undefined)}
+                        />
+                        <Label htmlFor="sequencing" className="flex items-center gap-2">
+                            Yes sequencing
+                            <Sequencing />
+                        </Label>
+
+                    </div>
+                    <div className="h-3"></div>
+                    <div className='flex flex-col gap-2'>
+                        {settings?.cmd.metaSettings?.sequencing
+                            && settings.cmd.metaSettings.sequencing.map((seq, i) => (
+                                <div key={seq.index} className='flex items-center'>
+                                    <Input
+                                        id={seq.index.toString()}
+                                        tabIndex={i}
+                                        name={seq.index.toString()}
+                                        placeholder={seq.message}
+                                        defaultValue={seq.echo || ''}
+                                        onChange={() => setIsPending(true)}
+                                        onBlur={(e) => onChange('sequencing', { ...seq, echo: e.target.value })}
+                                    />
+                                    <Label htmlFor={seq.index.toString()} className="text-right p-1">
+                                        :{seq.index}
+                                    </Label>
+                                </div>
+                            ))}
                     </div>
                 </div>
+
+
             </SheetContent>
         </Sheet>
     )

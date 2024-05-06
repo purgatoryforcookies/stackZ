@@ -8,7 +8,6 @@ import {
     SelectValue
 } from '@renderer/@/ui/select'
 import { IUseStack } from '@renderer/hooks/useStack'
-import { GitEvents } from '@t'
 import { useContext, useEffect, useState } from 'react'
 import { CustomToolTip } from './CustomTooltip'
 import { ThemeContext } from '@renderer/App'
@@ -29,11 +28,11 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
 
         const socket = stack.stackSocket?.get(stack.selectedStack)
         if (!socket) return
-        socket.emit(GitEvents.PULL, (errors: string[]) => {
+        socket.emit('gitPull', (errors) => {
             if (errors.length > 0) setErrors(errors)
             else setErrors(undefined)
         })
-        socket.emit(GitEvents.GETBRANCHES, (data: string[]) => {
+        socket.emit('gitGetBranches', (data) => {
             setOptions(data)
             setSelected(data.find((i) => i.startsWith('*')))
             setTimeout(() => {
@@ -50,7 +49,7 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
 
         // For UX reasons
         setTimeout(() => {
-            socket.emit(GitEvents.SWITCHBRANCH, branch, (errors: string[]) => {
+            socket.emit('gitSwitchBranch', branch, (errors) => {
                 if (errors.length > 0) setErrors(errors)
                 else setSelected(branch)
                 setLoading(false)
@@ -63,11 +62,11 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
         setLoading(true)
         const socket = stack.stackSocket?.get(stack.selectedStack)
         if (!socket) return
-        socket.emit(GitEvents.PULL, (errors: string[]) => {
+        socket.emit('gitPull', (errors) => {
             if (errors.length > 0) setErrors(errors)
             else setErrors(undefined)
         })
-        socket.emit(GitEvents.GETBRANCHES, (data: string[]) => {
+        socket.emit('gitGetBranches', (data) => {
             setOptions(data)
             setSelected(data.find((i) => i.startsWith('*')))
 
@@ -93,14 +92,13 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
                     <SelectGroup>
                         {!loading && options
                             ? options.map((option) => (
-                                  <SelectItem
-                                      key={option}
-                                      value={option}
-                                      disabled={errors?.length ? true : false}
-                                  >
-                                      {option}
-                                  </SelectItem>
-                              ))
+                                <SelectItem
+                                    key={option}
+                                    value={option}
+                                >
+                                    {option}
+                                </SelectItem>
+                            ))
                             : null}
                     </SelectGroup>
                 </SelectContent>

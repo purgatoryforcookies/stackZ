@@ -1,8 +1,8 @@
 import { TerminalUIEngine } from '@renderer/service/TerminalUIEngine'
 import { baseSocket } from '@renderer/service/socket'
 import { useEffect, useState } from 'react'
-import { ClientEvents, Cmd, PaletteStack, UtilityEvents } from '@t'
-import { Socket, io } from 'socket.io-client'
+import { Cmd, CustomClientSocket, PaletteStack } from '@t'
+import { io } from 'socket.io-client'
 
 export interface IReOrder {
     (stackId: string, terminalId: string, newOrder: number): void
@@ -10,7 +10,7 @@ export interface IReOrder {
 
 export interface IUseStack {
     stack: Map<string, PaletteStack> | undefined
-    stackSocket: Map<string, Socket>
+    stackSocket: Map<string, CustomClientSocket>
     terminals: Map<string, Map<string, TerminalUIEngine>> | undefined
     loading: boolean
     selectStack: React.Dispatch<React.SetStateAction<string>>
@@ -27,7 +27,7 @@ export interface IUseStack {
 
 export const useStack = (SOCKET_HOST: string): IUseStack => {
     const [stack, setStack] = useState<Map<string, PaletteStack>>()
-    const [stackSocket, setStackSockets] = useState<Map<string, Socket>>(new Map())
+    const [stackSocket, setStackSockets] = useState<Map<string, CustomClientSocket>>(new Map())
     const [terminals, setTerminals] = useState<Map<string, Map<string, TerminalUIEngine>>>()
     const [loading, setLoading] = useState(false)
 
@@ -38,10 +38,10 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         setLoading(true)
         const data = (await window.api.getStack()) as PaletteStack[]
         const newStack = new Map<string, PaletteStack>()
-        const newSocketStack = new Map<string, Socket>()
+        const newSocketStack = new Map<string, CustomClientSocket>()
         data.forEach((stack) => {
             newStack.set(stack.id, stack)
-            const sock = io(SOCKET_HOST, {
+            const sock: CustomClientSocket = io(SOCKET_HOST, {
                 query: { stack: stack.id }
             })
             newSocketStack.set(stack.id, sock)
@@ -79,7 +79,7 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         const newStack = new Map(stack)
         const newSocketStack = new Map(stackSocket)
         newStack.set(st.id, st)
-        const sock = io(SOCKET_HOST, {
+        const sock: CustomClientSocket = io(SOCKET_HOST, {
             query: { stack: st.id }
         })
         newSocketStack.set(st.id, sock)
@@ -153,10 +153,10 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
 
         setStack(newStack)
 
-        connection.emit(UtilityEvents.REORDER, { terminalId, newOrder })
+        connection.emit('reOrder', { terminalId, newOrder })
     }
 
-    baseSocket.on(ClientEvents.DELTERMINAL, (d: { stack: string; terminal: string }) => {
+    baseSocket.on('terminalDelete', (d) => {
         if (d.stack !== selectedStack) return
         if (stack) {
             const newStack = new Map(stack)
