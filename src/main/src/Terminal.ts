@@ -125,7 +125,7 @@ export class Terminal {
                 cols: this.cols
             })
             if (this.settings.metaSettings?.sequencing) {
-                this.yesSequence.bind(this.ptyProcess, this.settings.metaSettings.sequencing)
+                this.yesSequence.bind(this.ptyProcess, this.settings.metaSettings.sequencing, shell)
             }
 
             this.isRunning = true

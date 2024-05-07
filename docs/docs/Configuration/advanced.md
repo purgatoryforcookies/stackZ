@@ -41,18 +41,35 @@ Sending CTRL-C on exit is a feature to stop any other services you might be runn
 
 ### Sequencing (in beta)
 
-In efforts to make running more complicated (and repetitve) tasks easy, stackZ offers a feature for sequencing user inputs to the terminal sessions. 
+In efforts to make running more complicated (and repetitive) tasks easy, stackZ offers a feature for sequencing user inputs to the terminal sessions. It is little similar to **[Linux yes(1)](https://man7.org/linux/man-pages/man1/yes.1.html)**, but with added control.
 
-It works by recording when the terminal session requires user input and then providing configurable interace for setting these inputs for later runs.
 
-You can set each step in a sequence to be either a string or a command of which output is then used as an input. This is particularly useful when working with sensitive data and you want to retrieve secret values from for e.g. vaults, programmatically. 
+It works by recording places where you type into the session and then provides configurable interface for setting these values for later runs. 
 
-Start by enabling the feature, and then run the terminal process once. After, come back to the settings and fill in the values for the steps. 
+Set up each step in a sequence with a command which output is then used as an input. This is particularly useful when working with sensitive data and you want to retrieve secret values from for e.g. vaults, programmatically. 
+
+Start by enabling the feature, and then run the terminal process once. After, come back to the settings and fill in the values for the steps.
+
+:::note
+ While line hints in the steps can provide helpful messages for you to remember what was asked in what step, they do not show the arbiturary commands given. 
+ 
+ StackZ does not, and will not, record any user input for these sequences while setting up the sequencer. 
+:::
 
 
 The following rules apply:
 - Empty field is considered as empty input, and continued with Enter
-- Input can be a string or a command which outputs a string
-- Each keystroke during the initial setup-run is registered as a user input step in the sequence.
+- Input is a command which outputs a string. Output is used as an input to the terminal process.
+- Inputs are run with the same shell as is set up in the terminal. No other settings are passed to it (variables, cwd). It runs in the context of your host machine. 
+- Each time you type into an active terminal run, the index of it is registered as a step. (this makes sense to you once you finish your setup and go fill in the steps in the settings)
 
+:::tip
+For passing command into the terminal process to execute, use echo.
 
+In windows `echo "command"`
+
+In posix `echo command`
+
+:::
+
+Currently there is no way of removing a step from a sequence once it is registered. If you think you made an error while setting up the sequencer, you can start over by unchecking the setting. 

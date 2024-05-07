@@ -23,7 +23,7 @@ export type SettingsProps = {
 }
 
 function Settings({ setTheme, stack }: SettingsProps) {
-    const [open, setOpen] = useState<boolean>(true)
+    const [open, setOpen] = useState<boolean>(false)
     const [versions] = useState(window.electron.process.versions)
 
     const theme = useContext(ThemeContext)
