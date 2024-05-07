@@ -16,6 +16,7 @@ export class YesSequencer {
 
     counter: number
     ptyProcess: IPty | null
+    shell: string
     private sequence: CommandMetaSetting['sequencing']
     cache: string[] = []
     cacheLimit = 2
@@ -39,18 +40,16 @@ export class YesSequencer {
         if (!this.ptyProcess) return
         if (!this.sequence || this.sequence.length === 0) return
 
-        const weHave = this.sequence.find(i => i.index === this.counter)
-        if (!weHave) return
-        if (this.garbage.includes(weHave.index)) return
-        this.garbage.push(weHave.index)
+        const step = this.sequence.find(i => i.index === this.counter)
+        if (!step) return
+        if (this.garbage.includes(step.index)) return
+        this.garbage.push(step.index)
 
-        const weDo = weHave.echo
+        const command = step.echo
         let output = ''
-        if (weDo) {
-            output = await executeScript(weDo, process.platform === 'win32' ? 'powershell.exe' : 'bash', true)
-            if (!output) {
-                output = await executeScript('echo ' + weDo, process.platform === 'win32' ? 'powershell.exe' : 'bash', true)
-            }
+        if (command) {
+            output = await executeScript(command, this.shell, true)
+            output = output.replace("\r\n", "")
         }
 
         setTimeout(() => {
@@ -58,7 +57,8 @@ export class YesSequencer {
                 this.ptyProcess?.write(output)
             }
             this.ptyProcess?.write('\r')
-        }, 600)
+
+        }, 1600)
     }
 
     trace(line: string) {
@@ -83,7 +83,7 @@ export class YesSequencer {
             index: this.counter,
             message: this.cache[1]
                 .replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')
-                .slice(-30)
+                .slice(-40)
         })
     }
 
@@ -94,10 +94,11 @@ export class YesSequencer {
         this.garbage = []
     }
 
-    bind(process: IPty | null, sequence: CommandMetaSetting['sequencing']) {
+    bind(process: IPty | null, sequence: CommandMetaSetting['sequencing'], shell: string) {
         if (!process) throw new Error("No process provided")
         this.ptyProcess = process
         this.sequence = sequence
+        this.shell = shell
 
     }
 

@@ -10,7 +10,7 @@ function Sequencing() {
 
     return (
         <Dialog>
-            <CustomToolTip message="Similar to linux yes(1). Click to read more...">
+            <CustomToolTip message="Sequence your inputs for automated terminal jobs. Click to read more...">
                 <DialogTrigger asChild>
 
                     <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
@@ -18,7 +18,7 @@ function Sequencing() {
             </CustomToolTip>
             <DialogContent data-theme={theme}>
                 <DialogHeader>
-                    <DialogTitle className='flex items-center pb-3'>Yes sequencing - Similar to linux yes(1)
+                    <DialogTitle className='flex items-center pb-3'>Yes sequencing
                     </DialogTitle>
                     <DialogDescription>
                         This is how you use it:
@@ -33,16 +33,13 @@ function Sequencing() {
                                 </span>
                             ))}
                         </div>
-                        <p className=''>
-                            After setup, these steps are then given to the terminal on next runs.
-                        </p>
-                        <div className=' my-3'>
-                            Tip:
+
+                        <div className='my-3 text-white'>
                             <p className=''>
-                                You can provide either a string or a command returning a string, into a step.
+                                After setup, these steps are then given to the terminal on next runs.
                             </p>
                             <p className=''>
-                                This is useful for passwords and secrets stored in external services (for e.g. Aws Secrets Manager)
+                                Each step is a command which should output a string when run in a shell specified by your terminal.
                             </p>
                             <p className='text-red-500 pt-5'>
                                 Keep in mind, values you fill in to the steps will be stored plaintext in stacks.json file.

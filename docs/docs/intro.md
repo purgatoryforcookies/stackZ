@@ -32,6 +32,7 @@ Clone the repo and build from source.
 
 Or download assets from the latest **[Release](https://github.com/purgatoryforcookies/stackZ/releases)**.
 
+
 ### What you'll need
 
 Building from source requires [Node.js](https://nodejs.org/en/download/).
