@@ -16,7 +16,7 @@ function Sequencing() {
                     <InfoCircledIcon className="h-4 w-4 hover:cursor-pointer" />
                 </DialogTrigger>
             </CustomToolTip>
-            <DialogContent data-theme={theme}>
+            <DialogContent data-theme={theme.theme}>
                 <DialogHeader>
                     <DialogTitle className='flex items-center pb-3'>Yes sequencing
                     </DialogTitle>

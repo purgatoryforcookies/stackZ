@@ -12,11 +12,8 @@ import { baseSocket } from '@renderer/service/socket'
 import { CustomToolTip } from '../Common/CustomTooltip'
 import { GoInfo } from 'react-icons/go'
 
-type GeneralProps = {
-    setTheme: (name: string) => void
-}
 
-function General({ setTheme }: GeneralProps) {
+function General() {
     const theme = useContext(ThemeContext)
 
     const [defShell, setDefShell] = useState<string>()
@@ -99,12 +96,12 @@ function General({ setTheme }: GeneralProps) {
                         <Label htmlFor="theme" className="text-right">
                             Theme
                         </Label>
-                        <RadioGroup defaultValue={theme} className="text-secondary-foreground">
+                        <RadioGroup defaultValue={theme.theme} className="text-secondary-foreground">
                             <div className="flex items-center space-x-2 ">
                                 <RadioGroupItem
                                     value="dark"
                                     id="r1"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
+                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
                                 />
                                 <Label htmlFor="r1">Dark</Label>
                                 <ColorSquare theme="dark" />
@@ -113,7 +110,7 @@ function General({ setTheme }: GeneralProps) {
                                 <RadioGroupItem
                                     value="aurora"
                                     id="r2"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
+                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
                                 />
                                 <Label htmlFor="r2">Aurora</Label>
                                 <ColorSquare theme="aurora" />
@@ -122,7 +119,7 @@ function General({ setTheme }: GeneralProps) {
                                 <RadioGroupItem
                                     value="north"
                                     id="r2"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
+                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
                                 />
                                 <Label htmlFor="r2">North</Label>
                                 <ColorSquare theme="north" />
@@ -131,7 +128,7 @@ function General({ setTheme }: GeneralProps) {
                                 <RadioGroupItem
                                     value="morning"
                                     id="r3"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
+                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
                                 />
                                 <Label htmlFor="r3">Morning</Label>
                                 <ColorSquare theme="morning" />
@@ -140,7 +137,7 @@ function General({ setTheme }: GeneralProps) {
                                 <RadioGroupItem
                                     value="forrest"
                                     id="r4"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
+                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
                                 />
                                 <Label htmlFor="r4">Forrest</Label>
                                 <ColorSquare theme="forrest" />
@@ -149,7 +146,7 @@ function General({ setTheme }: GeneralProps) {
                                 <RadioGroupItem
                                     value="pink"
                                     id="r4"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
+                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
                                 />
                                 <Label htmlFor="r4">Pink</Label>
                                 <ColorSquare theme="pink" />
@@ -191,8 +188,8 @@ function General({ setTheme }: GeneralProps) {
                                 {success
                                     ? 'Done.'
                                     : deleteConfirmation
-                                      ? 'Really?'
-                                      : 'History Service'}
+                                        ? 'Really?'
+                                        : 'History Service'}
                                 <GoInfo className="size-4" />
                             </p>
                         </CustomToolTip>

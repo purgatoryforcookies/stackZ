@@ -57,7 +57,7 @@ function NewCommand({ stack }: NewCommandProps) {
                     <PlusIcon className="h-5 w-5" />
                 </Badge>
             </DialogTrigger>
-            <DialogContent data-theme={theme}>
+            <DialogContent data-theme={theme.theme}>
                 <DialogHeader>
                     <DialogTitle>New Command</DialogTitle>
                 </DialogHeader>

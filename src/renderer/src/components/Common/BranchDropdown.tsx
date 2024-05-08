@@ -88,7 +88,7 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
                 <SelectTrigger className="w-full min-w-[8rem] text-[0.8rem] h-8 p-[0.6rem] border-0 overflow-hidden text-ellipsis">
                     <SelectValue placeholder={'Git brances'} />
                 </SelectTrigger>
-                <SelectContent data-theme={theme}>
+                <SelectContent data-theme={theme.theme}>
                     <SelectGroup>
                         {!loading && options
                             ? options.map((option) => (

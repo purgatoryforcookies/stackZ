@@ -117,7 +117,7 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
                     </div>
                 </div>
             </DialogTrigger>
-            <DialogContent data-theme={theme}>
+            <DialogContent data-theme={theme.theme}>
                 <DialogHeader>
                     <DialogTitle>New Environment</DialogTitle>
                     <DialogDescription>Create new</DialogDescription>

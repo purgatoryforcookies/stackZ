@@ -47,7 +47,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
             </SheetTrigger>
             <SheetContent
                 side={'left'}
-                data-theme={theme}
+                data-theme={theme.theme}
                 className="sm:max-w-none w-[50rem] overflow-auto"
                 onOpenAutoFocus={(e) => e.preventDefault()}
             >

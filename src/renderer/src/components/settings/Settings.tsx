@@ -18,16 +18,14 @@ import { IUseStack } from '@renderer/hooks/useStack'
 import packageJson from '../../../../../package.json'
 
 export type SettingsProps = {
-    setTheme: (name: string) => void
     stack: IUseStack
 }
 
-function Settings({ setTheme, stack }: SettingsProps) {
+function Settings({ stack }: SettingsProps) {
     const [open, setOpen] = useState<boolean>(false)
     const [versions] = useState(window.electron.process.versions)
 
     const theme = useContext(ThemeContext)
-    console.log(import.meta.env)
 
     const handleShortCuts = (e: KeyboardEvent) => {
         switch (e.key) {
@@ -54,7 +52,7 @@ function Settings({ setTheme, stack }: SettingsProps) {
     useEffect(() => {
         const fetchStore = async () => {
             await window.store.get('theme').then((t) => {
-                setTheme(t as string)
+                theme.setTheme(t as string)
             })
         }
         fetchStore()
@@ -67,13 +65,13 @@ function Settings({ setTheme, stack }: SettingsProps) {
             </SheetTrigger>
             <SheetContent
                 className="w-[32vw] min-w-[36rem] sm:max-w-none overflow-auto"
-                data-theme={theme}
+                data-theme={theme.theme}
                 onOpenAutoFocus={(e) => e.preventDefault()}
             >
                 <SheetHeader>
                     <SheetTitle>Settings</SheetTitle>
                     <SheetDescription></SheetDescription>
-                    <Tabs defaultValue="stack" data-theme={theme}>
+                    <Tabs defaultValue="stack" data-theme={theme.theme}>
                         <TabsList>
                             <TabsTrigger value="stack">Stack</TabsTrigger>
                             <TabsTrigger value="general">General</TabsTrigger>
@@ -87,7 +85,7 @@ function Settings({ setTheme, stack }: SettingsProps) {
                         </TabsContent>
                         <TabsContent value="general">
                             General settings
-                            <General setTheme={setTheme} />
+                            <General />
                         </TabsContent>
                     </Tabs>
                 </SheetHeader>

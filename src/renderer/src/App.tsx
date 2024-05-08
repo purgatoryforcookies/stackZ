@@ -14,10 +14,20 @@ import BranchDropdown from './components/Common/BranchDropdown'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './@/ui/tabs'
 import Ports from './components/GlobalMonitor/Ports'
 
-export const ThemeContext = createContext('aurora')
+type ThemeContextType = {
+    theme: string
+    setTheme: (name: string) => void
+
+}
+
+export const ThemeContext = createContext<ThemeContextType>({
+    theme: 'aurora',
+    setTheme: () => { }
+
+})
 
 function App(): JSX.Element {
-    const [theme, setTheme] = useState<string>()
+    const [theme, setTheme] = useState<string>('aurora')
     const paletteRef = useRef<ImperativePanelHandle>(null)
     const headerRef = useRef<ImperativePanelHandle>(null)
 
@@ -29,7 +39,7 @@ function App(): JSX.Element {
 
     return (
 
-        <ThemeContext.Provider value={theme!}>
+        <ThemeContext.Provider value={{ theme, setTheme }}>
             {storedWidth ? (
                 <ResizablePanelGroup
                     direction="horizontal"
@@ -37,7 +47,7 @@ function App(): JSX.Element {
                     data-theme={theme}
                 >
                     <CommandMenu stack={stack} toggle={toggle} />
-                    <Settings setTheme={setTheme} stack={stack} />
+                    <Settings stack={stack} />
                     <ResizablePanel>
                         <ResizablePanelGroup direction="vertical">
                             <ResizablePanel className="relative">
