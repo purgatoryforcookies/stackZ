@@ -31,7 +31,7 @@ function DetailHeader({ stack }: DetailHeaderProps) {
     }
 
     const terminal = stack.terminals?.get(stack.selectedStack)?.get(stack.selectedTerminal)
-    if (!terminal) return <p>Error</p>
+    if (!terminal) return <p className='text-secondary-foreground'>No terminal selected</p>
 
     return (
         <div className="flex gap-8 pb-16 pr-10 h-full" ref={bodyRef}>

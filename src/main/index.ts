@@ -103,7 +103,7 @@ app.on('window-all-closed', () => {
 })
 
 ipcMain.handle('getStack', (_, id?: string) => {
-    return stack.get(id)
+    return JSON.stringify(stack.get(id))
 })
 
 ipcMain.handle('toggleTerminal', (_, stackId: string, terminalID: string, state: boolean) => {

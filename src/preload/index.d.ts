@@ -5,7 +5,7 @@ declare global {
     interface Window {
         electron: ElectronAPI
         api: {
-            getStack: (id?: string) => Promise<PaletteStack[] | PaletteStack>
+            getStack: (id?: string) => Promise<string>
             startTerminal: (stack: string, terminal: string) => Promise<boolean>
             stopTerminal: (stack: string, terminal: string) => Promise<boolean>
             killAll: () => Promise<void>

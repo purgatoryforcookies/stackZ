@@ -4,7 +4,7 @@ import { Cmd, NewCommandPayload, PaletteStack } from '../types'
 
 // Custom APIs for renderer
 const api = {
-    getStack: (id?: string): Promise<PaletteStack[] | PaletteStack> =>
+    getStack: (id?: string): Promise<PaletteStack[]> =>
         ipcRenderer.invoke('getStack', id),
 
     startTerminal: (stack: string, terminal: string): Promise<boolean> =>

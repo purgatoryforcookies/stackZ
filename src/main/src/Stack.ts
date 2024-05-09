@@ -104,7 +104,7 @@ export class Stack {
     }
 
     get(id?: string) {
-        if (id) return this.raw.find((r) => r.id === id)
+        if (id) return [this.raw.find((r) => r.id === id)]
         return this.raw
     }
 

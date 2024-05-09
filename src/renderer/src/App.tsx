@@ -12,7 +12,6 @@ import { useResizable } from './hooks/useResizable'
 import { ImperativePanelHandle } from 'react-resizable-panels'
 import BranchDropdown from './components/Common/BranchDropdown'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './@/ui/tabs'
-import Ports from './components/GlobalMonitor/Ports'
 
 type ThemeContextType = {
     theme: string
@@ -81,7 +80,8 @@ function App(): JSX.Element {
                                         <DetailHeader stack={stack} />
                                     </TabsContent>
                                     <TabsContent value="monitor" className="pl-4">
-                                        <Ports />
+                                        {/* <Ports /> */}
+                                        <p className='text-secondary-foreground'>Not available</p>
                                     </TabsContent>
                                 </Tabs>
                             </ResizablePanel>

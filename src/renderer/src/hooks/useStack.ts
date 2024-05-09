@@ -26,9 +26,9 @@ export interface IUseStack {
 }
 
 export const useStack = (SOCKET_HOST: string): IUseStack => {
-    const [stack, setStack] = useState<Map<string, PaletteStack>>()
+    const [stack, setStack] = useState<Map<string, PaletteStack>>(new Map())
     const [stackSocket, setStackSockets] = useState<Map<string, CustomClientSocket>>(new Map())
-    const [terminals, setTerminals] = useState<Map<string, Map<string, TerminalUIEngine>>>()
+    const [terminals, setTerminals] = useState<Map<string, Map<string, TerminalUIEngine>>>(new Map())
     const [loading, setLoading] = useState(false)
 
     const [selectedStack, selectStack] = useState<string>('a')
@@ -36,9 +36,10 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
 
     const fetchTerminals = async () => {
         setLoading(true)
-        const data = (await window.api.getStack()) as PaletteStack[]
+        const data: PaletteStack[] = JSON.parse(await window.api.getStack())
         const newStack = new Map<string, PaletteStack>()
         const newSocketStack = new Map<string, CustomClientSocket>()
+
         data.forEach((stack) => {
             newStack.set(stack.id, stack)
             const sock: CustomClientSocket = io(SOCKET_HOST, {
