@@ -8,6 +8,7 @@ module.exports = {
             }
         ]
     },
+    roots: ['<rootDir>/src/main'],
     testRegex: '((\\.|/)(test))\\.(js|ts)?$',
     testEnvironment: 'node',
     watchPathIgnorePatterns: ['src/main/tests/fixtures'],

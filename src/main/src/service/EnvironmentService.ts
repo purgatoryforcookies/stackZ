@@ -18,7 +18,7 @@ export class EnvironmentService {
     }
 
     register(id: string, env?: Environment[], omitOS = false) {
-        console.log('Registering', id, omitOS)
+
         if (omitOS) {
             if (!env) return
             this.store.set(id, env)
@@ -73,7 +73,6 @@ export class EnvironmentService {
             disabled: []
         }
         target.push(newEnv)
-        console.log(target)
         this.store.set(id, target)
     }
 
