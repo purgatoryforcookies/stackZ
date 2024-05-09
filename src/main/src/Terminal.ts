@@ -209,7 +209,7 @@ export class Terminal {
         try {
             this.ptyProcess?.resize(dims.cols, dims.rows)
         } catch {
-            // swallow
+            console.log('[Warning:] Could not resize.')
         }
         this.rows = dims.rows
         this.cols = dims.cols
@@ -224,7 +224,7 @@ export class Terminal {
                 this.isRunning = false
                 this.ptyProcess?.kill(code)
             } catch {
-                //swallow
+                console.log('[Warning:] Error happened during stop.')
             }
         }
         this.ping()

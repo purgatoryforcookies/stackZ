@@ -156,6 +156,7 @@ export class Stack {
         if (!existingStack) {
             throw new Error(`Whoah, stack ${stack} was not found when adding new terminal`)
         }
+
         const newT = await this.palettes.get(stack)?.createCommand(payload)
         if (!newT) throw new Error(`Could not create terminal ${payload.title} ${stack}`)
         this.save()

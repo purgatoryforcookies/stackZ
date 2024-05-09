@@ -32,6 +32,15 @@ export class EnvironmentService {
         this.store.delete(id)
     }
 
+    retrieve(id: string, omitOS: boolean = true) {
+        const existing = this.store.get(id)
+        if (!existing) return
+
+        if (omitOS) {
+            return existing.filter(i => i.order !== 0)
+        }
+        return existing
+    }
 
     mute(id: string, order: number, key?: string) {
 

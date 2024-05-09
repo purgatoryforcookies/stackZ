@@ -125,11 +125,18 @@ export class Palette {
 
         const userSettings = store.get('userSettings')
 
-        payload.id = uuidv4()
         payload.executionOrder = newOrder
 
         if (!payload.command) {
             payload.command = {}
+        }
+
+        //If it has an id, it is an existing one and this is a copy process
+        if (payload?.id) {
+            const existing = this.environment.retrieve(payload.id)
+            if (existing) {
+                payload.command.env = existing
+            }
         }
 
         if (!payload?.command?.cmd) {
@@ -147,6 +154,7 @@ export class Palette {
                 ?? undefined
         }
 
+        payload.id = uuidv4()
         this.settings.palette.push(payload as Cmd)
         return payload
     }
