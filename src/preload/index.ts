@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { Cmd, NewCommandPayload, PaletteStack } from '../types'
+import { Cmd, PaletteStack, RecursivePartial } from '../types'
 
 // Custom APIs for renderer
 const api = {
@@ -20,8 +20,9 @@ const api = {
 
     save: (): Promise<void> => ipcRenderer.invoke('save'),
 
-    createCommand: (payload: NewCommandPayload, stackId: string): Promise<Cmd> =>
+    createCommand: (payload: RecursivePartial<Cmd>, stackId: string): Promise<Cmd> =>
         ipcRenderer.invoke('createCommand', payload, stackId),
+
 
     deleteCommand: (stackId: string, terminalId: string): Promise<Cmd> =>
         ipcRenderer.invoke('deleteCommand', stackId, terminalId),

@@ -2,8 +2,8 @@ import { v4 as uuidv4 } from 'uuid'
 import {
     Cmd,
     CustomServerSocket,
-    NewCommandPayload,
     PaletteStack,
+    RecursivePartial,
     StackDefaultsProps,
     StackStatus,
 } from '../../types'
@@ -112,7 +112,7 @@ export class Palette {
         this.pingState()
     }
 
-    async createCommand(payload: NewCommandPayload) {
+    async createCommand(payload: RecursivePartial<Cmd>) {
         let newOrder = 1
 
         if (!this.settings.palette) {
@@ -125,29 +125,31 @@ export class Palette {
 
         const userSettings = store.get('userSettings')
 
-        const newOne: Cmd = {
-            id: uuidv4(),
-            title: payload.title,
-            executionOrder: newOrder,
-            command: {
-                cmd: payload.command ?? this.settings.defaultCommand ?? 'echo Hello World!',
-                cwd:
-                    payload.cwd ??
-                    this.settings.defaultCwd ??
-                    userSettings.global.defaultCwd ??
-                    process.env.HOME,
-                shell:
-                    payload.shell ??
-                    this.settings.defaultShell ??
-                    userSettings.global.defaultShell ??
-                    undefined
-            }
+        payload.id = uuidv4()
+        payload.executionOrder = newOrder
+
+        if (!payload.command) {
+            payload.command = {}
         }
 
-        this.settings.palette.push(newOne)
-        return newOne
-    }
+        if (!payload?.command?.cmd) {
+            payload.command.cmd = this.settings.defaultCommand
+                ?? 'Echo Hello World!'
+        }
+        if (!payload?.command?.cwd) {
+            payload.command.cwd = this.settings.defaultCwd
+                ?? userSettings.global.defaultCwd
+                ?? process.env.HOME
+        }
+        if (!payload?.command?.shell) {
+            payload.command.shell = this.settings.defaultShell
+                ?? userSettings.global.defaultShell
+                ?? undefined
+        }
 
+        this.settings.palette.push(payload as Cmd)
+        return payload
+    }
 
 
     startTerminal(id: string) {

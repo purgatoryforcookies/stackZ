@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { CustomServer, NewCommandPayload, PaletteStack } from '../../types'
+import { Cmd, CustomServer, PaletteStack, RecursivePartial } from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './stores/DataStore'
 import { ZodTypeAny } from 'zod'
@@ -151,7 +151,7 @@ export class Stack {
         this.server.emit('terminalDelete', { stack, terminal })
     }
 
-    async createTerminal(payload: NewCommandPayload, stack: string) {
+    async createTerminal(payload: RecursivePartial<Cmd>, stack: string) {
         const existingStack = this.palettes.get(stack)
         if (!existingStack) {
             throw new Error(`Whoah, stack ${stack} was not found when adding new terminal`)

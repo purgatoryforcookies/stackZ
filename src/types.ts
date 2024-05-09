@@ -70,6 +70,10 @@ export type Environment = Exclude<Cmd['command']['env'], undefined>[0]
 export type CommandMetaSetting = Exclude<Cmd['metaSettings'], undefined>
 export type EnginedCmd = Cmd & { engine: TerminalUIEngine }
 
+export type RecursivePartial<T> = {
+    [P in keyof T]?: RecursivePartial<T[P]>;
+};
+
 export enum SelectionEvents {
     START = 'START',
     CONN = 'CONNECT',

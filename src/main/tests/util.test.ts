@@ -1,23 +1,23 @@
 import { Environment } from '../../types'
+import { EnvironmentService } from '../src/service/EnvironmentService'
 import { mapEnvs } from '../src/util/util'
 
 describe('Utilities tests', () => {
-    // it('Parses variables from string', () => {
-    //   const cases = [
-    //     { cmd: 'echo hello from', params: [] },
-    //     { cmd: 'echo {variable1} and {variable2}', params: ['variable1', 'variable2'] },
-    //     { cmd: "echo 'variable1' from single quotes", params: ['variable1'] },
-    //     { cmd: 'echo ${variable1} bash type', params: ['variable1'] },
-    //     { cmd: "echo '${variable1}' quoted bash type", params: ['variable1'] }
-    //   ]
 
-    //   cases.forEach((value) => {
-    //     const test = value.params.join('')
-    //     expect(parseVariables(value.cmd).join('')).toBe(test)
-    //   })
-    // })
+    const envService = EnvironmentService.get()
 
-    it.only('Removes the disabled envs from the sets', () => {
+
+    it('Registers a stack with OS envs omitted', () => {
+        envService.register('stack1', undefined, true)
+
+        expect(envService.store.get('stack1')).toBeDefined()
+        expect(envService.store.get('stack1')?.length).toBe(0)
+
+
+    })
+
+
+    it.skip('Removes the disabled envs from the sets', () => {
         // There is a list of envs objects. Each object
         // has a K,V pairs of envs, and a list of disabled
         // keys. Remove the keys from a the pairs without

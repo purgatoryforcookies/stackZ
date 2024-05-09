@@ -92,6 +92,10 @@ describe('stack', () => {
         const newstack = stack.createStack('Test1')
 
         const newTerminal = await stack.createTerminal({ title: 'Test00' }, newstack.id)
+
+        expect(newTerminal.id).toBeDefined()
+        if (!newTerminal.id) throw new Error('Typesafety throw.')
+
         const test = stack.palettes.get(newstack.id)
 
         expect(test).toBeDefined()
@@ -101,7 +105,7 @@ describe('stack', () => {
         expect(newTerminal?.title).toBe('Test00')
         expect(newTerminal?.executionOrder).toBeDefined()
 
-        stack.deleteTerminal(newstack.id, newTerminal?.id)
+        stack.deleteTerminal(newstack.id, newTerminal.id)
         stack.removeStack(test!.settings.id)
 
         expect(test?.settings.palette?.length).toBe(0)
@@ -120,6 +124,8 @@ describe('stack', () => {
             const tTerminals: string[] = []
             for (const term of testTerminalNames) {
                 const newT = await stack.createTerminal({ title: term }, id)
+                expect(newT.id).toBeDefined()
+                if (!newT.id) throw new Error('Typesafety throw.')
                 tTerminals.push(newT.id)
             }
             testStacks.set(id, tTerminals)

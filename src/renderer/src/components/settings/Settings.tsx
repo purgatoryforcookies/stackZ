@@ -46,7 +46,7 @@ function Settings({ stack }: SettingsProps) {
 
     useEffect(() => {
         if (!theme) return
-        window.store.set('theme', theme)
+        window.store.set('theme', theme.theme)
     }, [theme])
 
     useEffect(() => {

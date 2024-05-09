@@ -15,7 +15,7 @@ export interface IUseStack {
     loading: boolean
     selectStack: React.Dispatch<React.SetStateAction<string>>
     selectTerminal: React.Dispatch<React.SetStateAction<string>>
-    addTerminal: (cmd: Cmd) => void
+    addTerminal: (cmd: Cmd, targetStack?: string) => void
     addStack: (st: PaletteStack) => void
     deleteStack: () => void
     reOrder: IReOrder
@@ -97,29 +97,33 @@ export const useStack = (SOCKET_HOST: string): IUseStack => {
         setStackSockets(newSocketStack)
     }
 
-    const addTerminal = async (cmd: Cmd) => {
-        if (terminals?.get(selectedStack)?.has(cmd.id)) return
+    const addTerminal = async (cmd: Cmd, targetStack?: string) => {
+
+        const target = targetStack ?? selectedStack
+
+        if (terminals?.get(target)?.has(cmd.id)) return
 
         const newStack = new Map(stack)
-        const selected = newStack.get(selectedStack)
+        const selected = newStack.get(targetStack ?? target)
         if (!selected) return
         if (!selected.palette) selected.palette = []
         selected.palette.push(cmd)
 
         const newTerminals = new Map(terminals)
 
-        if (!newTerminals.get(selectedStack)) {
-            newTerminals.set(selectedStack, new Map<string, TerminalUIEngine>())
+        if (!newTerminals.get(target)) {
+            newTerminals.set(target, new Map<string, TerminalUIEngine>())
         }
-        const stacks = newTerminals.get(selectedStack)
+        const stacks = newTerminals.get(target)
         if (!stacks) return
 
-        const engine = new TerminalUIEngine(selectedStack, cmd.id, SOCKET_HOST)
+        const engine = new TerminalUIEngine(target, cmd.id, SOCKET_HOST)
         engine.startListening()
         stacks.set(cmd.id, engine)
         setStack(newStack)
         setTerminals(newTerminals)
         selectTerminal(cmd.id)
+        if (targetStack) selectStack(targetStack)
     }
 
     const reIndexOrder = (arr: Cmd[]) => {

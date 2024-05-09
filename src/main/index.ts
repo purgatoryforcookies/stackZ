@@ -141,6 +141,7 @@ ipcMain.handle('createCommand', (_, payload, stackId) => {
     const newOne = stack.createTerminal(payload, stackId)
     return newOne
 })
+
 ipcMain.handle('deleteCommand', (_, stackId, terminalId) => {
     return stack.deleteTerminal(stackId, terminalId)
 })

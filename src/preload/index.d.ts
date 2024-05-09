@@ -10,7 +10,7 @@ declare global {
             stopTerminal: (stack: string, terminal: string) => Promise<boolean>
             killAll: () => Promise<void>
             save: () => Promise<void>
-            createCommand: (payload: NewCommandPayload, stackId: string) => Promise<Cmd>
+            createCommand: (payload: RecursivePartial<Cmd>, stackId: string) => Promise<Cmd>
             startStack: (stack: string) => Promise<void>
             stopStack: (stack: string) => Promise<void>
             createStack: (title: string) => Promise<PaletteStack>
