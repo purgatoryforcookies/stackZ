@@ -125,7 +125,7 @@ export class EnvironmentService {
     }
 
 
-    bake(id: string[]) {
+    bake(id: string[], omitOS: boolean = false) {
 
         const reduced: Record<string, string | undefined> = {}
 
@@ -134,6 +134,9 @@ export class EnvironmentService {
             if (!environment) return
 
             environment.sort((a, b) => a.order - b.order).forEach((envSet) => {
+
+                if (omitOS && envSet.title === 'OS Environment') return
+
                 Object.keys(envSet.pairs).forEach((key) => {
                     if (envSet.disabled.includes(key)) return
                     reduced[key] = envSet.pairs[key]

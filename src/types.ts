@@ -130,6 +130,7 @@ export interface ClientToServerEvents {
 
     clearHistory: (callback: () => void) => void
     m_ports: (callback: (params: { tcp: Processes, udp: Processes }) => void) => void
+    copyToClipboard: (callback: (cmd: string) => void) => void
 
 
 }

@@ -6,7 +6,7 @@ import {
     Status,
 } from '../../types'
 import { spawn, IPty } from 'node-pty'
-import { parseBufferToEnvironment } from './util/util'
+import { bakeEnvironmentToString, parseBufferToEnvironment } from './util/util'
 import path from 'path'
 import { ITerminalDimensions } from 'xterm-addon-fit'
 import { IPingFunction, ISaveFuntion } from './Palette'
@@ -416,6 +416,17 @@ export class Terminal {
 
         this.socket.on('retrieveSettings', (akw) => {
             akw(this.getState())
+        })
+
+        this.socket.on('copyToClipboard', (akw) => {
+            const environment = this.environment.bake([this.stackId, this.settings.id], true)
+
+            const asString = bakeEnvironmentToString(environment)
+
+            const fullCommand = asString + this.settings.command.cmd
+
+            akw(fullCommand)
+
         })
 
         this.socket.on('history',

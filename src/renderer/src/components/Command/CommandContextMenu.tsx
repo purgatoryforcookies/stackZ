@@ -34,6 +34,16 @@ export default function CommandContextMenu({ children, stack, terminal }: Comman
         stack.addTerminal(newTerminal, stackId)
     }
 
+    const copyToClipBoard = () => {
+        const socket = stack.terminals?.get(stack.selectedStack)
+            ?.get(terminal.id)?.socket
+
+        socket?.emit('copyToClipboard', (cmd: string) => {
+            navigator.clipboard.writeText(cmd)
+        })
+    }
+
+
     return (
         <ContextMenu>
             <ContextMenuTrigger>{children}</ContextMenuTrigger>
@@ -41,7 +51,7 @@ export default function CommandContextMenu({ children, stack, terminal }: Comman
                 <ContextMenuItem inset onClick={startTerminal}>Start</ContextMenuItem>
                 <ContextMenuItem inset onClick={stopTerminal}>Stop</ContextMenuItem>
                 <ContextMenuSeparator />
-                <ContextMenuItem inset>Copy to clipboard</ContextMenuItem>
+                <ContextMenuItem inset onClick={copyToClipBoard}>Copy to clipboard</ContextMenuItem>
                 <ContextMenuSub>
                     <ContextMenuSubTrigger inset>Duplicate to</ContextMenuSubTrigger>
                     <ContextMenuSubContent className="w-48">

@@ -194,3 +194,21 @@ export const executeScript = async (script: string, shell: string, silent = fals
         return ''
     }
 }
+
+
+export const bakeEnvironmentToString = (env: Record<string, string | undefined>) => {
+
+    let envString = ''
+
+    Object.entries(env).forEach(entry => {
+        if (process.platform === 'win32') {
+            envString += `$env:${entry[0]}='${entry[1]}'; `
+        } else {
+            envString += `${entry[0]}=${entry[1]} `
+        }
+    })
+
+    return envString
+
+
+}
