@@ -205,7 +205,7 @@ export class Terminal {
     }
 
     resize(dims: ITerminalDimensions) {
-        if (!dims) return
+        if (!dims || !this.isRunning) return
         try {
             this.ptyProcess?.resize(dims.cols, dims.rows)
         } catch {
@@ -223,8 +223,15 @@ export class Terminal {
                 const code = this.win ? undefined : 'SIGHUP'
                 this.isRunning = false
                 this.ptyProcess?.kill(code)
-            } catch {
-                console.log('[Warning:] Error happened during stop.')
+
+            } catch (err) {
+                if (err instanceof Error) {
+                    if (err.message !== 'Pty seems to have been killed already') {
+                        console.log('[Warning:] Fatal error happened during stop.')
+                    }
+                } else {
+                    console.log(err)
+                }
             }
         }
         this.ping()

@@ -61,7 +61,15 @@ function App(): JSX.Element {
                         maxHeight={'100%'}
                         className='border-t-2 '
                         minHeight={25}
-                        onResize={sizeHeader}>
+                        onResize={sizeHeader}
+                        handleStyles={
+                            {
+                                right: { display: 'none' },
+                                left: { display: 'none' },
+                                bottom: { display: 'none' }
+                            }
+                        }>
+
                         <Tabs
                             defaultValue="environment"
                             data-theme={theme}
@@ -88,12 +96,19 @@ function App(): JSX.Element {
                     maxWidth={'100%'}
                     className='border-l-2'
                     onResize={sizePalette}
+                    handleStyles={
+                        {
+                            right: { display: 'none' },
+                            top: { display: 'none' },
+                            bottom: { display: 'none' }
+                        }
+                    }
                 >
                     <CommandMenu stack={stack} toggle={toggle} />
                     <Settings stack={stack} />
 
                     {w ?
-                        <div className="text-secondary-foreground ml-2 ">
+                        <div className="text-secondary-foreground">
                             <div
                                 className={`p-1 ${w < 450
                                     ? 'flex flex-col-reverse justify-center items-center gap-2'
