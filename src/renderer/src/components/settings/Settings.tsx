@@ -44,19 +44,6 @@ function Settings({ stack }: SettingsProps) {
         }
     }, [open])
 
-    useEffect(() => {
-        if (!theme) return
-        window.store.set('theme', theme.theme)
-    }, [theme])
-
-    useEffect(() => {
-        const fetchStore = async () => {
-            await window.store.get('theme').then((t) => {
-                theme.setTheme(t as string)
-            })
-        }
-        fetchStore()
-    }, [open])
 
     return (
         <Sheet open={open} onOpenChange={setOpen}>

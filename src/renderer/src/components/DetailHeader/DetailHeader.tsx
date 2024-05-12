@@ -34,7 +34,7 @@ function DetailHeader({ stack }: DetailHeaderProps) {
     if (!terminal) return <p className='text-secondary-foreground'>No terminal selected</p>
 
     return (
-        <div className="flex gap-8 pb-16 pr-10 h-full" ref={bodyRef}>
+        <div className="flex gap-8 h-[calc(100%-70px)] " ref={bodyRef}>
 
             {status?.stackEnv ? status.stackEnv
                 .sort((a, b) => a.order - b.order)

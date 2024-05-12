@@ -47,7 +47,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
 
     return (
         <div
-            className={`p-7 py-4 mb-8
+            className={`
         ${minimized && editMode ? '' : 'max-w-[35rem]'}
         ${editMode ? 'max-w-[100%]' : ''}
         `}

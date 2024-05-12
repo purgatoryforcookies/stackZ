@@ -46,6 +46,12 @@ function General() {
         }
     }
 
+    const changeTheme = (e: string) => {
+        theme.setTheme(e)
+        window.store.set('theme', e)
+    }
+
+
     return (
         <>
             <div className="py-8">
@@ -96,12 +102,14 @@ function General() {
                         <Label htmlFor="theme" className="text-right">
                             Theme
                         </Label>
-                        <RadioGroup defaultValue={theme.theme} className="text-secondary-foreground">
+                        <RadioGroup
+                            defaultValue={theme.theme}
+                            className="text-secondary-foreground"
+                            onValueChange={changeTheme}>
                             <div className="flex items-center space-x-2 ">
                                 <RadioGroupItem
                                     value="dark"
                                     id="r1"
-                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
                                 />
                                 <Label htmlFor="r1">Dark</Label>
                                 <ColorSquare theme="dark" />
@@ -110,7 +118,6 @@ function General() {
                                 <RadioGroupItem
                                     value="aurora"
                                     id="r2"
-                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
                                 />
                                 <Label htmlFor="r2">Aurora</Label>
                                 <ColorSquare theme="aurora" />
@@ -118,37 +125,33 @@ function General() {
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem
                                     value="north"
-                                    id="r2"
-                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
+                                    id="r3"
                                 />
-                                <Label htmlFor="r2">North</Label>
+                                <Label htmlFor="r3">North</Label>
                                 <ColorSquare theme="north" />
                             </div>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem
                                     value="morning"
-                                    id="r3"
-                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
+                                    id="r4"
                                 />
-                                <Label htmlFor="r3">Morning</Label>
+                                <Label htmlFor="r4">Morning</Label>
                                 <ColorSquare theme="morning" />
                             </div>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem
                                     value="forrest"
-                                    id="r4"
-                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
+                                    id="r5"
                                 />
-                                <Label htmlFor="r4">Forrest</Label>
+                                <Label htmlFor="r5">Forrest</Label>
                                 <ColorSquare theme="forrest" />
                             </div>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem
                                     value="pink"
-                                    id="r4"
-                                    onClick={(e) => theme.setTheme((e.target as HTMLInputElement).value)}
+                                    id="r6"
                                 />
-                                <Label htmlFor="r4">Pink</Label>
+                                <Label htmlFor="r6">Pink</Label>
                                 <ColorSquare theme="pink" />
                             </div>
                         </RadioGroup>
