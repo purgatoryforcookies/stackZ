@@ -7,6 +7,7 @@ import { TerminalScheduler } from './service/TerminalScheduler'
 import { HistoryService } from './service/HistoryService'
 import { MonitorService } from './service/MonitorService'
 import { EnvironmentService } from './service/EnvironmentService'
+import { DockerService } from './service/DockerService'
 
 
 export class Stack {
@@ -19,6 +20,7 @@ export class Stack {
     history: HistoryService
     monitor: MonitorService
     environment: EnvironmentService
+    dockerService: DockerService
 
     constructor(jsonPath: string, server: CustomServer, schema: ZodTypeAny) {
         this.path = jsonPath
@@ -30,6 +32,7 @@ export class Stack {
         this.history = new HistoryService()
         this.monitor = new MonitorService()
         this.environment = EnvironmentService.get()
+        this.dockerService = new DockerService()
     }
 
     async load() {
@@ -86,6 +89,10 @@ export class Stack {
                     console.log('Clearing history service')
                     this.history.reboot()
                     akw()
+                })
+                client.on('dockerContainers', async (akw) => {
+                    const containers = await this.dockerService.getContainers()
+                    akw(JSON.stringify(Object.fromEntries(containers)))
                 })
 
                 client.on('m_ports', async (akw) => {

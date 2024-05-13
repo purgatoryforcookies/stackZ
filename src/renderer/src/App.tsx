@@ -11,6 +11,7 @@ import { useResizable } from './hooks/useResizable'
 import BranchDropdown from './components/Common/BranchDropdown'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './@/ui/tabs'
 import { Resizable } from 're-resizable'
+import DockerStrip from './components/Common/DockerStrip'
 
 type ThemeContextType = {
     theme?: string
@@ -60,7 +61,7 @@ function App(): JSX.Element {
                         size={{ width: '100%', height: h }}
                         maxHeight={'100%'}
                         className='border-t-2 '
-                        minHeight={25}
+                        minHeight={27}
                         onResize={sizeHeader}
                         handleStyles={
                             {
@@ -69,7 +70,7 @@ function App(): JSX.Element {
                                 bottom: { display: 'none' }
                             }
                         }>
-
+                        <DockerStrip />
                         <Tabs
                             defaultValue="environment"
                             data-theme={theme}
@@ -108,7 +109,7 @@ function App(): JSX.Element {
                     <Settings stack={stack} />
 
                     {w ?
-                        <div className="text-secondary-foreground">
+                        <div className="text-secondary-foreground h-[calc(100%-70px)]">
                             <div
                                 className={`p-1 ${w < 450
                                     ? 'flex flex-col-reverse justify-center items-center gap-2'

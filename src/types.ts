@@ -132,7 +132,7 @@ export interface ClientToServerEvents {
     m_ports: (callback: (params: { tcp: Processes, udp: Processes }) => void) => void
     copyToClipboard: (callback: (cmd: string) => void) => void
 
-
+    dockerContainers: (callback: (data: string) => void) => void
 }
 
 export type CustomServerSocket = Socket<ClientToServerEvents, ServerToClientEvents>
@@ -263,3 +263,37 @@ export type HistoryBook = {
     stackz: string[]
     host: string[]
 }
+
+export type DockerNetwork = {
+    IPAMConfig: string | null,
+    Links: string | null,
+    Aliases: string[] | null,
+    NetworkID: string,
+    EndpointID: string,
+    Gateway: string,
+    IPAddress: string,
+    IPPrefixLen: number,
+    IPv6Gateway: string,
+    GlobalIPv6Address: string,
+    GlobalIPv6PrefixLen: number,
+    MacAddress: string,
+    DriverOpts: string | null
+}
+
+export type DockerContainer = {
+    Id: string
+    Names: string[]
+    Image: string
+    ImageID: string
+    Command: string
+    Created: number
+    Ports: number[]
+    Labels: { [key: string]: string }
+    State: string
+    Status: string
+    HostConfig: { [key: string]: string }
+    NetworkSettings: { [key: string]: { [key: string]: DockerNetwork } }
+    Mounts: string[]
+}
+
+
