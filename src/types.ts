@@ -133,6 +133,10 @@ export interface ClientToServerEvents {
     copyToClipboard: (callback: (cmd: string) => void) => void
 
     dockerContainers: (callback: (data: string) => void) => void
+    dockerStop: (id: string, callback: (data: string) => void) => void
+    dockerStart: (id: string, callback: (data: string) => void) => void
+    dockerRemove: (id: string, callback: (data: string) => void) => void
+
 }
 
 export type CustomServerSocket = Socket<ClientToServerEvents, ServerToClientEvents>
@@ -280,6 +284,24 @@ export type DockerNetwork = {
     DriverOpts: string | null
 }
 
+export type DockerMount = {
+    Destination: string
+    Driver: string
+    Mode: string
+    Name: string
+    Propagation: string
+    RW: boolean
+    source: string
+    Type: string
+}
+
+export type DockerPort = {
+    IP: string
+    PrivatePort: number
+    PublicPort: number
+    type: 'tcp' | 'udp'
+}
+
 export type DockerContainer = {
     Id: string
     Names: string[]
@@ -287,13 +309,13 @@ export type DockerContainer = {
     ImageID: string
     Command: string
     Created: number
-    Ports: number[]
+    Ports: DockerPort[]
     Labels: { [key: string]: string }
     State: string
     Status: string
     HostConfig: { [key: string]: string }
     NetworkSettings: { [key: string]: { [key: string]: DockerNetwork } }
-    Mounts: string[]
+    Mounts: DockerMount[]
 }
 
 

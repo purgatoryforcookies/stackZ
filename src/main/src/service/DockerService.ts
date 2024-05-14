@@ -13,7 +13,7 @@ export class DockerService {
 
     async getContainers() {
 
-        const resp: DockerContainer[] = await fetch(this.baseUrl + '/containers/json')
+        const resp: DockerContainer[] = await fetch(this.baseUrl + '/containers/json?all=true')
             .then(d => {
                 if (d.status !== 200) {
                     throw new Error('Unable to connect. Is the docker api enabled?')
@@ -41,6 +41,14 @@ export class DockerService {
         return byProject
     }
 
-
+    async stopContainer(id: string) {
+        await fetch(this.baseUrl + `/containers/${id}/stop`, { method: 'POST' })
+    }
+    async startContainer(id: string) {
+        await fetch(this.baseUrl + `/containers/${id}/start`, { method: 'POST' })
+    }
+    async removeContainer(id: string) {
+        await fetch(this.baseUrl + `/containers/${id}?v=true&force=true`, { method: 'DELETE' })
+    }
 
 }

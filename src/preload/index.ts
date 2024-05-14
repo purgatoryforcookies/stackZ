@@ -34,7 +34,7 @@ const api = {
 const store = {
     get: (key: string): Promise<unknown> => ipcRenderer.invoke('getStore', key),
     set: (key: string, value: unknown): Promise<void> => ipcRenderer.invoke('setStore', key, value),
-    openFileLocation: () => ipcRenderer.invoke('openFilesLocation')
+    openFileLocation: (path?: string) => ipcRenderer.invoke('openFilesLocation', path)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

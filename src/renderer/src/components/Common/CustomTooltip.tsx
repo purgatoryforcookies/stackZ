@@ -11,11 +11,11 @@ export const CustomToolTip = ({
 }) => {
     return (
         <TooltipProvider >
-            <Tooltip >
+            <Tooltip>
                 <TooltipTrigger >{children}</TooltipTrigger>
                 {!hidden ? (
                     <TooltipContent>
-                        <p className="text-bold text-[0.8rem]">{message}</p>
+                        <p className="font-semibold text-[0.8rem]">{message}</p>
                     </TooltipContent>
                 ) : null}
             </Tooltip>

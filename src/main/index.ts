@@ -152,8 +152,8 @@ ipcMain.handle('deleteStack', (_, stackId) => {
     return stack.removeStack(stackId)
 })
 
-ipcMain.handle('openFilesLocation', () => {
-    const dirPath = app.getPath('userData')
+ipcMain.handle('openFilesLocation', (_, path?: string) => {
+    const dirPath = path ?? app.getPath('userData')
     let command = ''
     switch (process.platform) {
         case 'darwin':

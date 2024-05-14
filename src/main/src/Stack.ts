@@ -94,6 +94,21 @@ export class Stack {
                     const containers = await this.dockerService.getContainers()
                     akw(JSON.stringify(Object.fromEntries(containers)))
                 })
+                client.on('dockerStop', async (id: string, akw) => {
+                    await this.dockerService.stopContainer(id)
+                    const containers = await this.dockerService.getContainers()
+                    akw(JSON.stringify(Object.fromEntries(containers)))
+                })
+                client.on('dockerStart', async (id: string, akw) => {
+                    await this.dockerService.startContainer(id)
+                    const containers = await this.dockerService.getContainers()
+                    akw(JSON.stringify(Object.fromEntries(containers)))
+                })
+                client.on('dockerRemove', async (id: string, akw) => {
+                    await this.dockerService.removeContainer(id)
+                    const containers = await this.dockerService.getContainers()
+                    akw(JSON.stringify(Object.fromEntries(containers)))
+                })
 
                 client.on('m_ports', async (akw) => {
                     await Promise.all([

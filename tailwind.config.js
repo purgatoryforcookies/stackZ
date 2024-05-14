@@ -8,6 +8,9 @@ module.exports = {
     },
     prefix: '',
     theme: {
+        fontFamily: {
+            'code': ['Inconsolata']
+        },
         screens: {
             sm: '500px',
             md: '768px',
