@@ -2,6 +2,9 @@ import { readFile, writeFileSync, existsSync } from 'fs'
 import { Environment, TPorts } from '../../../types'
 import { ZodTypeAny, z } from 'zod'
 import { exec } from 'child_process'
+import http from "http"
+import { DockerError } from './error'
+
 
 export const readJsonFile = <T extends z.ZodTypeAny>(
     path: string,
@@ -211,4 +214,38 @@ export const bakeEnvironmentToString = (env: Record<string, string | undefined>)
     return envString
 
 
+}
+
+export const httpNativeRequest = <T>(options: http.RequestOptions) => {
+    return new Promise<T | null>((resolve, reject) => {
+        http.request(options, (res) => {
+            let data = ''
+
+            if (!res.statusCode) {
+                reject(new DockerError('No response'))
+                return
+            }
+            if (res.statusCode >= 300) {
+                reject(new DockerError(`${res.statusCode} - ${res.statusMessage}`))
+                return
+            }
+
+            res.on('data', chunk => {
+                data += chunk
+            })
+
+            res.on('end', () => {
+                try {
+                    resolve(JSON.parse(data))
+                } catch {
+                    resolve(null)
+                }
+            })
+            res.on('error', (err) => {
+                reject(new DockerError(`${err.name} - ${err.message}`))
+
+            })
+
+        }).end()
+    })
 }

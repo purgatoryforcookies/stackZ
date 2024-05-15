@@ -77,37 +77,46 @@ export class Stack {
 
             if (palette) {
                 if (!remoteTerminalID) {
-                    console.log(`Stack ${stackId} connected`)
+                    // console.log(`Stack ${stackId} connected`)
                     palette.installStackSocket(client)
                 } else {
-                    console.log(`Terminal ${remoteTerminalID} connected`)
+                    // console.log(`Terminal ${remoteTerminalID} connected`)
                     palette.initTerminal(client, String(remoteTerminalID))
                 }
             } else {
-                console.log(`General client connected ${client.id}`)
+                // console.log(`General client connected ${client.id}`)
                 client.on('clearHistory', (akw) => {
                     console.log('Clearing history service')
                     this.history.reboot()
                     akw()
                 })
                 client.on('dockerContainers', async (akw) => {
-                    const containers = await this.dockerService.getContainers()
-                    akw(JSON.stringify(Object.fromEntries(containers)))
+                    try {
+                        const containers = await this.dockerService.getContainers()
+                        akw(JSON.stringify(Object.fromEntries(containers)))
+
+                    } catch (error) {
+                        if (error instanceof Error) {
+                            akw('', error.message)
+                        }
+                        akw('', 'Unknown docker error')
+                        console.log("Unknown docker error", error)
+                    }
                 })
                 client.on('dockerStop', async (id: string, akw) => {
-                    await this.dockerService.stopContainer(id)
+                    const err = await this.dockerService.stopContainer(id)
                     const containers = await this.dockerService.getContainers()
-                    akw(JSON.stringify(Object.fromEntries(containers)))
+                    akw(JSON.stringify(Object.fromEntries(containers)), err)
                 })
                 client.on('dockerStart', async (id: string, akw) => {
-                    await this.dockerService.startContainer(id)
+                    const err = await this.dockerService.startContainer(id)
                     const containers = await this.dockerService.getContainers()
-                    akw(JSON.stringify(Object.fromEntries(containers)))
+                    akw(JSON.stringify(Object.fromEntries(containers)), err)
                 })
                 client.on('dockerRemove', async (id: string, akw) => {
-                    await this.dockerService.removeContainer(id)
+                    const err = await this.dockerService.removeContainer(id)
                     const containers = await this.dockerService.getContainers()
-                    akw(JSON.stringify(Object.fromEntries(containers)))
+                    akw(JSON.stringify(Object.fromEntries(containers)), err)
                 })
 
                 client.on('m_ports', async (akw) => {

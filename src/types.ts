@@ -132,10 +132,10 @@ export interface ClientToServerEvents {
     m_ports: (callback: (params: { tcp: Processes, udp: Processes }) => void) => void
     copyToClipboard: (callback: (cmd: string) => void) => void
 
-    dockerContainers: (callback: (data: string) => void) => void
-    dockerStop: (id: string, callback: (data: string) => void) => void
-    dockerStart: (id: string, callback: (data: string) => void) => void
-    dockerRemove: (id: string, callback: (data: string) => void) => void
+    dockerContainers: (callback: (data: string, err?: string) => void) => void
+    dockerStop: (id: string, callback: (data: string, err?: string) => void) => void
+    dockerStart: (id: string, callback: (data: string, err?: string) => void) => void
+    dockerRemove: (id: string, callback: (data: string, err?: string) => void) => void
 
 }
 
@@ -310,7 +310,7 @@ export type DockerContainer = {
     Command: string
     Created: number
     Ports: DockerPort[]
-    Labels: { [key: string]: string }
+    Labels: { [key: string]: string | undefined }
     State: string
     Status: string
     HostConfig: { [key: string]: string }
