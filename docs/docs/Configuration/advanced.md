@@ -51,9 +51,9 @@ Set up each step in a sequence with a command which output is then used as an in
 Start by enabling the feature, and then run the terminal process once. After, come back to the settings and fill in the values for the steps.
 
 :::note
- While line hints in the steps can provide helpful messages for you to remember what was asked in what step, they do not show the arbiturary commands given. 
+ While line hints in the steps can provide helpful messages, they do not show the commands typed into the terminal session. 
  
- StackZ does not, and will not, record any user input for these sequences while setting up the sequencer. 
+ StackZ does not, and will not, record any user input for these sequences while you set it up. 
 :::
 
 

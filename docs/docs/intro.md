@@ -23,6 +23,7 @@ Switching between differrent projects becomes faster and easier, letting you get
 - Configurable working directories on terminal level
 - Search for terminal output
 - Input sequencing (in beta)
+- Docker widget
 
 Each terminal process is a child process of stackZ. If stackZ closes, all of the terminals exit too.
 
@@ -35,8 +36,9 @@ Or download assets from the latest **[Release](https://github.com/purgatoryforco
 
 ### What you'll need
 
-Building from source requires [Node.js](https://nodejs.org/en/download/).
-Development and tests are run on v21.
+Building from source requires [Node.js v21](https://nodejs.org/en/download/).
+
+You'll also need the things listed in here [Node-pty](https://www.npmjs.com/package/node-pty#dependencies)
 
 
 ### First steps

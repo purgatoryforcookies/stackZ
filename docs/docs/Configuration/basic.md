@@ -13,6 +13,8 @@ The main configuring blocks for stacks and terminals are:
 
 Since you can configure these in both levels - the terminal takes the priority.
 
+To copy an existing terminal with its settings to another stack, you can do so by right clicking a command from your palette and choosing "copy to".
+
 :::tip
 You can mix and match differrent shells and paths in your stack's terminals.
 :::

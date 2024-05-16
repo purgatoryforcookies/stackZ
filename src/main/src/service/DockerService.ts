@@ -63,7 +63,7 @@ export class DockerService {
             byProject.set(label, [...prev, i])
 
         })
-
+        this.errorCount = 0
         return byProject
     }
 
@@ -84,6 +84,7 @@ export class DockerService {
 
         try {
             await httpNativeRequest(options)
+            this.errorCount = 0
             return
         } catch (error) {
             this.errorCount += 1
@@ -112,6 +113,7 @@ export class DockerService {
 
         try {
             await httpNativeRequest(options)
+            this.errorCount = 0
             return
 
         } catch (error) {
@@ -140,6 +142,7 @@ export class DockerService {
 
         try {
             await httpNativeRequest(options)
+            this.errorCount = 0
             return
 
         } catch (error) {
