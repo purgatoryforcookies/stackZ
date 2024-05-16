@@ -6,8 +6,15 @@ import { baseSocket } from '@renderer/service/socket'
 import { HoverCardTrigger, HoverCard, HoverCardContent } from '@renderer/@/ui/hover-card'
 import { CustomToolTip } from './CustomTooltip'
 
-function DockerStrip() {
-    const [containers, setContainers] = useState<Map<string, DockerContainer[]>>(new Map())
+
+type DockerStripProps = {
+    containers: Record<string, DockerContainer[]>
+    setContainers: (containers: Record<string, DockerContainer[]>) => void
+}
+
+
+function DockerStrip({ containers, setContainers }: DockerStripProps) {
+
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
     const [clipBoardLoad, setClipBoardLoad] = useState(false)
@@ -169,27 +176,31 @@ function DockerStrip() {
                                                     <p>
                                                         {
                                                             c.Labels[
-                                                                'com.docker.compose.depends_on'
-                                                            ]?.split(':')[0]
-                                                        }
-                                                    </p>
-                                                    <p>
-                                                        {
-                                                            c.Labels[
-                                                                'com.docker.compose.depends_on'
-                                                            ]?.split(':')[1]
+                                                            'com.docker.compose.depends_on'
+                                                            ]
                                                         }
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="pb-10">
-                                                <p className="text-base text-white/50">
-                                                    Compose project:
-                                                </p>
-                                                <p className="text-[1.2rem] leading-4">
-                                                    {c.Labels?.['com.docker.compose.project'] ??
-                                                        '-'}
-                                                </p>
+                                            <div className='flex justify-between'>
+
+                                                <div className="pb-10">
+                                                    <p className="text-base text-white/50">
+                                                        Compose project:
+                                                    </p>
+                                                    <p className="text-[1.2rem] leading-4">
+                                                        {c.Labels?.['com.docker.compose.project'] ??
+                                                            '-'}
+                                                    </p>
+                                                </div>
+                                                <div className="pb-10">
+                                                    <p className="text-base text-white/50">
+                                                        Ports:
+                                                    </p>
+                                                    <p className="text-[1.2rem] leading-4">
+                                                        {c.Ports.map((p) => `${p.PrivatePort}->${p.PublicPort}`).join('-')}
+                                                    </p>
+                                                </div>
                                             </div>
                                             <p className="text-white/50 self-center absolute bottom-2">
                                                 {c.Status}

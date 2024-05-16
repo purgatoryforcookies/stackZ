@@ -12,6 +12,7 @@ import BranchDropdown from './components/Common/BranchDropdown'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './@/ui/tabs'
 import { Resizable } from 're-resizable'
 import DockerStrip from './components/Common/DockerStrip'
+import { DockerContainer } from '@t'
 
 type ThemeContextType = {
     theme?: string
@@ -30,6 +31,7 @@ function App(): JSX.Element {
     const { sizeHeader, sizePalette, toggle, w, h } = useResizable()
 
     const [theme, setTheme] = useState<string>()
+    const [containers, setContainers] = useState<Record<string, DockerContainer[]>>({})
 
 
     useEffect(() => {
@@ -70,7 +72,7 @@ function App(): JSX.Element {
                                 bottom: { display: 'none' }
                             }
                         }>
-                        <DockerStrip />
+                        <DockerStrip containers={containers} setContainers={setContainers} />
                         <Tabs
                             defaultValue="environment"
                             data-theme={theme}
@@ -105,7 +107,7 @@ function App(): JSX.Element {
                         }
                     }
                 >
-                    <CommandMenu stack={stack} toggle={toggle} />
+                    <CommandMenu stack={stack} toggle={toggle} containers={containers} />
                     <Settings stack={stack} />
 
                     {w ?
