@@ -8,6 +8,7 @@ import { HistoryService } from './service/HistoryService'
 import { MonitorService } from './service/MonitorService'
 import { EnvironmentService } from './service/EnvironmentService'
 import { DockerService } from './service/DockerService'
+import { DockerError } from './util/error'
 
 
 export class Stack {
@@ -96,7 +97,7 @@ export class Stack {
                         akw(JSON.stringify(Object.fromEntries(containers)))
 
                     } catch (error) {
-                        if (error instanceof Error) {
+                        if (error instanceof DockerError) {
                             akw('', error.message)
                         }
                         akw('', 'Unknown docker error')
@@ -105,18 +106,40 @@ export class Stack {
                 })
                 client.on('dockerStop', async (id: string, akw) => {
                     const err = await this.dockerService.stopContainer(id)
-                    const containers = await this.dockerService.getContainers()
-                    akw(JSON.stringify(Object.fromEntries(containers)), err)
+                    try {
+                        const containers = await this.dockerService.getContainers()
+                        akw(JSON.stringify(Object.fromEntries(containers)), err)
+                    } catch (error) {
+                        if (error instanceof DockerError) {
+                            akw('', error.message)
+                        }
+                        akw('', 'Unknown docker error')
+                    }
+
                 })
                 client.on('dockerStart', async (id: string, akw) => {
                     const err = await this.dockerService.startContainer(id)
-                    const containers = await this.dockerService.getContainers()
-                    akw(JSON.stringify(Object.fromEntries(containers)), err)
+                    try {
+                        const containers = await this.dockerService.getContainers()
+                        akw(JSON.stringify(Object.fromEntries(containers)), err)
+                    } catch (error) {
+                        if (error instanceof DockerError) {
+                            akw('', error.message)
+                        }
+                        akw('', 'Unknown docker error')
+                    }
                 })
                 client.on('dockerRemove', async (id: string, akw) => {
                     const err = await this.dockerService.removeContainer(id)
-                    const containers = await this.dockerService.getContainers()
-                    akw(JSON.stringify(Object.fromEntries(containers)), err)
+                    try {
+                        const containers = await this.dockerService.getContainers()
+                        akw(JSON.stringify(Object.fromEntries(containers)), err)
+                    } catch (error) {
+                        if (error instanceof DockerError) {
+                            akw('', error.message)
+                        }
+                        akw('', 'Unknown docker error')
+                    }
                 })
 
                 client.on('m_ports', async (akw) => {

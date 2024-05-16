@@ -80,15 +80,15 @@ function App(): JSX.Element {
                         >
                             <TabsList>
                                 <TabsTrigger value="environment">Environment</TabsTrigger>
-                                <TabsTrigger value="monitor">Monitor</TabsTrigger>
+                                {/* <TabsTrigger value="monitor">Monitor</TabsTrigger> */}
                             </TabsList>
                             <TabsContent value="environment" className="pl-4 pt-5 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden" >
                                 <DetailHeader stack={stack} />
                             </TabsContent>
-                            <TabsContent value="monitor" className="pl-4">
-                                {/* <Ports /> */}
+                            {/* <TabsContent value="monitor" className="pl-4">
+                                <Ports />
                                 <p className='text-secondary-foreground'>Not available</p>
-                            </TabsContent>
+                            </TabsContent> */}
                         </Tabs>
 
                     </Resizable>

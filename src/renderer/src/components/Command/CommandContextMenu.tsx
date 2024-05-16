@@ -50,7 +50,7 @@ export default function CommandContextMenu({ children, stack, terminal }: Comman
             <ContextMenuContent data-theme={theme.theme} className="w-96">
                 <ContextMenuItem inset onClick={startTerminal}>Start</ContextMenuItem>
                 <ContextMenuItem inset onClick={stopTerminal}>Stop</ContextMenuItem>
-                <ContextMenuItem inset onClick={stopTerminal}>Start standalone</ContextMenuItem>
+                <ContextMenuItem inset disabled>Start standalone</ContextMenuItem>
                 <ContextMenuSeparator />
                 <ContextMenuItem inset onClick={copyToClipBoard}>Copy to clipboard</ContextMenuItem>
                 <ContextMenuSub>

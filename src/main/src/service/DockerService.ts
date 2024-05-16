@@ -1,4 +1,4 @@
-import { DockerContainer } from "src/types"
+import { DockerContainer } from "../../../types"
 import http from "http"
 import { httpNativeRequest } from "../util/util"
 import { DockerError } from "../util/error"
@@ -9,13 +9,23 @@ export class DockerService {
     private port: number = 2375
     private winHost: string = 'localhost'
     private macHost: string = '/var/run/docker.sock'
+    errorCount: number = 0
+    errorLimit: number = 10
 
     constructor() {
         this.getContainers()
     }
 
+    isTooMuch() {
+        return this.errorCount > this.errorLimit
+    }
 
     async getContainers() {
+
+        const byProject: Map<string, DockerContainer[]> = new Map()
+
+        if (this.isTooMuch()) return byProject
+
 
         const resp: DockerContainer[] = []
 
@@ -31,16 +41,16 @@ export class DockerService {
         }
 
 
-        const byProject: Map<string, DockerContainer[]> = new Map()
+
+
         const data = await httpNativeRequest<DockerContainer[]>(options)
         if (!data) {
             return byProject
         }
         resp.push(...data)
 
+
         if (resp.length === 0) return byProject
-
-
 
         resp.forEach(i => {
 
@@ -54,12 +64,11 @@ export class DockerService {
 
         })
 
-
         return byProject
     }
 
     async stopContainer(id: string) {
-
+        if (this.isTooMuch()) return
 
         const options: http.RequestOptions = {
             path: `/containers/${id}/stop`,
@@ -77,6 +86,7 @@ export class DockerService {
             await httpNativeRequest(options)
             return
         } catch (error) {
+            this.errorCount += 1
             console.log(error)
             if (error instanceof DockerError) {
                 return error.message
@@ -86,6 +96,7 @@ export class DockerService {
 
     }
     async startContainer(id: string) {
+        if (this.isTooMuch()) return
 
         const options: http.RequestOptions = {
             path: `/containers/${id}/start`,
@@ -104,6 +115,7 @@ export class DockerService {
             return
 
         } catch (error) {
+            this.errorCount += 1
             console.log(error)
             if (error instanceof DockerError) {
                 return error.message
@@ -112,7 +124,7 @@ export class DockerService {
         }
     }
     async removeContainer(id: string) {
-
+        if (this.isTooMuch()) return
 
         const options: http.RequestOptions = {
             path: `/containers/${id}?v=true&force=true`,
@@ -131,6 +143,7 @@ export class DockerService {
             return
 
         } catch (error) {
+            this.errorCount += 1
             console.log(error)
             if (error instanceof DockerError) {
                 return error.message
