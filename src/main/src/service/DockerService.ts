@@ -4,12 +4,11 @@ import { httpNativeRequest } from "../util/util"
 import { DockerError } from "../util/error"
 
 
-
-
-
 export class DockerService {
 
-    baseUrl: string = 'http://localhost:2375'
+    private port: number = 2375
+    private winHost: string = 'localhost'
+    private macHost: string = '/var/run/docker.sock'
 
     constructor() {
         this.getContainers()
@@ -21,9 +20,14 @@ export class DockerService {
         const resp: DockerContainer[] = []
 
         const options: http.RequestOptions = {
-            socketPath: process.platform !== 'win32' ? '/var/run/docker.sock' : 'localhost',
             path: '/containers/json?all=true',
             timeout: 1
+        }
+        if (process.platform === 'win32') {
+            options.host = this.winHost
+            options.port = this.port
+        } else {
+            options.socketPath = this.macHost
         }
 
 
@@ -32,7 +36,6 @@ export class DockerService {
         if (!data) {
             return byProject
         }
-
         resp.push(...data)
 
         if (resp.length === 0) return byProject
@@ -57,11 +60,17 @@ export class DockerService {
 
     async stopContainer(id: string) {
 
+
         const options: http.RequestOptions = {
-            socketPath: process.platform !== 'win32' ? '/var/run/docker.sock' : 'localhost',
             path: `/containers/${id}/stop`,
             timeout: 10,
             method: 'POST'
+        }
+        if (process.platform === 'win32') {
+            options.host = this.winHost
+            options.port = this.port
+        } else {
+            options.socketPath = this.macHost
         }
 
         try {
@@ -79,10 +88,15 @@ export class DockerService {
     async startContainer(id: string) {
 
         const options: http.RequestOptions = {
-            socketPath: process.platform !== 'win32' ? '/var/run/docker.sock' : 'localhost',
             path: `/containers/${id}/start`,
             timeout: 10,
             method: 'POST'
+        }
+        if (process.platform === 'win32') {
+            options.host = this.winHost
+            options.port = this.port
+        } else {
+            options.socketPath = this.macHost
         }
 
         try {
@@ -99,11 +113,17 @@ export class DockerService {
     }
     async removeContainer(id: string) {
 
+
         const options: http.RequestOptions = {
-            socketPath: process.platform !== 'win32' ? '/var/run/docker.sock' : 'localhost',
             path: `/containers/${id}?v=true&force=true`,
-            timeout: 5,
+            timeout: 10,
             method: 'DELETE'
+        }
+        if (process.platform === 'win32') {
+            options.host = this.winHost
+            options.port = this.port
+        } else {
+            options.socketPath = this.macHost
         }
 
         try {

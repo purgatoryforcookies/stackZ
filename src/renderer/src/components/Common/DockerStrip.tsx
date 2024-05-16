@@ -68,6 +68,10 @@ function DockerStrip() {
     const makeFriendlyName = (name: string[]) => {
         const firstname = name[0]
         const parts = firstname.split('-')
+
+        if (parts.length === 1) {
+            return parts[0].slice(0, 4) + parts[0].slice(-1)
+        }
         if (parts.length <= 2) {
             return parts[0].slice(0, 2) + parts[1].slice(0, 2)
         }

@@ -144,30 +144,8 @@ export class EnvironmentService {
             })
         })
 
-        if (Object.keys(reduced).length === 0) {
-            throw new Error('Empty environment is not a possible configuration')
-        }
         return reduced
     }
 
-
-
-
-
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
 
