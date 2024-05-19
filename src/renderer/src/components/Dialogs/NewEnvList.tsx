@@ -48,6 +48,7 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
         setTitle('')
         scroll()
         setOpen(false)
+        setFile(null)
     }
 
     const handleFileChange = (event: React.DragEvent<HTMLDivElement>) => {
@@ -99,15 +100,19 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
                 >
                     <div
                         className={`
-                     inline-block
-                    bg-[length:400%_400%] p-[1px] 
-                    ${!handleEnter ? 'bg-transparent' : 'animate-pulse bg-gradient-to-r from-[#fbfaf6cc] via-[#eeedebd3] to-gradient'}
+                    p-[1px] 
+                    ${!handleEnter ? 'bg-transparent' : `animate-border  bg-gradient-to-r
+                  from-[#ede5c2e6] via-[#e2e0d74e] to-[#e1d7b076] hover:cursor-pointer bg-[length:_700%_900%]
+                    p-0 flex justify-center items-center`}
                     z-10 size-32 rounded-[7.5px]`}
                     >
                         <span
                             className={`
                         ${!handleEnter ? 'bg-transparent' : 'bg-gradient'}
-                        bg-[length:100%_110%]   flex rounded-[7px] px-5 py-3 font-bold text-white h-full w-full items-center justify-center`}
+                        text-center rounded-[6px] px-2 
+                        h-[calc(100%-2px)] 
+                        w-[calc(100%-2px)] 
+                        bg-[length:_800%_800%] flex justify-center items-center`}
                         >
                             <PlusIcon className=" h-8 w-8 hover:cursor-pointer hover:text-primary text-secondary-foreground" />
                             {handleEnter ? (
@@ -119,7 +124,7 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
             </DialogTrigger>
             <DialogContent data-theme={theme.theme}>
                 <DialogHeader>
-                    <DialogTitle>New Environment</DialogTitle>
+                    <DialogTitle>Environment</DialogTitle>
                     <DialogDescription>Create new</DialogDescription>
                 </DialogHeader>
                 <form

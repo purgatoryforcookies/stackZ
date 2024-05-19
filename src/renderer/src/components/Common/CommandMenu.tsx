@@ -15,17 +15,18 @@ import { ThemeContext } from '@renderer/App'
 import { IUseStack } from '@renderer/hooks/useStack'
 import { DockerContainer } from '@t'
 import dockerLogo from '../../assets/docker-mark-white.svg'
+import { IUseDocker } from '@renderer/hooks/useDocker'
 
 type CommandMenuProps = {
     stack: IUseStack,
-    containers: Record<string, DockerContainer[]>
+    docker: IUseDocker
     toggle: {
         header: () => void
         palette: () => void
     }
 }
 
-export function CommandMenu({ stack, toggle, containers }: CommandMenuProps) {
+export function CommandMenu({ stack, toggle, docker }: CommandMenuProps) {
     const theme = useContext(ThemeContext)
 
     const [open, setOpen] = useState(false)
@@ -217,8 +218,8 @@ export function CommandMenu({ stack, toggle, containers }: CommandMenuProps) {
                 </CommandGroup>
                 <Separator />
                 <CommandGroup heading="Containers">
-                    {containers ? Object.keys(containers).map((key) => {
-                        const conts: DockerContainer[] = containers[key]
+                    {docker.containers ? Object.keys(docker.containers).map((key) => {
+                        const conts: DockerContainer[] = docker.containers[key]
                         if (!conts) return null
 
                         return conts.map((c) => {

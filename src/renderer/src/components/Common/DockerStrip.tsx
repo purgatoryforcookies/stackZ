@@ -1,38 +1,26 @@
 import { CheckIcon, FileIcon, ReloadIcon, TrashIcon } from '@radix-ui/react-icons'
 import dockerLogo from '../../assets/docker-mark-blue.svg'
-import { useEffect, useState } from 'react'
+import { useContext, useState } from 'react'
 import { DockerContainer } from '@t'
-import { baseSocket } from '@renderer/service/socket'
 import { HoverCardTrigger, HoverCard, HoverCardContent } from '@renderer/@/ui/hover-card'
 import { CustomToolTip } from './CustomTooltip'
+import { IUseDocker } from '@renderer/hooks/useDocker'
+import { ContextMenuTrigger, ContextMenu, ContextMenuContent, ContextMenuItem } from '@renderer/@/ui/context-menu'
+import { ThemeContext } from '@renderer/App'
 
 
 type DockerStripProps = {
-    containers: Record<string, DockerContainer[]>
-    setContainers: (containers: Record<string, DockerContainer[]>) => void
+    docker: IUseDocker
 }
 
-const FAULTSTATE_ERROR_CODE = 'ERRFAULT'
 
-function DockerStrip({ containers, setContainers }: DockerStripProps) {
 
-    const [error, setError] = useState<string | null>(null)
-    const [loading, setLoading] = useState(false)
+function DockerStrip({ docker }: DockerStripProps) {
+
     const [clipBoardLoad, setClipBoardLoad] = useState(false)
+    const theme = useContext(ThemeContext)
 
-    const fetchContainers = async (userInitted: boolean = false) => {
-
-        if (userInitted) setLoading(true)
-        baseSocket.emit('dockerContainers', (data, err) => {
-            setLoading(false)
-            if (err) {
-                setError(err)
-                return
-            }
-            setContainers(JSON.parse(data))
-            setError(null)
-        })
-    }
+    const { loading, error, containers, toggle, remove, get, stopAll } = docker
 
     const handleClipBoardCopy = (file: string | undefined) => {
         if (file) {
@@ -44,39 +32,6 @@ function DockerStrip({ containers, setContainers }: DockerStripProps) {
         }
     }
 
-    useEffect(() => {
-        if (error === FAULTSTATE_ERROR_CODE) return
-        const interval = setInterval(fetchContainers, 2000)
-        return () => clearInterval(interval)
-    }, [error])
-
-    const toggleContainer = (id: string, running: boolean) => {
-        setError(null)
-        setLoading(true)
-        if (running) {
-            baseSocket.emit('dockerStop', id, (data, err) => {
-                setLoading(false)
-                if (err) setError(err)
-                setContainers(JSON.parse(data))
-            })
-        } else {
-            baseSocket.emit('dockerStart', id, (data, err) => {
-                setLoading(false)
-                if (err) setError(err)
-                setContainers(JSON.parse(data))
-            })
-        }
-    }
-
-    const removeContainer = (id: string) => {
-        setError(null)
-        setLoading(true)
-        baseSocket.emit('dockerRemove', id, (data, err) => {
-            setLoading(false)
-            if (err) setError(err)
-            setContainers(JSON.parse(data))
-        })
-    }
 
     const makeFriendlyName = (name: string[]) => {
         const firstname = name[0]
@@ -110,7 +65,7 @@ function DockerStrip({ containers, setContainers }: DockerStripProps) {
                                 <HoverCard key={c.Id} openDelay={200} closeDelay={300}>
                                     <HoverCardTrigger
                                         className="hover:cursor-pointer"
-                                        onClick={() => toggleContainer(c.Id, c.State === 'running')}
+                                        onClick={() => toggle(c.Id, c.State === 'running')}
                                         onContextMenu={() =>
                                             window.store.openFileLocation(composeFile)
                                         }
@@ -149,7 +104,7 @@ function DockerStrip({ containers, setContainers }: DockerStripProps) {
                                                 )}
                                                 <CustomToolTip message="Kills and removes the container and anonymous volumes associated with it.">
                                                     <TrashIcon
-                                                        onClick={() => removeContainer(c.Id)}
+                                                        onClick={() => remove(c.Id)}
                                                     />
                                                 </CustomToolTip>
                                             </div>
@@ -203,11 +158,13 @@ function DockerStrip({ containers, setContainers }: DockerStripProps) {
                                                     <p className="text-base text-white/50">
                                                         Ports:
                                                     </p>
-                                                    {c.Ports.map((p) => (
-                                                        <p className="text-[1.2rem] leading-4">
-                                                            {p.PrivatePort}:{p.PublicPort}
-                                                        </p>))}
+                                                    <div className='flex flex-col gap-1'>
+                                                        {c.Ports.map((p) => (
+                                                            <p className="text-[1.2rem] leading-4">
+                                                                {p.PublicPort} : {p.PrivatePort}
+                                                            </p>))}
 
+                                                    </div>
                                                 </div>
                                             </div>
                                             <p className="text-white/50 self-center absolute bottom-2">
@@ -221,11 +178,19 @@ function DockerStrip({ containers, setContainers }: DockerStripProps) {
                     </div>
                 )
             })}
-            <img
-                src={dockerLogo}
-                className="size-5 hover:cursor-pointer"
-                onClick={() => fetchContainers(true)}
-            />
+            <ContextMenu>
+                <ContextMenuTrigger>
+                    <img
+                        src={dockerLogo}
+                        className="size-5 hover:cursor-pointer"
+                        onClick={() => get(true)}
+                    />
+                </ContextMenuTrigger>
+                <ContextMenuContent data-theme={theme.theme} className="w-36">
+                    <ContextMenuItem inset onClick={stopAll}>Stop all</ContextMenuItem>
+                </ContextMenuContent>
+            </ContextMenu>
+
         </div>
     )
 }

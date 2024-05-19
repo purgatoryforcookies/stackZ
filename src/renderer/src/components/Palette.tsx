@@ -79,7 +79,7 @@ function Palette({ data }: PaletteProps) {
                 <NewStack set={data.addStack} />
             </div>
             <div
-                className={`flex w-full mb-2 items-center ${isCompact ? 'justify-center p-1 bg-card' : 'justify-end pr-12'}`}
+                className={`flex w-full mb-2 items-center ${isCompact ? 'justify-center bg-card' : 'justify-end pr-12'}`}
             >
                 <Button
                     variant={'link'}

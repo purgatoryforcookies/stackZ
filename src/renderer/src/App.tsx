@@ -12,7 +12,7 @@ import BranchDropdown from './components/Common/BranchDropdown'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './@/ui/tabs'
 import { Resizable } from 're-resizable'
 import DockerStrip from './components/Common/DockerStrip'
-import { DockerContainer } from '@t'
+import useDocker from './hooks/useDocker'
 
 type ThemeContextType = {
     theme?: string
@@ -31,7 +31,8 @@ function App(): JSX.Element {
     const { sizeHeader, sizePalette, toggle, w, h } = useResizable()
 
     const [theme, setTheme] = useState<string>()
-    const [containers, setContainers] = useState<Record<string, DockerContainer[]>>({})
+
+    const docker = useDocker()
 
 
     useEffect(() => {
@@ -69,10 +70,14 @@ function App(): JSX.Element {
                             {
                                 right: { display: 'none' },
                                 left: { display: 'none' },
-                                bottom: { display: 'none' }
+                                bottom: { display: 'none' },
+                                bottomRight: { display: 'none' },
+                                bottomLeft: { display: 'none' },
+                                topLeft: { display: 'none' },
+                                topRight: { display: 'none' },
                             }
                         }>
-                        <DockerStrip containers={containers} setContainers={setContainers} />
+                        <DockerStrip docker={docker} />
                         <Tabs
                             defaultValue="environment"
                             data-theme={theme}
@@ -103,11 +108,15 @@ function App(): JSX.Element {
                         {
                             right: { display: 'none' },
                             top: { display: 'none' },
-                            bottom: { display: 'none' }
+                            bottom: { display: 'none' },
+                            bottomRight: { display: 'none' },
+                            bottomLeft: { display: 'none' },
+                            topRight: { display: 'none' },
+                            topLeft: { display: 'none' },
                         }
                     }
                 >
-                    <CommandMenu stack={stack} toggle={toggle} containers={containers} />
+                    <CommandMenu stack={stack} toggle={toggle} docker={docker} />
                     <Settings stack={stack} />
 
                     {w ?
@@ -115,7 +124,7 @@ function App(): JSX.Element {
                             <div
                                 className={`p-1 ${w < 450
                                     ? 'flex flex-col-reverse justify-center items-center gap-2'
-                                    : 'grid grid-cols-3 grid-rows-1'
+                                    : 'sm:grid sm:grid-cols-3 sm:grid-rows-1 flex flex-col-reverse justify-center items-center gap-2'
                                     }`}
                             >
                                 <BranchDropdown stack={stack} />

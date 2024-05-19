@@ -2,12 +2,12 @@ import { RefObject, useEffect, useState } from 'react'
 
 /**
  *
- * Observer given element dimensions
+ * Observes given element dimensions
  * @returns w,h in pixels
  */
-export const useTaalasmaa = (ref: RefObject<HTMLDivElement>) => {
-    const [w, setW] = useState<number>()
-    const [h, setH] = useState<number>()
+export const useTaalasmaa = <T extends HTMLDivElement>(ref: RefObject<T>) => {
+    const [w, setW] = useState<number>(0)
+    const [h, setH] = useState<number>(0)
 
     useEffect(() => {
         if (!ref.current) return
