@@ -217,8 +217,9 @@ export const bakeEnvironmentToString = (env: Record<string, string | undefined>)
 }
 
 export const httpNativeRequest = <T>(options: http.RequestOptions) => {
+
     return new Promise<T | null>((resolve, reject) => {
-        http.request(options, (res) => {
+        const req = http.request(options, (res) => {
             let data = ''
 
             if (!res.statusCode) {
@@ -246,6 +247,13 @@ export const httpNativeRequest = <T>(options: http.RequestOptions) => {
 
             })
 
-        }).end()
+        })
+
+        req.on('error', (err) => {
+            reject(new DockerError(`${err.message}`))
+        })
+
+        req.end()
+
     })
 }

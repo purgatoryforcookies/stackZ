@@ -12,6 +12,7 @@ type DockerStripProps = {
     setContainers: (containers: Record<string, DockerContainer[]>) => void
 }
 
+const FAULTSTATE_ERROR_CODE = 'ERRFAULT'
 
 function DockerStrip({ containers, setContainers }: DockerStripProps) {
 
@@ -20,12 +21,16 @@ function DockerStrip({ containers, setContainers }: DockerStripProps) {
     const [clipBoardLoad, setClipBoardLoad] = useState(false)
 
     const fetchContainers = async (userInitted: boolean = false) => {
-        setError(null)
+
         if (userInitted) setLoading(true)
         baseSocket.emit('dockerContainers', (data, err) => {
             setLoading(false)
-            if (err) setError(err)
+            if (err) {
+                setError(err)
+                return
+            }
             setContainers(JSON.parse(data))
+            setError(null)
         })
     }
 
@@ -40,9 +45,10 @@ function DockerStrip({ containers, setContainers }: DockerStripProps) {
     }
 
     useEffect(() => {
-        const interv = setInterval(fetchContainers, 2000)
-        return () => clearInterval(interv)
-    }, [])
+        if (error === FAULTSTATE_ERROR_CODE) return
+        const interval = setInterval(fetchContainers, 2000)
+        return () => clearInterval(interval)
+    }, [error])
 
     const toggleContainer = (id: string, running: boolean) => {
         setError(null)
@@ -197,9 +203,11 @@ function DockerStrip({ containers, setContainers }: DockerStripProps) {
                                                     <p className="text-base text-white/50">
                                                         Ports:
                                                     </p>
-                                                    <p className="text-[1.2rem] leading-4">
-                                                        {c.Ports.map((p) => `${p.PrivatePort}->${p.PublicPort}`).join('-')}
-                                                    </p>
+                                                    {c.Ports.map((p) => (
+                                                        <p className="text-[1.2rem] leading-4">
+                                                            {p.PrivatePort}:{p.PublicPort}
+                                                        </p>))}
+
                                                 </div>
                                             </div>
                                             <p className="text-white/50 self-center absolute bottom-2">

@@ -16,7 +16,7 @@ const stack = new Stack(savedCommandsPath, socketServer, stackSchema)
 //         console.log('Rare pty error swallowed')
 //         return
 //     }
-//     throw err
+//     console.log(err)
 // })
 
 async function createWindow(): Promise<void> {

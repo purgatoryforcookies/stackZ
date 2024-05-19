@@ -8,8 +8,9 @@ import { HistoryService } from './service/HistoryService'
 import { MonitorService } from './service/MonitorService'
 import { EnvironmentService } from './service/EnvironmentService'
 import { DockerService } from './service/DockerService'
-import { DockerError } from './util/error'
+import { DockerError, DockerFaultState } from './util/error'
 
+const FAULTSTATE_ERROR_CODE = 'ERRFAULT'
 
 export class Stack {
     path: string
@@ -99,9 +100,13 @@ export class Stack {
                     } catch (error) {
                         if (error instanceof DockerError) {
                             akw('', error.message)
+                            return
+                        }
+                        if (error instanceof DockerFaultState) {
+                            akw('', FAULTSTATE_ERROR_CODE)
+                            return
                         }
                         akw('', 'Unknown docker error')
-                        console.log("Unknown docker error", error)
                     }
                 })
                 client.on('dockerStop', async (id: string, akw) => {
@@ -112,6 +117,7 @@ export class Stack {
                     } catch (error) {
                         if (error instanceof DockerError) {
                             akw('', error.message)
+                            return
                         }
                         akw('', 'Unknown docker error')
                     }
@@ -125,6 +131,7 @@ export class Stack {
                     } catch (error) {
                         if (error instanceof DockerError) {
                             akw('', error.message)
+                            return
                         }
                         akw('', 'Unknown docker error')
                     }
@@ -137,6 +144,7 @@ export class Stack {
                     } catch (error) {
                         if (error instanceof DockerError) {
                             akw('', error.message)
+                            return
                         }
                         akw('', 'Unknown docker error')
                     }
