@@ -2,6 +2,8 @@ import { readFile, writeFileSync, existsSync } from 'fs'
 import { Environment, TPorts } from '../../../types'
 import { ZodTypeAny, z } from 'zod'
 import { exec } from 'child_process'
+import { RequestOptions, request } from 'http'
+import { DockerError } from './error'
 
 export const readJsonFile = <T extends z.ZodTypeAny>(
     path: string,
@@ -54,13 +56,11 @@ export const parseBufferToEnvironment = (buf: ArrayBuffer | null) => {
     return envir
 }
 
-
 /**
  * Factory sorts envs into order and adds host environments
  * into the settings, if they dont already exist.
  */
 export const envFactory = (args: Environment[] | undefined) => {
-
     const hostEnv: Environment = {
         title: 'OS Environment',
         pairs: process.env as Record<string, string>,
@@ -193,4 +193,56 @@ export const executeScript = async (script: string, shell: string, silent = fals
         }
         return ''
     }
+}
+
+export const bakeEnvironmentToString = (env: Record<string, string | undefined>) => {
+    let envString = ''
+
+    Object.entries(env).forEach((entry) => {
+        if (process.platform === 'win32') {
+            envString += `$env:${entry[0]}='${entry[1]}'; `
+        } else {
+            envString += `${entry[0]}=${entry[1]} `
+        }
+    })
+
+    return envString
+}
+
+export const httpNativeRequest = <T>(options: RequestOptions) => {
+    return new Promise<T | null>((resolve, reject) => {
+        const req = request(options, (res) => {
+            let data = ''
+
+            if (!res.statusCode) {
+                reject(new DockerError('No response'))
+                return
+            }
+            if (res.statusCode >= 300) {
+                reject(new DockerError(`${res.statusCode} - ${res.statusMessage}`))
+                return
+            }
+
+            res.on('data', (chunk) => {
+                data += chunk
+            })
+
+            res.on('end', () => {
+                try {
+                    resolve(JSON.parse(data))
+                } catch {
+                    resolve(null)
+                }
+            })
+            res.on('error', (err) => {
+                reject(new DockerError(`${err.name} - ${err.message}`))
+            })
+        })
+
+        req.on('error', (err) => {
+            reject(new DockerError(`${err.message}`))
+        })
+
+        req.end()
+    })
 }

@@ -1,14 +1,13 @@
-import { Environment } from "../../../types"
-import { envFactory, haveThesameElements } from "../util/util"
-
+import { Environment } from '../../../types'
+import { envFactory, haveThesameElements } from '../util/util'
 
 export class EnvironmentService {
-
     os: Environment[]
     public store: Map<string, Environment[]> = new Map()
     private static instance: EnvironmentService
 
-    private constructor() { }
+    // @ts-ignore singleton
+    private constructor() {}
 
     public static get() {
         if (!EnvironmentService.instance) {
@@ -18,7 +17,6 @@ export class EnvironmentService {
     }
 
     register(id: string, env?: Environment[], omitOS = false) {
-        console.log('Registering', id, omitOS)
         if (omitOS) {
             if (!env) return
             this.store.set(id, env)
@@ -32,9 +30,17 @@ export class EnvironmentService {
         this.store.delete(id)
     }
 
+    retrieve(id: string, omitOS: boolean = true) {
+        const existing = this.store.get(id)
+        if (!existing) return
+
+        if (omitOS) {
+            return existing.filter((i) => i.order !== 0)
+        }
+        return existing
+    }
 
     mute(id: string, order: number, key?: string) {
-
         if (key && key.trim().length == 0) return
         const target = this.store.get(id)?.find((list) => list.order === order)
 
@@ -51,7 +57,6 @@ export class EnvironmentService {
         } else {
             target.disabled.push(key)
         }
-
     }
     addOrder(id: string, title: string, variables: Record<string, string>) {
         if (!title) return
@@ -73,7 +78,6 @@ export class EnvironmentService {
             disabled: []
         }
         target.push(newEnv)
-        console.log(target)
         this.store.set(id, target)
     }
 
@@ -82,7 +86,7 @@ export class EnvironmentService {
         if (!target) throw new Error('Deleting failed. No environment found')
 
         const newTarget = target
-            .filter(env => env.order !== order)
+            .filter((env) => env.order !== order)
             .map((item, i) => {
                 item.order = i
                 return item
@@ -92,14 +96,13 @@ export class EnvironmentService {
         this.store.set(id, newTarget)
     }
 
-
     /**
      * Edits or adds a key-value pair to given set.
      */
     edit(id: string, order: number, value: string, key: string, prevKey?: string) {
         if (key.trim().length == 0) return
 
-        const target = this.store.get(id)?.find(list => list.order === order)
+        const target = this.store.get(id)?.find((list) => list.order === order)
         if (!target) throw new Error('Editing failed. No environment found.')
 
         if (prevKey) {
@@ -116,47 +119,25 @@ export class EnvironmentService {
         delete list?.pairs[key]
     }
 
-
-    bake(id: string[]) {
-
+    bake(id: string[], omitOS: boolean = false) {
         const reduced: Record<string, string | undefined> = {}
 
-        id.forEach(i => {
+        id.forEach((i) => {
             const environment = this.store.get(i)
             if (!environment) return
 
-            environment.sort((a, b) => a.order - b.order).forEach((envSet) => {
-                Object.keys(envSet.pairs).forEach((key) => {
-                    if (envSet.disabled.includes(key)) return
-                    reduced[key] = envSet.pairs[key]
+            environment
+                .sort((a, b) => a.order - b.order)
+                .forEach((envSet) => {
+                    if (omitOS && envSet.title === 'OS Environment') return
+
+                    Object.keys(envSet.pairs).forEach((key) => {
+                        if (envSet.disabled.includes(key)) return
+                        reduced[key] = envSet.pairs[key]
+                    })
                 })
-            })
         })
 
-        if (Object.keys(reduced).length === 0) {
-            throw new Error('Empty environment is not a possible configuration')
-        }
         return reduced
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-

@@ -85,36 +85,33 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
                 value={selected}
                 onValueChange={handleSelect}
             >
-                <SelectTrigger className="w-full min-w-[8rem] text-[0.8rem] h-8 p-[0.6rem] border-0 overflow-hidden text-ellipsis">
+                <SelectTrigger className="w-full sm:min-w-[8rem] min-w-[4rem] text-[0.8rem] h-8 p-[0.6rem] border-0 overflow-hidden text-ellipsis">
                     <SelectValue placeholder={'Git brances'} />
                 </SelectTrigger>
-                <SelectContent data-theme={theme}>
+                <SelectContent data-theme={theme.theme} className="sm:w-[100%] w-[80%]">
                     <SelectGroup>
                         {!loading && options
                             ? options.map((option) => (
-                                <SelectItem
-                                    key={option}
-                                    value={option}
-                                >
-                                    {option}
-                                </SelectItem>
-                            ))
+                                  <SelectItem key={option} value={option}>
+                                      {option}
+                                  </SelectItem>
+                              ))
                             : null}
                     </SelectGroup>
                 </SelectContent>
             </Select>
             <ReloadIcon
                 onClick={handlePull}
-                className={`w-4 h-4 hover:cursor-pointer hover:scale-110 hover:text-violet-500 ${loading ? 'animate-spin' : ''}`}
+                className={`size-4 hover:cursor-pointer hover:scale-110 hover:text-violet-500 ${loading ? 'animate-spin' : ''}`}
             />
             <CustomToolTip message={`${errors}`} hidden={!errors}>
                 {errors ? (
                     <ExclamationTriangleIcon
-                        className={`w-4 h-4 text-orange-500 transition-opacity duration-500 ${errors ? 'opacity-100' : 'opacity-0'}`}
+                        className={`size-4 text-orange-500 transition-opacity duration-500 ${errors ? 'opacity-100' : 'opacity-0'}`}
                     />
                 ) : (
                     <CheckIcon
-                        className={`w-4 h-4 text-green-500 transition-opacity duration-500 ${!loading ? 'opacity-100' : 'opacity-0'}`}
+                        className={`size-4 text-green-500 transition-opacity duration-500 ${!loading ? 'opacity-100' : 'opacity-0'}`}
                     />
                 )}
             </CustomToolTip>

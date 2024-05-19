@@ -56,7 +56,7 @@ function TerminalUI({ engine }: TerminalUIProps) {
                 />
                 <button hidden formAction="submit"></button>
             </form>
-            <div ref={terminalRef} className="h-full overflow-hidden" />
+            <div ref={terminalRef} className="h-full overflow-hidden w-full" />
         </>
     )
 }

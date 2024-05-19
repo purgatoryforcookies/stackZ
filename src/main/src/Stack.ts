@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { CustomServer, NewCommandPayload, PaletteStack } from '../../types'
+import { Cmd, CustomServer, PaletteStack, RecursivePartial } from '../../types'
 import { Palette } from './Palette'
 import { DataStore } from './stores/DataStore'
 import { ZodTypeAny } from 'zod'
@@ -7,7 +7,10 @@ import { TerminalScheduler } from './service/TerminalScheduler'
 import { HistoryService } from './service/HistoryService'
 import { MonitorService } from './service/MonitorService'
 import { EnvironmentService } from './service/EnvironmentService'
+import { DockerService } from './service/DockerService'
+import { DockerError, DockerFaultState } from './util/error'
 
+const FAULTSTATE_ERROR_CODE = 'ERRFAULT'
 
 export class Stack {
     path: string
@@ -19,6 +22,7 @@ export class Stack {
     history: HistoryService
     monitor: MonitorService
     environment: EnvironmentService
+    dockerService: DockerService
 
     constructor(jsonPath: string, server: CustomServer, schema: ZodTypeAny) {
         this.path = jsonPath
@@ -30,6 +34,7 @@ export class Stack {
         this.history = new HistoryService()
         this.monitor = new MonitorService()
         this.environment = EnvironmentService.get()
+        this.dockerService = new DockerService()
     }
 
     async load() {
@@ -74,18 +79,73 @@ export class Stack {
 
             if (palette) {
                 if (!remoteTerminalID) {
-                    console.log(`Stack ${stackId} connected`)
+                    // console.log(`Stack ${stackId} connected`)
                     palette.installStackSocket(client)
                 } else {
-                    console.log(`Terminal ${remoteTerminalID} connected`)
+                    // console.log(`Terminal ${remoteTerminalID} connected`)
                     palette.initTerminal(client, String(remoteTerminalID))
                 }
             } else {
-                console.log(`General client connected ${client.id}`)
+                // console.log(`General client connected ${client.id}`)
                 client.on('clearHistory', (akw) => {
                     console.log('Clearing history service')
                     this.history.reboot()
                     akw()
+                })
+                client.on('dockerContainers', async (akw) => {
+                    try {
+                        const containers = await this.dockerService.getContainers()
+                        akw(JSON.stringify(Object.fromEntries(containers)))
+                    } catch (error) {
+                        if (error instanceof DockerError) {
+                            akw('', error.message)
+                            return
+                        }
+                        if (error instanceof DockerFaultState) {
+                            akw('', FAULTSTATE_ERROR_CODE)
+                            return
+                        }
+                        akw('', 'Unknown docker error')
+                    }
+                })
+                client.on('dockerStop', async (id: string, akw) => {
+                    const err = await this.dockerService.stopContainer(id)
+                    try {
+                        const containers = await this.dockerService.getContainers()
+                        akw(JSON.stringify(Object.fromEntries(containers)), err)
+                    } catch (error) {
+                        if (error instanceof DockerError) {
+                            akw('', error.message)
+                            return
+                        }
+                        akw('', 'Unknown docker error')
+                    }
+                })
+                client.on('dockerStart', async (id: string, akw) => {
+                    const err = await this.dockerService.startContainer(id)
+                    try {
+                        const containers = await this.dockerService.getContainers()
+                        akw(JSON.stringify(Object.fromEntries(containers)), err)
+                    } catch (error) {
+                        if (error instanceof DockerError) {
+                            akw('', error.message)
+                            return
+                        }
+                        akw('', 'Unknown docker error')
+                    }
+                })
+                client.on('dockerRemove', async (id: string, akw) => {
+                    const err = await this.dockerService.removeContainer(id)
+                    try {
+                        const containers = await this.dockerService.getContainers()
+                        akw(JSON.stringify(Object.fromEntries(containers)), err)
+                    } catch (error) {
+                        if (error instanceof DockerError) {
+                            akw('', error.message)
+                            return
+                        }
+                        akw('', 'Unknown docker error')
+                    }
                 })
 
                 client.on('m_ports', async (akw) => {
@@ -104,7 +164,7 @@ export class Stack {
     }
 
     get(id?: string) {
-        if (id) return this.raw.find((r) => r.id === id)
+        if (id) return [this.raw.find((r) => r.id === id)]
         return this.raw
     }
 
@@ -151,11 +211,12 @@ export class Stack {
         this.server.emit('terminalDelete', { stack, terminal })
     }
 
-    async createTerminal(payload: NewCommandPayload, stack: string) {
+    async createTerminal(payload: RecursivePartial<Cmd>, stack: string) {
         const existingStack = this.palettes.get(stack)
         if (!existingStack) {
             throw new Error(`Whoah, stack ${stack} was not found when adding new terminal`)
         }
+
         const newT = await this.palettes.get(stack)?.createCommand(payload)
         if (!newT) throw new Error(`Could not create terminal ${payload.title} ${stack}`)
         this.save()

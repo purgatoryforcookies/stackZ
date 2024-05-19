@@ -10,6 +10,7 @@ import { IUseStack } from '@renderer/hooks/useStack'
 import { useTaalasmaa } from '@renderer/hooks/useTaalasmaa'
 import CommandSM from './Command/CommandSM'
 import RadioBadge from './Common/RadioBadge'
+import CommandContextMenu from './Command/CommandContextMenu'
 
 type PaletteProps = {
     data: IUseStack
@@ -78,7 +79,7 @@ function Palette({ data }: PaletteProps) {
                 <NewStack set={data.addStack} />
             </div>
             <div
-                className={`flex w-full mb-2 items-center ${isCompact ? 'justify-center p-1 bg-card' : 'justify-end pr-12'}`}
+                className={`flex w-full mb-2 items-center ${isCompact ? 'justify-center bg-card' : 'justify-end pr-12'}`}
             >
                 <Button
                     variant={'link'}
@@ -99,33 +100,35 @@ function Palette({ data }: PaletteProps) {
             <div className="overflow-auto pb-14" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
                     ? stack.palette
-                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                        .map((cmd) => {
-                            if (!cmd?.id) return null
-                            const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
-                            if (!engine) return null
-                            return isCompact ? (
-                                <CommandSM
-                                    key={cmd.id}
-                                    data={cmd}
-                                    engine={engine}
-                                    selected={cmd.id === data.selectedTerminal}
-                                    handleDrag={handleDrag}
-                                    stack={data}
-                                    stackRunning={running}
-                                />
-                            ) : (
-                                <Command
-                                    key={cmd.id}
-                                    data={cmd}
-                                    engine={engine}
-                                    selected={cmd.id === data.selectedTerminal}
-                                    handleDrag={handleDrag}
-                                    stack={data}
-                                    stackRunning={running}
-                                />
-                            )
-                        })
+                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                          .map((cmd) => {
+                              if (!cmd?.id) return null
+                              const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
+                              if (!engine) return null
+                              return (
+                                  <CommandContextMenu key={cmd.id} stack={data} terminal={cmd}>
+                                      {isCompact ? (
+                                          <CommandSM
+                                              data={cmd}
+                                              engine={engine}
+                                              selected={cmd.id === data.selectedTerminal}
+                                              handleDrag={handleDrag}
+                                              stack={data}
+                                              stackRunning={running}
+                                          />
+                                      ) : (
+                                          <Command
+                                              data={cmd}
+                                              engine={engine}
+                                              selected={cmd.id === data.selectedTerminal}
+                                              handleDrag={handleDrag}
+                                              stack={data}
+                                              stackRunning={running}
+                                          />
+                                      )}
+                                  </CommandContextMenu>
+                              )
+                          })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand stack={data} />

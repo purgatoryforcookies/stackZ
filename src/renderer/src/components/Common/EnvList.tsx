@@ -47,13 +47,12 @@ function EnvList({ data, socket, id }: EnvListProps) {
 
     return (
         <div
-            className={`p-7 py-4 mb-8
+            className={`
         ${minimized && editMode ? '' : 'max-w-[35rem]'}
         ${editMode ? 'max-w-[100%]' : ''}
         `}
         >
-            <div className='flex justify-center'>
-
+            <div className="flex justify-center">
                 {data.title === 'OS Environment' ? (
                     <CustomToolTip message="This environment is editable, but not persistent.">
                         <h1 className="text-center text-foreground text-nowrap flex items-center gap-1">
@@ -63,7 +62,6 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 ) : (
                     <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
                 )}
-
             </div>
             <Separator className="my-2" />
             <div className="flex gap-1 justify-center mb-2">
@@ -123,19 +121,19 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 >
                     {data.pairs
                         ? Object.keys(data.pairs).map((key: string) => (
-                            <Record
-                                key={key} //react component key
-                                id={id}
-                                newRecord={false}
-                                editMode={editMode}
-                                socket={socket}
-                                orderId={data.order}
-                                minimized={minimized}
-                                keyv={key}
-                                muted={data.disabled.includes(key)}
-                                value={data.pairs[key]}
-                            />
-                        ))
+                              <Record
+                                  key={key} //react component key
+                                  id={id}
+                                  newRecord={false}
+                                  editMode={editMode}
+                                  socket={socket}
+                                  orderId={data.order}
+                                  minimized={minimized}
+                                  keyv={key}
+                                  muted={data.disabled.includes(key)}
+                                  value={data.pairs[key]}
+                              />
+                          ))
                         : null}
                     {editMode ? (
                         <Record

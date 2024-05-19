@@ -8,7 +8,7 @@ const Toaster = () => {
 
     return (
         <Sonner
-            data-theme={theme}
+            data-theme={theme.theme}
             className="toaster group"
             toastOptions={{
                 classNames: {

@@ -16,7 +16,7 @@ const stack = new Stack(savedCommandsPath, socketServer, stackSchema)
 //         console.log('Rare pty error swallowed')
 //         return
 //     }
-//     throw err
+//     console.log(err)
 // })
 
 async function createWindow(): Promise<void> {
@@ -103,7 +103,7 @@ app.on('window-all-closed', () => {
 })
 
 ipcMain.handle('getStack', (_, id?: string) => {
-    return stack.get(id)
+    return JSON.stringify(stack.get(id))
 })
 
 ipcMain.handle('toggleTerminal', (_, stackId: string, terminalID: string, state: boolean) => {
@@ -141,6 +141,7 @@ ipcMain.handle('createCommand', (_, payload, stackId) => {
     const newOne = stack.createTerminal(payload, stackId)
     return newOne
 })
+
 ipcMain.handle('deleteCommand', (_, stackId, terminalId) => {
     return stack.deleteTerminal(stackId, terminalId)
 })
@@ -151,8 +152,8 @@ ipcMain.handle('deleteStack', (_, stackId) => {
     return stack.removeStack(stackId)
 })
 
-ipcMain.handle('openFilesLocation', () => {
-    const dirPath = app.getPath('userData')
+ipcMain.handle('openFilesLocation', (_, path?: string) => {
+    const dirPath = path ?? app.getPath('userData')
     let command = ''
     switch (process.platform) {
         case 'darwin':

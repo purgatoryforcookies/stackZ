@@ -1,63 +1,102 @@
-import { Environment } from '../../types'
-import { mapEnvs } from '../src/util/util'
+import { EnvironmentService } from '../src/service/EnvironmentService'
 
 describe('Utilities tests', () => {
-    // it('Parses variables from string', () => {
-    //   const cases = [
-    //     { cmd: 'echo hello from', params: [] },
-    //     { cmd: 'echo {variable1} and {variable2}', params: ['variable1', 'variable2'] },
-    //     { cmd: "echo 'variable1' from single quotes", params: ['variable1'] },
-    //     { cmd: 'echo ${variable1} bash type', params: ['variable1'] },
-    //     { cmd: "echo '${variable1}' quoted bash type", params: ['variable1'] }
-    //   ]
+    const envService = EnvironmentService.get()
 
-    //   cases.forEach((value) => {
-    //     const test = value.params.join('')
-    //     expect(parseVariables(value.cmd).join('')).toBe(test)
-    //   })
-    // })
+    beforeAll(() => {
+        envService.store = new Map()
+    })
 
-    it.only('Removes the disabled envs from the sets', () => {
-        // There is a list of envs objects. Each object
-        // has a K,V pairs of envs, and a list of disabled
-        // keys. Remove the keys from a the pairs without
-        // affecting others. Also return a union K,V set from all
+    it('Does nothing if no env is provided and OS env is omitted (stack creation)', () => {
+        envService.register('stack1', undefined, true)
+        expect(envService.store.get('stack1')).toBeUndefined()
+    })
 
-        const testEnvs: Environment[] = [
-            {
-                pairs: {
-                    key1: 'value1.1',
-                    key2: 'value2.1',
-                    key3: 'value3.1'
-                },
-                title: 'Test set 1',
-                order: 1,
-                disabled: []
-            },
-            {
-                pairs: {
-                    key1: 'value1.2',
-                    key2: 'value2.2',
-                    key3: 'value3.2'
-                },
-                title: 'Test set 2',
-                order: 2,
-                disabled: ['key1']
-            }
+    it('Registers a new env set for existing stack', () => {
+        const newEnv: Record<string, string> = {
+            key1: 'value1.1',
+            key2: 'value2.1',
+            key3: 'value3.1'
+        }
+
+        envService.addOrder('stack1', 'title1', newEnv)
+
+        expect(envService.store.get('stack1')).toBeDefined()
+        expect(envService.store.get('stack1')?.length).toBe(1)
+        expect(envService.store.get('stack1')?.[0].title).toBe('title1')
+        expect(envService.store.get('stack1')?.[0].order).toBe(0)
+        expect(envService.store.size).toBe(1)
+    })
+
+    it('Registers another env set for existing stack', () => {
+        const newEnv: Record<string, string> = {
+            key1: 'value1.2',
+            key2: 'value2.2',
+            key3: 'value3.2'
+        }
+
+        envService.addOrder('stack1', 'title2', newEnv)
+
+        expect(envService.store.get('stack1')).toBeDefined()
+        expect(envService.store.get('stack1')?.length).toBe(2)
+        expect(envService.store.get('stack1')?.[1].title).toBe('title2')
+        // TODO: might want to revisit that ordering logic. technically should be 1..
+        expect(envService.store.get('stack1')?.[1].order).toBe(2)
+        expect(envService.store.size).toBe(1)
+    })
+
+    it('Registering a new terminal with empty env and with OS', () => {
+        envService.register('term1')
+
+        expect(envService.store.get('term1')).toBeDefined()
+        expect(envService.store.get('term1')?.length).toBe(1)
+        expect(envService.store.get('term1')?.[0].title).toBe('OS Environment')
+        expect(envService.store.get('term1')?.[0].order).toBe(0)
+        expect(envService.store.size).toBe(2)
+    })
+
+    it('Registering a new env set for existing terminal', () => {
+        const newEnv: Record<string, string> = {
+            key12: 'value1.1',
+            key22: 'value2.1',
+            key32: 'value3.1'
+        }
+
+        envService.addOrder('term1', 'env1', newEnv)
+
+        expect(envService.store.get('term1')).toBeDefined()
+        expect(envService.store.get('term1')?.length).toBe(2)
+        expect(envService.store.get('term1')?.[0].title).toBe('OS Environment')
+        expect(envService.store.get('term1')?.[0].order).toBe(0)
+        expect(envService.store.get('term1')?.[1].title).toBe('env1')
+        // TODO: might want to revisit that ordering logic. technically should be 1..
+        expect(envService.store.get('term1')?.[1].order).toBe(2)
+        expect(envService.store.size).toBe(2)
+    })
+
+    it('Bakes environment correctly for a terminal to run', () => {
+        const envs = envService.bake(['stack1', 'term1'])
+
+        const toLookFor = ['key12', 'key22', 'key32', 'key1', 'key2', 'key3']
+        const toLookForValues = [
+            'value1.1',
+            'value2.1',
+            'value3.1',
+            'value1.2',
+            'value2.2',
+            'value3.2'
         ]
 
-        const parsed = mapEnvs(testEnvs)
+        console.log(envs)
 
-        expect(Object.keys(parsed)).toContain('key1')
-        expect(Object.keys(parsed)).toContain('key2')
-        expect(Object.keys(parsed)).toContain('key3')
-        expect(Object.values(parsed)).toContain('value1.1')
-        // disabled on the second set, therefore will not be overwritten
-        // if it would be on the first set, it would remain and not get overwritten
-        expect(Object.values(parsed)).not.toContain('value1.2')
-        expect(Object.values(parsed)).not.toContain('value2.1') // overwritten
-        expect(Object.values(parsed)).not.toContain('value3.1') // overwritten
-        expect(Object.values(parsed)).toContain('value2.2')
-        expect(Object.values(parsed)).toContain('value3.2')
+        toLookFor.forEach((key, i) => {
+            expect(envs[key]).toBeDefined()
+            expect(envs[key]).toBe(toLookForValues[i])
+        })
+
+        // Expect that if this is defined, the OS envs are with the set
+        expect(envs.HOME).toBeDefined()
     })
+
+    it.todo('Bakes environment correctly when there are dublicated keys')
 })

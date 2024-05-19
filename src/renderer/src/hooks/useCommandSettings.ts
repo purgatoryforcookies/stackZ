@@ -22,8 +22,15 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
         setIsPending(false)
     }
 
-    const onChange = (name: OnChangeType, value?: string |
-        Exclude<CommandMetaSetting['sequencing'], undefined>[0] | [] | boolean | number) => {
+    const onChange = (
+        name: OnChangeType,
+        value?:
+            | string
+            | Exclude<CommandMetaSetting['sequencing'], undefined>[0]
+            | []
+            | boolean
+            | number
+    ) => {
         setIsLoading(true)
 
         switch (name) {
@@ -52,10 +59,8 @@ const useCommandSettings = (engine: TerminalUIEngine) => {
                     if (!data) return
                     finishUp(data)
                 })
-
         }
     }
-
 
     useEffect(() => {
         setIsLoading(true)

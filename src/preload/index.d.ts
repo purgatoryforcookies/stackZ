@@ -5,12 +5,12 @@ declare global {
     interface Window {
         electron: ElectronAPI
         api: {
-            getStack: (id?: string) => Promise<PaletteStack[] | PaletteStack>
+            getStack: (id?: string) => Promise<string>
             startTerminal: (stack: string, terminal: string) => Promise<boolean>
             stopTerminal: (stack: string, terminal: string) => Promise<boolean>
             killAll: () => Promise<void>
             save: () => Promise<void>
-            createCommand: (payload: NewCommandPayload, stackId: string) => Promise<Cmd>
+            createCommand: (payload: RecursivePartial<Cmd>, stackId: string) => Promise<Cmd>
             startStack: (stack: string) => Promise<void>
             stopStack: (stack: string) => Promise<void>
             createStack: (title: string) => Promise<PaletteStack>
@@ -20,7 +20,7 @@ declare global {
         store: {
             get: (key: string) => Promise<unknown>
             set: (key: string, value: unknown) => Promise<void>
-            openFileLocation: () => Promise<void>
+            openFileLocation: (path?: string) => Promise<void>
         }
     }
 }

@@ -13,16 +13,20 @@ import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@rende
 import { Separator } from '@renderer/@/ui/separator'
 import { ThemeContext } from '@renderer/App'
 import { IUseStack } from '@renderer/hooks/useStack'
+import { DockerContainer } from '@t'
+import dockerLogo from '../../assets/docker-mark-white.svg'
+import { IUseDocker } from '@renderer/hooks/useDocker'
 
 type CommandMenuProps = {
     stack: IUseStack
+    docker: IUseDocker
     toggle: {
         header: () => void
         palette: () => void
     }
 }
 
-export function CommandMenu({ stack, toggle }: CommandMenuProps) {
+export function CommandMenu({ stack, toggle, docker }: CommandMenuProps) {
     const theme = useContext(ThemeContext)
 
     const [open, setOpen] = useState(false)
@@ -105,7 +109,7 @@ export function CommandMenu({ stack, toggle }: CommandMenuProps) {
     if (!st) return null
 
     return (
-        <CommandDialog open={open} onOpenChange={setOpen} data-theme={theme}>
+        <CommandDialog open={open} onOpenChange={setOpen} data-theme={theme.theme}>
             <CommandInput placeholder="Type a command or search..." />
             <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
@@ -127,7 +131,6 @@ export function CommandMenu({ stack, toggle }: CommandMenuProps) {
                         <CommandShortcut>CTRL+ENTER</CommandShortcut>
                     </CommandItem>
                 </CommandGroup>
-                <Separator />
                 <Separator />
                 <CommandGroup heading="Stacks">
                     {stack
@@ -162,7 +165,7 @@ export function CommandMenu({ stack, toggle }: CommandMenuProps) {
                                                           <GlobeIcon />
                                                       </TooltipTrigger>
                                                       <TooltipContent side={'left'}>
-                                                          <p>Has global environments</p>
+                                                          <p>Has stack environments</p>
                                                       </TooltipContent>
                                                   </Tooltip>
                                               </TooltipProvider>
@@ -195,7 +198,9 @@ export function CommandMenu({ stack, toggle }: CommandMenuProps) {
                                               setOpen(false)
                                           }}
                                       >
-                                          <ButtonIcon className="mr-2 h-4 w-4" />
+                                          <div>
+                                              <ButtonIcon className="mr-2 h-4 w-4" />
+                                          </div>
                                           <div className="flex flex-col">
                                               <span>{cmd.title}</span>
                                               <div className="flex flex-col">
@@ -204,6 +209,58 @@ export function CommandMenu({ stack, toggle }: CommandMenuProps) {
                                                   <span>stack: {s.stackName}</span>
                                               </div>
                                           </div>
+                                      </CommandItem>
+                                  )
+                              })
+                          })
+                        : null}
+                </CommandGroup>
+                <Separator />
+                <CommandGroup heading="Containers">
+                    {docker.containers
+                        ? Object.keys(docker.containers).map((key) => {
+                              const conts: DockerContainer[] = docker.containers[key]
+                              if (!conts) return null
+
+                              return conts.map((c) => {
+                                  const ports = c.Ports.map(
+                                      (p) => `${p.PrivatePort}:${p.PublicPort}`
+                                  ).join('-')
+                                  return (
+                                      <CommandItem
+                                          key={c.Id}
+                                          className="flex gap-5 h-30"
+                                          value={
+                                              c.Command +
+                                              c.Image +
+                                              c.Names.join('') +
+                                              Object.values(c.Labels).join('') +
+                                              ports
+                                          }
+                                      >
+                                          <div>
+                                              <img
+                                                  src={dockerLogo}
+                                                  className="size-5 hover:cursor-pointer"
+                                              />
+                                          </div>
+                                          <div className="flex flex-col w-full">
+                                              <span>{c.Names.join('-')}</span>
+                                              <span className="text-white/50">{c.Image}</span>
+                                              <div className="flex flex-col pt-2">
+                                                  <span>{c.Command}</span>
+                                                  <span>
+                                                      Project:{' '}
+                                                      {c.Labels?.['com.docker.compose.project']}
+                                                  </span>
+                                              </div>
+                                              {ports ? (
+                                                  <span className="self-end">Ports: {ports}</span>
+                                              ) : null}
+                                          </div>
+                                          <p className="text-[0.8rem] absolute right-1 top-0 text-white/40">
+                                              {c.Status}
+                                          </p>
                                       </CommandItem>
                                   )
                               })

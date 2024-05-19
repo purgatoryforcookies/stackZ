@@ -8,6 +8,7 @@ export class MonitorService {
     }
 
     async activePortsTCP() {
+        if (process.platform !== 'win32') return []
         const command = [
             'Get-NetTCPConnection -state Listen |',
             'select-object',
@@ -68,6 +69,7 @@ export class MonitorService {
 
     // TODO: combine functions from this and tcp into one.
     async activePortsUDP() {
+        if (process.platform !== 'win32') return []
         const command = [
             'Get-NetUDPEndpoint |',
             ' select LocalAddress,LocalPort,OwningProcess,',

@@ -2,3 +2,7 @@ node_modules
 dist
 out
 .gitignore
+*.config.ts
+*.config.js
+*.md
+docs

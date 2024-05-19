@@ -18,16 +18,14 @@ import { IUseStack } from '@renderer/hooks/useStack'
 import packageJson from '../../../../../package.json'
 
 export type SettingsProps = {
-    setTheme: (name: string) => void
     stack: IUseStack
 }
 
-function Settings({ setTheme, stack }: SettingsProps) {
+function Settings({ stack }: SettingsProps) {
     const [open, setOpen] = useState<boolean>(false)
     const [versions] = useState(window.electron.process.versions)
 
     const theme = useContext(ThemeContext)
-    console.log(import.meta.env)
 
     const handleShortCuts = (e: KeyboardEvent) => {
         switch (e.key) {
@@ -46,34 +44,23 @@ function Settings({ setTheme, stack }: SettingsProps) {
         }
     }, [open])
 
-    useEffect(() => {
-        if (!theme) return
-        window.store.set('theme', theme)
-    }, [theme])
-
-    useEffect(() => {
-        const fetchStore = async () => {
-            await window.store.get('theme').then((t) => {
-                setTheme(t as string)
-            })
-        }
-        fetchStore()
-    }, [open])
-
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-                <DotsHorizontalIcon className="w-5 h-5 absolute right-3 top-2 text-primary/90 hover:scale-110 hover:text-primary hover:cursor-pointer" />
+                <DotsHorizontalIcon
+                    className="size-5 absolute right-3 top-2 text-primary/90 hover:scale-110 hover:text-primary hover:cursor-pointer
+                hidden sm:block"
+                />
             </SheetTrigger>
             <SheetContent
                 className="w-[32vw] min-w-[36rem] sm:max-w-none overflow-auto"
-                data-theme={theme}
+                data-theme={theme.theme}
                 onOpenAutoFocus={(e) => e.preventDefault()}
             >
                 <SheetHeader>
                     <SheetTitle>Settings</SheetTitle>
                     <SheetDescription></SheetDescription>
-                    <Tabs defaultValue="stack" data-theme={theme}>
+                    <Tabs defaultValue="stack" data-theme={theme.theme}>
                         <TabsList>
                             <TabsTrigger value="stack">Stack</TabsTrigger>
                             <TabsTrigger value="general">General</TabsTrigger>
@@ -87,14 +74,14 @@ function Settings({ setTheme, stack }: SettingsProps) {
                         </TabsContent>
                         <TabsContent value="general">
                             General settings
-                            <General setTheme={setTheme} />
+                            <General />
                         </TabsContent>
                     </Tabs>
                 </SheetHeader>
                 <SheetFooter>
                     <SheetClose asChild></SheetClose>
                 </SheetFooter>
-                <p className='absolute right-2 bottom-1 text-white/30 text-[0.7rem]'>
+                <p className="absolute right-2 bottom-1 text-white/30 text-[0.7rem]">
                     {versions.node}-{packageJson.version}
                 </p>
             </SheetContent>

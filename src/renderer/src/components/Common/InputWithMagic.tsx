@@ -84,9 +84,11 @@ function InputWithMagic({
 
     return (
         <div className="relative">
-            {title ? <Label htmlFor={valueKey} className="text-right p-1">
-                {title}
-            </Label> : null}
+            {title ? (
+                <Label htmlFor={valueKey} className="text-right p-1">
+                    {title}
+                </Label>
+            ) : null}
             <Input
                 id={valueKey}
                 data-testid={'magickInput'}

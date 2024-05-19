@@ -5,7 +5,6 @@ import InputWithMagic from '../components/Common/InputWithMagic'
 import { render, renderHook } from '@testing-library/react'
 
 jest.mock('socket.io-client', () => {
-
     const socket = {
         emit: jest.fn(),
         on: jest.fn()

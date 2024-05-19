@@ -35,11 +35,15 @@ export const stackSchema = z.array(
                             delay: z.number().optional(),
                             healthCheck: z.string().optional(),
                             halt: z.boolean().default(false).optional(),
-                            sequencing: z.array(z.object({
-                                index: z.number(),
-                                echo: z.string().optional(),
-                                message: z.string().optional()
-                            })).optional(),
+                            sequencing: z
+                                .array(
+                                    z.object({
+                                        index: z.number(),
+                                        echo: z.string().optional(),
+                                        message: z.string().optional()
+                                    })
+                                )
+                                .optional()
                         })
                         .optional(),
                     command: z.object({
@@ -70,6 +74,10 @@ export type Environment = Exclude<Cmd['command']['env'], undefined>[0]
 export type CommandMetaSetting = Exclude<Cmd['metaSettings'], undefined>
 export type EnginedCmd = Cmd & { engine: TerminalUIEngine }
 
+export type RecursivePartial<T> = {
+    [P in keyof T]?: RecursivePartial<T[P]>
+}
+
 export enum SelectionEvents {
     START = 'START',
     CONN = 'CONNECT',
@@ -77,7 +85,6 @@ export enum SelectionEvents {
     EXPAND = 'EXPAND',
     NEWSTACK = 'NEWSTACK'
 }
-
 
 export interface ServerToClientEvents {
     hello: () => void
@@ -87,15 +94,24 @@ export interface ServerToClientEvents {
     heartBeat: (beat: number | undefined) => void
     terminalState: (state: Status) => void
     output: (data: string) => void
-    terminalDelete: (args: { stack: string, terminal: string }) => void
+    terminalDelete: (args: { stack: string; terminal: string }) => void
     error: (err: string) => void
 }
 
-export type MetaSettingPayload = string | boolean | number | [] |
-    Exclude<CommandMetaSetting['sequencing'], undefined>[0] | undefined
+export type MetaSettingPayload =
+    | string
+    | boolean
+    | number
+    | []
+    | Exclude<CommandMetaSetting['sequencing'], undefined>[0]
+    | undefined
 
 type ChangeSettingEvent = (arg: string, callback: (state: Status) => void) => void
-type ChangeMetaSettingEvent = (name: string, value: MetaSettingPayload, callback: (state: Status) => void) => void
+type ChangeMetaSettingEvent = (
+    name: string,
+    value: MetaSettingPayload,
+    callback: (state: Status) => void
+) => void
 
 export interface ClientToServerEvents {
     state: () => void
@@ -103,10 +119,18 @@ export interface ClientToServerEvents {
     stackDefaults: (arg: StackDefaultsProps) => void
     stackName: (arg: { name: string }) => void
     retrieveSettings: (callback: (state: Status) => void) => void
-    history: (key: keyof typeof HistoryKey, feed: string, callback: (data: HistoryBook) => void) => void
+    history: (
+        key: keyof typeof HistoryKey,
+        feed: string,
+        callback: (data: HistoryBook) => void
+    ) => void
 
     environmentEdit: (args: EnvironmentEditProps) => void
-    environmentList: (args: { value: string; fromFile: ArrayBuffer | null, id?: string | null }) => void
+    environmentList: (args: {
+        value: string
+        fromFile: ArrayBuffer | null
+        id?: string | null
+    }) => void
     environmentMute: (arg: UtilityProps) => void
     environmentListDelete: (args: UtilityProps) => void
     environmentDelete: (args: UtilityProps) => void
@@ -125,15 +149,18 @@ export interface ClientToServerEvents {
     gitSwitchBranch: (branch: string, callback: (errors: string[]) => void) => void
 
     clearHistory: (callback: () => void) => void
-    m_ports: (callback: (params: { tcp: Processes, udp: Processes }) => void) => void
+    m_ports: (callback: (params: { tcp: Processes; udp: Processes }) => void) => void
+    copyToClipboard: (callback: (cmd: string) => void) => void
 
-
+    dockerContainers: (callback: (data: string, err?: string) => void) => void
+    dockerStop: (id: string, callback: (data: string, err?: string) => void) => void
+    dockerStart: (id: string, callback: (data: string, err?: string) => void) => void
+    dockerRemove: (id: string, callback: (data: string, err?: string) => void) => void
 }
 
 export type CustomServerSocket = Socket<ClientToServerEvents, ServerToClientEvents>
 export type CustomClientSocket = ClientSocket<ServerToClientEvents, ClientToServerEvents>
 export type CustomServer = Server<ClientToServerEvents, ServerToClientEvents>
-
 
 export type Status = {
     stackId: string
@@ -257,4 +284,54 @@ export type Processes = {
 export type HistoryBook = {
     stackz: string[]
     host: string[]
+}
+
+export type DockerNetwork = {
+    IPAMConfig: string | null
+    Links: string | null
+    Aliases: string[] | null
+    NetworkID: string
+    EndpointID: string
+    Gateway: string
+    IPAddress: string
+    IPPrefixLen: number
+    IPv6Gateway: string
+    GlobalIPv6Address: string
+    GlobalIPv6PrefixLen: number
+    MacAddress: string
+    DriverOpts: string | null
+}
+
+export type DockerMount = {
+    Destination: string
+    Driver: string
+    Mode: string
+    Name: string
+    Propagation: string
+    RW: boolean
+    source: string
+    Type: string
+}
+
+export type DockerPort = {
+    IP: string
+    PrivatePort: number
+    PublicPort: number
+    type: 'tcp' | 'udp'
+}
+
+export type DockerContainer = {
+    Id: string
+    Names: string[]
+    Image: string
+    ImageID: string
+    Command: string
+    Created: number
+    Ports: DockerPort[]
+    Labels: { [key: string]: string | undefined }
+    State: string
+    Status: string
+    HostConfig: { [key: string]: string }
+    NetworkSettings: { [key: string]: { [key: string]: DockerNetwork } }
+    Mounts: DockerMount[]
 }

@@ -14,6 +14,6 @@ module.exports = {
     moduleNameMapper: {
         '^@t$': '<rootDir>/src/types',
         '^@renderer/(.*)': '<rootDir>/src/renderer/src/$1',
-        "\\.(s?css|less)$": "identity-obj-proxy"
+        '\\.(s?css|less)$': 'identity-obj-proxy'
     }
 }

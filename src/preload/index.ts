@@ -1,11 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { Cmd, NewCommandPayload, PaletteStack } from '../types'
+import { Cmd, PaletteStack, RecursivePartial } from '../types'
 
 // Custom APIs for renderer
 const api = {
-    getStack: (id?: string): Promise<PaletteStack[] | PaletteStack> =>
-        ipcRenderer.invoke('getStack', id),
+    getStack: (id?: string): Promise<PaletteStack[]> => ipcRenderer.invoke('getStack', id),
 
     startTerminal: (stack: string, terminal: string): Promise<boolean> =>
         ipcRenderer.invoke('toggleTerminal', stack, terminal, true),
@@ -20,7 +19,7 @@ const api = {
 
     save: (): Promise<void> => ipcRenderer.invoke('save'),
 
-    createCommand: (payload: NewCommandPayload, stackId: string): Promise<Cmd> =>
+    createCommand: (payload: RecursivePartial<Cmd>, stackId: string): Promise<Cmd> =>
         ipcRenderer.invoke('createCommand', payload, stackId),
 
     deleteCommand: (stackId: string, terminalId: string): Promise<Cmd> =>
@@ -33,7 +32,7 @@ const api = {
 const store = {
     get: (key: string): Promise<unknown> => ipcRenderer.invoke('getStore', key),
     set: (key: string, value: unknown): Promise<void> => ipcRenderer.invoke('setStore', key, value),
-    openFileLocation: () => ipcRenderer.invoke('openFilesLocation')
+    openFileLocation: (path?: string) => ipcRenderer.invoke('openFilesLocation', path)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

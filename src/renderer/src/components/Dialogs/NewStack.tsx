@@ -44,7 +44,7 @@ export function NewStack({ set }: NewStack) {
                     <PlusIcon className="h-4 w-4" />
                 </Badge>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]" data-theme={theme}>
+            <DialogContent className="sm:max-w-[500px]" data-theme={theme.theme}>
                 <DialogHeader>
                     <DialogTitle>New Stack</DialogTitle>
                     <DialogDescription>Create new</DialogDescription>

@@ -107,16 +107,16 @@
     [data-theme='north'] {
         --gradient: linear-gradient(to right bottom, #0a090b, #0d0c0f, #100f12, #131115, #151318);
 
-        --background: 276 7.15% 4%;
+        --background: 276 7.15% 6%;
         --foreground: 276 1.1% 96.3%;
 
         --muted: 276 5.5% 7.8001%;
         --muted-foreground: 276 1.1% 52.6%;
 
-        --popover: 276 62.8% 3.38%;
+        --popover: 276 62.8% 6.38%;
         --popover-foreground: 276 1.1% 96.3%;
 
-        --card: 262, 12%, 5%;
+        --card: 262, 12%, 7%;
         --card-foreground: 276 1.1% 96.3%;
 
         --border: 276 5.5% 12.8001%;
@@ -141,7 +141,7 @@
     [data-theme='morning'] {
         --gradient: linear-gradient(to right bottom, #131415, #0d141b, #091221, #081026, #0c0d2a);
 
-        --background: 191 4.5501% 7.76%;
+        --background: 191 4.5501% 10.76%;
         --foreground: 191 0.70001% 99.85%;
 
         --muted: 191 3.50004% 29.099999999999998%;

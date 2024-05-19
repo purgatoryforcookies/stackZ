@@ -81,20 +81,18 @@ export class HistoryService {
     }
 
     async loadHostHistory() {
-
-
         if (process.platform !== 'win32') {
-
             const resultzsh = await executeScript('cat ~/.zsh_history', '/bin/bash')
             const resultbash = await executeScript('cat ~/.bash_history', '/bin/bash')
 
-
-            const arrayedZsh = resultzsh.split('\n').map((i) => i.replaceAll('\r', '')).map(i => i.split(';', 2)[1])
+            const arrayedZsh = resultzsh
+                .split('\n')
+                .map((i) => i.replaceAll('\r', ''))
+                .map((i) => i.split(';', 2)[1])
             const arrayedBash = resultbash.split('\n').map((i) => i.replaceAll('\r', ''))
             const combined = [...new Set(arrayedBash), ...new Set(arrayedZsh)]
-            this.hostHistory = combined.filter(i => i)
-        }
-        else {
+            this.hostHistory = combined.filter((i) => i)
+        } else {
             const command = [
                 'cat $env:USERPROFILE\\AppData',
                 '\\Roaming\\Microsoft',
@@ -105,7 +103,6 @@ export class HistoryService {
             const arrayed = result.split('\n').map((i) => i.replaceAll('\r', ''))
             this.hostHistory = [...new Set(arrayed)]
         }
-
     }
 
     async readFromDisk(basePath: string, key: keyof typeof HistoryKey) {

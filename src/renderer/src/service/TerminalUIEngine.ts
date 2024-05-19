@@ -40,7 +40,7 @@ export class TerminalUIEngine {
         this.host = host
         this.terminal.loadAddon(this.fitAddon)
         this.terminal.loadAddon(this.searchAddon)
-        this.terminal.loadAddon(this.weblinkAddon);
+        this.terminal.loadAddon(this.weblinkAddon)
         this.searchWord = ''
         this.buffer = ''
         this.isRunning = false
@@ -103,7 +103,6 @@ export class TerminalUIEngine {
         })
 
         this.terminal.attachCustomKeyEventHandler((e) => {
-
             if (e.type === 'keyup') {
                 if (e.code === 'Enter' && (e.metaKey || e.ctrlKey)) {
                     if (!this.isRunning) {

@@ -13,13 +13,11 @@ function Stack({ stack, close }: { stack: IUseStack; close: () => void }) {
     const [deleteConfirmation, setDeleteConfirmation] = useState(false)
 
     useEffect(() => {
-        stack.stackSocket
-            .get(stack.selectedStack)
-            ?.on('stackState', (d) => {
-                setDefCwd(d.cwd)
-                setDefShell(d.shell)
-                setDefCommand(d.cmd)
-            })
+        stack.stackSocket.get(stack.selectedStack)?.on('stackState', (d) => {
+            setDefCwd(d.cwd)
+            setDefShell(d.shell)
+            setDefCommand(d.cmd)
+        })
         stack.stackSocket.get(stack.selectedStack)?.emit('stackState')
 
         return () => {
@@ -37,9 +35,7 @@ function Stack({ stack, close }: { stack: IUseStack; close: () => void }) {
     }
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        stack.stackSocket
-            .get(stack.selectedStack)
-            ?.emit('stackName', { name: e.target.value })
+        stack.stackSocket.get(stack.selectedStack)?.emit('stackName', { name: e.target.value })
         stack.renameStack(e.target.value)
         setName(e.target.value)
     }

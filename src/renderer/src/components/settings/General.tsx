@@ -12,11 +12,7 @@ import { baseSocket } from '@renderer/service/socket'
 import { CustomToolTip } from '../Common/CustomTooltip'
 import { GoInfo } from 'react-icons/go'
 
-type GeneralProps = {
-    setTheme: (name: string) => void
-}
-
-function General({ setTheme }: GeneralProps) {
+function General() {
     const theme = useContext(ThemeContext)
 
     const [defShell, setDefShell] = useState<string>()
@@ -47,6 +43,11 @@ function General({ setTheme }: GeneralProps) {
         } else {
             setDeleteConfirmation(true)
         }
+    }
+
+    const changeTheme = (e: string) => {
+        theme.setTheme(e)
+        window.store.set('theme', e)
     }
 
     return (
@@ -99,59 +100,39 @@ function General({ setTheme }: GeneralProps) {
                         <Label htmlFor="theme" className="text-right">
                             Theme
                         </Label>
-                        <RadioGroup defaultValue={theme} className="text-secondary-foreground">
+                        <RadioGroup
+                            defaultValue={theme.theme}
+                            className="text-secondary-foreground"
+                            onValueChange={changeTheme}
+                        >
                             <div className="flex items-center space-x-2 ">
-                                <RadioGroupItem
-                                    value="dark"
-                                    id="r1"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
-                                />
+                                <RadioGroupItem value="dark" id="r1" />
                                 <Label htmlFor="r1">Dark</Label>
                                 <ColorSquare theme="dark" />
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="aurora"
-                                    id="r2"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
-                                />
+                                <RadioGroupItem value="aurora" id="r2" />
                                 <Label htmlFor="r2">Aurora</Label>
                                 <ColorSquare theme="aurora" />
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="north"
-                                    id="r2"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
-                                />
-                                <Label htmlFor="r2">North</Label>
+                                <RadioGroupItem value="north" id="r3" />
+                                <Label htmlFor="r3">North</Label>
                                 <ColorSquare theme="north" />
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="morning"
-                                    id="r3"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
-                                />
-                                <Label htmlFor="r3">Morning</Label>
+                                <RadioGroupItem value="morning" id="r4" />
+                                <Label htmlFor="r4">Morning</Label>
                                 <ColorSquare theme="morning" />
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="forrest"
-                                    id="r4"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
-                                />
-                                <Label htmlFor="r4">Forrest</Label>
+                                <RadioGroupItem value="forrest" id="r5" />
+                                <Label htmlFor="r5">Forrest</Label>
                                 <ColorSquare theme="forrest" />
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="pink"
-                                    id="r4"
-                                    onClick={(e) => setTheme((e.target as HTMLInputElement).value)}
-                                />
-                                <Label htmlFor="r4">Pink</Label>
+                                <RadioGroupItem value="pink" id="r6" />
+                                <Label htmlFor="r6">Pink</Label>
                                 <ColorSquare theme="pink" />
                             </div>
                         </RadioGroup>
@@ -170,7 +151,7 @@ function General({ setTheme }: GeneralProps) {
                         <ArrowDownIcon className="mr-2 h-4 w-4" />
                         Import
                     </Button>
-                    <Button variant={'outline'} onClick={window.store.openFileLocation}>
+                    <Button variant={'outline'} onClick={() => window.store.openFileLocation()}>
                         <FileTextIcon className="mr-2 h-4 w-4" />
                         Open
                     </Button>
@@ -191,8 +172,8 @@ function General({ setTheme }: GeneralProps) {
                                 {success
                                     ? 'Done.'
                                     : deleteConfirmation
-                                      ? 'Really?'
-                                      : 'History Service'}
+                                        ? 'Really?'
+                                        : 'History Service'}
                                 <GoInfo className="size-4" />
                             </p>
                         </CustomToolTip>

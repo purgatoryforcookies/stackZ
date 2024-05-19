@@ -1,4 +1,4 @@
-import { FormEvent, useContext, useState } from 'react'
+import { FormEvent, useContext, useEffect, useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -14,7 +14,7 @@ import { Input } from '@renderer/@/ui/input'
 import { ThemeContext } from '@renderer/App'
 import { Badge } from '@renderer/@/ui/badge'
 import { IUseStack } from '@renderer/hooks/useStack'
-import { NewCommandPayload } from '@t'
+import { Cmd, RecursivePartial } from '@t'
 
 type NewCommandProps = {
     stack: IUseStack
@@ -24,26 +24,37 @@ function NewCommand({ stack }: NewCommandProps) {
     const [open, setOpen] = useState(false)
     const theme = useContext(ThemeContext)
 
-    const [command, setCommand] = useState<NewCommandPayload>()
+    const [command, setCommand] = useState<RecursivePartial<Cmd>>()
 
     const handleSave = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         if (!command) return
-        if (command.title.length === 0) return
+        if (command?.title?.length === 0) return
         const newCommand = await window.api.createCommand(command, stack.selectedStack)
         setOpen(false)
         setCommand(undefined)
         stack.addTerminal(newCommand)
     }
 
+    useEffect(() => {
+        setCommand(undefined)
+    }, [open])
+
     const handleChange = (e: FormEvent<HTMLInputElement>) => {
         const { name, value } = e.currentTarget
 
         const newCommand = { ...command }
-        newCommand[name] = value
+        if (name === 'title') {
+            newCommand[name] = value
+        } else {
+            if (!newCommand.command) {
+                newCommand.command = {}
+            }
+            newCommand.command[name] = value
+        }
 
-        setCommand(newCommand as NewCommandPayload)
+        setCommand(newCommand as Cmd)
     }
 
     return (
@@ -57,7 +68,7 @@ function NewCommand({ stack }: NewCommandProps) {
                     <PlusIcon className="h-5 w-5" />
                 </Badge>
             </DialogTrigger>
-            <DialogContent data-theme={theme}>
+            <DialogContent data-theme={theme.theme}>
                 <DialogHeader>
                     <DialogTitle>New Command</DialogTitle>
                 </DialogHeader>
@@ -75,7 +86,7 @@ function NewCommand({ stack }: NewCommandProps) {
                                 className="col-span-3"
                                 name="title"
                                 onChange={handleChange}
-                                value={command?.title}
+                                value={command?.title || ''}
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -86,9 +97,9 @@ function NewCommand({ stack }: NewCommandProps) {
                                 id="command"
                                 className="col-span-3"
                                 placeholder="Optional"
-                                name="command"
+                                name="cmd"
                                 onChange={handleChange}
-                                value={command?.command}
+                                value={command?.command?.cmd || ''}
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -101,7 +112,7 @@ function NewCommand({ stack }: NewCommandProps) {
                                 name="shell"
                                 onChange={handleChange}
                                 placeholder="Optional"
-                                value={command?.shell}
+                                value={command?.command?.shell || ''}
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -114,7 +125,7 @@ function NewCommand({ stack }: NewCommandProps) {
                                 name="cwd"
                                 onChange={handleChange}
                                 placeholder="Optional"
-                                value={command?.cwd}
+                                value={command?.command?.cwd || ''}
                             />
                         </div>
                     </div>

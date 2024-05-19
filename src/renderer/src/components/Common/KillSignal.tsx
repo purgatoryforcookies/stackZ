@@ -17,7 +17,7 @@ function KillSignal() {
             <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select kill signal" />
             </SelectTrigger>
-            <SelectContent data-theme={theme}>
+            <SelectContent data-theme={theme.theme}>
                 <SelectGroup>
                     <SelectItem value="SIGHUP">SIGHUP (1)</SelectItem>
                     <SelectItem value="SIGINT">SIGINT (2)</SelectItem>
