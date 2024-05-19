@@ -151,7 +151,7 @@ function General() {
                         <ArrowDownIcon className="mr-2 h-4 w-4" />
                         Import
                     </Button>
-                    <Button variant={'outline'} onClick={window.store.openFileLocation}>
+                    <Button variant={'outline'} onClick={() => window.store.openFileLocation()}>
                         <FileTextIcon className="mr-2 h-4 w-4" />
                         Open
                     </Button>
@@ -172,8 +172,8 @@ function General() {
                                 {success
                                     ? 'Done.'
                                     : deleteConfirmation
-                                      ? 'Really?'
-                                      : 'History Service'}
+                                        ? 'Really?'
+                                        : 'History Service'}
                                 <GoInfo className="size-4" />
                             </p>
                         </CustomToolTip>
