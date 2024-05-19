@@ -5,11 +5,11 @@ function tailwindPlugin(context, options) {
             postcssOptions.plugins = [
                 require('postcss-import'),
                 require('tailwindcss'),
-                require('autoprefixer'),
-            ];
-            return postcssOptions;
-        },
-    };
+                require('autoprefixer')
+            ]
+            return postcssOptions
+        }
+    }
 }
 
-module.exports = tailwindPlugin;
+module.exports = tailwindPlugin

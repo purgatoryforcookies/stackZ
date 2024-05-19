@@ -5,18 +5,19 @@ import { DockerContainer } from '@t'
 import { HoverCardTrigger, HoverCard, HoverCardContent } from '@renderer/@/ui/hover-card'
 import { CustomToolTip } from './CustomTooltip'
 import { IUseDocker } from '@renderer/hooks/useDocker'
-import { ContextMenuTrigger, ContextMenu, ContextMenuContent, ContextMenuItem } from '@renderer/@/ui/context-menu'
+import {
+    ContextMenuTrigger,
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem
+} from '@renderer/@/ui/context-menu'
 import { ThemeContext } from '@renderer/App'
-
 
 type DockerStripProps = {
     docker: IUseDocker
 }
 
-
-
 function DockerStrip({ docker }: DockerStripProps) {
-
     const [clipBoardLoad, setClipBoardLoad] = useState(false)
     const theme = useContext(ThemeContext)
 
@@ -31,7 +32,6 @@ function DockerStrip({ docker }: DockerStripProps) {
             }, 1800)
         }
     }
-
 
     const makeFriendlyName = (name: string[]) => {
         const firstname = name[0]
@@ -103,9 +103,7 @@ function DockerStrip({ docker }: DockerStripProps) {
                                                     <CheckIcon />
                                                 )}
                                                 <CustomToolTip message="Kills and removes the container and anonymous volumes associated with it.">
-                                                    <TrashIcon
-                                                        onClick={() => remove(c.Id)}
-                                                    />
+                                                    <TrashIcon onClick={() => remove(c.Id)} />
                                                 </CustomToolTip>
                                             </div>
                                         </div>
@@ -135,16 +133,11 @@ function DockerStrip({ docker }: DockerStripProps) {
                                                         Depends on:
                                                     </p>
                                                     <p>
-                                                        {
-                                                            c.Labels[
-                                                            'com.docker.compose.depends_on'
-                                                            ]
-                                                        }
+                                                        {c.Labels['com.docker.compose.depends_on']}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className='flex justify-between'>
-
+                                            <div className="flex justify-between">
                                                 <div className="pb-10">
                                                     <p className="text-base text-white/50">
                                                         Compose project:
@@ -158,12 +151,15 @@ function DockerStrip({ docker }: DockerStripProps) {
                                                     <p className="text-base text-white/50">
                                                         Ports:
                                                     </p>
-                                                    <div className='flex flex-col gap-1'>
+                                                    <div className="flex flex-col gap-1">
                                                         {c.Ports.map((p) => (
-                                                            <p className="text-[1.2rem] leading-4">
+                                                            <p
+                                                                key={p.IP}
+                                                                className="text-[1.2rem] leading-4"
+                                                            >
                                                                 {p.PublicPort} : {p.PrivatePort}
-                                                            </p>))}
-
+                                                            </p>
+                                                        ))}
                                                     </div>
                                                 </div>
                                             </div>
@@ -187,10 +183,11 @@ function DockerStrip({ docker }: DockerStripProps) {
                     />
                 </ContextMenuTrigger>
                 <ContextMenuContent data-theme={theme.theme} className="w-36">
-                    <ContextMenuItem inset onClick={stopAll}>Stop all</ContextMenuItem>
+                    <ContextMenuItem inset onClick={stopAll}>
+                        Stop all
+                    </ContextMenuItem>
                 </ContextMenuContent>
             </ContextMenu>
-
         </div>
     )
 }

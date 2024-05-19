@@ -18,7 +18,7 @@ import dockerLogo from '../../assets/docker-mark-white.svg'
 import { IUseDocker } from '@renderer/hooks/useDocker'
 
 type CommandMenuProps = {
-    stack: IUseStack,
+    stack: IUseStack
     docker: IUseDocker
     toggle: {
         header: () => void
@@ -135,125 +135,137 @@ export function CommandMenu({ stack, toggle, docker }: CommandMenuProps) {
                 <CommandGroup heading="Stacks">
                     {stack
                         ? [...st.values()].map((s) => {
-                            return (
-                                <CommandItem
-                                    key={s.id}
-                                    className="flex gap-5"
-                                    value={s.stackName}
-                                    onSelect={() => {
-                                        stack.selectStack(s.id)
-                                        stack.selectTerminal(s.palette?.[0].id || 'gibberish')
-                                        setOpen(false)
-                                    }}
-                                >
-                                    <div className="flex w-20 justify-between">
-                                        <span>{s.palette?.length ?? 0}x</span>
-                                        <LayersIcon className="mr-2 h-4 w-4" />
-                                    </div>
-                                    <div className="flex justify-between w-full">
-                                        <div className="flex flex-col">
-                                            <span>{s.stackName}</span>
-                                            <span className="text-white/20 text-[0.7rem]">
-                                                #{s.id}
-                                            </span>
-                                        </div>
+                              return (
+                                  <CommandItem
+                                      key={s.id}
+                                      className="flex gap-5"
+                                      value={s.stackName}
+                                      onSelect={() => {
+                                          stack.selectStack(s.id)
+                                          stack.selectTerminal(s.palette?.[0].id || 'gibberish')
+                                          setOpen(false)
+                                      }}
+                                  >
+                                      <div className="flex w-20 justify-between">
+                                          <span>{s.palette?.length ?? 0}x</span>
+                                          <LayersIcon className="mr-2 h-4 w-4" />
+                                      </div>
+                                      <div className="flex justify-between w-full">
+                                          <div className="flex flex-col">
+                                              <span>{s.stackName}</span>
+                                              <span className="text-white/20 text-[0.7rem]">
+                                                  #{s.id}
+                                              </span>
+                                          </div>
 
-                                        {s.env?.length && s.env.length > 0 ? (
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger>
-                                                        <GlobeIcon />
-                                                    </TooltipTrigger>
-                                                    <TooltipContent side={'left'}>
-                                                        <p>Has stack environments</p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        ) : null}
-                                    </div>
-                                </CommandItem>
-                            )
-                        })
+                                          {s.env?.length && s.env.length > 0 ? (
+                                              <TooltipProvider>
+                                                  <Tooltip>
+                                                      <TooltipTrigger>
+                                                          <GlobeIcon />
+                                                      </TooltipTrigger>
+                                                      <TooltipContent side={'left'}>
+                                                          <p>Has stack environments</p>
+                                                      </TooltipContent>
+                                                  </Tooltip>
+                                              </TooltipProvider>
+                                          ) : null}
+                                      </div>
+                                  </CommandItem>
+                              )
+                          })
                         : null}
                 </CommandGroup>
                 <Separator />
                 <CommandGroup heading="Terminals">
                     {st
                         ? [...st.values()].map((s) => {
-                            if (!s.palette) return null
-                            return s.palette.map((cmd) => {
-                                return (
-                                    <CommandItem
-                                        key={cmd.id}
-                                        className="flex gap-5"
-                                        value={
-                                            cmd.title +
-                                            cmd.command.cmd +
-                                            cmd.command.cwd +
-                                            s.stackName
-                                        }
-                                        onSelect={() => {
-                                            stack.selectStack(s.id)
-                                            stack.selectTerminal(cmd.id)
-                                            setOpen(false)
-                                        }}
-                                    >
-                                        <div>
-
-                                            <ButtonIcon className="mr-2 h-4 w-4" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span>{cmd.title}</span>
-                                            <div className="flex flex-col">
-                                                <span>{cmd.command.cmd}</span>
-                                                <span>@{cmd.command.cwd}</span>
-                                                <span>stack: {s.stackName}</span>
-                                            </div>
-                                        </div>
-                                    </CommandItem>
-                                )
-                            })
-                        })
+                              if (!s.palette) return null
+                              return s.palette.map((cmd) => {
+                                  return (
+                                      <CommandItem
+                                          key={cmd.id}
+                                          className="flex gap-5"
+                                          value={
+                                              cmd.title +
+                                              cmd.command.cmd +
+                                              cmd.command.cwd +
+                                              s.stackName
+                                          }
+                                          onSelect={() => {
+                                              stack.selectStack(s.id)
+                                              stack.selectTerminal(cmd.id)
+                                              setOpen(false)
+                                          }}
+                                      >
+                                          <div>
+                                              <ButtonIcon className="mr-2 h-4 w-4" />
+                                          </div>
+                                          <div className="flex flex-col">
+                                              <span>{cmd.title}</span>
+                                              <div className="flex flex-col">
+                                                  <span>{cmd.command.cmd}</span>
+                                                  <span>@{cmd.command.cwd}</span>
+                                                  <span>stack: {s.stackName}</span>
+                                              </div>
+                                          </div>
+                                      </CommandItem>
+                                  )
+                              })
+                          })
                         : null}
                 </CommandGroup>
                 <Separator />
                 <CommandGroup heading="Containers">
-                    {docker.containers ? Object.keys(docker.containers).map((key) => {
-                        const conts: DockerContainer[] = docker.containers[key]
-                        if (!conts) return null
+                    {docker.containers
+                        ? Object.keys(docker.containers).map((key) => {
+                              const conts: DockerContainer[] = docker.containers[key]
+                              if (!conts) return null
 
-                        return conts.map((c) => {
-                            const ports = c.Ports.map(p => `${p.PrivatePort}:${p.PublicPort}`).join("-")
-                            return <CommandItem
-                                key={c.Id}
-                                className="flex gap-5 h-30"
-                                value={
-                                    c.Command + c.Image + c.Names.join('') + Object.values(c.Labels).join('') + ports
-                                }
-                            >
-                                <div>
-                                    <img
-                                        src={dockerLogo}
-                                        className="size-5 hover:cursor-pointer"
-                                    />
-                                </div>
-                                <div className="flex flex-col w-full">
-                                    <span>{c.Names.join('-')}</span>
-                                    <span className='text-white/50'>{c.Image}</span>
-                                    <div className="flex flex-col pt-2">
-                                        <span>{c.Command}</span>
-                                        <span>Project: {c.Labels?.['com.docker.compose.project']}</span>
-                                    </div>
-                                    {ports ? <span className='self-end'>Ports: {ports}</span> : null}
-                                </div>
-                                <p className='text-[0.8rem] absolute right-1 top-0 text-white/40'>{c.Status}</p>
-                            </CommandItem>
-                        })
-
-
-
-                    }) : null}
-
+                              return conts.map((c) => {
+                                  const ports = c.Ports.map(
+                                      (p) => `${p.PrivatePort}:${p.PublicPort}`
+                                  ).join('-')
+                                  return (
+                                      <CommandItem
+                                          key={c.Id}
+                                          className="flex gap-5 h-30"
+                                          value={
+                                              c.Command +
+                                              c.Image +
+                                              c.Names.join('') +
+                                              Object.values(c.Labels).join('') +
+                                              ports
+                                          }
+                                      >
+                                          <div>
+                                              <img
+                                                  src={dockerLogo}
+                                                  className="size-5 hover:cursor-pointer"
+                                              />
+                                          </div>
+                                          <div className="flex flex-col w-full">
+                                              <span>{c.Names.join('-')}</span>
+                                              <span className="text-white/50">{c.Image}</span>
+                                              <div className="flex flex-col pt-2">
+                                                  <span>{c.Command}</span>
+                                                  <span>
+                                                      Project:{' '}
+                                                      {c.Labels?.['com.docker.compose.project']}
+                                                  </span>
+                                              </div>
+                                              {ports ? (
+                                                  <span className="self-end">Ports: {ports}</span>
+                                              ) : null}
+                                          </div>
+                                          <p className="text-[0.8rem] absolute right-1 top-0 text-white/40">
+                                              {c.Status}
+                                          </p>
+                                      </CommandItem>
+                                  )
+                              })
+                          })
+                        : null}
                 </CommandGroup>
             </CommandList>
         </CommandDialog>

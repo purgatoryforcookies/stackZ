@@ -4,8 +4,7 @@ import { Cmd, PaletteStack, RecursivePartial } from '../types'
 
 // Custom APIs for renderer
 const api = {
-    getStack: (id?: string): Promise<PaletteStack[]> =>
-        ipcRenderer.invoke('getStack', id),
+    getStack: (id?: string): Promise<PaletteStack[]> => ipcRenderer.invoke('getStack', id),
 
     startTerminal: (stack: string, terminal: string): Promise<boolean> =>
         ipcRenderer.invoke('toggleTerminal', stack, terminal, true),
@@ -22,7 +21,6 @@ const api = {
 
     createCommand: (payload: RecursivePartial<Cmd>, stackId: string): Promise<Cmd> =>
         ipcRenderer.invoke('createCommand', payload, stackId),
-
 
     deleteCommand: (stackId: string, terminalId: string): Promise<Cmd> =>
         ipcRenderer.invoke('deleteCommand', stackId, terminalId),

@@ -16,7 +16,6 @@ import { Badge } from '@renderer/@/ui/badge'
 import { IUseStack } from '@renderer/hooks/useStack'
 import { Cmd, RecursivePartial } from '@t'
 
-
 type NewCommandProps = {
     stack: IUseStack
 }
@@ -56,7 +55,6 @@ function NewCommand({ stack }: NewCommandProps) {
         }
 
         setCommand(newCommand as Cmd)
-
     }
 
     return (

@@ -65,7 +65,7 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
 
     /**
      * Testing this out. Highlight the dropzone for user
-     * in semi-random times. 
+     * in semi-random times.
      */
     useEffect(() => {
         let timestamp = read('since')
@@ -101,9 +101,13 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
                     <div
                         className={`
                     p-[1px] 
-                    ${!handleEnter ? 'bg-transparent' : `animate-border  bg-gradient-to-r
+                    ${
+                        !handleEnter
+                            ? 'bg-transparent'
+                            : `animate-border  bg-gradient-to-r
                   from-[#ede5c2e6] via-[#e2e0d74e] to-[#e1d7b076] hover:cursor-pointer bg-[length:_700%_900%]
-                    p-0 flex justify-center items-center`}
+                    p-0 flex justify-center items-center`
+                    }
                     z-10 size-32 rounded-[7.5px]`}
                     >
                         <span
@@ -147,9 +151,9 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
                     </div>
                     <DialogFooter className="relative">
                         <div className="flex items-center">
-                            <div className='flex gap-1 pr-5'>
+                            <div className="flex gap-1 pr-5">
                                 <Checkbox
-                                    id='sequencing'
+                                    id="sequencing"
                                     checked={global}
                                     onCheckedChange={(e) => setGlobal(e)}
                                 />
@@ -171,7 +175,6 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
                                 Save
                             </Button>
                         </div>
-
                     </DialogFooter>
                 </form>
             </DialogContent>

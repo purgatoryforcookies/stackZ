@@ -100,33 +100,35 @@ function Palette({ data }: PaletteProps) {
             <div className="overflow-auto pb-14" style={{ scrollbarGutter: 'stable' }}>
                 {stack?.palette
                     ? stack.palette
-                        .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
-                        .map((cmd) => {
-                            if (!cmd?.id) return null
-                            const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
-                            if (!engine) return null
-                            return <CommandContextMenu key={cmd.id} stack={data} terminal={cmd}>
-                                {isCompact ? (
-                                    <CommandSM
-                                        data={cmd}
-                                        engine={engine}
-                                        selected={cmd.id === data.selectedTerminal}
-                                        handleDrag={handleDrag}
-                                        stack={data}
-                                        stackRunning={running}
-                                    />
-                                ) : (
-                                    <Command
-                                        data={cmd}
-                                        engine={engine}
-                                        selected={cmd.id === data.selectedTerminal}
-                                        handleDrag={handleDrag}
-                                        stack={data}
-                                        stackRunning={running}
-                                    />
-                                )}
-                            </CommandContextMenu>
-                        })
+                          .sort((a, b) => (a.executionOrder || 0) - (b.executionOrder || 0))
+                          .map((cmd) => {
+                              if (!cmd?.id) return null
+                              const engine = data.terminals?.get(data.selectedStack)?.get(cmd.id)
+                              if (!engine) return null
+                              return (
+                                  <CommandContextMenu key={cmd.id} stack={data} terminal={cmd}>
+                                      {isCompact ? (
+                                          <CommandSM
+                                              data={cmd}
+                                              engine={engine}
+                                              selected={cmd.id === data.selectedTerminal}
+                                              handleDrag={handleDrag}
+                                              stack={data}
+                                              stackRunning={running}
+                                          />
+                                      ) : (
+                                          <Command
+                                              data={cmd}
+                                              engine={engine}
+                                              selected={cmd.id === data.selectedTerminal}
+                                              handleDrag={handleDrag}
+                                              stack={data}
+                                              stackRunning={running}
+                                          />
+                                      )}
+                                  </CommandContextMenu>
+                              )
+                          })
                     : null}
                 <div className="w-full flex justify-center ">
                     <NewCommand stack={data} />

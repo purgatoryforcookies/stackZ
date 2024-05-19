@@ -96,7 +96,6 @@ export class Stack {
                     try {
                         const containers = await this.dockerService.getContainers()
                         akw(JSON.stringify(Object.fromEntries(containers)))
-
                     } catch (error) {
                         if (error instanceof DockerError) {
                             akw('', error.message)
@@ -121,7 +120,6 @@ export class Stack {
                         }
                         akw('', 'Unknown docker error')
                     }
-
                 })
                 client.on('dockerStart', async (id: string, akw) => {
                     const err = await this.dockerService.startContainer(id)

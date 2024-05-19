@@ -17,13 +17,11 @@ import useDocker from './hooks/useDocker'
 type ThemeContextType = {
     theme?: string
     setTheme: (name: string) => void
-
 }
 
 export const ThemeContext = createContext<ThemeContextType>({
     theme: 'aurora',
-    setTheme: () => { }
-
+    setTheme: () => {}
 })
 
 function App(): JSX.Element {
@@ -34,24 +32,20 @@ function App(): JSX.Element {
 
     const docker = useDocker()
 
-
     useEffect(() => {
         const fetchTheme = async () => {
-            const savedTheme = await window.store.get('theme') as string
+            const savedTheme = (await window.store.get('theme')) as string
             if (savedTheme) setTheme(savedTheme)
         }
         fetchTheme()
-
     }, [])
 
-    if (stack.loading) return <p className='text-secondary-foreground'>Loading...</p>
-
+    if (stack.loading) return <p className="text-secondary-foreground">Loading...</p>
 
     return (
         <ThemeContext.Provider value={{ theme, setTheme }}>
-
-            <div className='flex h-full w-full overflow-hidden bg-gradient' data-theme={theme}>
-                <div className='flex flex-col overflow-hidden size-full relative'>
+            <div className="flex h-full w-full overflow-hidden bg-gradient" data-theme={theme}>
+                <div className="flex flex-col overflow-hidden size-full relative">
                     {stack.terminals && !stack.loading ? (
                         <TerminalUI
                             engine={stack.terminals
@@ -63,20 +57,19 @@ function App(): JSX.Element {
                     <Resizable
                         size={{ width: '100%', height: h }}
                         maxHeight={'100%'}
-                        className='border-t-2 '
+                        className="border-t-2 "
                         minHeight={27}
                         onResize={sizeHeader}
-                        handleStyles={
-                            {
-                                right: { display: 'none' },
-                                left: { display: 'none' },
-                                bottom: { display: 'none' },
-                                bottomRight: { display: 'none' },
-                                bottomLeft: { display: 'none' },
-                                topLeft: { display: 'none' },
-                                topRight: { display: 'none' },
-                            }
-                        }>
+                        handleStyles={{
+                            right: { display: 'none' },
+                            left: { display: 'none' },
+                            bottom: { display: 'none' },
+                            bottomRight: { display: 'none' },
+                            bottomLeft: { display: 'none' },
+                            topLeft: { display: 'none' },
+                            topRight: { display: 'none' }
+                        }}
+                    >
                         <DockerStrip docker={docker} />
                         <Tabs
                             defaultValue="environment"
@@ -87,7 +80,10 @@ function App(): JSX.Element {
                                 <TabsTrigger value="environment">Environment</TabsTrigger>
                                 {/* <TabsTrigger value="monitor">Monitor</TabsTrigger> */}
                             </TabsList>
-                            <TabsContent value="environment" className="pl-4 pt-5 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden" >
+                            <TabsContent
+                                value="environment"
+                                className="pl-4 pt-5 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden"
+                            >
                                 <DetailHeader stack={stack} />
                             </TabsContent>
                             {/* <TabsContent value="monitor" className="pl-4">
@@ -95,49 +91,46 @@ function App(): JSX.Element {
                                 <p className='text-secondary-foreground'>Not available</p>
                             </TabsContent> */}
                         </Tabs>
-
                     </Resizable>
                 </div>
                 <Resizable
                     size={{ width: w, height: '100%' }}
                     minWidth={'200px'}
                     maxWidth={'100%'}
-                    className='border-l-2'
+                    className="border-l-2"
                     onResize={sizePalette}
-                    handleStyles={
-                        {
-                            right: { display: 'none' },
-                            top: { display: 'none' },
-                            bottom: { display: 'none' },
-                            bottomRight: { display: 'none' },
-                            bottomLeft: { display: 'none' },
-                            topRight: { display: 'none' },
-                            topLeft: { display: 'none' },
-                        }
-                    }
+                    handleStyles={{
+                        right: { display: 'none' },
+                        top: { display: 'none' },
+                        bottom: { display: 'none' },
+                        bottomRight: { display: 'none' },
+                        bottomLeft: { display: 'none' },
+                        topRight: { display: 'none' },
+                        topLeft: { display: 'none' }
+                    }}
                 >
                     <CommandMenu stack={stack} toggle={toggle} docker={docker} />
                     <Settings stack={stack} />
 
-                    {w ?
+                    {w ? (
                         <div className="text-secondary-foreground h-[calc(100%-70px)]">
                             <div
-                                className={`p-1 ${w < 450
-                                    ? 'flex flex-col-reverse justify-center items-center gap-2'
-                                    : 'sm:grid sm:grid-cols-3 sm:grid-rows-1 flex flex-col-reverse justify-center items-center gap-2'
-                                    }`}
+                                className={`p-1 ${
+                                    w < 450
+                                        ? 'flex flex-col-reverse justify-center items-center gap-2'
+                                        : 'sm:grid sm:grid-cols-3 sm:grid-rows-1 flex flex-col-reverse justify-center items-center gap-2'
+                                }`}
                             >
                                 <BranchDropdown stack={stack} />
                                 <span className="font-semibold text-lg text-center">Terminals</span>
                             </div>
                             {stack.stack && !stack.loading ? <Palette data={stack} /> : null}
                         </div>
-                        : null}
+                    ) : null}
                 </Resizable>
             </div>
-        </ThemeContext.Provider >
+        </ThemeContext.Provider>
     )
 }
 
 export default App
-

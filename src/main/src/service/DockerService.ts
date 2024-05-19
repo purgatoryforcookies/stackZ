@@ -1,11 +1,9 @@
-import { DockerContainer } from "../../../types"
-import http from "http"
-import { httpNativeRequest } from "../util/util"
-import { DockerError, DockerFaultState } from "../util/error"
-
+import { DockerContainer } from '../../../types'
+import http from 'http'
+import { httpNativeRequest } from '../util/util'
+import { DockerError, DockerFaultState } from '../util/error'
 
 export class DockerService {
-
     private port: number = 2375
     private winHost: string = '127.0.0.1'
     private macHost: string = '/var/run/docker.sock'
@@ -21,14 +19,11 @@ export class DockerService {
     }
 
     async getContainers() {
-
-
         const byProject: Map<string, DockerContainer[]> = new Map()
 
         if (this.isTooMuch()) {
             throw new DockerFaultState('Docker service in fault state')
         }
-
 
         const resp: DockerContainer[] = []
 
@@ -43,24 +38,20 @@ export class DockerService {
             options.socketPath = this.macHost
         }
 
-
         try {
             const data = await httpNativeRequest<DockerContainer[]>(options)
             if (!data) {
                 return byProject
             }
             resp.push(...data)
-
         } catch (error) {
             this.errorCount += 1
             throw error
-
         }
 
         if (resp.length === 0) return byProject
 
-        resp.forEach(i => {
-
+        resp.forEach((i) => {
             const label = i.Labels?.['com.docker.compose.project'] ?? 'noProject'
 
             if (!byProject.has(label)) byProject.set(label, [])
@@ -68,7 +59,6 @@ export class DockerService {
             const prev = byProject.get(label)
             if (!prev) throw new Error('TS Array not found')
             byProject.set(label, [...prev, i])
-
         })
         this.errorCount = 0
         return byProject
@@ -103,7 +93,6 @@ export class DockerService {
             }
             return 'Unknown stop container error'
         }
-
     }
     async startContainer(id: string) {
         if (this.isTooMuch()) {
@@ -126,7 +115,6 @@ export class DockerService {
             await httpNativeRequest(options)
             this.errorCount = 0
             return
-
         } catch (error) {
             this.errorCount += 1
             console.log(error)
@@ -157,7 +145,6 @@ export class DockerService {
             await httpNativeRequest(options)
             this.errorCount = 0
             return
-
         } catch (error) {
             this.errorCount += 1
             console.log(error)
@@ -166,7 +153,5 @@ export class DockerService {
             }
             return 'Unknown remove container error'
         }
-
     }
-
 }

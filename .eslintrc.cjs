@@ -12,7 +12,18 @@ module.exports = {
             rules: {
                 '@typescript-eslint/explicit-function-return-type': 'off',
                 'react/prop-types': 'off',
-                'react/no-unknown-property': 'off'
+                'react/no-unknown-property': 'off',
+                '@typescript-eslint/no-empty-function': 'off',
+                'no-control-regex': 'off',
+                'no-unused-vars': 'off',
+                '@typescript-eslint/no-unused-vars': [
+                    'error',
+                    {
+                        argsIgnorePattern: '^_',
+                        varsIgnorePattern: '^_',
+                        caughtErrorsIgnorePattern: '^_'
+                    }
+                ]
             }
         },
         {

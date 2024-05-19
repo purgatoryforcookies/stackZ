@@ -2,9 +2,8 @@ import { readFile, writeFileSync, existsSync } from 'fs'
 import { Environment, TPorts } from '../../../types'
 import { ZodTypeAny, z } from 'zod'
 import { exec } from 'child_process'
-import http from "http"
+import { RequestOptions, request } from 'http'
 import { DockerError } from './error'
-
 
 export const readJsonFile = <T extends z.ZodTypeAny>(
     path: string,
@@ -57,13 +56,11 @@ export const parseBufferToEnvironment = (buf: ArrayBuffer | null) => {
     return envir
 }
 
-
 /**
  * Factory sorts envs into order and adds host environments
  * into the settings, if they dont already exist.
  */
 export const envFactory = (args: Environment[] | undefined) => {
-
     const hostEnv: Environment = {
         title: 'OS Environment',
         pairs: process.env as Record<string, string>,
@@ -198,12 +195,10 @@ export const executeScript = async (script: string, shell: string, silent = fals
     }
 }
 
-
 export const bakeEnvironmentToString = (env: Record<string, string | undefined>) => {
-
     let envString = ''
 
-    Object.entries(env).forEach(entry => {
+    Object.entries(env).forEach((entry) => {
         if (process.platform === 'win32') {
             envString += `$env:${entry[0]}='${entry[1]}'; `
         } else {
@@ -212,14 +207,11 @@ export const bakeEnvironmentToString = (env: Record<string, string | undefined>)
     })
 
     return envString
-
-
 }
 
-export const httpNativeRequest = <T>(options: http.RequestOptions) => {
-
+export const httpNativeRequest = <T>(options: RequestOptions) => {
     return new Promise<T | null>((resolve, reject) => {
-        const req = http.request(options, (res) => {
+        const req = request(options, (res) => {
             let data = ''
 
             if (!res.statusCode) {
@@ -231,7 +223,7 @@ export const httpNativeRequest = <T>(options: http.RequestOptions) => {
                 return
             }
 
-            res.on('data', chunk => {
+            res.on('data', (chunk) => {
                 data += chunk
             })
 
@@ -244,9 +236,7 @@ export const httpNativeRequest = <T>(options: http.RequestOptions) => {
             })
             res.on('error', (err) => {
                 reject(new DockerError(`${err.name} - ${err.message}`))
-
             })
-
         })
 
         req.on('error', (err) => {
@@ -254,6 +244,5 @@ export const httpNativeRequest = <T>(options: http.RequestOptions) => {
         })
 
         req.end()
-
     })
 }

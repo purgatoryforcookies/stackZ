@@ -5,7 +5,7 @@ import {
     PaletteStack,
     RecursivePartial,
     StackDefaultsProps,
-    StackStatus,
+    StackStatus
 } from '../../types'
 import { Terminal } from './Terminal'
 import { Server } from 'socket.io'
@@ -13,7 +13,6 @@ import { store } from './stores/Store'
 import { HistoryService } from './service/HistoryService'
 import { GitService } from './service/GitService'
 import { EnvironmentService } from './service/EnvironmentService'
-
 
 export interface ISaveFuntion {
     (onExport?: boolean): void
@@ -140,25 +139,21 @@ export class Palette {
         }
 
         if (!payload?.command?.cmd) {
-            payload.command.cmd = this.settings.defaultCommand
-                ?? 'Echo Hello World!'
+            payload.command.cmd = this.settings.defaultCommand ?? 'Echo Hello World!'
         }
         if (!payload?.command?.cwd) {
-            payload.command.cwd = this.settings.defaultCwd
-                ?? userSettings.global.defaultCwd
-                ?? process.env.HOME
+            payload.command.cwd =
+                this.settings.defaultCwd ?? userSettings.global.defaultCwd ?? process.env.HOME
         }
         if (!payload?.command?.shell) {
-            payload.command.shell = this.settings.defaultShell
-                ?? userSettings.global.defaultShell
-                ?? undefined
+            payload.command.shell =
+                this.settings.defaultShell ?? userSettings.global.defaultShell ?? undefined
         }
 
         payload.id = uuidv4()
         this.settings.palette.push(payload as Cmd)
         return payload
     }
-
 
     startTerminal(id: string) {
         console.log(`Starting terminal number ${id}`)
@@ -285,5 +280,4 @@ export class Palette {
         this.save()
         this.pingState()
     }
-
 }

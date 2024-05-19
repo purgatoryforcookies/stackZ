@@ -5,3 +5,11 @@ LICENSE.md
 tsconfig.json
 tsconfig.*.json
 *.yaml
+
+node_modules
+.gitignore
+*.config.ts
+*.config.js
+*.md
+docs/build
+.docusaurus

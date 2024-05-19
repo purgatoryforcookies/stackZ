@@ -10,9 +10,9 @@ export const CustomToolTip = ({
     hidden?: boolean
 }) => {
     return (
-        <TooltipProvider >
+        <TooltipProvider>
             <Tooltip>
-                <TooltipTrigger >{children}</TooltipTrigger>
+                <TooltipTrigger>{children}</TooltipTrigger>
                 {!hidden ? (
                     <TooltipContent>
                         <p className="font-semibold text-[0.8rem]">{message}</p>

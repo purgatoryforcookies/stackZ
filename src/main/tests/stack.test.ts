@@ -12,20 +12,20 @@ const testServer = new Server({
 })
 
 /**
- * Mocking both of these here because 
+ * Mocking both of these here because
  * 1. They hang and take time
  * 2. They should be tested separetly.
  */
 jest.mock('../src/service/MonitorService', () => {
     return {
-        MonitorService: jest.fn(() => { })
+        MonitorService: jest.fn(() => {})
     }
-});
+})
 jest.mock('../src/service/HistoryService', () => {
     return {
-        HistoryService: jest.fn(() => { })
+        HistoryService: jest.fn(() => {})
     }
-});
+})
 
 const filepath = join(__dirname, './testStack1.json')
 
@@ -37,8 +37,6 @@ describe('stack', () => {
     const testTerminalNames = ['terminal1', 'terminal2', 'terminal3', 'terminal4']
     const testStacks: Map<string, string[]> = new Map()
     const uiSockets: CustomClientSocket[] = []
-
-
 
     beforeAll(async () => {
         await stack.load()

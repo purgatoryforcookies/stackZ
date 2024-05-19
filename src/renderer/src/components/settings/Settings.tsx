@@ -44,12 +44,13 @@ function Settings({ stack }: SettingsProps) {
         }
     }, [open])
 
-
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-                <DotsHorizontalIcon className="size-5 absolute right-3 top-2 text-primary/90 hover:scale-110 hover:text-primary hover:cursor-pointer
-                hidden sm:block" />
+                <DotsHorizontalIcon
+                    className="size-5 absolute right-3 top-2 text-primary/90 hover:scale-110 hover:text-primary hover:cursor-pointer
+                hidden sm:block"
+                />
             </SheetTrigger>
             <SheetContent
                 className="w-[32vw] min-w-[36rem] sm:max-w-none overflow-auto"
@@ -80,7 +81,7 @@ function Settings({ stack }: SettingsProps) {
                 <SheetFooter>
                     <SheetClose asChild></SheetClose>
                 </SheetFooter>
-                <p className='absolute right-2 bottom-1 text-white/30 text-[0.7rem]'>
+                <p className="absolute right-2 bottom-1 text-white/30 text-[0.7rem]">
                     {versions.node}-{packageJson.version}
                 </p>
             </SheetContent>

@@ -2,28 +2,23 @@ import { StoreType } from '@t'
 import { useEffect, useState } from 'react'
 import { ResizeCallback } from 're-resizable'
 
-
 export const useResizable = () => {
-
     const [w, setW] = useState(0)
     const [h, setH] = useState(0)
 
     useEffect(() => {
         const fetchPaletteWidth = async () => {
-            const size = await window.store.get('paletteWidths') as StoreType['paletteWidths']
+            const size = (await window.store.get('paletteWidths')) as StoreType['paletteWidths']
             setW(size.palette)
             setH(size.header)
         }
         fetchPaletteWidth()
     }, [])
 
-
-
     const sizeHeader: ResizeCallback = (_e, _direction, ref, _d) => {
         setH(ref.clientHeight)
         const newWidths = { header: ref.clientHeight, palette: w }
         window.store.set('paletteWidths', newWidths)
-
     }
     const sizePalette: ResizeCallback = (_e, _direction, ref, _d) => {
         setW(ref.clientWidth)

@@ -8,11 +8,11 @@ import {
     ContextMenuSub,
     ContextMenuSubContent,
     ContextMenuSubTrigger
-} from "@renderer/@/ui/context-menu";
-import { ThemeContext } from "@renderer/App";
-import { IUseStack } from "@renderer/hooks/useStack";
-import { Cmd } from "@t";
-import { useContext } from "react";
+} from '@renderer/@/ui/context-menu'
+import { ThemeContext } from '@renderer/App'
+import { IUseStack } from '@renderer/hooks/useStack'
+import { Cmd } from '@t'
+import { useContext } from 'react'
 
 type CommandContextMenuProps = {
     children: React.ReactNode
@@ -21,7 +21,6 @@ type CommandContextMenuProps = {
 }
 
 export default function CommandContextMenu({ children, stack, terminal }: CommandContextMenuProps) {
-
     const theme = useContext(ThemeContext)
 
     const startTerminal = () => window.api.startTerminal(stack.selectedStack, terminal.id)
@@ -35,41 +34,45 @@ export default function CommandContextMenu({ children, stack, terminal }: Comman
     }
 
     const copyToClipBoard = () => {
-        const socket = stack.terminals?.get(stack.selectedStack)
-            ?.get(terminal.id)?.socket
+        const socket = stack.terminals?.get(stack.selectedStack)?.get(terminal.id)?.socket
 
         socket?.emit('copyToClipboard', (cmd: string) => {
             navigator.clipboard.writeText(cmd)
         })
     }
 
-
     return (
         <ContextMenu>
             <ContextMenuTrigger>{children}</ContextMenuTrigger>
             <ContextMenuContent data-theme={theme.theme} className="w-96">
-                <ContextMenuItem inset onClick={startTerminal}>Start</ContextMenuItem>
-                <ContextMenuItem inset onClick={stopTerminal}>Stop</ContextMenuItem>
-                <ContextMenuItem inset disabled>Start standalone</ContextMenuItem>
+                <ContextMenuItem inset onClick={startTerminal}>
+                    Start
+                </ContextMenuItem>
+                <ContextMenuItem inset onClick={stopTerminal}>
+                    Stop
+                </ContextMenuItem>
+                <ContextMenuItem inset disabled>
+                    Start standalone
+                </ContextMenuItem>
                 <ContextMenuSeparator />
-                <ContextMenuItem inset onClick={copyToClipBoard}>Copy to clipboard</ContextMenuItem>
+                <ContextMenuItem inset onClick={copyToClipBoard}>
+                    Copy to clipboard
+                </ContextMenuItem>
                 <ContextMenuSub>
                     <ContextMenuSubTrigger inset>Duplicate to</ContextMenuSubTrigger>
                     <ContextMenuSubContent className="w-48">
-                        {stack.stack ? Array.from(stack.stack.values()).map(st => (
-                            <ContextMenuItem
-                                onClick={() => dublicateTo(st.id)}
-                                key={st.id}
-                                className="flex justify-between">
-                                <p>
-                                    {st.stackName}
-                                </p>
-                                <p className="text-white/40">
-                                    x{st.palette?.length || 0}
-                                </p>
-
-                            </ContextMenuItem>
-                        )) : null}
+                        {stack.stack
+                            ? Array.from(stack.stack.values()).map((st) => (
+                                  <ContextMenuItem
+                                      onClick={() => dublicateTo(st.id)}
+                                      key={st.id}
+                                      className="flex justify-between"
+                                  >
+                                      <p>{st.stackName}</p>
+                                      <p className="text-white/40">x{st.palette?.length || 0}</p>
+                                  </ContextMenuItem>
+                              ))
+                            : null}
                     </ContextMenuSubContent>
                 </ContextMenuSub>
                 <ContextMenuSeparator />
@@ -82,7 +85,9 @@ export default function CommandContextMenu({ children, stack, terminal }: Comman
                     {stack.selectedStack}
                 </ContextMenuLabel>
                 <ContextMenuSeparator />
-                <ContextMenuItem inset onClick={deleteTerminal}>Delete</ContextMenuItem>
+                <ContextMenuItem inset onClick={deleteTerminal}>
+                    Delete
+                </ContextMenuItem>
             </ContextMenuContent>
         </ContextMenu>
     )

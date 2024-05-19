@@ -12,7 +12,6 @@ import { baseSocket } from '@renderer/service/socket'
 import { CustomToolTip } from '../Common/CustomTooltip'
 import { GoInfo } from 'react-icons/go'
 
-
 function General() {
     const theme = useContext(ThemeContext)
 
@@ -50,7 +49,6 @@ function General() {
         theme.setTheme(e)
         window.store.set('theme', e)
     }
-
 
     return (
         <>
@@ -105,52 +103,35 @@ function General() {
                         <RadioGroup
                             defaultValue={theme.theme}
                             className="text-secondary-foreground"
-                            onValueChange={changeTheme}>
+                            onValueChange={changeTheme}
+                        >
                             <div className="flex items-center space-x-2 ">
-                                <RadioGroupItem
-                                    value="dark"
-                                    id="r1"
-                                />
+                                <RadioGroupItem value="dark" id="r1" />
                                 <Label htmlFor="r1">Dark</Label>
                                 <ColorSquare theme="dark" />
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="aurora"
-                                    id="r2"
-                                />
+                                <RadioGroupItem value="aurora" id="r2" />
                                 <Label htmlFor="r2">Aurora</Label>
                                 <ColorSquare theme="aurora" />
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="north"
-                                    id="r3"
-                                />
+                                <RadioGroupItem value="north" id="r3" />
                                 <Label htmlFor="r3">North</Label>
                                 <ColorSquare theme="north" />
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="morning"
-                                    id="r4"
-                                />
+                                <RadioGroupItem value="morning" id="r4" />
                                 <Label htmlFor="r4">Morning</Label>
                                 <ColorSquare theme="morning" />
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="forrest"
-                                    id="r5"
-                                />
+                                <RadioGroupItem value="forrest" id="r5" />
                                 <Label htmlFor="r5">Forrest</Label>
                                 <ColorSquare theme="forrest" />
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="pink"
-                                    id="r6"
-                                />
+                                <RadioGroupItem value="pink" id="r6" />
                                 <Label htmlFor="r6">Pink</Label>
                                 <ColorSquare theme="pink" />
                             </div>
@@ -191,8 +172,8 @@ function General() {
                                 {success
                                     ? 'Done.'
                                     : deleteConfirmation
-                                        ? 'Really?'
-                                        : 'History Service'}
+                                      ? 'Really?'
+                                      : 'History Service'}
                                 <GoInfo className="size-4" />
                             </p>
                         </CustomToolTip>

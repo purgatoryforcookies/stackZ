@@ -1,9 +1,8 @@
-import { baseSocket } from "@renderer/service/socket"
-import { DockerContainer } from "@t"
-import { useEffect, useState } from "react"
+import { baseSocket } from '@renderer/service/socket'
+import { DockerContainer } from '@t'
+import { useEffect, useState } from 'react'
 
 const FAULTSTATE_ERROR_CODE = 'ERRFAULT'
-
 
 export interface IUseDocker {
     containers: Record<string, DockerContainer[]>
@@ -16,11 +15,9 @@ export interface IUseDocker {
 }
 
 export const useDocker = (): IUseDocker => {
-
     const [containers, setContainers] = useState<Record<string, DockerContainer[]>>({})
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
-
 
     useEffect(() => {
         if (error === FAULTSTATE_ERROR_CODE) return
@@ -28,9 +25,7 @@ export const useDocker = (): IUseDocker => {
         return () => clearInterval(interval)
     }, [error])
 
-
     const get = async (userInitted: boolean = false) => {
-
         if (userInitted) setLoading(true)
         baseSocket.emit('dockerContainers', (data, err) => {
             setLoading(false)
@@ -42,7 +37,6 @@ export const useDocker = (): IUseDocker => {
             setError(null)
         })
     }
-
 
     const toggle = (id: string, running: boolean) => {
         setError(null)
@@ -73,16 +67,14 @@ export const useDocker = (): IUseDocker => {
     }
 
     const stopAll = () => {
-        Object.values(containers).forEach(project => {
-            project.forEach(container => {
+        Object.values(containers).forEach((project) => {
+            project.forEach((container) => {
                 baseSocket.emit('dockerStop', container.Id, (data) => {
                     setContainers(JSON.parse(data))
                 })
             })
-
         })
     }
-
 
     return {
         containers,
@@ -95,7 +87,4 @@ export const useDocker = (): IUseDocker => {
     }
 }
 
-
 export default useDocker
-
-

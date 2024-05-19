@@ -1,10 +1,4 @@
-import {
-    Cmd,
-    CustomServerSocket,
-    HistoryKey,
-    MetaSettingPayload,
-    Status,
-} from '../../types'
+import { Cmd, CustomServerSocket, HistoryKey, MetaSettingPayload, Status } from '../../types'
 import { spawn, IPty } from 'node-pty'
 import { bakeEnvironmentToString, parseBufferToEnvironment } from './util/util'
 import path from 'path'
@@ -14,7 +8,6 @@ import { HistoryService } from './service/HistoryService'
 import { TerminalScheduler } from './service/TerminalScheduler'
 import { YesSequencer } from './service/YesSequencer'
 import { EnvironmentService } from './service/EnvironmentService'
-
 
 export class Terminal {
     settings: Cmd
@@ -58,7 +51,6 @@ export class Terminal {
 
         this.environment = EnvironmentService.get()
         this.environment.register(this.settings.id, this.settings.command.env)
-
     }
 
     chooseShell(shell?: string) {
@@ -223,7 +215,6 @@ export class Terminal {
                 const code = this.win ? undefined : 'SIGHUP'
                 this.isRunning = false
                 this.ptyProcess?.kill(code)
-
             } catch (err) {
                 if (err instanceof Error) {
                     if (err.message !== 'Pty seems to have been killed already') {
@@ -337,14 +328,12 @@ export class Terminal {
             const trimmed = value.trim()
             if (trimmed.length > 3) this.history.store('HEALTH', trimmed)
             this.settings.metaSettings[name] = trimmed
-
         }
         if (name === 'sequencing' && typeof value === 'object' && !Array.isArray(value)) {
-
             if (!this.settings.metaSettings.sequencing) {
                 this.settings.metaSettings.sequencing = []
             }
-            this.settings.metaSettings.sequencing.map(item => {
+            this.settings.metaSettings.sequencing.map((item) => {
                 if (item.index !== value.index) return item
                 item.echo = value.echo
                 return item
@@ -390,7 +379,6 @@ export class Terminal {
             akw(this.getState())
         })
 
-
         this.socket.on('environmentListDelete', (args) => {
             this.environment.removeViaOrder(args.id || this.settings.id, args.order)
             this.ping()
@@ -405,8 +393,7 @@ export class Terminal {
             const environment = parseBufferToEnvironment(args.fromFile)
             this.environment.addOrder(args.id || this.settings.id, args.value, environment)
             this.ping()
-        }
-        )
+        })
         this.socket.on('environmentEdit', (args) => {
             const { order, value, key, previousKey } = args
             this.environment.edit(args.id || this.settings.id, order, value, key, previousKey)
@@ -433,18 +420,15 @@ export class Terminal {
             const fullCommand = asString + this.settings.command.cmd
 
             akw(fullCommand)
-
         })
 
-        this.socket.on('history',
-            (key: keyof typeof HistoryKey, feed: string, akw) => {
-                if (feed) {
-                    akw(this.history.search(key, feed))
-                    return
-                }
+        this.socket.on('history', (key: keyof typeof HistoryKey, feed: string, akw) => {
+            if (feed) {
+                akw(this.history.search(key, feed))
                 return
             }
-        )
+            return
+        })
         this.socket.emit('hello')
         this.stackPing()
     }

@@ -88,17 +88,14 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
                 <SelectTrigger className="w-full sm:min-w-[8rem] min-w-[4rem] text-[0.8rem] h-8 p-[0.6rem] border-0 overflow-hidden text-ellipsis">
                     <SelectValue placeholder={'Git brances'} />
                 </SelectTrigger>
-                <SelectContent data-theme={theme.theme} className='sm:w-[100%] w-[80%]'>
+                <SelectContent data-theme={theme.theme} className="sm:w-[100%] w-[80%]">
                     <SelectGroup>
                         {!loading && options
                             ? options.map((option) => (
-                                <SelectItem
-                                    key={option}
-                                    value={option}
-                                >
-                                    {option}
-                                </SelectItem>
-                            ))
+                                  <SelectItem key={option} value={option}>
+                                      {option}
+                                  </SelectItem>
+                              ))
                             : null}
                     </SelectGroup>
                 </SelectContent>

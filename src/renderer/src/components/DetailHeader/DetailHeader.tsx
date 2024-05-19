@@ -31,31 +31,46 @@ function DetailHeader({ stack }: DetailHeaderProps) {
     }
 
     const terminal = stack.terminals?.get(stack.selectedStack)?.get(stack.selectedTerminal)
-    if (!terminal) return <p className='text-secondary-foreground'>No terminal selected</p>
+    if (!terminal) return <p className="text-secondary-foreground">No terminal selected</p>
 
     return (
         <div className="flex gap-8 h-[calc(100%-70px)] " ref={bodyRef}>
+            {status?.stackEnv
+                ? status.stackEnv
+                      .sort((a, b) => a.order - b.order)
+                      .map((record) => (
+                          <EnvList
+                              id={stack.selectedStack}
+                              data={record}
+                              key={record.title}
+                              socket={terminal.socket}
+                          />
+                      ))
+                : null}
 
-            {status?.stackEnv ? status.stackEnv
-                .sort((a, b) => a.order - b.order)
-                .map((record) =>
-                    <EnvList id={stack.selectedStack} data={record}
-                        key={record.title} socket={terminal.socket} />) : null}
-
-            {status?.stackEnv ?
-                <div className='flex'>
-                    <p className='text-secondary-foreground/30 pr-2 text-[0.8rem] tracking-wide'>Stack</p>
-                    <Separator orientation='vertical' />
-                    <p className='text-secondary-foreground/30 pl-2 text-[0.8rem] tracking-wide'>Terminal</p>
-                </div> : null}
+            {status?.stackEnv ? (
+                <div className="flex">
+                    <p className="text-secondary-foreground/30 pr-2 text-[0.8rem] tracking-wide">
+                        Stack
+                    </p>
+                    <Separator orientation="vertical" />
+                    <p className="text-secondary-foreground/30 pl-2 text-[0.8rem] tracking-wide">
+                        Terminal
+                    </p>
+                </div>
+            ) : null}
 
             {status?.cmd.command.env
                 ? status.cmd.command.env
-                    .sort((a, b) => a.order - b.order)
-                    .map((record) => (
-                        <EnvList id={stack.selectedTerminal} data={record}
-                            key={record.title} socket={terminal.socket} />
-                    ))
+                      .sort((a, b) => a.order - b.order)
+                      .map((record) => (
+                          <EnvList
+                              id={stack.selectedTerminal}
+                              data={record}
+                              key={record.title}
+                              socket={terminal.socket}
+                          />
+                      ))
                 : null}
             <div className="p-11">
                 <NewEnvList scroll={scroll} terminal={terminal} stack={stack} />

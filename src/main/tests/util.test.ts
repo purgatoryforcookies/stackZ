@@ -1,24 +1,18 @@
 import { EnvironmentService } from '../src/service/EnvironmentService'
 
-
 describe('Utilities tests', () => {
-
     const envService = EnvironmentService.get()
 
     beforeAll(() => {
         envService.store = new Map()
     })
 
-
     it('Does nothing if no env is provided and OS env is omitted (stack creation)', () => {
-
         envService.register('stack1', undefined, true)
         expect(envService.store.get('stack1')).toBeUndefined()
-
     })
 
     it('Registers a new env set for existing stack', () => {
-
         const newEnv: Record<string, string> = {
             key1: 'value1.1',
             key2: 'value2.1',
@@ -32,11 +26,9 @@ describe('Utilities tests', () => {
         expect(envService.store.get('stack1')?.[0].title).toBe('title1')
         expect(envService.store.get('stack1')?.[0].order).toBe(0)
         expect(envService.store.size).toBe(1)
-
     })
 
     it('Registers another env set for existing stack', () => {
-
         const newEnv: Record<string, string> = {
             key1: 'value1.2',
             key2: 'value2.2',
@@ -51,12 +43,9 @@ describe('Utilities tests', () => {
         // TODO: might want to revisit that ordering logic. technically should be 1..
         expect(envService.store.get('stack1')?.[1].order).toBe(2)
         expect(envService.store.size).toBe(1)
-
     })
 
     it('Registering a new terminal with empty env and with OS', () => {
-
-
         envService.register('term1')
 
         expect(envService.store.get('term1')).toBeDefined()
@@ -64,12 +53,9 @@ describe('Utilities tests', () => {
         expect(envService.store.get('term1')?.[0].title).toBe('OS Environment')
         expect(envService.store.get('term1')?.[0].order).toBe(0)
         expect(envService.store.size).toBe(2)
-
     })
 
     it('Registering a new env set for existing terminal', () => {
-
-
         const newEnv: Record<string, string> = {
             key12: 'value1.1',
             key22: 'value2.1',
@@ -86,15 +72,20 @@ describe('Utilities tests', () => {
         // TODO: might want to revisit that ordering logic. technically should be 1..
         expect(envService.store.get('term1')?.[1].order).toBe(2)
         expect(envService.store.size).toBe(2)
-
     })
 
     it('Bakes environment correctly for a terminal to run', () => {
-
         const envs = envService.bake(['stack1', 'term1'])
 
         const toLookFor = ['key12', 'key22', 'key32', 'key1', 'key2', 'key3']
-        const toLookForValues = ['value1.1', 'value2.1', 'value3.1', 'value1.2', 'value2.2', 'value3.2']
+        const toLookForValues = [
+            'value1.1',
+            'value2.1',
+            'value3.1',
+            'value1.2',
+            'value2.2',
+            'value3.2'
+        ]
 
         console.log(envs)
 
@@ -108,5 +99,4 @@ describe('Utilities tests', () => {
     })
 
     it.todo('Bakes environment correctly when there are dublicated keys')
-
 })

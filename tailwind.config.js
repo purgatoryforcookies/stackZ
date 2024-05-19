@@ -9,7 +9,7 @@ module.exports = {
     prefix: '',
     theme: {
         fontFamily: {
-            'code': ['Inconsolata']
+            code: ['Inconsolata']
         },
         screens: {
             sm: '500px',

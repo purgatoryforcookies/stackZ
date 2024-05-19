@@ -24,8 +24,6 @@ import useCommandSettings from '@renderer/hooks/useCommandSettings'
 import InputWithMagic from './InputWithMagic'
 import Sequencing from '../Dialogs/Sequencing'
 
-
-
 export type CommandSettingsProps = {
     engine: TerminalUIEngine
 }
@@ -38,7 +36,6 @@ function CommandSettings({ engine }: CommandSettingsProps) {
 
     return (
         <Sheet open={open} onOpenChange={setOpen}>
-
             <SheetTrigger>
                 <HamburgerMenuIcon
                     className={`h-4 w-4 moveHandle
@@ -52,7 +49,8 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                 onOpenAutoFocus={(e) => e.preventDefault()}
             >
                 <SheetHeader>
-                    <SheetTitle className='flex items-center'>Terminal Settings
+                    <SheetTitle className="flex items-center">
+                        Terminal Settings
                         <div className="relative left-2 top-[2px] gap-3">
                             {isLoading ? (
                                 <ReloadIcon className="h-4 w-4 animate-spin" />
@@ -63,9 +61,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                             )}
                         </div>
                     </SheetTitle>
-                    <SheetDescription>
-
-                    </SheetDescription>
+                    <SheetDescription></SheetDescription>
                 </SheetHeader>
                 <div className="h-5"></div>
 
@@ -208,9 +204,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                 </div>
                 <div>
                     <div className="h-10"></div>
-
                 </div>
-
 
                 <div className="h-2"></div>
 
@@ -220,7 +214,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
 
                     <div className="flex items-center space-x-2">
                         <Checkbox
-                            id='sequencing'
+                            id="sequencing"
                             checked={Boolean(settings?.cmd.metaSettings?.sequencing) || false}
                             onCheckedChange={(e) => onChange('sequencing', e ? [] : undefined)}
                         />
@@ -228,13 +222,12 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                             Yes sequencing
                             <Sequencing />
                         </Label>
-
                     </div>
                     <div className="h-3"></div>
-                    <div className='flex flex-col gap-2'>
-                        {settings?.cmd.metaSettings?.sequencing
-                            && settings.cmd.metaSettings.sequencing.map((seq, i) => (
-                                <div key={seq.index} className='flex items-center'>
+                    <div className="flex flex-col gap-2">
+                        {settings?.cmd.metaSettings?.sequencing &&
+                            settings.cmd.metaSettings.sequencing.map((seq, i) => (
+                                <div key={seq.index} className="flex items-center">
                                     <Input
                                         id={seq.index.toString()}
                                         tabIndex={i}
@@ -242,17 +235,20 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                                         placeholder={seq.message}
                                         defaultValue={seq.echo || ''}
                                         onChange={() => setIsPending(true)}
-                                        onBlur={(e) => onChange('sequencing', { ...seq, echo: e.target.value })}
+                                        onBlur={(e) =>
+                                            onChange('sequencing', { ...seq, echo: e.target.value })
+                                        }
                                     />
-                                    <Label htmlFor={seq.index.toString()} className="text-right p-1">
+                                    <Label
+                                        htmlFor={seq.index.toString()}
+                                        className="text-right p-1"
+                                    >
                                         :{seq.index}
                                     </Label>
                                 </div>
                             ))}
                     </div>
                 </div>
-
-
             </SheetContent>
         </Sheet>
     )
