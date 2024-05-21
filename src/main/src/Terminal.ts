@@ -1,4 +1,4 @@
-import { Cmd, CustomServerSocket, HistoryKey, MetaSettingPayload, Status } from '../../types'
+import { Cmd, CustomServerSocket, Environment, HistoryKey, MetaSettingPayload, Status } from '../../types'
 import { spawn, IPty } from 'node-pty'
 import { bakeEnvironmentToString, parseBufferToEnvironment } from './util/util'
 import path from 'path'
@@ -401,6 +401,10 @@ export class Terminal {
         })
         this.socket.on('environmentMute', (arg) => {
             this.environment.mute(arg.id || this.settings.id, arg.order, arg.value)
+            this.ping()
+        })
+        this.socket.on('environmentVisualState', (arg) => {
+            this.environment.setVisuals(arg.id || this.settings.id, arg.order, arg.value as Environment['visualState'])
             this.ping()
         })
 

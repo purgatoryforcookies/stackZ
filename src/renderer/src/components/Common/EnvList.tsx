@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Record from '@renderer/components/Common/ListItem'
 import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
 import { CustomToolTip } from './CustomTooltip'
 import { GoInfo } from 'react-icons/go'
-import { Cmd, CustomClientSocket } from '@t'
+import { Cmd, CustomClientSocket, Environment } from '@t'
 
 type EnvListProps = {
     data: Exclude<Cmd['command']['env'], undefined>[0]
@@ -14,8 +14,8 @@ type EnvListProps = {
 }
 
 function EnvList({ data, socket, id }: EnvListProps) {
-    const [minimized, setMinimized] = useState<boolean>(false)
-    const [hidden, setHidden] = useState<boolean>(false)
+    const [minimized, setMinimized] = useState<boolean>(true)
+    const [hidden, setHidden] = useState<boolean>(true)
     const [editMode, setEditMode] = useState<boolean>(false)
 
     const handleMute = () => {
@@ -25,18 +25,54 @@ function EnvList({ data, socket, id }: EnvListProps) {
         })
     }
 
+    const handleVisualState = (state: Environment['visualState']) => {
+        socket.emit('environmentVisualState', {
+            order: data.order,
+            id: id,
+            value: state
+        })
+    }
+
     const handleMinimize = () => {
         if (!minimized) {
             setMinimized(true)
+            handleVisualState('1')
         }
         if (minimized && !hidden) {
             setHidden(true)
+            handleVisualState('2')
         }
         if (minimized && hidden) {
             setHidden(false)
             setMinimized(false)
+            handleVisualState('0')
         }
     }
+
+    useEffect(() => {
+
+        if (data.title === 'OS Environment' && !data.visualState) {
+            setHidden(true)
+            setMinimized(true)
+            return
+        }
+
+        switch (data.visualState) {
+            case '0':
+                setHidden(false)
+                setMinimized(false)
+                break
+            case '1':
+                setHidden(false)
+                setMinimized(true)
+                break
+            case '2':
+                setHidden(true)
+                setMinimized(true)
+                break
+        }
+
+    }, [data])
 
     const handleDelete = () => {
         socket.emit('environmentListDelete', {
@@ -121,19 +157,19 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 >
                     {data.pairs
                         ? Object.keys(data.pairs).map((key: string) => (
-                              <Record
-                                  key={key} //react component key
-                                  id={id}
-                                  newRecord={false}
-                                  editMode={editMode}
-                                  socket={socket}
-                                  orderId={data.order}
-                                  minimized={minimized}
-                                  keyv={key}
-                                  muted={data.disabled.includes(key)}
-                                  value={data.pairs[key]}
-                              />
-                          ))
+                            <Record
+                                key={key} //react component key
+                                id={id}
+                                newRecord={false}
+                                editMode={editMode}
+                                socket={socket}
+                                orderId={data.order}
+                                minimized={minimized}
+                                keyv={key}
+                                muted={data.disabled.includes(key)}
+                                value={data.pairs[key]}
+                            />
+                        ))
                         : null}
                     {editMode ? (
                         <Record

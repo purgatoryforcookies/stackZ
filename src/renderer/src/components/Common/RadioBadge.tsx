@@ -2,7 +2,6 @@ import { Badge } from '@renderer/@/ui/badge'
 import { IUseStack } from '@renderer/hooks/useStack'
 import { useEffect, useState } from 'react'
 
-// Line 46 bg-transparent -> something else to get a border
 
 function RadioBadge({ stack, id }: { stack: IUseStack; id: string }) {
     const [running, setRunning] = useState(false)
