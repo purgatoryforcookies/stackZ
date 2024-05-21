@@ -60,6 +60,7 @@ export class DockerService {
 
             const prev = byProject.get(label)
             if (!prev) throw new Error('TS Array not found')
+            i.Ports.sort((a, b) => a.PrivatePort - b.PrivatePort)
             byProject.set(label, [...prev, i])
         })
         this.errorCount = 0

@@ -66,7 +66,7 @@ function DockerStrip({ docker }: DockerStripProps) {
                                     <HoverCardTrigger
                                         className="hover:cursor-pointer"
                                         onClick={() => toggle(c.Id, c.State === 'running')}
-                                        onContextMenu={() =>
+                                        onContextMenu={() => composeDir &&
                                             window.store.openFileLocation(composeFile)
                                         }
                                     >

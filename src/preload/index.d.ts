@@ -21,6 +21,10 @@ declare global {
             get: (key: string) => Promise<unknown>
             set: (key: string, value: unknown) => Promise<void>
             openFileLocation: (path?: string) => Promise<void>
+        },
+        tools: {
+            close: () => Promise<void>
+            minimize: () => Promise<void>
         }
     }
 }
