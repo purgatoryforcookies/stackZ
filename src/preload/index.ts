@@ -37,7 +37,8 @@ const store = {
 
 const tools = {
     close: (): Promise<void> => ipcRenderer.invoke('close'),
-    minimize: (): Promise<void> => ipcRenderer.invoke('minimize')
+    minimize: (): Promise<void> => ipcRenderer.invoke('minimize'),
+    maximize: (): Promise<void> => ipcRenderer.invoke('maximize')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

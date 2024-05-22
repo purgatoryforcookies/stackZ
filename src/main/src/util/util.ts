@@ -65,7 +65,7 @@ export const envFactory = (args: Environment[] | undefined) => {
         title: 'OS Environment',
         pairs: process.env as Record<string, string>,
         order: 0,
-        disabled: [],
+        disabled: []
     }
 
     if (!args) return [hostEnv]
@@ -104,7 +104,6 @@ export const resolveDefaultCwd = () => {
     }
     return '~'
 }
-
 
 export const executeScript = async (script: string, shell: string, silent = false) => {
     try {

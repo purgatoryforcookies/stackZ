@@ -50,7 +50,6 @@ function EnvList({ data, socket, id }: EnvListProps) {
     }
 
     useEffect(() => {
-
         if (data.title === 'OS Environment' && !data.visualState) {
             setHidden(true)
             setMinimized(true)
@@ -71,7 +70,6 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 setMinimized(true)
                 break
         }
-
     }, [data])
 
     const handleDelete = () => {
@@ -157,19 +155,19 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 >
                     {data.pairs
                         ? Object.keys(data.pairs).map((key: string) => (
-                            <Record
-                                key={key} //react component key
-                                id={id}
-                                newRecord={false}
-                                editMode={editMode}
-                                socket={socket}
-                                orderId={data.order}
-                                minimized={minimized}
-                                keyv={key}
-                                muted={data.disabled.includes(key)}
-                                value={data.pairs[key]}
-                            />
-                        ))
+                              <Record
+                                  key={key} //react component key
+                                  id={id}
+                                  newRecord={false}
+                                  editMode={editMode}
+                                  socket={socket}
+                                  orderId={data.order}
+                                  minimized={minimized}
+                                  keyv={key}
+                                  muted={data.disabled.includes(key)}
+                                  value={data.pairs[key]}
+                              />
+                          ))
                         : null}
                     {editMode ? (
                         <Record

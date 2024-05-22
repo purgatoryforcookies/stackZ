@@ -28,7 +28,7 @@ async function createWindow(): Promise<void> {
     }
 
     const mainWindow = new BrowserWindow({
-        titleBarStyle: "hidden",
+        titleBarStyle: is.dev ? 'default' : 'hidden',
         hasShadow: true,
         width: 1800,
         height: 900,
@@ -106,6 +106,16 @@ ipcMain.handle('minimize', () => {
     if (windowInstance) {
         if (windowInstance.minimizable) {
             windowInstance.minimize()
+        }
+    }
+})
+
+ipcMain.handle('maximize', () => {
+    if (windowInstance) {
+        if (windowInstance.isMaximized()) {
+            windowInstance.unmaximize()
+        } else {
+            windowInstance.maximize()
         }
     }
 })

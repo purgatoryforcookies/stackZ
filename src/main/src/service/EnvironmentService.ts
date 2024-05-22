@@ -7,7 +7,7 @@ export class EnvironmentService {
     private static instance: EnvironmentService
 
     // @ts-ignore singleton
-    private constructor() { }
+    private constructor() {}
 
     public static get() {
         if (!EnvironmentService.instance) {
@@ -124,7 +124,6 @@ export class EnvironmentService {
     }
 
     setVisuals(id: string, order: number, state: Environment['visualState']) {
-
         const target = this.store.get(id)?.find((list) => list.order === order)
         if (!target) throw new Error('Setting visual state failed. No environment found')
         target.visualState = state
