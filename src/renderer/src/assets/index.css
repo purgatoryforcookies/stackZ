@@ -20,8 +20,8 @@ html {
     overflow: hidden !important;
 }
 
-.xterm-screen {
-    padding: 6px;
+.xterm {
+    padding: 7px;
 }
 
 ::-webkit-scrollbar {

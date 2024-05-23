@@ -50,6 +50,7 @@ if (process.contextIsolated) {
         contextBridge.exposeInMainWorld('api', api)
         contextBridge.exposeInMainWorld('store', store)
         contextBridge.exposeInMainWorld('tools', tools)
+        contextBridge.exposeInMainWorld('process', { platform: process.platform })
     } catch (error) {
         console.error(error)
     }
