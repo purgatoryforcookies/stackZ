@@ -28,7 +28,7 @@ async function createWindow(): Promise<void> {
     }
 
     const mainWindow = new BrowserWindow({
-        titleBarStyle: !is.dev ? 'default' : 'hidden',
+        titleBarStyle: 'hidden',
         hasShadow: true,
         width: 1800,
         height: 900,
