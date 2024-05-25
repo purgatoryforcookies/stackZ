@@ -19,6 +19,7 @@ function TerminalUI({ engine }: TerminalUIProps) {
         if (terminalRef.current) {
             if (!engine) return
             engine.attachTo(terminalRef.current)
+            engine.resize()
         }
         return () => engine?.detach()
     }, [engine])

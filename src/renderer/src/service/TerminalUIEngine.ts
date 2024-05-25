@@ -34,7 +34,7 @@ export class TerminalUIEngine {
     constructor(stackId: string, terminalId: string, host: string) {
         this.fitAddon = new FitAddon()
         this.searchAddon = new SearchAddon()
-        this.weblinkAddon = new WebLinksAddon()
+        this.weblinkAddon = new WebLinksAddon((_, uri) => window.open(uri))
         this.stackId = stackId
         this.terminalId = terminalId
         this.host = host
