@@ -11,6 +11,7 @@ import {
     HeartIcon,
     MixIcon,
     MoveIcon,
+    PlayIcon,
     ReloadIcon,
     SymbolIcon,
     TimerIcon
@@ -122,14 +123,19 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                     ${engine.terminalId === data.id ? '' : 'bg-background'}`}
                     >
                         <div className="flex justify-between">
-                            <div className="flex flex-col pl-3 p-1 text-sm text-secondary-foreground">
-                                <span>command: {ping.cmd.command.cmd}</span>
-                                <span>shell: {ping.cmd.command.shell ?? data.command.shell}</span>
-                                <span>palettes: x{ping.cmd.command.env?.length}</span>
+                            <div className="flex flex-col pl-3 p-1 pr-12 text-sm text-secondary-foreground">
+                                <p className="text-white leading-5">{ping.cmd.command.cmd}</p>
+                                <div className="py-2 pl-5 flex gap-5">
+                                    <span>
+                                        {'>'}
+                                        {ping.cmd.command.shell ?? data.command.shell}
+                                    </span>
+                                </div>
+                                <span>Environments: x{ping.cmd.command.env?.length}</span>
                                 <span>notes: {ping.cmd.title}</span>
                             </div>
 
-                            <div className="flex items-center relative bottom-1 right-12">
+                            <div className="flex items-center relative bottom-1 right-10">
                                 <div>
                                     <Button
                                         variant={'ghost'}
@@ -164,6 +170,9 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                             ) : null}
                             {ping.cmd.metaSettings?.loose ? (
                                 <EyeNoneIcon className="h-4 w-4" />
+                            ) : null}
+                            {ping.cmd.metaSettings?.sequencing ? (
+                                <PlayIcon className="h-4 w-4" />
                             ) : null}
                             {ping.cmd.metaSettings?.delay ? (
                                 <span className="flex relative">
