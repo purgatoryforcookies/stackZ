@@ -12,6 +12,7 @@ export interface IUseDocker {
     toggle: (id: string, running: boolean) => void
     remove: (id: string) => void
     stopAll: () => void
+    deleteAll: () => void
 }
 
 export const useDocker = (): IUseDocker => {
@@ -76,6 +77,17 @@ export const useDocker = (): IUseDocker => {
         })
     }
 
+
+    const deleteAll = () => {
+        Object.values(containers).forEach((project) => {
+            project.forEach((container) => {
+                baseSocket.emit('dockerRemove', container.Id, (data) => {
+                    setContainers(JSON.parse(data))
+                })
+            })
+        })
+    }
+
     return {
         containers,
         loading,
@@ -83,7 +95,8 @@ export const useDocker = (): IUseDocker => {
         get,
         toggle,
         remove,
-        stopAll
+        stopAll,
+        deleteAll
     }
 }
 

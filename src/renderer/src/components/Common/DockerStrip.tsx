@@ -21,7 +21,7 @@ function DockerStrip({ docker }: DockerStripProps) {
     const [clipBoardLoad, setClipBoardLoad] = useState(false)
     const theme = useContext(ThemeContext)
 
-    const { loading, error, containers, toggle, remove, get, stopAll } = docker
+    const { loading, error, containers, toggle, remove, get, stopAll, deleteAll } = docker
 
     const handleClipBoardCopy = (file: string | undefined) => {
         if (file) {
@@ -185,6 +185,9 @@ function DockerStrip({ docker }: DockerStripProps) {
                 <ContextMenuContent data-theme={theme.theme} className="w-36">
                     <ContextMenuItem inset onClick={stopAll}>
                         Stop all
+                    </ContextMenuItem>
+                    <ContextMenuItem inset onClick={deleteAll}>
+                        Delete all
                     </ContextMenuItem>
                 </ContextMenuContent>
             </ContextMenu>
