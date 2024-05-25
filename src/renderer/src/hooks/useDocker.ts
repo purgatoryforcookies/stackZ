@@ -77,7 +77,6 @@ export const useDocker = (): IUseDocker => {
         })
     }
 
-
     const deleteAll = () => {
         Object.values(containers).forEach((project) => {
             project.forEach((container) => {

@@ -355,6 +355,7 @@ export class Terminal {
     registerTerminalEvents() {
         this.socket.on('changeCwd', (arg: string, akw) => {
             console.log(`[New cwd]: ${arg}`)
+            if (arg.startsWith('cd')) arg = arg.slice(2).trim()
             this.updateCwd(arg)
             akw(this.getState())
         })

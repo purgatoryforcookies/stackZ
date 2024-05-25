@@ -22,7 +22,7 @@ type ThemeContextType = {
 
 export const ThemeContext = createContext<ThemeContextType>({
     theme: 'aurora',
-    setTheme: () => { }
+    setTheme: () => {}
 })
 
 function App(): JSX.Element {
@@ -114,10 +114,11 @@ function App(): JSX.Element {
                     {w ? (
                         <div className="text-secondary-foreground h-[calc(100%-70px)]">
                             <div
-                                className={`p-1 ${w < 450
-                                    ? 'flex flex-col-reverse justify-center items-center gap-2'
-                                    : 'sm:grid sm:grid-cols-3 sm:grid-rows-1 flex flex-col-reverse justify-center items-center gap-2'
-                                    }`}
+                                className={`p-1 ${
+                                    w < 450
+                                        ? 'flex flex-col-reverse justify-center items-center gap-2'
+                                        : 'sm:grid sm:grid-cols-3 sm:grid-rows-1 flex flex-col-reverse justify-center items-center gap-2'
+                                }`}
                             >
                                 <BranchDropdown stack={stack} />
                                 <span className="font-semibold text-lg text-center">Terminals</span>

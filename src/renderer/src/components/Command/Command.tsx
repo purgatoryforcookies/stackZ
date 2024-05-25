@@ -125,13 +125,13 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                         <div className="flex justify-between">
                             <div className="flex flex-col pl-3 p-1 pr-12 text-sm text-secondary-foreground">
                                 <p className="text-white leading-5">{ping.cmd.command.cmd}</p>
-                                <div className="py-2 pl-5 flex gap-5">
+                                <div className="py-1 pt-2 pl-2 flex gap-5">
                                     <span>
                                         {'>'}
                                         {ping.cmd.command.shell ?? data.command.shell}
                                     </span>
                                 </div>
-                                <span>Environments: x{ping.cmd.command.env?.length}</span>
+                                <span>environments: x{ping.cmd.command.env?.length}</span>
                                 <span>notes: {ping.cmd.title}</span>
                             </div>
 

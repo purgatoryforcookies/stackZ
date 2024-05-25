@@ -20,7 +20,6 @@ const ButtonWrapper = ({ children, className, onClick }: ButtonWrapperProps) => 
 }
 
 function NavBar({ children }: { children: React.ReactNode }) {
-
     const platform = window.process.platform
 
     return (
@@ -34,7 +33,7 @@ function NavBar({ children }: { children: React.ReactNode }) {
                 <QuestionMarkIcon className="size-4 text-primary" />
             </ButtonWrapper>
             <ButtonWrapper>{children}</ButtonWrapper>
-            {platform === 'win32' ?
+            {platform === 'win32' ? (
                 <>
                     <ButtonWrapper onClick={() => window.tools.minimize()}>
                         <GoHorizontalRule className="size-4 mx-2 text-primary " />
@@ -46,8 +45,7 @@ function NavBar({ children }: { children: React.ReactNode }) {
                         <Cross2Icon className="size-5 mx-2 text-primary" />
                     </ButtonWrapper>
                 </>
-
-                : null}
+            ) : null}
             <div className="navbarDragArea w-5 h-full"></div>
         </div>
     )
