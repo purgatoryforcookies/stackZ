@@ -1,5 +1,5 @@
 import { readFile, writeFileSync, existsSync } from 'fs'
-import { Environment, TPorts } from '../../../types'
+import { Environment } from '../../../types'
 import { ZodTypeAny, z } from 'zod'
 import { exec } from 'child_process'
 import { RequestOptions, request } from 'http'
@@ -105,76 +105,6 @@ export const resolveDefaultCwd = () => {
     return '~'
 }
 
-export const parsePSTCPMessage = (message: string) => {
-    const linesInArray = message.split('\n').slice(3)
-    const groupedLines2 = new Map<string, Map<number, TPorts[]>>()
-
-    linesInArray.forEach((item) => {
-        const trimmed = trimShellTableRow(item)
-        if (!trimmed) return
-
-        const obj = {
-            localAddress: trimmed[0],
-            localPort: Number(trimmed[1]),
-            remoteAddress: trimmed[2],
-            remotePort: Number(trimmed[3]),
-            state: trimmed[4],
-            pid: Number(trimmed[5]),
-            process: trimmed[6],
-            protocol: 'TCP'
-        }
-
-        if (!groupedLines2.has(obj.process)) {
-            groupedLines2.set(obj.process, new Map())
-        }
-        if (!groupedLines2.get(obj.process)?.has(obj.localPort)) {
-            groupedLines2.get(obj.process)?.set(obj.localPort, [])
-        }
-
-        groupedLines2.get(obj.process)?.get(obj.localPort)?.push(obj)
-    })
-
-    return groupedLines2
-}
-
-//TODO: this and tcp one can be made into one.
-export const parsePSUDPMessage = (message: string) => {
-    const linesInArray = message.split('\n').slice(3)
-
-    const groupedLines2 = new Map<string, Map<number, TPorts[]>>()
-
-    linesInArray.forEach((item) => {
-        const trimmed = trimShellTableRow(item)
-        if (!trimmed) return
-
-        const obj: TPorts = {
-            localAddress: trimmed[0],
-            localPort: Number(trimmed[1]),
-            remoteAddress: null,
-            remotePort: null,
-            state: null,
-            pid: Number(trimmed[2]),
-            process: trimmed[3],
-            protocol: 'UDP'
-        }
-
-        if (!groupedLines2.has(obj.process)) {
-            groupedLines2.set(obj.process, new Map())
-        }
-        if (!groupedLines2.get(obj.process)?.has(obj.localPort)) {
-            groupedLines2.get(obj.process)?.set(obj.localPort, [])
-        }
-
-        groupedLines2.get(obj.process)?.get(obj.localPort)?.push(obj)
-    })
-    return groupedLines2
-}
-
-const trimShellTableRow = (row: string) => {
-    if (row.length < 10) return
-    return row.split(' ').filter((i) => i.length > 0 && i !== '\r')
-}
-
 export const executeScript = async (script: string, shell: string, silent = false) => {
     try {
         const data: string = await new Promise((res, rej) => {
@@ -209,7 +139,7 @@ export const bakeEnvironmentToString = (env: Record<string, string | undefined>)
     return envString
 }
 
-export const httpNativeRequest = <T>(options: RequestOptions) => {
+export const dockerHTTPRequest = <T>(options: RequestOptions) => {
     return new Promise<T | null>((resolve, reject) => {
         const req = request(options, (res) => {
             let data = ''

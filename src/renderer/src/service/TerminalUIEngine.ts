@@ -151,6 +151,13 @@ export class TerminalUIEngine {
         this.terminal.open(this.hostdiv)
         this.terminal.focus()
         this.mounted = true
+
+        if (window.process.platform !== 'win32') {
+            const terms = document.getElementsByClassName('xterm')
+            if (terms.length > 0) {
+                terms[0].setAttribute('style', 'padding-top:27px;')
+            }
+        }
         this.resize()
         this.socket.on('terminalState', (data) => {
             this.isRunning = data.isRunning

@@ -172,8 +172,8 @@ function General() {
                                 {success
                                     ? 'Done.'
                                     : deleteConfirmation
-                                        ? 'Really?'
-                                        : 'History Service'}
+                                      ? 'Really?'
+                                      : 'History Service'}
                                 <GoInfo className="size-4" />
                             </p>
                         </CustomToolTip>

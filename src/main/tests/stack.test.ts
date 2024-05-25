@@ -16,14 +16,9 @@ const testServer = new Server({
  * 1. They hang and take time
  * 2. They should be tested separetly.
  */
-jest.mock('../src/service/MonitorService', () => {
-    return {
-        MonitorService: jest.fn(() => {})
-    }
-})
 jest.mock('../src/service/HistoryService', () => {
     return {
-        HistoryService: jest.fn(() => {})
+        HistoryService: jest.fn(() => { })
     }
 })
 

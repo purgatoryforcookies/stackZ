@@ -1,6 +1,6 @@
 import { DockerContainer } from '../../../types'
 import http from 'http'
-import { httpNativeRequest } from '../util/util'
+import { dockerHTTPRequest } from '../util/util'
 import { DockerError, DockerFaultState } from '../util/error'
 
 export class DockerService {
@@ -39,14 +39,16 @@ export class DockerService {
         }
 
         try {
-            const data = await httpNativeRequest<DockerContainer[]>(options)
+            const data = await dockerHTTPRequest<DockerContainer[]>(options)
             if (!data) {
                 return byProject
             }
             resp.push(...data)
         } catch (error) {
             this.errorCount += 1
-            throw error
+            if (error instanceof Error) {
+                throw new DockerError(error.message)
+            }
         }
 
         if (resp.length === 0) return byProject
@@ -58,6 +60,7 @@ export class DockerService {
 
             const prev = byProject.get(label)
             if (!prev) throw new Error('TS Array not found')
+            i.Ports.sort((a, b) => a.PrivatePort - b.PrivatePort)
             byProject.set(label, [...prev, i])
         })
         this.errorCount = 0
@@ -82,7 +85,7 @@ export class DockerService {
         }
 
         try {
-            await httpNativeRequest(options)
+            await dockerHTTPRequest(options)
             this.errorCount = 0
             return
         } catch (error) {
@@ -112,7 +115,7 @@ export class DockerService {
         }
 
         try {
-            await httpNativeRequest(options)
+            await dockerHTTPRequest(options)
             this.errorCount = 0
             return
         } catch (error) {
@@ -142,7 +145,7 @@ export class DockerService {
         }
 
         try {
-            await httpNativeRequest(options)
+            await dockerHTTPRequest(options)
             this.errorCount = 0
             return
         } catch (error) {

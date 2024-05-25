@@ -10,14 +10,7 @@ import { exec } from 'child_process'
 const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
 const stack = new Stack(savedCommandsPath, socketServer, stackSchema)
 
-// process.on('uncaughtException', (err) => {
-//     if (err.message.includes('Pty seems to have been killed already')) {
-//         // this might be fixed when moving stacks to individual sockets
-//         console.log('Rare pty error swallowed')
-//         return
-//     }
-//     console.log(err)
-// })
+let windowInstance: BrowserWindow | null = null
 
 async function createWindow(): Promise<void> {
     await stack.load()
@@ -35,6 +28,8 @@ async function createWindow(): Promise<void> {
     }
 
     const mainWindow = new BrowserWindow({
+        titleBarStyle: 'hidden',
+        hasShadow: true,
         width: 1800,
         height: 900,
         minWidth: 200,
@@ -69,6 +64,8 @@ async function createWindow(): Promise<void> {
     } else {
         mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
     }
+
+    windowInstance = mainWindow
 }
 
 // This method will be called when Electron has finished
@@ -99,6 +96,28 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit()
+    }
+})
+
+ipcMain.handle('close', () => {
+    app.quit()
+})
+
+ipcMain.handle('minimize', () => {
+    if (windowInstance) {
+        if (windowInstance.minimizable) {
+            windowInstance.minimize()
+        }
+    }
+})
+
+ipcMain.handle('maximize', () => {
+    if (windowInstance) {
+        if (windowInstance.isMaximized()) {
+            windowInstance.unmaximize()
+        } else {
+            windowInstance.maximize()
+        }
     }
 })
 

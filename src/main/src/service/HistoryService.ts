@@ -141,7 +141,10 @@ export class HistoryService {
                     .map((i) => i.trim())
                     .reverse()
                     .forEach((i) => {
-                        this.history.get(key)?.push(i)
+                        const store = this.history.get(key)
+                        if (!store) return
+                        if (store.includes(i)) return
+                        store.push(i)
                     })
                 res()
             })

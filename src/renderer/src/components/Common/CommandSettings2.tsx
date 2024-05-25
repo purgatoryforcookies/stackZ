@@ -45,7 +45,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
             <SheetContent
                 side={'left'}
                 data-theme={theme.theme}
-                className="sm:max-w-none w-[50rem] overflow-auto"
+                className="sm:max-w-none w-[50rem]"
                 onOpenAutoFocus={(e) => e.preventDefault()}
             >
                 <SheetHeader>

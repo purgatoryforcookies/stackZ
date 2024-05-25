@@ -46,7 +46,7 @@ function InputWithMagic({
         } else {
             setIsPending(false)
         }
-        setSearchList([])
+        // setSearchList([])
     }
 
     const handleListSelect = () => {
@@ -102,7 +102,7 @@ function InputWithMagic({
                 placeholder="curl --fail https://google.com || exit 1"
             />
             {searchList.length > 0 ? (
-                <ul className="absolute  min-w-full max-w-[190%] p-1 rounded-sm max-h-[20rem] overflow-auto z-10">
+                <ul className="absolute p-1 rounded-sm max-h-[30rem] overflow-auto z-10">
                     <ScrollArea
                         test-id={'historyBook'}
                         className="bg-foreground text-muted rounded-sm w-max"
@@ -114,10 +114,14 @@ function InputWithMagic({
                                     role="button"
                                     test-id={'historyItem'}
                                     key={idx}
-                                    className={`hover:cursor-pointer hover:outline hover:outline-1 pl-1 pr-2 ${idx + infiniteIndex - OFFSET === infiniteIndex ? 'bg-primary text-primary-foreground' : ''}`}
+                                    className={`hover:cursor-pointer hover:outline hover:outline-1 px-2 max-w-[90vw] break-words flex gap-2
+                                    ${idx + infiniteIndex - OFFSET === infiniteIndex ? 'bg-primary text-primary-foreground' : ''}`}
                                     onClick={() => handleSelect(item)}
                                 >
-                                    {idx - OFFSET + infiniteIndex} - {item}
+                                    <p className="text-muted/70 w-8">
+                                        {idx - OFFSET + infiniteIndex}
+                                    </p>
+                                    <p>{item}</p>
                                 </li>
                             )
                         })}

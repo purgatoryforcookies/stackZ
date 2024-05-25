@@ -1,7 +1,6 @@
 import { RefObject, useEffect, useState } from 'react'
 
 /**
- *
  * Observes given element dimensions
  * @returns w,h in pixels
  */

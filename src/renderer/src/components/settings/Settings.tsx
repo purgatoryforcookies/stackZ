@@ -47,10 +47,7 @@ function Settings({ stack }: SettingsProps) {
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-                <DotsHorizontalIcon
-                    className="size-5 absolute right-3 top-2 text-primary/90 hover:scale-110 hover:text-primary hover:cursor-pointer
-                hidden sm:block"
-                />
+                <DotsHorizontalIcon className="size-5 text-primary/90 hidden sm:block" />
             </SheetTrigger>
             <SheetContent
                 className="w-[32vw] min-w-[36rem] sm:max-w-none overflow-auto"

@@ -93,7 +93,11 @@ export class EnvironmentService {
             })
 
         if (!newTarget) return
-        this.store.set(id, newTarget)
+        if (newTarget.length === 0) {
+            this.store.delete(id)
+        } else {
+            this.store.set(id, newTarget)
+        }
     }
 
     /**
@@ -117,6 +121,12 @@ export class EnvironmentService {
 
         const list = target.find((list) => list.order === order)
         delete list?.pairs[key]
+    }
+
+    setVisuals(id: string, order: number, state: Environment['visualState']) {
+        const target = this.store.get(id)?.find((list) => list.order === order)
+        if (!target) throw new Error('Setting visual state failed. No environment found')
+        target.visualState = state
     }
 
     bake(id: string[], omitOS: boolean = false) {

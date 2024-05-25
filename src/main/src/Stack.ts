@@ -5,7 +5,6 @@ import { DataStore } from './stores/DataStore'
 import { ZodTypeAny } from 'zod'
 import { TerminalScheduler } from './service/TerminalScheduler'
 import { HistoryService } from './service/HistoryService'
-import { MonitorService } from './service/MonitorService'
 import { EnvironmentService } from './service/EnvironmentService'
 import { DockerService } from './service/DockerService'
 import { DockerError, DockerFaultState } from './util/error'
@@ -20,7 +19,6 @@ export class Stack {
     store: DataStore
     scheduler: Map<string, TerminalScheduler>
     history: HistoryService
-    monitor: MonitorService
     environment: EnvironmentService
     dockerService: DockerService
 
@@ -32,7 +30,6 @@ export class Stack {
         this.palettes = new Map<string, Palette>()
         this.scheduler = new Map<string, TerminalScheduler>()
         this.history = new HistoryService()
-        this.monitor = new MonitorService()
         this.environment = EnvironmentService.get()
         this.dockerService = new DockerService()
     }
@@ -79,14 +76,14 @@ export class Stack {
 
             if (palette) {
                 if (!remoteTerminalID) {
-                    // console.log(`Stack ${stackId} connected`)
+                    console.log(`Stack ${stackId} connected`)
                     palette.installStackSocket(client)
                 } else {
-                    // console.log(`Terminal ${remoteTerminalID} connected`)
+                    console.log(`Terminal ${remoteTerminalID} connected`)
                     palette.initTerminal(client, String(remoteTerminalID))
                 }
             } else {
-                // console.log(`General client connected ${client.id}`)
+                console.log(`General client connected ${client.id}`)
                 client.on('clearHistory', (akw) => {
                     console.log('Clearing history service')
                     this.history.reboot()
@@ -146,18 +143,6 @@ export class Stack {
                         }
                         akw('', 'Unknown docker error')
                     }
-                })
-
-                client.on('m_ports', async (akw) => {
-                    await Promise.all([
-                        this.monitor.activePortsTCP(),
-                        this.monitor.activePortsUDP()
-                    ]).then((results) => {
-                        akw({
-                            tcp: results[0],
-                            udp: results[1]
-                        })
-                    })
                 })
             }
         })

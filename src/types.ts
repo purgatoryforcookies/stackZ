@@ -55,7 +55,8 @@ export const stackSchema = z.array(
                                     pairs: z.record(z.string().min(1), z.string().optional()),
                                     title: z.string().min(1).default('Default'),
                                     order: z.number().default(1),
-                                    disabled: z.array(z.string())
+                                    disabled: z.array(z.string()),
+                                    visualState: z.enum(['0', '1', '2']).optional()
                                 })
                             )
                             .optional(),
@@ -134,6 +135,7 @@ export interface ClientToServerEvents {
     environmentMute: (arg: UtilityProps) => void
     environmentListDelete: (args: UtilityProps) => void
     environmentDelete: (args: UtilityProps) => void
+    environmentVisualState: (args: UtilityProps) => void
 
     commandMetaSetting: ChangeMetaSettingEvent
     commandHealthSetting: () => void
@@ -149,7 +151,6 @@ export interface ClientToServerEvents {
     gitSwitchBranch: (branch: string, callback: (errors: string[]) => void) => void
 
     clearHistory: (callback: () => void) => void
-    m_ports: (callback: (params: { tcp: Processes; udp: Processes }) => void) => void
     copyToClipboard: (callback: (cmd: string) => void) => void
 
     dockerContainers: (callback: (data: string, err?: string) => void) => void

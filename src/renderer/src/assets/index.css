@@ -8,12 +8,20 @@ body {
     -moz-osx-font-smoothing: auto;
 }
 
+.navbarDragArea {
+    -webkit-app-region: drag;
+}
+
 html {
     font-size: 14px;
 }
 
 .xterm-viewport {
     overflow: hidden !important;
+}
+
+.xterm {
+    padding: 7px;
 }
 
 ::-webkit-scrollbar {

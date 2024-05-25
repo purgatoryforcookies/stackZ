@@ -78,14 +78,14 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
     }
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 relative min-w-[70%]">
             <Select
                 open={open}
                 onOpenChange={setOpen}
                 value={selected}
                 onValueChange={handleSelect}
             >
-                <SelectTrigger className="w-full sm:min-w-[8rem] min-w-[4rem] text-[0.8rem] h-8 p-[0.6rem] border-0 overflow-hidden text-ellipsis">
+                <SelectTrigger className="w-full sm:min-w-[8rem] min-w-[4rem] text-[0.8rem] h-8 p-[0.6rem] border-0 overflow-hidden text-ellipsis bg-card">
                     <SelectValue placeholder={'Git brances'} />
                 </SelectTrigger>
                 <SelectContent data-theme={theme.theme} className="sm:w-[100%] w-[80%]">
@@ -100,10 +100,12 @@ function BranchDropdown({ stack }: { stack: IUseStack }) {
                     </SelectGroup>
                 </SelectContent>
             </Select>
-            <ReloadIcon
-                onClick={handlePull}
-                className={`size-4 hover:cursor-pointer hover:scale-110 hover:text-violet-500 ${loading ? 'animate-spin' : ''}`}
-            />
+            <div>
+                <ReloadIcon
+                    onClick={handlePull}
+                    className={`size-4 hover:cursor-pointer hover:scale-110 hover:text-violet-500 ${loading ? 'animate-spin' : ''}`}
+                />
+            </div>
             <CustomToolTip message={`${errors}`} hidden={!errors}>
                 {errors ? (
                     <ExclamationTriangleIcon

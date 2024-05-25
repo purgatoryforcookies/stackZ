@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './@/ui/tabs'
 import { Resizable } from 're-resizable'
 import DockerStrip from './components/Common/DockerStrip'
 import useDocker from './hooks/useDocker'
+import NavBar from './components/Common/NavBar'
 
 type ThemeContextType = {
     theme?: string
@@ -44,7 +45,7 @@ function App(): JSX.Element {
 
     return (
         <ThemeContext.Provider value={{ theme, setTheme }}>
-            <div className="flex h-full w-full overflow-hidden bg-gradient" data-theme={theme}>
+            <div className="flex size-full overflow-hidden bg-gradient" data-theme={theme}>
                 <div className="flex flex-col overflow-hidden size-full relative">
                     {stack.terminals && !stack.loading ? (
                         <TerminalUI
@@ -74,22 +75,17 @@ function App(): JSX.Element {
                         <Tabs
                             defaultValue="environment"
                             data-theme={theme}
-                            className="text-primary-foreground h-full px-4 py-8"
+                            className="text-primary-foreground h-full px-4 pt-7"
                         >
                             <TabsList>
                                 <TabsTrigger value="environment">Environment</TabsTrigger>
-                                {/* <TabsTrigger value="monitor">Monitor</TabsTrigger> */}
                             </TabsList>
                             <TabsContent
                                 value="environment"
-                                className="pl-4 pt-5 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden"
+                                className="pl-6 pt-3 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden"
                             >
                                 <DetailHeader stack={stack} />
                             </TabsContent>
-                            {/* <TabsContent value="monitor" className="pl-4">
-                                <Ports />
-                                <p className='text-secondary-foreground'>Not available</p>
-                            </TabsContent> */}
                         </Tabs>
                     </Resizable>
                 </div>
@@ -110,7 +106,10 @@ function App(): JSX.Element {
                     }}
                 >
                     <CommandMenu stack={stack} toggle={toggle} docker={docker} />
-                    <Settings stack={stack} />
+
+                    <NavBar>
+                        <Settings stack={stack} />
+                    </NavBar>
 
                     {w ? (
                         <div className="text-secondary-foreground h-[calc(100%-70px)]">
