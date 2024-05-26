@@ -204,7 +204,7 @@ export class Terminal {
     }
 
     resize(dims: ITerminalDimensions) {
-        if (!dims || !this.isRunning) return
+        if (!dims) return
         try {
             this.ptyProcess?.resize(dims.cols, dims.rows)
         } catch {

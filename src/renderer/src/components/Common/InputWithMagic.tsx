@@ -46,7 +46,7 @@ function InputWithMagic({
         } else {
             setIsPending(false)
         }
-        // setSearchList([])
+        setSearchList([])
     }
 
     const handleListSelect = () => {
