@@ -37,15 +37,15 @@ function DetailHeader({ stack }: DetailHeaderProps) {
         <div className="flex gap-8 h-[calc(100%-70px)] " ref={bodyRef}>
             {status?.stackEnv
                 ? status.stackEnv
-                      .sort((a, b) => a.order - b.order)
-                      .map((record) => (
-                          <EnvList
-                              id={stack.selectedStack}
-                              data={record}
-                              key={record.title}
-                              socket={terminal.socket}
-                          />
-                      ))
+                    .sort((a, b) => a.order - b.order)
+                    .map((record) => (
+                        <EnvList
+                            id={stack.selectedStack}
+                            data={record}
+                            key={record.title}
+                            socket={terminal.socket}
+                        />
+                    ))
                 : null}
 
             {status?.stackEnv ? (
@@ -62,15 +62,15 @@ function DetailHeader({ stack }: DetailHeaderProps) {
 
             {status?.cmd.command.env
                 ? status.cmd.command.env
-                      .sort((a, b) => a.order - b.order)
-                      .map((record) => (
-                          <EnvList
-                              id={stack.selectedTerminal}
-                              data={record}
-                              key={record.title}
-                              socket={terminal.socket}
-                          />
-                      ))
+                    .sort((a, b) => a.order - b.order)
+                    .map((record) => (
+                        <EnvList
+                            id={stack.selectedTerminal}
+                            data={record}
+                            key={record.title}
+                            socket={terminal.socket}
+                        />
+                    ))
                 : null}
             <div className="p-11">
                 <NewEnvList scroll={scroll} terminal={terminal} stack={stack} />

@@ -134,7 +134,7 @@ export class Palette {
         if (payload?.id) {
             const existing = this.environment.retrieve(payload.id)
             if (existing) {
-                payload.command.env = existing
+                payload.command.env = JSON.parse(JSON.stringify(existing))
             }
         }
 
