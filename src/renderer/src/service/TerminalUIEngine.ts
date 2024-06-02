@@ -30,6 +30,7 @@ export class TerminalUIEngine {
     private hostdiv: HTMLElement
     private buffer: string
     private searchWord: string
+    ctrlCPassthrough: boolean = false
 
     constructor(stackId: string, terminalId: string, host: string) {
         this.fitAddon = new FitAddon()
@@ -119,6 +120,12 @@ export class TerminalUIEngine {
                 }
                 return false
             }
+            if (e.code === 'KeyC' && (e.metaKey || e.ctrlKey)) {
+                if (e.type === 'keyup') {
+                    this.copy()
+                }
+                return false
+            }
             return true
         })
     }
@@ -127,6 +134,20 @@ export class TerminalUIEngine {
         const clip = await navigator.clipboard.readText()
         this.sendInput(clip)
     }
+    async copy() {
+        if (this.ctrlCPassthrough) {
+            this.sendInput('\x03')
+            this.ctrlCPassthrough = false
+        } else {
+            const clip = this.terminal.getSelection()
+            navigator.clipboard.writeText(clip)
+            this.ctrlCPassthrough = true
+            setTimeout(() => {
+                this.ctrlCPassthrough = false
+            }, 300);
+        }
+    }
+
 
     ping() {
         this.socket.emit('state')

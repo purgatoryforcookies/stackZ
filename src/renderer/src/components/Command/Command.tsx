@@ -174,6 +174,12 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                             {ping.cmd.metaSettings?.sequencing ? (
                                 <PlayIcon className="h-4 w-4" />
                             ) : null}
+                            {ping.cmd.metaSettings?.ctrlc ? (
+                                <div className='flex relative'>
+                                    <p>ctrl</p>
+                                    <p className='absolute bottom-[7px] left-2'>+C</p>
+                                </div>
+                            ) : null}
                             {ping.cmd.metaSettings?.delay ? (
                                 <span className="flex relative">
                                     <TimerIcon
