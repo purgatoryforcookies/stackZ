@@ -47,6 +47,9 @@ export class DockerService {
         } catch (error) {
             this.errorCount += 1
             if (error instanceof Error) {
+                if (error.message.includes('ECONNREFUSED')) {
+                    return byProject
+                }
                 throw new DockerError(error.message)
             }
         }

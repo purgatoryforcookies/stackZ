@@ -18,6 +18,10 @@ export class YesSequencer {
     private sequence: CommandMetaSetting['sequencing']
     cache: string[] = []
     cacheLimit = 2
+
+    /**
+ * Registry contains stored steps from the stacks.json file.
+ */
     registry: Exclude<CommandMetaSetting['sequencing'], undefined>
     garbage: number[] = []
 
