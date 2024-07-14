@@ -90,6 +90,9 @@ export class Stack {
                     akw()
                 })
                 client.on('dockerContainers', async (akw) => {
+
+                    this.dockerService.reset()
+
                     try {
                         const containers = await this.dockerService.getContainers()
                         akw(JSON.stringify(Object.fromEntries(containers)))

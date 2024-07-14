@@ -1,7 +1,7 @@
 import { RefObject, useEffect, useState } from 'react'
 
 /**
- * Observes given element dimensions
+ * Observes given element dimensions without doing anything to them.
  * @returns w,h in pixels
  */
 export const useTaalasmaa = <T extends HTMLDivElement>(ref: RefObject<T>) => {

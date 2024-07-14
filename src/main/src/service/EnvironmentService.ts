@@ -1,13 +1,26 @@
 import { Environment } from '../../../types'
 import { envFactory, haveThesameElements } from '../util/util'
 
+
+// TODO: Remove the singleton pattern. it was a bad idea afterall.
+
+/**
+ * Environment service stores and keeps track of
+ * all the environments given stack or terminal can have.
+ * Each environment can consist of multiple sets of environment variable lists.
+ * Each list has an order, specifying its uniqueness in a given record
+ * and order its applied. 
+ * 
+ * When enviroment is baked, order determines it's precedence in the output.
+ * Higher the order, higher the priority of its keys.
+ */
 export class EnvironmentService {
     os: Environment[]
     public store: Map<string, Environment[]> = new Map()
     private static instance: EnvironmentService
 
     // @ts-ignore singleton
-    private constructor() {}
+    private constructor() { }
 
     public static get() {
         if (!EnvironmentService.instance) {
@@ -58,6 +71,10 @@ export class EnvironmentService {
             target.disabled.push(key)
         }
     }
+
+
+
+
     addOrder(id: string, title: string, variables: Record<string, string>) {
         if (!title) return
 
@@ -102,6 +119,9 @@ export class EnvironmentService {
 
     /**
      * Edits or adds a key-value pair to given set.
+     * 
+     * @param id Stack or terminal ID
+     * @param order Order of the environment
      */
     edit(id: string, order: number, value: string, key: string, prevKey?: string) {
         if (key.trim().length == 0) return
@@ -113,6 +133,25 @@ export class EnvironmentService {
             delete target.pairs[prevKey]
         }
         target.pairs[key] = value
+    }
+
+    /**
+     * Flush replaces the contents of an environment without changing its
+     * order or id. Useful for mass edits.
+     * 
+     * If no environment is provided, it resets the environment to be an
+     * empty environment. 
+     */
+    flush(id: string, order: number, env?: Record<string, string | undefined>) {
+        const target = this.store.get(id)?.find((list) => list.order === order)
+        if (!target) throw new Error('Editing failed. No environment found.')
+
+        if (!env) {
+            target.pairs = {}
+        } else {
+            target.pairs = env
+        }
+
     }
 
     remove(id: string, key: string, order: number) {
@@ -129,6 +168,12 @@ export class EnvironmentService {
         target.visualState = state
     }
 
+    /**
+     * Baking takes all the environments in a given terminal
+     * ands enumerates them to one single environment. 
+     * This action removes duplicated keys and muted variables.
+     * Dublicated key is always overwritten by the last key present.
+     */
     bake(id: string[], omitOS: boolean = false) {
         const reduced: Record<string, string | undefined> = {}
 

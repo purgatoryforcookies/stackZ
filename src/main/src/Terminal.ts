@@ -134,7 +134,7 @@ export class Terminal {
             }
 
             this.ptyProcess.onData((data) => {
-                this.sendToClient(data)
+                this.sendToClient(this.yesSequence.redactSecrets(data))
                 this.yesSequence.trace(data)
             })
             this.ptyProcess.onExit((data) => {
@@ -205,9 +205,10 @@ export class Terminal {
 
     resize(dims: ITerminalDimensions) {
         if (!dims) return
+        if (!this.isRunning) return
         try {
             this.ptyProcess?.resize(dims.cols, dims.rows)
-        } catch {
+        } catch (error) {
             console.log('[Warning:] Could not resize.')
         }
         this.rows = dims.rows
@@ -318,7 +319,6 @@ export class Terminal {
     }
 
     setMetaSettings(name: string, value: MetaSettingPayload) {
-        console.log(`Setting meta ${name} - ${value}`)
 
         if (!this.settings.metaSettings) {
             this.settings.metaSettings = {}
@@ -343,9 +343,11 @@ export class Terminal {
             this.settings.metaSettings.sequencing.map((item) => {
                 if (item.index !== value.index) return item
                 item.echo = value.echo
+                item.secret = value.secret
                 return item
             })
         } else {
+
             this.settings.metaSettings[name] = value
         }
 
@@ -396,17 +398,23 @@ export class Terminal {
             this.environment.remove(args.id || this.settings.id, args.value, args.order)
             this.ping()
         })
-        this.socket.on('environmentList', (args) => {
+        this.socket.on('environmentNewList', (args) => {
             if (!args.value) return
             const environment = parseBufferToEnvironment(args.fromFile)
             this.environment.addOrder(args.id || this.settings.id, args.value, environment)
             this.ping()
+
         })
-        this.socket.on('environmentEdit', (args) => {
-            const { order, value, key, previousKey } = args
-            this.environment.edit(args.id || this.settings.id, order, value, key, previousKey)
+        this.socket.on('environmentListEdit', (args) => {
+            if (!args.value) return
+            const environment = parseBufferToEnvironment(args.fromFile)
+
+            this.environment.flush(args.id || this.settings.id, args.order, environment)
             this.ping()
+
         })
+
+
         this.socket.on('environmentMute', (arg) => {
             this.environment.mute(arg.id || this.settings.id, arg.order, arg.value)
             this.ping()

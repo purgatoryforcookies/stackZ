@@ -89,7 +89,23 @@ export class HistoryService {
                 .split('\n')
                 .map((i) => i.replaceAll('\r', ''))
                 .map((i) => i.split(';', 2)[1])
-            const arrayedBash = resultbash.split('\n').map((i) => i.replaceAll('\r', ''))
+                .map((i) => {
+                    let newi = i
+                    while (newi.startsWith('cd ')) {
+                        newi = i.slice(3)
+                    }
+                    return newi
+                })
+            const arrayedBash = resultbash.split('\n')
+                .map((i) => i.replaceAll('\r', ''))
+                .map((i) => {
+                    let newi = i
+                    while (newi.startsWith('cd ')) {
+                        newi = i.slice(3)
+                    }
+                    return newi
+                })
+
             const combined = [...new Set(arrayedBash), ...new Set(arrayedZsh)]
             this.hostHistory = combined.filter((i) => i)
         } else {
@@ -100,7 +116,16 @@ export class HistoryService {
                 '\\ConsoleHost_history.txt'
             ]
             const result = await executeScript(command.join(''), 'powershell.exe')
-            const arrayed = result.split('\n').map((i) => i.replaceAll('\r', ''))
+            const arrayed = result.split('\n')
+                .map((i) => i.replaceAll('\r', ''))
+                .map((i) => {
+                    let newi = i
+                    while (newi.startsWith('cd ')) {
+                        newi = i.slice(3)
+                    }
+                    return newi
+                }).reverse()
+
             this.hostHistory = [...new Set(arrayed)]
         }
     }

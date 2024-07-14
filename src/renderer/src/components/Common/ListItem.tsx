@@ -1,11 +1,6 @@
-import { GoPlus } from 'react-icons/go'
-import { FormEvent, useState } from 'react'
-import { Input } from '@renderer/@/ui/input'
-import { Cross1Icon } from '@radix-ui/react-icons'
 import { CustomClientSocket } from '@t'
 
 type ListItemProps = {
-    newRecord: boolean
     orderId: number
     minimized: boolean
     socket: CustomClientSocket | undefined
@@ -14,108 +9,58 @@ type ListItemProps = {
 interface RecordProps extends ListItemProps {
     keyv?: string
     value?: string
-    editMode: boolean
     muted?: boolean
     highlight?: boolean
+    onDoubleClick?: () => void
     id: string
 }
 
 type FieldProps = {
     value?: string
-    disabled: boolean
-    onChange: (value: string) => void
     variant: 'primary' | 'secondary'
-    placeholder?: string
-    muted?: boolean
     minimized?: boolean
 }
 
 export const Field = ({
     value,
-    disabled,
-    onChange,
     variant,
-    placeholder,
     minimized
 }: FieldProps) => {
     const style = `rounded-full py-1
-    ${
-        variant === 'primary'
+    ${variant === 'primary'
             ? `px-3 text-secondary-foreground bg-transparent bg-[length:_150%_50%] ${minimized ? 'truncate' : ''}`
-            : `px-3  truncate text-primary-secondary bg-primary
+            : `px-3  truncate text-primary-foreground bg-primary
             }`
-    }`
+        }`
 
-    if (disabled) return <p className={style}>{value}</p>
+    return <p className={style}>{value}</p>
 
-    return (
-        <Input
-            type="text"
-            className={`${style} h-9 w-[20rem] ${variant === 'primary' ? 'pl-8' : ''}`}
-            onChange={(e) => onChange(e.target.value)}
-            defaultValue={value || ''}
-            placeholder={placeholder}
-            autoFocus={variant === 'primary' && !value}
-        />
-    )
 }
 
 /**
  * Component shows key-value pair in a single row.
- * Can edit and create new records.
+ * Can open editor on double click.
  *
- * Sends changes to server.
+ * Sends mute event to server to disable record.
  *
- * @param {boolean} editMode - Fields become input fields to enable editing
- * @param {boolean} newRecord - Renders a new empty record
  * @param {string} minimized - Renders without value field
  */
 const Record = ({
     socket,
     keyv,
     value,
-    editMode,
-    newRecord,
     orderId,
     minimized,
     muted,
+    onDoubleClick,
     id
 }: RecordProps) => {
-    const [newRecordOpen, setNewRecordOpen] = useState(false)
-    const [keyValue, setKeyValue] = useState<string | undefined>(keyv)
-    const [keyPreviousValue] = useState<string | undefined>(keyv)
-    const [valueValue, setValueValue] = useState<string | undefined>(value)
+
 
     const handleMute = () => {
-        if (editMode || !keyValue) return
         socket?.emit('environmentMute', {
-            value: keyValue,
+            value: keyv,
             order: orderId,
-            id: id
-        })
-    }
-
-    const handleEdits = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-
-        if (newRecordOpen && (!keyValue || !valueValue)) return
-        if (!keyValue || !valueValue) return
-        socket?.emit('environmentEdit', {
-            order: orderId,
-            key: keyValue,
-            previousKey: keyPreviousValue,
-            value: valueValue,
-            enabled: true,
-            id: id
-        })
-        setNewRecordOpen(false)
-    }
-
-    const handleDelete = () => {
-        if (!keyValue) return
-        socket?.emit('environmentDelete', {
-            order: orderId,
-            value: keyValue,
             id: id
         })
     }
@@ -124,46 +69,25 @@ const Record = ({
         <div
             className={`text-sm relative px-1 ${muted ? 'brightness-50' : ''}`}
             onContextMenu={handleMute}
+            onDoubleClick={onDoubleClick}
         >
-            {editMode && !newRecordOpen && !newRecord ? (
-                <Cross1Icon
-                    onClick={handleDelete}
-                    className="absolute left-[13px] top-[9px] w-4 h-4 hover:text-red-600 hover:cursor-pointer hover:scale-110"
+            <form
+                className="flex font-semibold justify-between hover:cursor-pointer rounded-full bg-muted"
+            >
+                <Field
+                    value={keyv}
+                    variant="primary"
+                    minimized={minimized}
                 />
-            ) : null}
-            {newRecord && !newRecordOpen ? (
-                <GoPlus
-                    size={20}
-                    onClick={() => setNewRecordOpen(!newRecordOpen)}
-                    className="flex justify-center items-center w-full mt-2 hover:cursor-pointer text-secondary-foreground"
-                />
-            ) : (
-                <form
-                    onSubmit={handleEdits}
-                    onBlur={handleEdits}
-                    className="flex font-semibold justify-between hover:cursor-pointer rounded-full bg-muted"
-                >
+                {!minimized ? (
                     <Field
-                        value={keyv}
-                        disabled={!editMode}
-                        onChange={setKeyValue}
-                        variant="primary"
-                        placeholder="KEY"
+                        value={value}
+                        variant="secondary"
                         minimized={minimized}
                     />
+                ) : null}
+            </form>
 
-                    {!minimized ? (
-                        <Field
-                            value={value}
-                            disabled={!editMode}
-                            onChange={setValueValue}
-                            muted={muted}
-                            variant="secondary"
-                            placeholder="VALUE"
-                        />
-                    ) : null}
-                </form>
-            )}
         </div>
     )
 }

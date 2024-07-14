@@ -3,6 +3,7 @@ import { useState } from 'react'
 /**
  * Hook for walking a list infinitely with arrow, pgup/pdgown, tab keys.
  * Enter fires all the functions provided.
+ * Return only ever 20 results at a time.
  *
  * @param list Array of elements
  * @param offset Offsets the current element selected
@@ -27,7 +28,7 @@ function useListWalker<T>(
         index + LIST_OFFSET > limit - 1 ? index + LIST_OFFSET - limit : index + LIST_OFFSET
 
     const infinityList = () => {
-        return [...list.slice(index), ...list.slice(0, index)]
+        return [...list.slice(index), ...list.slice(0, index)].slice(0, 20)
     }
 
     const update = (e: React.KeyboardEvent<HTMLInputElement>) => {

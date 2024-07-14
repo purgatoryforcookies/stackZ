@@ -18,6 +18,10 @@ export class DockerService {
         return this.errorCount > this.errorLimit
     }
 
+    reset() {
+        this.errorCount = 0
+    }
+
     async getContainers() {
         const byProject: Map<string, DockerContainer[]> = new Map()
 
@@ -47,6 +51,9 @@ export class DockerService {
         } catch (error) {
             this.errorCount += 1
             if (error instanceof Error) {
+                if (error.message.includes('ECONNREFUSED')) {
+                    return byProject
+                }
                 throw new DockerError(error.message)
             }
         }

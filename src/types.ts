@@ -40,7 +40,8 @@ export const stackSchema = z.array(
                                     z.object({
                                         index: z.number(),
                                         echo: z.string().optional(),
-                                        message: z.string().optional()
+                                        message: z.string().optional(),
+                                        secret: z.boolean().optional()
                                     })
                                 )
                                 .optional()
@@ -126,8 +127,14 @@ export interface ClientToServerEvents {
         callback: (data: HistoryBook) => void
     ) => void
 
-    environmentEdit: (args: EnvironmentEditProps) => void
-    environmentList: (args: {
+    environmentEditSingle: (args: EnvironmentEditProps) => void
+    environmentListEdit: (args: {
+        value: string
+        fromFile: ArrayBuffer | null
+        id?: string | null
+        order: number
+    }) => void
+    environmentNewList: (args: {
         value: string
         fromFile: ArrayBuffer | null
         id?: string | null
