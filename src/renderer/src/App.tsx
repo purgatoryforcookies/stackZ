@@ -9,7 +9,6 @@ import { useStack } from './hooks/useStack'
 import { createContext } from 'react'
 import { useResizable } from './hooks/useResizable'
 import BranchDropdown from './components/Common/BranchDropdown'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './@/ui/tabs'
 import { Resizable } from 're-resizable'
 import DockerStrip from './components/Common/DockerStrip'
 import useDocker from './hooks/useDocker'
@@ -72,23 +71,9 @@ function App(): JSX.Element {
                         }}
                     >
                         <DockerStrip docker={docker} />
-                        {/* <Tabs
-                            defaultValue="environment"
-                            data-theme={theme}
-                            className="text-primary-foreground h-full px-4 pt-7"
-                        >
-                            <TabsList>
-                                <TabsTrigger value="environment">Environment</TabsTrigger>
-                            </TabsList>
-                            <TabsContent
-                                value="environment"
-                                className="pl-6 pt-3 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden"
-                            > */}
-                        <div className='pl-10 pt-10 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden'>
+                        <div className='pl-10 mt-10 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden'>
                             <DetailHeader stack={stack} />
                         </div>
-                        {/* </TabsContent> */}
-                        {/* </Tabs> */}
                     </Resizable>
                 </div>
                 <Resizable

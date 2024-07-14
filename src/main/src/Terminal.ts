@@ -205,9 +205,10 @@ export class Terminal {
 
     resize(dims: ITerminalDimensions) {
         if (!dims) return
+        if (!this.isRunning) return
         try {
             this.ptyProcess?.resize(dims.cols, dims.rows)
-        } catch {
+        } catch (error) {
             console.log('[Warning:] Could not resize.')
         }
         this.rows = dims.rows

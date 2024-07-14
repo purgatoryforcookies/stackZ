@@ -75,6 +75,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                         defaultValue={settings?.cmd.command.cwd || ''}
                         valueKey="cwd"
                         historyKey="CWD"
+                        placeholder='/path/to/your/project'
                     />
 
                     <InputWithMagic
