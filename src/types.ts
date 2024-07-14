@@ -40,7 +40,8 @@ export const stackSchema = z.array(
                                     z.object({
                                         index: z.number(),
                                         echo: z.string().optional(),
-                                        message: z.string().optional()
+                                        message: z.string().optional(),
+                                        secret: z.boolean().optional()
                                     })
                                 )
                                 .optional()

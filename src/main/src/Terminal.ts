@@ -134,7 +134,7 @@ export class Terminal {
             }
 
             this.ptyProcess.onData((data) => {
-                this.sendToClient(data)
+                this.sendToClient(this.yesSequence.redactSecrets(data))
                 this.yesSequence.trace(data)
             })
             this.ptyProcess.onExit((data) => {
@@ -319,7 +319,6 @@ export class Terminal {
     }
 
     setMetaSettings(name: string, value: MetaSettingPayload) {
-        console.log(`Setting meta ${name} - ${value}`)
 
         if (!this.settings.metaSettings) {
             this.settings.metaSettings = {}
@@ -344,9 +343,11 @@ export class Terminal {
             this.settings.metaSettings.sequencing.map((item) => {
                 if (item.index !== value.index) return item
                 item.echo = value.echo
+                item.secret = value.secret
                 return item
             })
         } else {
+
             this.settings.metaSettings[name] = value
         }
 
