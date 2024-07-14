@@ -35,7 +35,7 @@ If rerun on exit is set, the terminal will always start again once it either exi
 
 Sending CTRL-C on exit is a feature to stop any other services you might be runnning withing your terminal session. For e.g. docker containers. If terminal process is exited with default SIGHUP (on posix machines), the docker container keeps running in the background.
 
-### Sequencing (in beta)
+### Sequencing
 
 In efforts to make running more complicated (and repetitive) tasks easy, stackZ offers a feature for sequencing user inputs to the terminal sessions. It is little similar to **[Linux yes(1)](https://man7.org/linux/man-pages/man1/yes.1.html)**, but with added control.
 
@@ -48,7 +48,7 @@ Start by enabling the feature, and then run the terminal process once. After, co
 :::note
 While line hints in the steps can provide helpful messages, they do not show the commands typed into the terminal session.
 
-StackZ does not, and will not, record any user input for these sequences while you set it up.
+Marking your step as a secret, prevents it from being printed in the console.
 :::
 
 The following rules apply:

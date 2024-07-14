@@ -210,7 +210,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                 <div className="h-2"></div>
 
                 <div>
-                    <h2 className="text-white/50 m-1 mb-3">In beta</h2>
+                    <h2 className="text-white/50 m-1 mb-3">Automation</h2>
                     <div className="h-4"></div>
 
                     <div className="flex items-center space-x-2 relative">

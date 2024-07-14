@@ -45,7 +45,7 @@ function Sequencing() {
                             </p>
                             <p className="">
                                 Each step is a command which should output a string when run in a
-                                shell specified by your terminal.
+                                shell.
                             </p>
                             <p className="text-red-500 pt-5">
                                 Keep in mind, values you fill in to the steps will be stored
