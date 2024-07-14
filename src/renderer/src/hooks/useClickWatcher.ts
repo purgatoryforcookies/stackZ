@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 /**
  * Fires all the functions when user clicks outside
- * of the element ref pointed element.
+ * of the ref pointed element.
  * @returns function for manual trigger
  */
 export const useClickWatcher = (

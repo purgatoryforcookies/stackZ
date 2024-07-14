@@ -18,6 +18,10 @@ export class DockerService {
         return this.errorCount > this.errorLimit
     }
 
+    reset() {
+        this.errorCount = 0
+    }
+
     async getContainers() {
         const byProject: Map<string, DockerContainer[]> = new Map()
 

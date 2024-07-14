@@ -126,8 +126,14 @@ export interface ClientToServerEvents {
         callback: (data: HistoryBook) => void
     ) => void
 
-    environmentEdit: (args: EnvironmentEditProps) => void
-    environmentList: (args: {
+    environmentEditSingle: (args: EnvironmentEditProps) => void
+    environmentListEdit: (args: {
+        value: string
+        fromFile: ArrayBuffer | null
+        id?: string | null
+        order: number
+    }) => void
+    environmentNewList: (args: {
         value: string
         fromFile: ArrayBuffer | null
         id?: string | null

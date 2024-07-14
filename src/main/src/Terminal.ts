@@ -396,17 +396,23 @@ export class Terminal {
             this.environment.remove(args.id || this.settings.id, args.value, args.order)
             this.ping()
         })
-        this.socket.on('environmentList', (args) => {
+        this.socket.on('environmentNewList', (args) => {
             if (!args.value) return
             const environment = parseBufferToEnvironment(args.fromFile)
             this.environment.addOrder(args.id || this.settings.id, args.value, environment)
             this.ping()
+
         })
-        this.socket.on('environmentEdit', (args) => {
-            const { order, value, key, previousKey } = args
-            this.environment.edit(args.id || this.settings.id, order, value, key, previousKey)
+        this.socket.on('environmentListEdit', (args) => {
+            if (!args.value) return
+            const environment = parseBufferToEnvironment(args.fromFile)
+
+            this.environment.flush(args.id || this.settings.id, args.order, environment)
             this.ping()
+
         })
+
+
         this.socket.on('environmentMute', (arg) => {
             this.environment.mute(arg.id || this.settings.id, arg.order, arg.value)
             this.ping()

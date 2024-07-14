@@ -72,7 +72,7 @@ function App(): JSX.Element {
                         }}
                     >
                         <DockerStrip docker={docker} />
-                        <Tabs
+                        {/* <Tabs
                             defaultValue="environment"
                             data-theme={theme}
                             className="text-primary-foreground h-full px-4 pt-7"
@@ -83,10 +83,12 @@ function App(): JSX.Element {
                             <TabsContent
                                 value="environment"
                                 className="pl-6 pt-3 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden"
-                            >
-                                <DetailHeader stack={stack} />
-                            </TabsContent>
-                        </Tabs>
+                            > */}
+                        <div className='pl-10 pt-10 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden'>
+                            <DetailHeader stack={stack} />
+                        </div>
+                        {/* </TabsContent> */}
+                        {/* </Tabs> */}
                     </Resizable>
                 </div>
                 <Resizable
@@ -115,8 +117,8 @@ function App(): JSX.Element {
                         <div className="text-secondary-foreground h-[calc(100%-70px)]">
                             <div
                                 className={`p-1 ${w < 450
-                                        ? 'flex flex-col-reverse justify-center items-center gap-2'
-                                        : 'sm:grid sm:grid-cols-3 sm:grid-rows-1 flex flex-col-reverse justify-center items-center gap-2'
+                                    ? 'flex flex-col-reverse justify-center items-center gap-2'
+                                    : 'sm:grid sm:grid-cols-3 sm:grid-rows-1 flex flex-col-reverse justify-center items-center gap-2'
                                     }`}
                             >
                                 <BranchDropdown stack={stack} />
