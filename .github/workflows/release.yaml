@@ -1,9 +1,9 @@
-name: Release on new merges to main
+name: Release on new merges to master
 
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
