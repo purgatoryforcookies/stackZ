@@ -1,5 +1,6 @@
 {
     "name": "stackz",
+    "version": "1.0.1",
     "private": true,
     "description": "Little helper for your environment setups.",
     "main": "./out/main/index.js",
