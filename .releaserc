@@ -19,6 +19,16 @@
                 ]
             }
         ],
-        "@semantic-release/github"
+        [
+            "@semantic-release/github",
+            {
+                "assets": [
+                    {
+                        "path": "./artifacts/*/**",
+                        "label": "Build files"
+                    }
+                ]
+            }
+        ]
     ]
 }
