@@ -39,23 +39,14 @@ jobs:
           path: ./dist/*${{ matrix.extension }}
   release:
     runs-on: ubuntu-latest
-    permissions: write-all
-    needs: build
+    environment:
+      name: ReleaseBot
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
         with:
-          path: artifacts/
-      - name: Get version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
-      - name: Create Release
-        id: create_release
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: ${{ steps.package-version.outputs.current-version}}
-          prerelease: false
-          files: ./artifacts/*/**
+          persist-credentials: false
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
