@@ -7,10 +7,6 @@ import { PaletteStack } from '../../../types'
  * DataStores job is to handle saving and loading the settings from a file.
  * Currently this is a json file.
  *
- * DataStore also can sync settings from a Palette, or a Stack.
- * When stacks and palettes are created from the source file,
- * their link breaks. Changes to palettes settings dont reflect to
- * source file without explicit sync.
  */
 export class DataStore {
     path: string
