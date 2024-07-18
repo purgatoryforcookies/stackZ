@@ -14,7 +14,7 @@ asarUnpack:
 win:
     executableName: Stack-z
 nsis:
-    artifactName: ${name}-${version}-${arch}.${ext}
+    artifactName: ${name}-${arch}.${ext}
     shortcutName: ${productName}
     uninstallDisplayName: ${productName}
     createDesktopShortcut: always
@@ -27,7 +27,7 @@ mac:
         - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
     notarize: false
 dmg:
-    artifactName: ${name}-${version}-${arch}.${ext}
+    artifactName: ${name}-${arch}.${ext}
 linux:
     target:
         - AppImage
@@ -35,7 +35,7 @@ linux:
         - deb
     category: Utility
 appImage:
-    artifactName: ${name}-${version}-${arch}.${ext}
+    artifactName: ${name}-${arch}.${ext}
 npmRebuild: false
 publish:
     provider: generic
