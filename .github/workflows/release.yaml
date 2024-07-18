@@ -1,9 +1,9 @@
 name: Release on new merges to main
 
 on:
-  pull_request:
-    branches: [master]
-    types: [closed]
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
