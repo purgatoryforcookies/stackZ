@@ -24,8 +24,7 @@
             {
                 "assets": [
                     {
-                        "path": "./artifacts/*/**",
-                        "label": "Build files"
+                        "path": "./artifacts/*/**"
                     }
                 ]
             }
