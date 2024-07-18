@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/purgatoryforcookies/stackZ/compare/v1.0.0...v1.0.1) (2024-07-18)
+
+
+### Bug Fixes
+
+* remove label from assets ([0d3232c](https://github.com/purgatoryforcookies/stackZ/commit/0d3232cd8f9950aef98f68c8f8a89a4fb3a9d16a))
+
 # 1.0.0 (2024-07-18)
 
 
