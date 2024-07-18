@@ -1,6 +1,7 @@
 {
     "name": "stackz",
     "version": "0.0.0",
+    "private": true,
     "description": "Little helper for your environment setups.",
     "main": "./out/main/index.js",
     "license": "GPL-3.0",
