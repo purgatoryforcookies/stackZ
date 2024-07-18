@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/purgatoryforcookies/stackZ/compare/v1.0.0...v1.0.1) (2024-07-18)
+
+
+### Bug Fixes
+
+* write package json version ([6ec113a](https://github.com/purgatoryforcookies/stackZ/commit/6ec113a12b7cca1a7bdbae93510e7fb607bab188))
+
 # 1.0.0 (2024-07-18)
 
 
