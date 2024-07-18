@@ -1,3 +1,12 @@
+# [1.1.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.0.1...v1.1.0) (2024-07-18)
+
+
+### Features
+
+* remove version name from builds due to semver bot ([0957b7d](https://github.com/purgatoryforcookies/stackZ/commit/0957b7df1714b8a2ec16694c4398573147ecd4b7))
+* test ([20c8987](https://github.com/purgatoryforcookies/stackZ/commit/20c8987636c5d50ebb3f52da4739499d1b5a150f))
+* test ([831867b](https://github.com/purgatoryforcookies/stackZ/commit/831867bc0fabc308cc5ca833d52b4eb4b48a14bc))
+
 ## [1.0.1](https://github.com/purgatoryforcookies/stackZ/compare/v1.0.0...v1.0.1) (2024-07-18)
 
 
