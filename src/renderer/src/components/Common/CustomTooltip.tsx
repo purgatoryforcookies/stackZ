@@ -14,7 +14,7 @@ export const CustomToolTip = ({
             <Tooltip>
                 <TooltipTrigger>{children}</TooltipTrigger>
                 {!hidden ? (
-                    <TooltipContent>
+                    <TooltipContent >
                         <p className="font-semibold text-[0.8rem]">{message}</p>
                     </TooltipContent>
                 ) : null}
