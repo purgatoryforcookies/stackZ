@@ -3,7 +3,6 @@ import Palette from './components/Palette'
 import DetailHeader from './components/DetailHeader/DetailHeader'
 import { useEffect, useState } from 'react'
 import { SOCKET_HOST } from './service/socket'
-import Settings from './components/settings/Settings'
 import { CommandMenu } from './components/Common/CommandMenu'
 import { useStack } from './hooks/useStack'
 import { createContext } from 'react'
@@ -93,10 +92,7 @@ function App(): JSX.Element {
                     }}
                 >
                     <CommandMenu stack={stack} toggle={toggle} docker={docker} />
-
-                    <NavBar>
-                        <Settings stack={stack} />
-                    </NavBar>
+                    <NavBar stack={stack} />
 
                     {w ? (
                         <div className="text-secondary-foreground h-[calc(100%-70px)]">

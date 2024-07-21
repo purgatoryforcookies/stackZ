@@ -6,10 +6,8 @@ import {
     SheetDescription,
     SheetFooter,
     SheetClose,
-    SheetTrigger
 } from '@renderer/@/ui/sheet'
 import { useContext, useEffect, useState } from 'react'
-import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { ThemeContext } from '@renderer/App'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@renderer/@/ui/tabs'
 import General from './General'
@@ -19,10 +17,12 @@ import packageJson from '../../../../../package.json'
 
 export type SettingsProps = {
     stack: IUseStack
+    open: boolean
+    setOpen: (open: boolean) => void
 }
 
-function Settings({ stack }: SettingsProps) {
-    const [open, setOpen] = useState<boolean>(false)
+function Settings({ stack, open, setOpen }: SettingsProps) {
+
     const [versions] = useState(window.electron.process.versions)
 
     const theme = useContext(ThemeContext)
@@ -46,9 +46,6 @@ function Settings({ stack }: SettingsProps) {
 
     return (
         <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-                <DotsHorizontalIcon className="size-5 text-primary/90 hidden sm:block" />
-            </SheetTrigger>
             <SheetContent
                 className="w-[32vw] min-w-[36rem] sm:max-w-none overflow-auto"
                 data-theme={theme.theme}

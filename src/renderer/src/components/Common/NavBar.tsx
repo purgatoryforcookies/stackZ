@@ -1,5 +1,8 @@
-import { Cross2Icon, QuestionMarkIcon, SquareIcon } from '@radix-ui/react-icons'
+import { Cross2Icon, DotsHorizontalIcon, QuestionMarkIcon, SquareIcon } from '@radix-ui/react-icons'
+import { IUseStack } from '@renderer/hooks/useStack'
 import { GoHorizontalRule } from 'react-icons/go'
+import Settings from '../settings/Settings'
+import { useState } from 'react'
 
 type ButtonWrapperProps = {
     children: React.ReactNode
@@ -12,15 +15,16 @@ const ButtonWrapper = ({ children, className, onClick }: ButtonWrapperProps) => 
         <div
             onClick={onClick}
             className={`h-full flex justify-center items-center w-10
-    hover:bg-accent hover:cursor-pointer ${className}`}
+    hover:bg-accent hover:cursor-pointer ${className || ''}`}
         >
             {children}
         </div>
     )
 }
 
-function NavBar({ children }: { children: React.ReactNode }) {
+function NavBar({ stack }: { stack: IUseStack }) {
     const platform = window.process.platform
+    const [settingsOpen, setSettingsOpen] = useState<boolean>(false)
 
     return (
         <div className="flex border-b-[1px] h-8 justify-end">
@@ -32,7 +36,9 @@ function NavBar({ children }: { children: React.ReactNode }) {
             >
                 <QuestionMarkIcon className="size-4 text-primary" />
             </ButtonWrapper>
-            <ButtonWrapper>{children}</ButtonWrapper>
+            <ButtonWrapper onClick={() => setSettingsOpen(true)}>
+                <DotsHorizontalIcon className="size-5 text-primary relative top-[1px]" />
+            </ButtonWrapper>
             {platform === 'win32' ? (
                 <>
                     <ButtonWrapper onClick={() => window.tools.minimize()}>
@@ -47,6 +53,7 @@ function NavBar({ children }: { children: React.ReactNode }) {
                 </>
             ) : null}
             <div className="navbarDragArea w-5 h-full"></div>
+            <Settings stack={stack} open={settingsOpen} setOpen={setSettingsOpen} />
         </div>
     )
 }
