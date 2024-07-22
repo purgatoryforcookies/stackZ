@@ -6,7 +6,7 @@ import { Badge } from '@renderer/@/ui/badge'
 import { CustomToolTip } from './CustomTooltip'
 import { GoInfo } from 'react-icons/go'
 import { Cmd, CustomClientSocket, Environment } from '@t'
-import EnvEditor from './EnvEditor'
+import EnvEditor from './EnvironmentEditor/EnvEditor'
 import { Button } from '@renderer/@/ui/button'
 
 type EnvListProps = {

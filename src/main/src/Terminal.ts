@@ -2,12 +2,13 @@ import {
     Cmd,
     CustomServerSocket,
     Environment,
+    EnvironmentSuggestions,
     HistoryKey,
     MetaSettingPayload,
     Status
 } from '../../types'
 import { spawn, IPty } from 'node-pty'
-import { bakeEnvironmentToString, parseBufferToEnvironment } from './util/util'
+import { bakeEnvironmentToString, executeScript, isAfile, parseBufferToEnvironment, resolveDefaultCwd, searchFiles } from './util/util'
 import path from 'path'
 import { ITerminalDimensions } from 'xterm-addon-fit'
 import { IPingFunction, ISaveFuntion } from './Palette'
@@ -117,7 +118,7 @@ export class Terminal {
                     shell === 'zsh' || shell === '/bin/zsh'
                         ? 'xterm-256color'
                         : `Palette ${this.settings.id}`,
-                cwd: this.settings.command.cwd,
+                cwd: this.settings.command.cwd || resolveDefaultCwd(),
                 env: this.environment.bake([this.stackId, this.settings.id]),
                 useConpty: false,
                 rows: this.rows,
@@ -405,12 +406,89 @@ export class Terminal {
             this.ping()
 
         })
-        this.socket.on('environmentListEdit', (args) => {
-            if (!args.value) return
-            const environment = parseBufferToEnvironment(args.fromFile)
+        this.socket.on('environmentListEdit', (args, akw) => {
+            try {
+                const environment = parseBufferToEnvironment(args.fromFile)
+                this.environment.flush(args.id || this.settings.id, args.order, environment)
+                this.ping()
+                akw(null)
+            } catch (error) {
+                akw(String(error))
+            }
+        })
+        this.socket.on('environmentListEditRemote', async (args, akw) => {
 
-            this.environment.flush(args.id || this.settings.id, args.order, environment)
+            const shell = this.win ? 'powershell.exe' : 'bin/bash'
+
+            try {
+                const func = args.source.split(' ')[0]
+                const script = this.win
+                    ? `Get-Command ${func}`
+                    : `which ${func}`
+                await executeScript(script, shell)
+            } catch (error) {
+                akw(String(error))
+            }
+
+
             this.ping()
+        })
+
+        this.socket.on('environmentSuggestions', async (akw) => {
+
+            const foundFiles = await searchFiles(this.settings.command.cwd || resolveDefaultCwd(), ['.env', '.md'])
+
+            const suggestions: EnvironmentSuggestions = {
+                files: foundFiles
+            }
+
+            akw(suggestions)
+        })
+
+        this.socket.on('environmentPreview', async (args, akw) => {
+
+
+            const isAProperFile = await isAfile(args.from)
+
+
+            if (!isAProperFile) {
+                try {
+                    const [raw, variables] = await this.environment.readFromService(args.from, this.win)
+                    const payload = {
+                        pairs: variables,
+                        unparsed: raw,
+                        isFile: isAProperFile
+                    }
+                    akw(payload)
+
+                } catch (error) {
+                    const payload = {
+                        pairs: null,
+                        unparsed: null,
+                        isFile: isAProperFile
+                    }
+                    akw(payload, String(error))
+                }
+                return
+            }
+
+            try {
+                const [raw, variables] = await this.environment.readFromFile(args.from)
+                const payload = {
+                    pairs: variables,
+                    unparsed: raw,
+                    isFile: isAProperFile
+                }
+                akw(payload)
+
+            } catch (error) {
+                const payload = {
+                    pairs: null,
+                    unparsed: null,
+                    isFile: isAProperFile
+                }
+                akw(payload, String(error))
+            }
 
         })
 
@@ -453,6 +531,8 @@ export class Terminal {
             }
             return
         })
+
+
         this.socket.emit('hello')
         this.stackPing()
     }

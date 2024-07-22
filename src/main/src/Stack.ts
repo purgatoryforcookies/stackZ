@@ -42,6 +42,7 @@ export class Stack {
             if (!stack.palette) return
             for (const palette of stack.palette) {
                 palette.id = uuidv4()
+
                 if (palette.executionOrder) return
                 const orders = stack.palette.map((pal) => pal.executionOrder || 0)
                 palette.executionOrder = (Math.max(...orders) ?? 1) + 1

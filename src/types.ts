@@ -17,7 +17,14 @@ export const stackSchema = z.array(
                     pairs: z.record(z.string().min(1), z.string().optional()),
                     title: z.string().min(1).default('Default'),
                     order: z.number().default(1),
-                    disabled: z.array(z.string())
+                    disabled: z.array(z.string()),
+                    visualState: z.enum(['0', '1', '2']).optional(),
+                    remote: z.object({
+                        type: z.enum(['file', 'service']),
+                        source: z.string(),
+                        keep: z.boolean().default(false),
+                        autoFresh: z.boolean().default(false)
+                    }).optional()
                 })
             )
             .optional(),
@@ -57,15 +64,19 @@ export const stackSchema = z.array(
                                     title: z.string().min(1).default('Default'),
                                     order: z.number().default(1),
                                     disabled: z.array(z.string()),
-                                    visualState: z.enum(['0', '1', '2']).optional()
+                                    visualState: z.enum(['0', '1', '2']).optional(),
+                                    remote: z.object({
+                                        type: z.enum(['file', 'service']),
+                                        source: z.string(),
+                                        keep: z.boolean().default(false),
+                                        autoFresh: z.boolean().default(false)
+                                    }).optional()
                                 })
-                            )
-                            .optional(),
+                            ).optional(),
                         cwd: z.string().optional()
                     })
                 })
-            )
-            .optional()
+            ).optional()
     })
 )
 
@@ -129,11 +140,17 @@ export interface ClientToServerEvents {
 
     environmentEditSingle: (args: EnvironmentEditProps) => void
     environmentListEdit: (args: {
-        value: string
         fromFile: ArrayBuffer | null
         id?: string | null
         order: number
-    }) => void
+    }, callback: (error: string | null) => void) => void
+    environmentListEditRemote: (args: {
+        source: string
+        keep: boolean
+        autoFresh: boolean
+        id?: string | null
+        order: number
+    }, callback: (error: string | null) => void) => void
     environmentNewList: (args: {
         value: string
         fromFile: ArrayBuffer | null
@@ -143,6 +160,9 @@ export interface ClientToServerEvents {
     environmentListDelete: (args: UtilityProps) => void
     environmentDelete: (args: UtilityProps) => void
     environmentVisualState: (args: UtilityProps) => void
+    environmentSuggestions: (callback: (data: EnvironmentSuggestions, err?: string) => void) => void
+    environmentPreview: (args: EnvironmentPreviewAction,
+        callback: (data: { pairs: Environment['pairs'] | null, unparsed: string | null, isFile: boolean }, err?: string) => void) => void
 
     commandMetaSetting: ChangeMetaSettingEvent
     commandHealthSetting: () => void
@@ -164,6 +184,7 @@ export interface ClientToServerEvents {
     dockerStop: (id: string, callback: (data: string, err?: string) => void) => void
     dockerStart: (id: string, callback: (data: string, err?: string) => void) => void
     dockerRemove: (id: string, callback: (data: string, err?: string) => void) => void
+
 }
 
 export type CustomServerSocket = Socket<ClientToServerEvents, ServerToClientEvents>
@@ -217,6 +238,16 @@ export type UpdateCwdProps = Pick<EnvironmentEditProps, 'order' | 'value'>
 export type RemoveEnvListProps = {
     terminal: string
     order: number
+}
+
+export type EnvironmentPreviewAction = {
+    from: string
+}
+
+
+
+export type EnvironmentSuggestions = {
+    files: string[]
 }
 
 export enum Panels {

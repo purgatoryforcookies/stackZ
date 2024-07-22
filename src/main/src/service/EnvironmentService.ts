@@ -1,15 +1,20 @@
 import { Environment } from '../../../types'
-import { envFactory, haveThesameElements } from '../util/util'
+import { envFactory, executeScript, haveThesameElements, parseBufferToEnvironment, readAnyFile } from '../util/util'
 
 
 // TODO: Remove the singleton pattern. it was a bad idea afterall.
+
+export const NAME_FOR_OS_ENV_SET = 'OS Environment'
 
 /**
  * Environment service stores and keeps track of
  * all the environments given stack or terminal can have.
  * Each environment can consist of multiple sets of environment variable lists.
  * Each list has an order, specifying its uniqueness in a given record
- * and order its applied. 
+ * and the order it is applied to.
+ * 
+ * Each set in an environment can be a local or a remote set. Local set's
+ * are stored in stacks.json and remote sets fetched on-the-fly.
  * 
  * When enviroment is baked, order determines it's precedence in the output.
  * Higher the order, higher the priority of its keys.
@@ -72,10 +77,7 @@ export class EnvironmentService {
         }
     }
 
-
-
-
-    addOrder(id: string, title: string, variables: Record<string, string>) {
+    addOrder(id: string, title: string, variables: Record<string, string | undefined>) {
         if (!title) return
 
         let target = this.store.get(id)
@@ -122,6 +124,8 @@ export class EnvironmentService {
      * 
      * @param id Stack or terminal ID
      * @param order Order of the environment
+     * @deprecated after 1.0.0. Editing local environments uses flush mainly due to the new environement
+     * editor and the ease of use of flush. 
      */
     edit(id: string, order: number, value: string, key: string, prevKey?: string) {
         if (key.trim().length == 0) return
@@ -151,7 +155,6 @@ export class EnvironmentService {
         } else {
             target.pairs = env
         }
-
     }
 
     remove(id: string, key: string, order: number) {
@@ -170,7 +173,7 @@ export class EnvironmentService {
 
     /**
      * Baking takes all the environments in a given terminal
-     * ands enumerates them to one single environment. 
+     * and enumerates them to one single environment. 
      * This action removes duplicated keys and muted variables.
      * Dublicated key is always overwritten by the last key present.
      */
@@ -184,7 +187,7 @@ export class EnvironmentService {
             environment
                 .sort((a, b) => a.order - b.order)
                 .forEach((envSet) => {
-                    if (omitOS && envSet.title === 'OS Environment') return
+                    if (omitOS && envSet.title === NAME_FOR_OS_ENV_SET) return
 
                     Object.keys(envSet.pairs).forEach((key) => {
                         if (envSet.disabled.includes(key)) return
@@ -195,4 +198,33 @@ export class EnvironmentService {
 
         return reduced
     }
+
+    /**
+     * Reads any file and returns an environment with raw string before parsing.
+     * 
+     * Throws if data cannot be read or if data cannot be converted to buffer.
+     */
+    async readFromFile(path: string):
+        Promise<[string, Record<string, string | undefined>]> {
+        const data = await readAnyFile(path)
+        const buffer = new TextEncoder().encode(data)
+        return [data, parseBufferToEnvironment(buffer)]
+    }
+
+    /**
+     * Attempts to read key value data from a service with exec().
+     * Converts it to an environment and returns it with raw string before parsing.
+     * 
+     * Throws if command exits with an error or its output cannot be converted to a buffer.
+     */
+    async readFromService(command: string, isWin: boolean):
+        Promise<[string, Record<string, string | undefined>]> {
+
+        const shell = isWin ? 'powershell.exe' : 'bin/bash'
+        const data = await executeScript(command, shell, false)
+        const buffer = new TextEncoder().encode(data)
+        return [data, parseBufferToEnvironment(buffer)]
+
+    }
+
 }

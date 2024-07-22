@@ -82,8 +82,8 @@ export class HistoryService {
 
     async loadHostHistory() {
         if (process.platform !== 'win32') {
-            const resultzsh = await executeScript('cat ~/.zsh_history', '/bin/bash')
-            const resultbash = await executeScript('cat ~/.bash_history', '/bin/bash')
+            const resultzsh = await executeScript('cat ~/.zsh_history', '/bin/bash', true)
+            const resultbash = await executeScript('cat ~/.bash_history', '/bin/bash', true)
 
             const arrayedZsh = resultzsh
                 .split('\n')
@@ -115,7 +115,7 @@ export class HistoryService {
                 '\\Windows\\PowerShell\\PSReadLine',
                 '\\ConsoleHost_history.txt'
             ]
-            const result = await executeScript(command.join(''), 'powershell.exe')
+            const result = await executeScript(command.join(''), 'powershell.exe', true)
             const arrayed = result.split('\n')
                 .map((i) => i.replaceAll('\r', ''))
                 .map((i) => {
