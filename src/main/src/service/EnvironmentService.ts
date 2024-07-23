@@ -113,7 +113,16 @@ export class EnvironmentService {
         const newTarget = target
             .filter((env) => env.order !== order)
             .map((item, i) => {
-                item.order = i
+                /**
+                 * Remapping orders after delete.
+                 * Order number 0 is reserved for OS.
+                 */
+                if (item.order === 0) return item
+
+                /**
+                 * +1 because index of 0 would go for OS
+                 */
+                item.order = i + 1
                 return item
             })
 
