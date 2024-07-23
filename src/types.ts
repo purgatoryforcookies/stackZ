@@ -22,7 +22,7 @@ export const stackSchema = z.array(
                     remote: z.object({
                         source: z.string(),
                         keep: z.boolean().default(false),
-                        autoFresh: z.boolean().default(false)
+                        autoFresh: z.boolean().default(false),
                     }).optional()
                 })
             )
@@ -67,7 +67,7 @@ export const stackSchema = z.array(
                                     remote: z.object({
                                         source: z.string(),
                                         keep: z.boolean().default(false),
-                                        autoFresh: z.boolean().default(false)
+                                        autoFresh: z.boolean().default(false),
                                     }).optional()
                                 })
                             ).optional(),
@@ -84,6 +84,7 @@ export type Cmd = Exclude<PaletteStack['palette'], undefined>[0]
 export type Environment = Exclude<Cmd['command']['env'], undefined>[0]
 export type CommandMetaSetting = Exclude<Cmd['metaSettings'], undefined>
 export type EnginedCmd = Cmd & { engine: TerminalUIEngine }
+
 
 export type RecursivePartial<T> = {
     [P in keyof T]?: RecursivePartial<T[P]>
@@ -103,6 +104,7 @@ export interface ServerToClientEvents {
     badgeHeartBeat: (state: StackStatus) => void
     haltBeat: (beat: boolean) => void
     heartBeat: (beat: number | undefined) => void
+    environmentHeartbeat: (args: { loading: boolean, id: string, order: number, error: string | null }) => void
     terminalState: (state: Status) => void
     output: (data: string) => void
     terminalDelete: (args: { stack: string; terminal: string }) => void
@@ -157,6 +159,7 @@ export interface ClientToServerEvents {
     environmentMute: (arg: UtilityProps) => void
     environmentListDelete: (args: UtilityProps) => void
     environmentDelete: (args: UtilityProps) => void
+    environmentListRefresh: (args: UtilityProps, callback: (error?: string | null) => void) => void
     environmentVisualState: (args: UtilityProps) => void
     environmentSuggestions: (callback: (data: EnvironmentSuggestions, err?: string) => void) => void
     environmentPreview: (args: EnvironmentPreviewAction,

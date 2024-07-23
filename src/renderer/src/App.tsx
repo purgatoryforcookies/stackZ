@@ -70,7 +70,7 @@ function App(): JSX.Element {
                         }}
                     >
                         <DockerStrip docker={docker} />
-                        <div className='pl-10 mt-10 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden'>
+                        <div className='pl-10 pt-10 h-full overflow-x-auto overflow-y-hidden'>
                             <DetailHeader stack={stack} />
                         </div>
                     </Resizable>

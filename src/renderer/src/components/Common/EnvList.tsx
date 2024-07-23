@@ -6,8 +6,9 @@ import { Badge } from '@renderer/@/ui/badge'
 import { CustomToolTip } from './CustomTooltip'
 import { GoInfo } from 'react-icons/go'
 import { Cmd, CustomClientSocket, Environment } from '@t'
-import EnvEditor from './EnvironmentEditor/EnvEditor'
+import EnvEditor, { NAME_FOR_OS_ENV_SET } from './EnvironmentEditor/EnvEditor'
 import { Button } from '@renderer/@/ui/button'
+import RadioEnvironmentTools from './RadioEnvironmentTools'
 
 type EnvListProps = {
     data: Exclude<Cmd['command']['env'], undefined>[0]
@@ -16,9 +17,10 @@ type EnvListProps = {
 }
 
 function EnvList({ data, socket, id }: EnvListProps) {
-    const [minimized, setMinimized] = useState<boolean>(true)
-    const [hidden, setHidden] = useState<boolean>(true)
+    const [minimized, setMinimized] = useState(true)
+    const [hidden, setHidden] = useState(true)
     const [editorOpen, setEditorOpen] = useState(false)
+
 
     const handleMute = () => {
         socket.emit('environmentMute', {
@@ -34,6 +36,8 @@ function EnvList({ data, socket, id }: EnvListProps) {
             value: state
         })
     }
+
+
 
     const handleMinimize = () => {
         if (!minimized) {
@@ -52,7 +56,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
     }
 
     useEffect(() => {
-        if (data.title === 'OS Environment' && !data.visualState) {
+        if (data.title === NAME_FOR_OS_ENV_SET && !data.visualState) {
             setHidden(true)
             setMinimized(true)
             return
@@ -71,6 +75,10 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 setHidden(true)
                 setMinimized(true)
                 break
+            default:
+                setHidden(true)
+                setMinimized(true)
+                break
         }
     }, [data])
 
@@ -82,10 +90,10 @@ function EnvList({ data, socket, id }: EnvListProps) {
     }
 
     return (
-        <div className={`${minimized ? '' : 'max-w-[35rem]'} mb-10`}>
+        <div className={`${minimized ? '' : 'max-w-[35rem]'} h-[calc(100%-120px)]`}>
             <EnvEditor setOpen={setEditorOpen} editorOpen={editorOpen} data={data} socket={socket} id={id} />
             <div className="flex justify-center cursor-pointer" onClick={() => setEditorOpen(true)}>
-                {data.title === 'OS Environment' ? (
+                {data.title === NAME_FOR_OS_ENV_SET ? (
                     <CustomToolTip message="This environment is editable, but not persistent.">
                         <h1 className="text-center text-foreground text-nowrap flex items-center gap-1">
                             {data.title} <GoInfo className="w-4 h-4 text-white/50" />
@@ -123,7 +131,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 />
             </div>
             {hidden ? (
-                <div className="flex flex-col justify-center items-center pt-10 text-white/40">
+                <div className="flex flex-col justify-center items-center pt-10 text-white/40 h-full">
                     <h2 className="text-2xl">
                         {Object.keys(data.pairs).length}{' '}
                         <span className="text-base">variables</span>
@@ -134,9 +142,9 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 </div>
             ) : (
                 <div
-                    className="flex flex-col gap-1 overflow-auto h-full py-2"
-                    style={{ scrollbarGutter: 'stable' }}
-                >
+                    className="flex flex-col gap-1 overflow-auto py-2 h-full relative"
+                    style={{ scrollbarGutter: 'stable' }}>
+
                     {Object.keys(data.pairs).length > 0
                         ? Object.keys(data.pairs).map((key: string) => (
                             <Record
@@ -161,6 +169,12 @@ function EnvList({ data, socket, id }: EnvListProps) {
                     }
                 </div>
             )}
+            {data.remote ?
+                <RadioEnvironmentTools
+                    data={data}
+                    socket={socket}
+                    id={id} />
+                : null}
         </div>
     )
 }

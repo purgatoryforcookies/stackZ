@@ -1,8 +1,6 @@
-import { Environment, EnvironmentFlushOptions } from '../../../types'
+import { CustomServer, Environment, EnvironmentFlushOptions } from '../../../types'
 import { envFactory, executeScript, haveThesameElements, isAfile, parseBufferToEnvironment, readAnyFile } from '../util/util'
 
-
-// TODO: Remove the singleton pattern. it was a bad idea afterall.
 
 export const NAME_FOR_OS_ENV_SET = 'OS Environment'
 
@@ -16,32 +14,28 @@ export const NAME_FOR_OS_ENV_SET = 'OS Environment'
  * Each set in an environment can be a local or a remote set. Local set's
  * are stored in stacks.json and remote sets fetched on-the-fly.
  * 
+ * 
  * When enviroment is baked, order determines it's precedence in the output.
  * Higher the order, higher the priority of its keys.
  */
 export class EnvironmentService {
     public store: Map<string, Environment[]> = new Map()
-    private static instance: EnvironmentService
     private isWin: boolean = process.platform === 'win32'
+    private server: CustomServer
 
-    // @ts-ignore singleton
-    private constructor() { }
 
-    public static get() {
-        if (!EnvironmentService.instance) {
-            EnvironmentService.instance = new EnvironmentService()
-        }
-        return EnvironmentService.instance
+    constructor(server: CustomServer) {
+        this.server = server
     }
 
     register(id: string, env?: Environment[], omitOS = false) {
         if (omitOS) {
             if (!env) return
             this.store.set(id, env)
-            return
+        } else {
+            const hostBakedIn = envFactory(env)
+            this.store.set(id, hostBakedIn)
         }
-        const hostBakedIn = envFactory(env)
-        this.store.set(id, hostBakedIn)
     }
 
     unregister(id: string) {
@@ -159,18 +153,61 @@ export class EnvironmentService {
         if (!target) throw new Error('Refresh failed. No environment found.')
         if (!target.remote) throw new Error('Refresh failed. This is not a remote environment.')
 
-        const isFileInSystem = await isAfile(target.remote.source)
+        this.broadcastLoading(id, order, true, null)
 
-        if (isFileInSystem) {
-            const [_raw, variables] = await this.readFromFile(target.remote.source)
-            target.pairs = variables
-        } else {
-            const [_raw, variables] = await this.readFromService(target.remote.source)
-            target.pairs = variables
+        try {
+            const isFileInSystem = await isAfile(target.remote.source)
+
+            if (isFileInSystem) {
+                const [_raw, variables] = await this.readFromFile(target.remote.source)
+                target.pairs = variables
+            } else {
+                const [_raw, variables] = await this.readFromService(target.remote.source)
+                target.pairs = variables
+            }
+
+        } catch (error) {
+            this.broadcastLoading(id, order, false, String(error))
+            throw error
         }
+
+        this.broadcastLoading(id, order, false, null)
 
     }
 
+    async refresAllRemotes(id: string) {
+        const target = this.store.get(id)
+        if (!target) throw new Error('Refresh failed. No environment found.')
+
+        target.forEach(environment => {
+            if (environment.remote) {
+                this.refreshRemote(id, environment.order)
+            }
+        })
+
+    }
+
+    private broadcastLoading(id: string, order: number, status: boolean, error: string | null) {
+        if (status) {
+
+            this.server.emit('environmentHeartbeat', {
+                loading: status,
+                id: id,
+                order: order,
+                error: error
+            })
+        }
+        else {
+            setTimeout(() => {
+                this.server.emit('environmentHeartbeat', {
+                    loading: status,
+                    id: id,
+                    order: order,
+                    error: error
+                })
+            }, 1200);
+        }
+    }
 
     /**
      * Flush replaces the contents of an environment without changing its

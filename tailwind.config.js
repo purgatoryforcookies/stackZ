@@ -78,12 +78,20 @@ module.exports = {
                 border: {
                     '0%, 100%': { backgroundPosition: '0% 50%' },
                     '50%': { backgroundPosition: '90% 50%' }
+                },
+                'border-left-to-right': {
+                    '0%': { left: '-96%' },
+                    '50%': { left: '96%' },
+                    '100%': { left: '-96%' },
                 }
             },
             animation: {
                 'accordion-down': 'accordion-down 0.2s ease-out',
                 'accordion-up': 'accordion-up 0.2s ease-out',
-                border: 'border 5s ease-in infinite'
+                border: 'border 5s ease-in infinite',
+                'border-linear': 'border-left-to-right 3s ease-in-out infinite'
+
+
             },
             transitionProperty: {
                 height: 'height',

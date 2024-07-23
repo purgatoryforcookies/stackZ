@@ -24,6 +24,7 @@ function RemoteEnvEditor({ socket, data, id, setOpen }: RemoteEnvEditorProps) {
     const [input, setInput] = useState<string>(data.remote?.source || '')
     const [synced, setSynced] = useState<boolean>(data.remote?.autoFresh || false)
     const [offlineMode, setOfflineMode] = useState<boolean>(data.remote?.keep || false)
+    const [loadingPreview, setLoadingPreview] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
 
     const getPreview = (path: string, run?: boolean) => {
@@ -31,7 +32,7 @@ function RemoteEnvEditor({ socket, data, id, setOpen }: RemoteEnvEditorProps) {
         setPreviewText('')
         setUnparsedText('')
         if (!run) return
-        setLoading(true)
+        setLoadingPreview(true)
         socket.emit('environmentPreview',
             { from: path }, (data, error) => {
                 const pairs = data.pairs
@@ -50,11 +51,12 @@ function RemoteEnvEditor({ socket, data, id, setOpen }: RemoteEnvEditorProps) {
                     setPreviewText(existingText)
                     setUnparsedText(data.unparsed || 'No content found')
                 }
-                setLoading(false)
+                setLoadingPreview(false)
             })
     }
 
     const handleSave = () => {
+        setLoading(true)
         socket.emit('environmentListEditRemote', {
             order: data.order,
             id: id,
@@ -62,17 +64,16 @@ function RemoteEnvEditor({ socket, data, id, setOpen }: RemoteEnvEditorProps) {
             autoFresh: synced,
             keep: offlineMode
         }, (error) => {
+            setLoading(false)
             if (error) {
                 setPreviewText(error)
             }
             else {
                 setOpen(false)
             }
+
         })
     }
-
-
-
 
     return (
         <>
@@ -88,7 +89,11 @@ function RemoteEnvEditor({ socket, data, id, setOpen }: RemoteEnvEditorProps) {
 
                 </div>
                 <div className="col-start-1 row-start-3 pr-5">
-                    <form onSubmit={() => getPreview(input, true)}>
+                    <form onSubmit={(e) => {
+                        e.preventDefault()
+                        getPreview(input, true)
+
+                    }}>
 
                         <Input placeholder="File path | command"
                             className="text-ellipsis"
@@ -99,7 +104,7 @@ function RemoteEnvEditor({ socket, data, id, setOpen }: RemoteEnvEditorProps) {
                             type="submit"
                             className="mt-4 float-right mr-2 w-20"
                             disabled={input.length === 0 || loading}
-                        >{!loading ? "Preview" :
+                        >{!loadingPreview ? "Preview" :
                             <ReloadIcon
                                 className={`size-4 animate-spin`}
                             />
@@ -177,9 +182,15 @@ function RemoteEnvEditor({ socket, data, id, setOpen }: RemoteEnvEditorProps) {
             <Button
                 onClick={handleSave}
                 className="mt-4 w-full"
-                disabled={loading || input.length === 0 ||
+                disabled={loadingPreview || input.length === 0 ||
                     (input === data.remote?.source && synced === data.remote?.autoFresh && offlineMode === data.remote?.keep)}
-            >Save</Button>
+            >{!loading ? "Save" :
+                <div>
+                    <ReloadIcon
+                        className={`size-4 h-5 animate-spin`}
+                    />
+                </div>
+                }</Button>
         </>
     )
 }

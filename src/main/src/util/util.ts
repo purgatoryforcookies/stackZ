@@ -100,13 +100,11 @@ export const envFactory = (args: Environment[] | undefined) => {
 
     if (!args) return [hostEnv]
 
-    let allenvs = args.map((obj) => ({ ...obj, disabled: [] })) as Environment[]
+    const newEnvs = args.filter(item => item.title !== NAME_FOR_OS_ENV_SET)
 
-    if (args.findIndex((item) => item.title === NAME_FOR_OS_ENV_SET) === -1) {
-        allenvs = allenvs.concat(hostEnv)
-    }
+    return newEnvs.concat(hostEnv)
 
-    return allenvs
+
 }
 
 export const mapEnvs = (obj: Environment[]) => {

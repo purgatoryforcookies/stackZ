@@ -37,7 +37,8 @@ export class Palette {
         settings: PaletteStack,
         server: Server,
         save: ISaveFuntion,
-        history: HistoryService
+        history: HistoryService,
+        environment: EnvironmentService
     ) {
         this.settings = settings
         this.terminals = new Map<string, Terminal>()
@@ -48,7 +49,7 @@ export class Palette {
         this.history = history
         this.git = new GitService(this.settings.defaultCwd)
 
-        this.environment = EnvironmentService.get()
+        this.environment = environment
         this.environment.register(this.settings.id, this.settings.env, true)
     }
 
@@ -62,7 +63,8 @@ export class Palette {
                 socket,
                 this.pingState.bind(this),
                 this.save,
-                this.history
+                this.history,
+                this.environment
             )
             this.terminals.set(terminal.id, newTerminal)
             newTerminal.ping()
@@ -132,9 +134,9 @@ export class Palette {
 
         //If it has an id, it is an existing one and this is a copy process
         if (payload?.id) {
-            const existing = this.environment.retrieve(payload.id)
+            const existing = this.environment.getCopy(payload.id)
             if (existing) {
-                payload.command.env = JSON.parse(JSON.stringify(existing))
+                payload.command.env = existing
             }
         }
 

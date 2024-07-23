@@ -30,7 +30,7 @@ export class Stack {
         this.palettes = new Map<string, Palette>()
         this.scheduler = new Map<string, TerminalScheduler>()
         this.history = new HistoryService()
-        this.environment = EnvironmentService.get()
+        this.environment = new EnvironmentService(server)
         this.dockerService = new DockerService()
     }
 
@@ -38,7 +38,6 @@ export class Stack {
         this.raw = await this.store.load()
         for (const stack of this.raw) {
             stack.id = uuidv4()
-
             if (!stack.palette) return
             for (const palette of stack.palette) {
                 palette.id = uuidv4()
@@ -46,6 +45,7 @@ export class Stack {
                 if (palette.executionOrder) return
                 const orders = stack.palette.map((pal) => pal.executionOrder || 0)
                 palette.executionOrder = (Math.max(...orders) ?? 1) + 1
+
             }
         }
         return this
@@ -59,7 +59,7 @@ export class Stack {
                 }
                 this.palettes.set(
                     palette.id,
-                    new Palette(palette, this.server, this.save.bind(this), this.history)
+                    new Palette(palette, this.server, this.save.bind(this), this.history, this.environment)
                 )
             }
         }
@@ -220,7 +220,7 @@ export class Stack {
         this.raw.push(newOne)
         this.palettes.set(
             newOne.id,
-            new Palette(newOne, this.server, this.save.bind(this), this.history)
+            new Palette(newOne, this.server, this.save.bind(this), this.history, this.environment)
         )
         this.save()
         return newOne
@@ -238,7 +238,7 @@ export class Stack {
      * OS Environments from the commands.
      * 
      * Save also makes sure no remote environments pairs are kept in stacks.json
-     * if remote.keep is false.
+     * if remote.keep is set to false.
      *
      * The OS Envs get repopulated at each save thus making them not persistent
      * (which is a good thing)
@@ -251,19 +251,25 @@ export class Stack {
             stack.env = this.environment.getCopy(stack.id)
 
             stack.env?.forEach(environment => {
+
+                // Remove any remote envs if we dont want to keep them
                 if (!environment.remote?.keep && environment.order !== 0) {
                     environment.pairs = {}
                 }
+
             })
 
             stack.palette?.forEach((pal) => {
                 pal.command.env = this.environment.getCopy(pal.id)
                 pal.command.env?.forEach(environment => {
-                    if (!environment.remote?.keep && environment.order !== 0) {
+
+                    // Remove any remote envs if we dont want to keep them
+                    if (environment.remote && !environment.remote.keep && environment.order !== 0) {
                         environment.pairs = {}
                     }
-                })
 
+                })
+                // Remove OS Environment
                 pal.command.env = pal.command.env?.filter((o) => o.order > 0)
             })
         })

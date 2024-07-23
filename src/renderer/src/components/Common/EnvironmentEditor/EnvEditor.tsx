@@ -16,7 +16,7 @@ type EnvEditorProps = {
     socket: CustomClientSocket
     id: string
 }
-
+export const NAME_FOR_OS_ENV_SET = 'OS Environment'
 
 /**
  * Editorbody for local and remote environment editing.
@@ -43,7 +43,10 @@ function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
                     <DialogTitle>Environment editor</DialogTitle>
                     <DialogDescription>{data.title}</DialogDescription>
                     <div className="w-full flex justify-end gap-2 items-center h-7">
-                        <Switch id="integrated" onCheckedChange={setRemote} checked={remote} />
+                        <Switch id="integrated"
+                            onCheckedChange={setRemote}
+                            checked={remote}
+                            disabled={data.title === NAME_FOR_OS_ENV_SET} />
                         <Label htmlFor="integrated">Remote</Label>
                     </div>
                 </DialogHeader>

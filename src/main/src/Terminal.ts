@@ -44,7 +44,8 @@ export class Terminal {
         socket: CustomServerSocket,
         stackPing: IPingFunction,
         save: ISaveFuntion,
-        history: HistoryService
+        history: HistoryService,
+        environment: EnvironmentService
     ) {
         this.settings = cmd
         this.stackId = stackId
@@ -60,8 +61,9 @@ export class Terminal {
         this.yesSequence = new YesSequencer()
         this.counter = 0
 
-        this.environment = EnvironmentService.get()
+        this.environment = environment
         this.environment.register(this.settings.id, this.settings.command.env)
+        this.environment.refresAllRemotes(this.settings.id)
     }
 
     chooseShell(shell?: string) {
@@ -395,6 +397,18 @@ export class Terminal {
 
         this.socket.on('environmentListDelete', (args) => {
             this.environment.removeViaOrder(args.id || this.settings.id, args.order)
+            this.ping()
+        })
+        this.socket.on('environmentListRefresh', async (args, akw) => {
+            console.log(this.settings.title, args.order, "Asked for refresh")
+            try {
+                await this.environment.refreshRemote(args.id || this.settings.id, args.order)
+                akw(null)
+            } catch (error) {
+                console.log("Remote refresh failed: ", error)
+                akw('Remote failed')
+            }
+
             this.ping()
         })
         this.socket.on('environmentDelete', (args) => {
