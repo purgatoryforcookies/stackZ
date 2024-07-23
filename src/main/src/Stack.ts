@@ -236,6 +236,9 @@ export class Stack {
     /**
      * Save takes a deepcopy of the stack and filters out any
      * OS Environments from the commands.
+     * 
+     * Save also makes sure no remote environments pairs are kept in stacks.json
+     * if remote.keep is false.
      *
      * The OS Envs get repopulated at each save thus making them not persistent
      * (which is a good thing)
@@ -245,9 +248,22 @@ export class Stack {
         const toBeSaved: PaletteStack[] = JSON.parse(JSON.stringify(this.raw))
 
         toBeSaved.forEach((stack) => {
-            stack.env = this.environment.store.get(stack.id)
+            stack.env = this.environment.getCopy(stack.id)
+
+            stack.env?.forEach(environment => {
+                if (!environment.remote?.keep && environment.order !== 0) {
+                    environment.pairs = {}
+                }
+            })
+
             stack.palette?.forEach((pal) => {
-                pal.command.env = this.environment.store.get(pal.id)
+                pal.command.env = this.environment.getCopy(pal.id)
+                pal.command.env?.forEach(environment => {
+                    if (!environment.remote?.keep && environment.order !== 0) {
+                        environment.pairs = {}
+                    }
+                })
+
                 pal.command.env = pal.command.env?.filter((o) => o.order > 0)
             })
         })

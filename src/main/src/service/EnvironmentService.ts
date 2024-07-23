@@ -48,6 +48,12 @@ export class EnvironmentService {
         this.store.delete(id)
     }
 
+    getCopy(id: string) {
+        const target = this.store.get(id)
+        if (!target) return
+        return JSON.parse(JSON.stringify(target))
+    }
+
     get(id: string, omitOS: boolean = true) {
         const existing = this.store.get(id)
         if (!existing) return
