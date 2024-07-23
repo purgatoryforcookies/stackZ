@@ -19,18 +19,18 @@ type EnvEditorProps = {
 
 
 /**
- * Editor for environment.
+ * Editorbody for local and remote environment editing.
  * Submits changes to the server on save. 
  */
 function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
 
     const theme = useContext(ThemeContext)
 
-    const [remote, setRemote] = useState<boolean>(false)
+    const [remote, setRemote] = useState<boolean>(data.remote ? true : false)
 
 
     return (
-        <Dialog open={!editorOpen} onOpenChange={setOpen}>
+        <Dialog open={editorOpen} onOpenChange={setOpen}>
             <DialogContent data-theme={theme.theme} className="
             max-w-[1100px] max-h-[700px] 
             w-[70%] h-[80%] 
@@ -43,7 +43,7 @@ function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
                     <DialogTitle>Environment editor</DialogTitle>
                     <DialogDescription>{data.title}</DialogDescription>
                     <div className="w-full flex justify-end gap-2 items-center h-7">
-                        <Switch id="integrated" onCheckedChange={setRemote} />
+                        <Switch id="integrated" onCheckedChange={setRemote} checked={remote} />
                         <Label htmlFor="integrated">Remote</Label>
                     </div>
                 </DialogHeader>

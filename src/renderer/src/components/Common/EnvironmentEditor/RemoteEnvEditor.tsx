@@ -21,9 +21,9 @@ function RemoteEnvEditor({ socket, data, id, setOpen }: RemoteEnvEditorProps) {
 
     const [previewText, setPreviewText] = useState<string>('')
     const [unparsedText, setUnparsedText] = useState<string>('')
-    const [input, setInput] = useState<string>('')
-    const [synced, setSynced] = useState<boolean>(false)
-    const [offlineMode, setOfflineMode] = useState<boolean>(false)
+    const [input, setInput] = useState<string>(data.remote?.source || '')
+    const [synced, setSynced] = useState<boolean>(data.remote?.autoFresh || false)
+    const [offlineMode, setOfflineMode] = useState<boolean>(data.remote?.keep || false)
     const [loading, setLoading] = useState<boolean>(false)
 
     const getPreview = (path: string, run?: boolean) => {
@@ -177,7 +177,8 @@ function RemoteEnvEditor({ socket, data, id, setOpen }: RemoteEnvEditorProps) {
             <Button
                 onClick={handleSave}
                 className="mt-4 w-full"
-                disabled={loading || input.length === 0}
+                disabled={loading || input.length === 0 ||
+                    (input === data.remote?.source && synced === data.remote?.autoFresh && offlineMode === data.remote?.keep)}
             >Save</Button>
         </>
     )

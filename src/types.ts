@@ -20,7 +20,6 @@ export const stackSchema = z.array(
                     disabled: z.array(z.string()),
                     visualState: z.enum(['0', '1', '2']).optional(),
                     remote: z.object({
-                        type: z.enum(['file', 'service']),
                         source: z.string(),
                         keep: z.boolean().default(false),
                         autoFresh: z.boolean().default(false)
@@ -66,7 +65,6 @@ export const stackSchema = z.array(
                                     disabled: z.array(z.string()),
                                     visualState: z.enum(['0', '1', '2']).optional(),
                                     remote: z.object({
-                                        type: z.enum(['file', 'service']),
                                         source: z.string(),
                                         keep: z.boolean().default(false),
                                         autoFresh: z.boolean().default(false)
@@ -279,6 +277,11 @@ export type NewCommandPayload = {
 export type MonitorPortsResponse = {
     tcp: Processes
     udp: Processes
+}
+
+export type EnvironmentFlushOptions = {
+    env?: Record<string, string | undefined>
+    remote?: Environment['remote']
 }
 
 export type StoreType = {

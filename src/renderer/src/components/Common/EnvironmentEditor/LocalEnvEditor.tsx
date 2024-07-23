@@ -77,7 +77,7 @@ function LocalEnvEditor({ data, socket, id, setOpen }: LocalEnvEditorProps) {
             <Button
                 onClick={handleSave}
                 className="mt-4 w-full"
-                disabled={oldText === text}
+                disabled={oldText === text && !data.remote}
             >Save</Button>
 
         </>

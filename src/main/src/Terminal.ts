@@ -8,7 +8,10 @@ import {
     Status
 } from '../../types'
 import { spawn, IPty } from 'node-pty'
-import { bakeEnvironmentToString, executeScript, isAfile, parseBufferToEnvironment, resolveDefaultCwd, searchFiles } from './util/util'
+import {
+    bakeEnvironmentToString, isAfile,
+    parseBufferToEnvironment, resolveDefaultCwd, searchFiles
+} from './util/util'
 import path from 'path'
 import { ITerminalDimensions } from 'xterm-addon-fit'
 import { IPingFunction, ISaveFuntion } from './Palette'
@@ -409,7 +412,7 @@ export class Terminal {
         this.socket.on('environmentListEdit', (args, akw) => {
             try {
                 const environment = parseBufferToEnvironment(args.fromFile)
-                this.environment.flush(args.id || this.settings.id, args.order, environment)
+                this.environment.flush(args.id || this.settings.id, args.order, { env: environment })
                 this.ping()
                 akw(null)
             } catch (error) {
@@ -418,15 +421,18 @@ export class Terminal {
         })
         this.socket.on('environmentListEditRemote', async (args, akw) => {
 
-            const shell = this.win ? 'powershell.exe' : 'bin/bash'
-
             try {
-                const func = args.source.split(' ')[0]
-                const script = this.win
-                    ? `Get-Command ${func}`
-                    : `which ${func}`
-                await executeScript(script, shell)
+                this.environment.flush(args.id || this.settings.id, args.order, {
+                    remote: {
+                        source: args.source,
+                        autoFresh: args.autoFresh,
+                        keep: args.keep
+                    }
+                })
+                await this.environment.refreshRemote(args.id || this.settings.id, args.order)
+                akw(null)
             } catch (error) {
+                console.log(error)
                 akw(String(error))
             }
 
@@ -453,7 +459,7 @@ export class Terminal {
 
             if (!isAProperFile) {
                 try {
-                    const [raw, variables] = await this.environment.readFromService(args.from, this.win)
+                    const [raw, variables] = await this.environment.readFromService(args.from)
                     const payload = {
                         pairs: variables,
                         unparsed: raw,

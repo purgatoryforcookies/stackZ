@@ -1,5 +1,5 @@
-import { Environment } from '../../../types'
-import { envFactory, executeScript, haveThesameElements, parseBufferToEnvironment, readAnyFile } from '../util/util'
+import { Environment, EnvironmentFlushOptions } from '../../../types'
+import { envFactory, executeScript, haveThesameElements, isAfile, parseBufferToEnvironment, readAnyFile } from '../util/util'
 
 
 // TODO: Remove the singleton pattern. it was a bad idea afterall.
@@ -20,9 +20,9 @@ export const NAME_FOR_OS_ENV_SET = 'OS Environment'
  * Higher the order, higher the priority of its keys.
  */
 export class EnvironmentService {
-    os: Environment[]
     public store: Map<string, Environment[]> = new Map()
     private static instance: EnvironmentService
+    private isWin: boolean = process.platform === 'win32'
 
     // @ts-ignore singleton
     private constructor() { }
@@ -48,7 +48,7 @@ export class EnvironmentService {
         this.store.delete(id)
     }
 
-    retrieve(id: string, omitOS: boolean = true) {
+    get(id: string, omitOS: boolean = true) {
         const existing = this.store.get(id)
         if (!existing) return
 
@@ -139,21 +139,44 @@ export class EnvironmentService {
         target.pairs[key] = value
     }
 
+    async refreshRemote(id: string, order: number) {
+        const target = this.store.get(id)?.find((list) => list.order === order)
+        if (!target) throw new Error('Refresh failed. No environment found.')
+        if (!target.remote) throw new Error('Refresh failed. This is not a remote environment.')
+
+        const isFileInSystem = await isAfile(target.remote.source)
+
+        if (isFileInSystem) {
+            const [_raw, variables] = await this.readFromFile(target.remote.source)
+            target.pairs = variables
+        } else {
+            const [_raw, variables] = await this.readFromService(target.remote.source)
+            target.pairs = variables
+        }
+
+    }
+
+
     /**
      * Flush replaces the contents of an environment without changing its
      * order or id. Useful for mass edits.
      * 
-     * If no environment is provided, it resets the environment to be an
-     * empty environment. 
+     * Options object is required, passing an empty object is a destructive 
+     * operation. 
      */
-    flush(id: string, order: number, env?: Record<string, string | undefined>) {
+    flush(id: string, order: number, options: EnvironmentFlushOptions) {
         const target = this.store.get(id)?.find((list) => list.order === order)
         if (!target) throw new Error('Editing failed. No environment found.')
 
-        if (!env) {
-            target.pairs = {}
+        if (options.env) {
+            target.pairs = options.env
         } else {
-            target.pairs = env
+            target.pairs = {}
+        }
+        if (options.remote) {
+            target.remote = options.remote
+        } else {
+            delete target.remote
         }
     }
 
@@ -217,10 +240,10 @@ export class EnvironmentService {
      * 
      * Throws if command exits with an error or its output cannot be converted to a buffer.
      */
-    async readFromService(command: string, isWin: boolean):
+    async readFromService(command: string):
         Promise<[string, Record<string, string | undefined>]> {
 
-        const shell = isWin ? 'powershell.exe' : 'bin/bash'
+        const shell = this.isWin ? 'powershell.exe' : 'bin/bash'
         const data = await executeScript(command, shell, false)
         const buffer = new TextEncoder().encode(data)
         return [data, parseBufferToEnvironment(buffer)]
