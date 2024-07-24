@@ -39,7 +39,6 @@ export class Terminal {
     save: ISaveFuntion
     history: HistoryService
     yesSequence: YesSequencer
-    counter: number
 
     constructor(
         stackId: string,
@@ -62,7 +61,6 @@ export class Terminal {
         this.save = save
         this.history = history
         this.yesSequence = new YesSequencer()
-        this.counter = 0
 
         this.environment = environment
         this.environment.register(this.settings.id, this.settings.command.env)
@@ -364,6 +362,7 @@ export class Terminal {
     }
 
     registerTerminalEvents() {
+
         this.socket.on('changeCwd', (arg: string, akw) => {
             console.log(`[New cwd]: ${arg}`)
             if (arg.startsWith('cd')) arg = arg.slice(2).trim()

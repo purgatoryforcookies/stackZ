@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import Record from '@renderer/components/Common/ListItem'
-import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
 import { CustomToolTip } from './CustomTooltip'
@@ -20,6 +19,23 @@ function EnvList({ data, socket, id }: EnvListProps) {
     const [minimized, setMinimized] = useState(true)
     const [hidden, setHidden] = useState(true)
     const [editorOpen, setEditorOpen] = useState(false)
+    const [delayedLoading, setDelayedLoading] = useState(false)
+
+    useEffect(() => {
+        socket.on('environmentHeartbeat', (resp) => {
+            if (resp.order !== data.order) {
+                return
+            }
+            //UX reason
+            if (resp.loading) {
+                setDelayedLoading(true)
+            } else {
+                setTimeout(() => {
+                    setDelayedLoading(false)
+                }, 1200);
+            }
+        })
+    }, [])
 
     const handleMute = () => {
         socket.emit('environmentMute', {
@@ -73,8 +89,8 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 setMinimized(true)
                 break
             default:
-                setHidden(true)
-                setMinimized(true)
+                setHidden(false)
+                setMinimized(false)
                 break
         }
     }, [data])
@@ -87,7 +103,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
     }
 
     return (
-        <div className={`${minimized ? '' : 'max-w-[35rem]'} h-[calc(100%-95px)] `}>
+        <div className={`${minimized ? '' : 'max-w-[35rem]'} h-[calc(100%-100px)] `}>
             <EnvEditor
                 setOpen={setEditorOpen}
                 editorOpen={editorOpen}
@@ -106,7 +122,15 @@ function EnvList({ data, socket, id }: EnvListProps) {
                     <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
                 )}
             </div>
-            <Separator className="my-2" />
+            {/* <Separator className="my-2" /> */}
+            <div className=" h-[1px] my-2 relative overflow-hidden bg-border">
+                <div
+                    className={`absolute w-full h-[0.5px]
+                        ${delayedLoading ? 'bg-gradient-to-r animate-border-linear' : 'bg-border'} 
+                        from-[#ede5c200] via-[#ecdfa8] to-[#ede5c200]
+                        `}
+                />
+            </div>
             <div className="flex gap-1 justify-center mb-2">
                 <Badge
                     variant={'outline'}
@@ -134,7 +158,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 />
             </div>
             {hidden ? (
-                <div className="flex flex-col justify-center items-center pt-10 text-white/40 h-full">
+                <div className="flex flex-col justify-center items-center pt-10 text-white/40 h-full pb-10">
                     <h2 className="text-2xl">
                         {Object.keys(data.pairs).length}{' '}
                         <span className="text-base">variables</span>

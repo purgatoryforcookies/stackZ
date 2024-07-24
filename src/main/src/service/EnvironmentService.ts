@@ -138,8 +138,7 @@ export class EnvironmentService {
      *
      * @param id Stack or terminal ID
      * @param order Order of the environment
-     * @deprecated after 1.0.0. Editing local environments uses flush mainly due to the new environement
-     * editor and the ease of use of flush.
+     * @deprecated after 1.0.0. Use flush.
      */
     edit(id: string, order: number, value: string, key: string, prevKey?: string) {
         if (key.trim().length == 0) return
@@ -182,7 +181,12 @@ export class EnvironmentService {
         this.emitStatus(id, order, false, null, target.remote)
     }
 
-    async refresAllRemotes(id: string) {
+    /**
+     * Refresh all remotes. Useful for stackZ startup.
+     * Asynchronous behaviour. Does not wait for finish.
+     *
+     */
+    refresAllRemotes(id: string) {
         const target = this.store.get(id)
         if (!target) throw new Error('Refresh failed. No environment found.')
 
@@ -209,15 +213,13 @@ export class EnvironmentService {
                 metadata: metadata
             })
         } else {
-            setTimeout(() => {
-                this.server.emit('environmentHeartbeat', {
-                    loading: status,
-                    id: id,
-                    order: order,
-                    error: error,
-                    metadata: metadata
-                })
-            }, 0)
+            this.server.emit('environmentHeartbeat', {
+                loading: status,
+                id: id,
+                order: order,
+                error: error,
+                metadata: metadata
+            })
         }
     }
 
@@ -259,20 +261,40 @@ export class EnvironmentService {
     }
 
     /**
-     * Baking takes all the environments in a given terminal
+     * Baking takes all the environments with given list of id's
      * and enumerates them to one single environment.
+     * Id order matters in the array given.
      * This action removes duplicated keys and muted variables.
      * Dublicated key is always overwritten by the last key present.
      * 
      * If environment is a remote one, and autofresh is on, before bake the 
      * environment set is refreshed.
      * 
-     * TODO: make the refershing on remotes paraller.
+     * 
      */
     async bake(id: string[], omitOS: boolean = false) {
         const reduced: Record<string, string | undefined> = {}
 
 
+        // Refresh all environments that need it in paraller.
+        const pendingEnvironments: Promise<void>[] = []
+
+        id.forEach(i => {
+            const environment = this.store.get(i)
+            if (!environment) return
+
+            environment.forEach(envSet => {
+                if (envSet.remote) {
+                    if (envSet.remote.autoFresh) {
+                        pendingEnvironments.push(this.refreshRemote(i, envSet.order))
+                    }
+                }
+            })
+        })
+
+        await Promise.all(pendingEnvironments)
+
+        // Map the nevs into one set
         for (const i of id) {
             const environment = this.store.get(i)
             if (!environment) continue
@@ -281,13 +303,6 @@ export class EnvironmentService {
 
             for (const envSet of environment) {
                 if (omitOS && envSet.title === NAME_FOR_OS_ENV_SET) continue
-
-                if (envSet.remote) {
-                    if (envSet.remote.autoFresh) {
-                        await this.refreshRemote(i, envSet.order)
-                    }
-                }
-
                 Object.keys(envSet.pairs).forEach((key) => {
                     if (envSet.disabled.includes(key)) return
                     reduced[key] = envSet.pairs[key]
