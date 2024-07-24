@@ -266,24 +266,23 @@ export class EnvironmentService {
      * Id order matters in the array given.
      * This action removes duplicated keys and muted variables.
      * Dublicated key is always overwritten by the last key present.
-     * 
-     * If environment is a remote one, and autofresh is on, before bake the 
+     *
+     * If environment is a remote one, and autofresh is on, before bake the
      * environment set is refreshed.
-     * 
-     * 
+     *
+     *
      */
     async bake(id: string[], omitOS: boolean = false) {
         const reduced: Record<string, string | undefined> = {}
 
-
         // Refresh all environments that need it in paraller.
         const pendingEnvironments: Promise<void>[] = []
 
-        id.forEach(i => {
+        id.forEach((i) => {
             const environment = this.store.get(i)
             if (!environment) return
 
-            environment.forEach(envSet => {
+            environment.forEach((envSet) => {
                 if (envSet.remote) {
                     if (envSet.remote.autoFresh) {
                         pendingEnvironments.push(this.refreshRemote(i, envSet.order))
@@ -298,8 +297,7 @@ export class EnvironmentService {
         for (const i of id) {
             const environment = this.store.get(i)
             if (!environment) continue
-            environment
-                .sort((a, b) => a.order - b.order)
+            environment.sort((a, b) => a.order - b.order)
 
             for (const envSet of environment) {
                 if (omitOS && envSet.title === NAME_FOR_OS_ENV_SET) continue

@@ -21,7 +21,7 @@ function RadioEnvironmentTools({ socket, id, data }: RadioEnvironmentToolsProps)
                 order: data.order,
                 id: id
             },
-            () => { }
+            () => {}
         )
     }
 
@@ -31,10 +31,8 @@ function RadioEnvironmentTools({ socket, id, data }: RadioEnvironmentToolsProps)
                 return
             }
             setPing(resp)
-
         })
     }, [])
-
 
     return (
         <div className="grid grid-cols-[40px_auto_40px]  grid-rows-1 relative top-[5px] ">
@@ -51,10 +49,7 @@ function RadioEnvironmentTools({ socket, id, data }: RadioEnvironmentToolsProps)
                 </div>
                 <div>
                     {data.remote && data.remote.keep ? (
-                        <CustomToolTip
-                            message={`Local backup turned on`}
-                            className="max-w-[30rem]"
-                        >
+                        <CustomToolTip message={`Local backup turned on`} className="max-w-[30rem]">
                             <BookmarkIcon className="size-4 text-green-500" />
                         </CustomToolTip>
                     ) : null}
@@ -66,14 +61,12 @@ function RadioEnvironmentTools({ socket, id, data }: RadioEnvironmentToolsProps)
                     onClick={askForRefresh}
                     onMouseEnter={() => setHover(true)}
                     onMouseLeave={() => setHover(false)}
-                >{hover ? 'Refresh' :
-                    data.remote?.metadata?.updated
-                        ? moment(
-
-                            data.remote?.metadata?.updated
-                        ).fromNow()
-                        : 'Not updated'}
-
+                >
+                    {hover
+                        ? 'Refresh'
+                        : data.remote?.metadata?.updated
+                          ? moment(data.remote?.metadata?.updated).fromNow()
+                          : 'Not updated'}
                 </p>
             </div>
             <div className="flex items-center justify-center relative top-[2px]">
@@ -88,7 +81,6 @@ function RadioEnvironmentTools({ socket, id, data }: RadioEnvironmentToolsProps)
                 ) : null}
             </div>
         </div>
-
     )
 }
 

@@ -32,7 +32,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
             } else {
                 setTimeout(() => {
                     setDelayedLoading(false)
-                }, 1200);
+                }, 1200)
             }
         })
     }, [])

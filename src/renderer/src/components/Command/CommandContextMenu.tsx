@@ -58,7 +58,10 @@ export default function CommandContextMenu({ children, stack, terminal }: Comman
                 <ContextMenuItem inset onClick={copyToClipBoard}>
                     Copy to clipboard
                 </ContextMenuItem>
-                <ContextMenuItem inset onClick={() => window.store.openFileLocation(terminal.command.cwd)}>
+                <ContextMenuItem
+                    inset
+                    onClick={() => window.store.openFileLocation(terminal.command.cwd)}
+                >
                     Open in Explorer
                 </ContextMenuItem>
                 <ContextMenuSub>
@@ -66,15 +69,15 @@ export default function CommandContextMenu({ children, stack, terminal }: Comman
                     <ContextMenuSubContent className="w-48">
                         {stack.stack
                             ? Array.from(stack.stack.values()).map((st) => (
-                                <ContextMenuItem
-                                    onClick={() => dublicateTo(st.id)}
-                                    key={st.id}
-                                    className="flex justify-between"
-                                >
-                                    <p>{st.stackName}</p>
-                                    <p className="text-white/40">x{st.palette?.length || 0}</p>
-                                </ContextMenuItem>
-                            ))
+                                  <ContextMenuItem
+                                      onClick={() => dublicateTo(st.id)}
+                                      key={st.id}
+                                      className="flex justify-between"
+                                  >
+                                      <p>{st.stackName}</p>
+                                      <p className="text-white/40">x{st.palette?.length || 0}</p>
+                                  </ContextMenuItem>
+                              ))
                             : null}
                     </ContextMenuSubContent>
                 </ContextMenuSub>

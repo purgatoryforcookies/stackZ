@@ -362,7 +362,6 @@ export class Terminal {
     }
 
     registerTerminalEvents() {
-
         this.socket.on('changeCwd', (arg: string, akw) => {
             console.log(`[New cwd]: ${arg}`)
             if (arg.startsWith('cd')) arg = arg.slice(2).trim()
@@ -530,7 +529,6 @@ export class Terminal {
         })
 
         this.socket.on('copyToClipboard', async (akw) => {
-
             const environment = await this.environment.bake([this.stackId, this.settings.id], true)
             const asString = bakeEnvironmentToString(environment)
 
