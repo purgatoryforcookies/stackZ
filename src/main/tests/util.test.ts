@@ -1,7 +1,16 @@
+import { ClientToServerEvents, ServerToClientEvents } from 'src/types'
 import { EnvironmentService } from '../src/service/EnvironmentService'
+import { Server } from 'socket.io'
 
 describe('Utilities tests', () => {
-    const envService = EnvironmentService.get()
+
+    const socketServer = new Server<ClientToServerEvents, ServerToClientEvents>({
+        cors: {
+            origin: '*'
+        }
+    })
+
+    const envService = new EnvironmentService(socketServer)
 
     beforeAll(() => {
         envService.store = new Map()
