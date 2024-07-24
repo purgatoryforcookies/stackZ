@@ -19,11 +19,18 @@ export const stackSchema = z.array(
                     order: z.number().default(1),
                     disabled: z.array(z.string()),
                     visualState: z.enum(['0', '1', '2']).optional(),
-                    remote: z.object({
-                        source: z.string(),
-                        keep: z.boolean().default(false),
-                        autoFresh: z.boolean().default(false),
-                    }).optional()
+                    remote: z
+                        .object({
+                            source: z.string(),
+                            keep: z.boolean().default(false),
+                            autoFresh: z.boolean().default(false),
+                            metadata: z
+                                .object({
+                                    updated: z.number().nullable().default(null)
+                                })
+                                .optional()
+                        })
+                        .optional()
                 })
             )
             .optional(),
@@ -64,17 +71,26 @@ export const stackSchema = z.array(
                                     order: z.number().default(1),
                                     disabled: z.array(z.string()),
                                     visualState: z.enum(['0', '1', '2']).optional(),
-                                    remote: z.object({
-                                        source: z.string(),
-                                        keep: z.boolean().default(false),
-                                        autoFresh: z.boolean().default(false),
-                                    }).optional()
+                                    remote: z
+                                        .object({
+                                            source: z.string(),
+                                            keep: z.boolean().default(false),
+                                            autoFresh: z.boolean().default(false),
+                                            metadata: z
+                                                .object({
+                                                    updated: z.number().nullable().default(null)
+                                                })
+                                                .optional()
+                                        })
+                                        .optional()
                                 })
-                            ).optional(),
+                            )
+                            .optional(),
                         cwd: z.string().optional()
                     })
                 })
-            ).optional()
+            )
+            .optional()
     })
 )
 
@@ -84,7 +100,6 @@ export type Cmd = Exclude<PaletteStack['palette'], undefined>[0]
 export type Environment = Exclude<Cmd['command']['env'], undefined>[0]
 export type CommandMetaSetting = Exclude<Cmd['metaSettings'], undefined>
 export type EnginedCmd = Cmd & { engine: TerminalUIEngine }
-
 
 export type RecursivePartial<T> = {
     [P in keyof T]?: RecursivePartial<T[P]>
@@ -104,7 +119,7 @@ export interface ServerToClientEvents {
     badgeHeartBeat: (state: StackStatus) => void
     haltBeat: (beat: boolean) => void
     heartBeat: (beat: number | undefined) => void
-    environmentHeartbeat: (args: { loading: boolean, id: string, order: number, error: string | null }) => void
+    environmentHeartbeat: (args: EnvironmentHeartbeat) => void
     terminalState: (state: Status) => void
     output: (data: string) => void
     terminalDelete: (args: { stack: string; terminal: string }) => void
@@ -126,6 +141,14 @@ type ChangeMetaSettingEvent = (
     callback: (state: Status) => void
 ) => void
 
+export type EnvironmentHeartbeat = {
+    loading: boolean
+    id: string
+    order: number
+    error: string | null
+    metadata: Environment['remote'] | null
+}
+
 export interface ClientToServerEvents {
     state: () => void
     stackState: () => void
@@ -139,18 +162,24 @@ export interface ClientToServerEvents {
     ) => void
 
     environmentEditSingle: (args: EnvironmentEditProps) => void
-    environmentListEdit: (args: {
-        fromFile: ArrayBuffer | null
-        id?: string | null
-        order: number
-    }, callback: (error: string | null) => void) => void
-    environmentListEditRemote: (args: {
-        source: string
-        keep: boolean
-        autoFresh: boolean
-        id?: string | null
-        order: number
-    }, callback: (error: string | null) => void) => void
+    environmentListEdit: (
+        args: {
+            fromFile: ArrayBuffer | null
+            id?: string | null
+            order: number
+        },
+        callback: (error: string | null) => void
+    ) => void
+    environmentListEditRemote: (
+        args: {
+            source: string
+            keep: boolean
+            autoFresh: boolean
+            id?: string | null
+            order: number
+        },
+        callback: (error: string | null) => void
+    ) => void
     environmentNewList: (args: {
         value: string
         fromFile: ArrayBuffer | null
@@ -162,8 +191,13 @@ export interface ClientToServerEvents {
     environmentListRefresh: (args: UtilityProps, callback: (error?: string | null) => void) => void
     environmentVisualState: (args: UtilityProps) => void
     environmentSuggestions: (callback: (data: EnvironmentSuggestions, err?: string) => void) => void
-    environmentPreview: (args: EnvironmentPreviewAction,
-        callback: (data: { pairs: Environment['pairs'] | null, unparsed: string | null, isFile: boolean }, err?: string) => void) => void
+    environmentPreview: (
+        args: EnvironmentPreviewAction,
+        callback: (
+            data: { pairs: Environment['pairs'] | null; unparsed: string | null; isFile: boolean },
+            err?: string
+        ) => void
+    ) => void
 
     commandMetaSetting: ChangeMetaSettingEvent
     commandHealthSetting: () => void
@@ -185,7 +219,6 @@ export interface ClientToServerEvents {
     dockerStop: (id: string, callback: (data: string, err?: string) => void) => void
     dockerStart: (id: string, callback: (data: string, err?: string) => void) => void
     dockerRemove: (id: string, callback: (data: string, err?: string) => void) => void
-
 }
 
 export type CustomServerSocket = Socket<ClientToServerEvents, ServerToClientEvents>
@@ -244,8 +277,6 @@ export type RemoveEnvListProps = {
 export type EnvironmentPreviewAction = {
     from: string
 }
-
-
 
 export type EnvironmentSuggestions = {
     files: string[]

@@ -5,7 +5,7 @@ import {
     SheetTitle,
     SheetDescription,
     SheetFooter,
-    SheetClose,
+    SheetClose
 } from '@renderer/@/ui/sheet'
 import { useContext, useEffect, useState } from 'react'
 import { ThemeContext } from '@renderer/App'
@@ -22,7 +22,6 @@ export type SettingsProps = {
 }
 
 function Settings({ stack, open, setOpen }: SettingsProps) {
-
     const [versions] = useState(window.electron.process.versions)
 
     const theme = useContext(ThemeContext)

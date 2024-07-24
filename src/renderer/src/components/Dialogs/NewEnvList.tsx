@@ -106,12 +106,13 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
                     <div
                         className={`
                     p-[1px] 
-                    ${!handleEnter
-                                ? 'bg-transparent'
-                                : `animate-border  bg-gradient-to-r
+                    ${
+                        !handleEnter
+                            ? 'bg-transparent'
+                            : `animate-border  bg-gradient-to-r
                   from-[#ede5c2e6] via-[#e2e0d74e] to-[#e1d7b076] hover:cursor-pointer bg-[length:_700%_900%]
                     p-0 flex justify-center items-center`
-                            }
+                    }
                     z-10 size-32 rounded-[7.5px]`}
                     >
                         <span
@@ -124,7 +125,9 @@ export function NewEnvList({ scroll, terminal, stack }: NewEnvListProps) {
                         >
                             <PlusIcon className=" h-8 w-8 hover:cursor-pointer hover:text-primary text-secondary-foreground" />
                             {handleEnter ? (
-                                <span className="text-secondary-foreground select-none">Dropzone</span>
+                                <span className="text-secondary-foreground select-none">
+                                    Dropzone
+                                </span>
                             ) : null}
                         </span>
                     </div>

@@ -21,20 +21,16 @@ type FieldProps = {
     minimized?: boolean
 }
 
-export const Field = ({
-    value,
-    variant,
-    minimized
-}: FieldProps) => {
+export const Field = ({ value, variant, minimized }: FieldProps) => {
     const style = `rounded-full py-1
-    ${variant === 'primary'
+    ${
+        variant === 'primary'
             ? `px-3 text-secondary-foreground bg-transparent bg-[length:_150%_50%] ${minimized ? 'truncate' : ''}`
             : `px-3  truncate text-primary-foreground bg-primary
             }`
-        }`
+    }`
 
     return <p className={style}>{value}</p>
-
 }
 
 /**
@@ -55,8 +51,6 @@ const Record = ({
     onDoubleClick,
     id
 }: RecordProps) => {
-
-
     const handleMute = () => {
         socket?.emit('environmentMute', {
             value: keyv,
@@ -71,23 +65,12 @@ const Record = ({
             onContextMenu={handleMute}
             onDoubleClick={onDoubleClick}
         >
-            <form
-                className="flex font-semibold justify-between hover:cursor-pointer rounded-full bg-muted"
-            >
-                <Field
-                    value={keyv}
-                    variant="primary"
-                    minimized={minimized}
-                />
+            <form className="flex font-semibold justify-between hover:cursor-pointer rounded-full bg-muted">
+                <Field value={keyv} variant="primary" minimized={minimized} />
                 {!minimized ? (
-                    <Field
-                        value={value}
-                        variant="secondary"
-                        minimized={minimized}
-                    />
+                    <Field value={value} variant="secondary" minimized={minimized} />
                 ) : null}
             </form>
-
         </div>
     )
 }

@@ -43,17 +43,17 @@ export const readAnyFile = (path: string) => {
     })
 }
 
-
 const createJsonFileTemplate = (path: string, schema: ZodTypeAny) => {
     const template = schema.parse([{}])
     writeFileSync(path, JSON.stringify(template))
 }
 
-export const parseBufferToEnvironment = (buf: ArrayBuffer | null): Record<string, string | undefined> => {
+export const parseBufferToEnvironment = (
+    buf: ArrayBuffer | null
+): Record<string, string | undefined> => {
     if (!buf) return {}
     const enc = new TextDecoder('utf-8')
     let decoded = enc.decode(buf)
-
 
     try {
         const ifItsJson = JSON.parse(decoded)
@@ -75,7 +75,6 @@ export const parseBufferToEnvironment = (buf: ArrayBuffer | null): Record<string
             const betterValue = value.replace(/["]+/g, '').trim()
             const betterKey = key.replace(/["]+/g, '').trim()
             envir[betterKey] = betterValue
-
         } catch {
             // swallow
         }
@@ -83,8 +82,6 @@ export const parseBufferToEnvironment = (buf: ArrayBuffer | null): Record<string
 
     return envir
 }
-
-
 
 /**
  * Factory sorts envs into order and adds host environments
@@ -100,11 +97,9 @@ export const envFactory = (args: Environment[] | undefined) => {
 
     if (!args) return [hostEnv]
 
-    const newEnvs = args.filter(item => item.title !== NAME_FOR_OS_ENV_SET)
+    const newEnvs = args.filter((item) => item.title !== NAME_FOR_OS_ENV_SET)
 
     return newEnvs.concat(hostEnv)
-
-
 }
 
 export const mapEnvs = (obj: Environment[]) => {
@@ -142,21 +137,19 @@ export const isAfile = async (path: string) => {
     try {
         const stat = await promises.stat(path)
         return stat.isFile()
-
     } catch (error) {
         return false
     }
 }
 
 /**
- * Runs a command provided with the shell given. 
- * 
+ * Runs a command provided with the shell given.
+ *
  * By default (silent = false) throws any errors occured
- * 
+ *
  * If run on silent, will ignore errors and return empty string.
  */
 export const executeScript = async (script: string, shell: string, silent = false) => {
-
     try {
         const data: string = await new Promise((res, rej) => {
             exec(script, { shell: shell, timeout: 10000 }, (err, stdout) => {
@@ -229,23 +222,21 @@ export const dockerHTTPRequest = <T>(options: RequestOptions) => {
 }
 
 export const searchFiles = async (rootPath: string, extensions: string[]) => {
-
     const files: string[] = []
 
     async function* walk(dir: string) {
         for await (const d of await promises.opendir(dir)) {
-
-            if (IGNORED_DIRS.some(i => i === d.name)) {
+            if (IGNORED_DIRS.some((i) => i === d.name)) {
                 continue
             }
 
-            if (!extensions.some(i => d.name.includes(i))) {
+            if (!extensions.some((i) => d.name.includes(i))) {
                 continue
             }
 
-            const entry = path.join(dir, d.name);
-            if (d.isDirectory()) yield* walk(entry);
-            else if (d.isFile()) yield entry;
+            const entry = path.join(dir, d.name)
+            if (d.isDirectory()) yield* walk(entry)
+            else if (d.isFile()) yield entry
         }
     }
 
@@ -256,5 +247,4 @@ export const searchFiles = async (rootPath: string, extensions: string[]) => {
     }
 
     return files
-
 }

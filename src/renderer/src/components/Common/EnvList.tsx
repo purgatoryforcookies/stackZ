@@ -21,7 +21,6 @@ function EnvList({ data, socket, id }: EnvListProps) {
     const [hidden, setHidden] = useState(true)
     const [editorOpen, setEditorOpen] = useState(false)
 
-
     const handleMute = () => {
         socket.emit('environmentMute', {
             order: data.order,
@@ -36,8 +35,6 @@ function EnvList({ data, socket, id }: EnvListProps) {
             value: state
         })
     }
-
-
 
     const handleMinimize = () => {
         if (!minimized) {
@@ -90,8 +87,14 @@ function EnvList({ data, socket, id }: EnvListProps) {
     }
 
     return (
-        <div className={`${minimized ? '' : 'max-w-[35rem]'} h-[calc(100%-120px)]`}>
-            <EnvEditor setOpen={setEditorOpen} editorOpen={editorOpen} data={data} socket={socket} id={id} />
+        <div className={`${minimized ? '' : 'max-w-[35rem]'} h-[calc(100%-95px)] `}>
+            <EnvEditor
+                setOpen={setEditorOpen}
+                editorOpen={editorOpen}
+                data={data}
+                socket={socket}
+                id={id}
+            />
             <div className="flex justify-center cursor-pointer" onClick={() => setEditorOpen(true)}>
                 {data.title === NAME_FOR_OS_ENV_SET ? (
                     <CustomToolTip message="This environment is editable, but not persistent.">
@@ -143,10 +146,10 @@ function EnvList({ data, socket, id }: EnvListProps) {
             ) : (
                 <div
                     className="flex flex-col gap-1 overflow-auto py-2 h-full relative"
-                    style={{ scrollbarGutter: 'stable' }}>
-
-                    {Object.keys(data.pairs).length > 0
-                        ? Object.keys(data.pairs).map((key: string) => (
+                    style={{ scrollbarGutter: 'stable' }}
+                >
+                    {Object.keys(data.pairs).length > 0 ? (
+                        Object.keys(data.pairs).map((key: string) => (
                             <Record
                                 key={key} //react component key
                                 id={id}
@@ -159,22 +162,17 @@ function EnvList({ data, socket, id }: EnvListProps) {
                                 onDoubleClick={() => setEditorOpen(true)}
                             />
                         ))
-                        :
-                        <div className='flex flex-col gap-6 pt-5'>
+                    ) : (
+                        <div className="flex flex-col gap-6 pt-5">
                             <h1 className="text-center text-white/40">No variables</h1>
-                            <Button
-                                size={'sm'}
-                                onClick={() => setEditorOpen(true)}>Add</Button>
+                            <Button size={'sm'} onClick={() => setEditorOpen(true)}>
+                                Add
+                            </Button>
                         </div>
-                    }
+                    )}
                 </div>
             )}
-            {data.remote ?
-                <RadioEnvironmentTools
-                    data={data}
-                    socket={socket}
-                    id={id} />
-                : null}
+            {data.remote ? <RadioEnvironmentTools data={data} socket={socket} id={id} /> : null}
         </div>
     )
 }

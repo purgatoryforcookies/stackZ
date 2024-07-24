@@ -1,13 +1,12 @@
-import { DialogDescription } from "@radix-ui/react-dialog"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@renderer/@/ui/dialog"
-import { Label } from "@renderer/@/ui/label"
-import { Switch } from "@renderer/@/ui/switch"
-import { ThemeContext } from "@renderer/App"
-import { Cmd, CustomClientSocket } from "@t"
-import { useContext, useState } from "react"
-import RemoteEnvEditor from "./RemoteEnvEditor"
-import LocalEnvEditor from "./LocalEnvEditor"
-
+import { DialogDescription } from '@radix-ui/react-dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@renderer/@/ui/dialog'
+import { Label } from '@renderer/@/ui/label'
+import { Switch } from '@renderer/@/ui/switch'
+import { ThemeContext } from '@renderer/App'
+import { Cmd, CustomClientSocket } from '@t'
+import { useContext, useState } from 'react'
+import RemoteEnvEditor from './RemoteEnvEditor'
+import LocalEnvEditor from './LocalEnvEditor'
 
 type EnvEditorProps = {
     setOpen: (open: boolean) => void
@@ -20,45 +19,44 @@ export const NAME_FOR_OS_ENV_SET = 'OS Environment'
 
 /**
  * Editorbody for local and remote environment editing.
- * Submits changes to the server on save. 
+ * Submits changes to the server on save.
  */
 function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
-
     const theme = useContext(ThemeContext)
 
     const [remote, setRemote] = useState<boolean>(data.remote ? true : false)
 
-
     return (
         <Dialog open={editorOpen} onOpenChange={setOpen}>
-            <DialogContent data-theme={theme.theme} className="
+            <DialogContent
+                data-theme={theme.theme}
+                className="
             max-w-[1100px] max-h-[700px] 
             w-[70%] h-[80%] 
             min-w-[200px] min-h-[300px] 
             rounded-sm
             flex flex-col justify-between
             overflow-auto
-            ">
+            "
+            >
                 <DialogHeader className="pb-1">
                     <DialogTitle>Environment editor</DialogTitle>
                     <DialogDescription>{data.title}</DialogDescription>
                     <div className="w-full flex justify-end gap-2 items-center h-7">
-                        <Switch id="integrated"
+                        <Switch
+                            id="integrated"
                             onCheckedChange={setRemote}
                             checked={remote}
-                            disabled={data.title === NAME_FOR_OS_ENV_SET} />
+                            disabled={data.title === NAME_FOR_OS_ENV_SET}
+                        />
                         <Label htmlFor="integrated">Remote</Label>
                     </div>
                 </DialogHeader>
-                {!remote ?
-                    <LocalEnvEditor
-                        data={data}
-                        socket={socket}
-                        id={id}
-                        setOpen={setOpen} />
-                    : <RemoteEnvEditor socket={socket} data={data} id={id} setOpen={setOpen} />
-                }
-
+                {!remote ? (
+                    <LocalEnvEditor data={data} socket={socket} id={id} setOpen={setOpen} />
+                ) : (
+                    <RemoteEnvEditor socket={socket} data={data} id={id} setOpen={setOpen} />
+                )}
             </DialogContent>
         </Dialog>
     )

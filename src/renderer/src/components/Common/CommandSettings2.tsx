@@ -75,7 +75,7 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                         defaultValue={settings?.cmd.command.cwd || ''}
                         valueKey="cwd"
                         historyKey="CWD"
-                        placeholder='/path/to/your/project'
+                        placeholder="/path/to/your/project"
                     />
 
                     <InputWithMagic
@@ -223,10 +223,10 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                             Yes sequencing
                             <Sequencing />
                         </Label>
-                        {settings?.cmd.metaSettings?.sequencing
-                            && settings?.cmd.metaSettings?.sequencing.length > 0 ?
-                            <p className='text-sm absolute right-0 top-0'>Secret?</p>
-                            : null}
+                        {settings?.cmd.metaSettings?.sequencing &&
+                        settings?.cmd.metaSettings?.sequencing.length > 0 ? (
+                            <p className="text-sm absolute right-0 top-0">Secret?</p>
+                        ) : null}
                     </div>
                     <div className="h-3"></div>
                     <div className="flex flex-col gap-2 relative">
@@ -258,7 +258,10 @@ function CommandSettings({ engine }: CommandSettingsProps) {
                                                 if (!was) {
                                                     onChange('sequencing', { ...seq, secret: true })
                                                 } else {
-                                                    onChange('sequencing', { ...seq, secret: false })
+                                                    onChange('sequencing', {
+                                                        ...seq,
+                                                        secret: false
+                                                    })
                                                 }
                                             }}
                                         />

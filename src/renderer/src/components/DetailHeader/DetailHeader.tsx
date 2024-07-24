@@ -34,18 +34,18 @@ function DetailHeader({ stack }: DetailHeaderProps) {
     if (!terminal) return <p className="text-secondary-foreground">No terminal selected</p>
 
     return (
-        <div className="flex gap-8 overflow-hidden h-full" ref={bodyRef}>
+        <div className="flex gap-8 overflow-x-auto overflow-y-hidden h-full" ref={bodyRef}>
             {status?.stackEnv
                 ? status.stackEnv
-                    .sort((a, b) => a.order - b.order)
-                    .map((record) => (
-                        <EnvList
-                            id={stack.selectedStack}
-                            data={record}
-                            key={record.title}
-                            socket={terminal.socket}
-                        />
-                    ))
+                      .sort((a, b) => a.order - b.order)
+                      .map((record) => (
+                          <EnvList
+                              id={stack.selectedStack}
+                              data={record}
+                              key={record.title}
+                              socket={terminal.socket}
+                          />
+                      ))
                 : null}
 
             {status?.stackEnv ? (
@@ -62,16 +62,17 @@ function DetailHeader({ stack }: DetailHeaderProps) {
 
             {status?.cmd.command.env
                 ? status.cmd.command.env
-                    .sort((a, b) => a.order - b.order)
-                    .map((record) => (
-                        <EnvList
-                            id={stack.selectedTerminal}
-                            data={record}
-                            key={record.title}
-                            socket={terminal.socket}
-                        />
-                    ))
+                      .sort((a, b) => a.order - b.order)
+                      .map((record) => (
+                          <EnvList
+                              id={stack.selectedTerminal}
+                              data={record}
+                              key={record.title}
+                              socket={terminal.socket}
+                          />
+                      ))
                 : null}
+
             <div className="p-11">
                 <NewEnvList scroll={scroll} terminal={terminal} stack={stack} />
             </div>

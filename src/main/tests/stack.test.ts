@@ -18,7 +18,7 @@ const testServer = new Server({
  */
 jest.mock('../src/service/HistoryService', () => {
     return {
-        HistoryService: jest.fn(() => { })
+        HistoryService: jest.fn(() => {})
     }
 })
 

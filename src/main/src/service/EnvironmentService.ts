@@ -1,6 +1,12 @@
 import { CustomServer, Environment, EnvironmentFlushOptions } from '../../../types'
-import { envFactory, executeScript, haveThesameElements, isAfile, parseBufferToEnvironment, readAnyFile } from '../util/util'
-
+import {
+    envFactory,
+    executeScript,
+    haveThesameElements,
+    isAfile,
+    parseBufferToEnvironment,
+    readAnyFile
+} from '../util/util'
 
 export const NAME_FOR_OS_ENV_SET = 'OS Environment'
 
@@ -10,11 +16,11 @@ export const NAME_FOR_OS_ENV_SET = 'OS Environment'
  * Each environment can consist of multiple sets of environment variable lists.
  * Each list has an order, specifying its uniqueness in a given record
  * and the order it is applied to.
- * 
+ *
  * Each set in an environment can be a local or a remote set. Local set's
  * are stored in stacks.json and remote sets fetched on-the-fly.
- * 
- * 
+ *
+ *
  * When enviroment is baked, order determines it's precedence in the output.
  * Higher the order, higher the priority of its keys.
  */
@@ -22,7 +28,6 @@ export class EnvironmentService {
     public store: Map<string, Environment[]> = new Map()
     private isWin: boolean = process.platform === 'win32'
     private server: CustomServer
-
 
     constructor(server: CustomServer) {
         this.server = server
@@ -130,11 +135,11 @@ export class EnvironmentService {
 
     /**
      * Edits or adds a key-value pair to given set.
-     * 
+     *
      * @param id Stack or terminal ID
      * @param order Order of the environment
      * @deprecated after 1.0.0. Editing local environments uses flush mainly due to the new environement
-     * editor and the ease of use of flush. 
+     * editor and the ease of use of flush.
      */
     edit(id: string, order: number, value: string, key: string, prevKey?: string) {
         if (key.trim().length == 0) return
@@ -153,7 +158,7 @@ export class EnvironmentService {
         if (!target) throw new Error('Refresh failed. No environment found.')
         if (!target.remote) throw new Error('Refresh failed. This is not a remote environment.')
 
-        this.broadcastLoading(id, order, true, null)
+        this.emitStatus(id, order, true, null, target.remote)
 
         try {
             const isFileInSystem = await isAfile(target.remote.source)
@@ -166,55 +171,62 @@ export class EnvironmentService {
                 target.pairs = variables
             }
 
+            target.remote.metadata = {
+                updated: new Date().valueOf()
+            }
         } catch (error) {
-            this.broadcastLoading(id, order, false, String(error))
+            this.emitStatus(id, order, false, String(error), target.remote)
             throw error
         }
 
-        this.broadcastLoading(id, order, false, null)
-
+        this.emitStatus(id, order, false, null, target.remote)
     }
 
     async refresAllRemotes(id: string) {
         const target = this.store.get(id)
         if (!target) throw new Error('Refresh failed. No environment found.')
 
-        target.forEach(environment => {
+        target.forEach((environment) => {
             if (environment.remote) {
                 this.refreshRemote(id, environment.order)
             }
         })
-
     }
 
-    private broadcastLoading(id: string, order: number, status: boolean, error: string | null) {
+    private emitStatus(
+        id: string,
+        order: number,
+        status: boolean,
+        error: string | null,
+        metadata: Environment['remote'] | null
+    ) {
         if (status) {
-
             this.server.emit('environmentHeartbeat', {
                 loading: status,
                 id: id,
                 order: order,
-                error: error
+                error: error,
+                metadata: metadata
             })
-        }
-        else {
+        } else {
             setTimeout(() => {
                 this.server.emit('environmentHeartbeat', {
                     loading: status,
                     id: id,
                     order: order,
-                    error: error
+                    error: error,
+                    metadata: metadata
                 })
-            }, 1200);
+            }, 1200)
         }
     }
 
     /**
      * Flush replaces the contents of an environment without changing its
      * order or id. Useful for mass edits.
-     * 
-     * Options object is required, passing an empty object is a destructive 
-     * operation. 
+     *
+     * Options object is required, passing an empty object is a destructive
+     * operation.
      */
     flush(id: string, order: number, options: EnvironmentFlushOptions) {
         const target = this.store.get(id)?.find((list) => list.order === order)
@@ -248,7 +260,7 @@ export class EnvironmentService {
 
     /**
      * Baking takes all the environments in a given terminal
-     * and enumerates them to one single environment. 
+     * and enumerates them to one single environment.
      * This action removes duplicated keys and muted variables.
      * Dublicated key is always overwritten by the last key present.
      */
@@ -276,11 +288,10 @@ export class EnvironmentService {
 
     /**
      * Reads any file and returns an environment with raw string before parsing.
-     * 
+     *
      * Throws if data cannot be read or if data cannot be converted to buffer.
      */
-    async readFromFile(path: string):
-        Promise<[string, Record<string, string | undefined>]> {
+    async readFromFile(path: string): Promise<[string, Record<string, string | undefined>]> {
         const data = await readAnyFile(path)
         const buffer = new TextEncoder().encode(data)
         return [data, parseBufferToEnvironment(buffer)]
@@ -289,17 +300,13 @@ export class EnvironmentService {
     /**
      * Attempts to read key value data from a service with exec().
      * Converts it to an environment and returns it with raw string before parsing.
-     * 
+     *
      * Throws if command exits with an error or its output cannot be converted to a buffer.
      */
-    async readFromService(command: string):
-        Promise<[string, Record<string, string | undefined>]> {
-
+    async readFromService(command: string): Promise<[string, Record<string, string | undefined>]> {
         const shell = this.isWin ? 'powershell.exe' : 'bin/bash'
         const data = await executeScript(command, shell, false)
         const buffer = new TextEncoder().encode(data)
         return [data, parseBufferToEnvironment(buffer)]
-
     }
-
 }

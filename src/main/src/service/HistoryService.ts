@@ -96,7 +96,8 @@ export class HistoryService {
                     }
                     return newi
                 })
-            const arrayedBash = resultbash.split('\n')
+            const arrayedBash = resultbash
+                .split('\n')
                 .map((i) => i.replaceAll('\r', ''))
                 .map((i) => {
                     let newi = i
@@ -116,7 +117,8 @@ export class HistoryService {
                 '\\ConsoleHost_history.txt'
             ]
             const result = await executeScript(command.join(''), 'powershell.exe', true)
-            const arrayed = result.split('\n')
+            const arrayed = result
+                .split('\n')
                 .map((i) => i.replaceAll('\r', ''))
                 .map((i) => {
                     let newi = i
@@ -124,7 +126,8 @@ export class HistoryService {
                         newi = i.slice(3)
                     }
                     return newi
-                }).reverse()
+                })
+                .reverse()
 
             this.hostHistory = [...new Set(arrayed)]
         }

@@ -9,8 +9,11 @@ import {
 } from '../../types'
 import { spawn, IPty } from 'node-pty'
 import {
-    bakeEnvironmentToString, isAfile,
-    parseBufferToEnvironment, resolveDefaultCwd, searchFiles
+    bakeEnvironmentToString,
+    isAfile,
+    parseBufferToEnvironment,
+    resolveDefaultCwd,
+    searchFiles
 } from './util/util'
 import path from 'path'
 import { ITerminalDimensions } from 'xterm-addon-fit'
@@ -325,7 +328,6 @@ export class Terminal {
     }
 
     setMetaSettings(name: string, value: MetaSettingPayload) {
-
         if (!this.settings.metaSettings) {
             this.settings.metaSettings = {}
         }
@@ -353,7 +355,6 @@ export class Terminal {
                 return item
             })
         } else {
-
             this.settings.metaSettings[name] = value
         }
 
@@ -400,12 +401,11 @@ export class Terminal {
             this.ping()
         })
         this.socket.on('environmentListRefresh', async (args, akw) => {
-            console.log(this.settings.title, args.order, "Asked for refresh")
+            console.log(this.settings.title, args.order, 'Asked for refresh')
             try {
                 await this.environment.refreshRemote(args.id || this.settings.id, args.order)
                 akw(null)
             } catch (error) {
-                console.log("Remote refresh failed: ", error)
                 akw('Remote failed')
             }
 
@@ -421,12 +421,13 @@ export class Terminal {
             const environment = parseBufferToEnvironment(args.fromFile)
             this.environment.addOrder(args.id || this.settings.id, args.value, environment)
             this.ping()
-
         })
         this.socket.on('environmentListEdit', (args, akw) => {
             try {
                 const environment = parseBufferToEnvironment(args.fromFile)
-                this.environment.flush(args.id || this.settings.id, args.order, { env: environment })
+                this.environment.flush(args.id || this.settings.id, args.order, {
+                    env: environment
+                })
                 this.ping()
                 akw(null)
             } catch (error) {
@@ -434,7 +435,6 @@ export class Terminal {
             }
         })
         this.socket.on('environmentListEditRemote', async (args, akw) => {
-
             try {
                 this.environment.flush(args.id || this.settings.id, args.order, {
                     remote: {
@@ -450,13 +450,14 @@ export class Terminal {
                 akw(String(error))
             }
 
-
             this.ping()
         })
 
         this.socket.on('environmentSuggestions', async (akw) => {
-
-            const foundFiles = await searchFiles(this.settings.command.cwd || resolveDefaultCwd(), ['.env', '.md'])
+            const foundFiles = await searchFiles(this.settings.command.cwd || resolveDefaultCwd(), [
+                '.env',
+                '.md'
+            ])
 
             const suggestions: EnvironmentSuggestions = {
                 files: foundFiles
@@ -466,10 +467,7 @@ export class Terminal {
         })
 
         this.socket.on('environmentPreview', async (args, akw) => {
-
-
             const isAProperFile = await isAfile(args.from)
-
 
             if (!isAProperFile) {
                 try {
@@ -480,7 +478,6 @@ export class Terminal {
                         isFile: isAProperFile
                     }
                     akw(payload)
-
                 } catch (error) {
                     const payload = {
                         pairs: null,
@@ -500,7 +497,6 @@ export class Terminal {
                     isFile: isAProperFile
                 }
                 akw(payload)
-
             } catch (error) {
                 const payload = {
                     pairs: null,
@@ -509,9 +505,7 @@ export class Terminal {
                 }
                 akw(payload, String(error))
             }
-
         })
-
 
         this.socket.on('environmentMute', (arg) => {
             this.environment.mute(arg.id || this.settings.id, arg.order, arg.value)
@@ -551,7 +545,6 @@ export class Terminal {
             }
             return
         })
-
 
         this.socket.emit('hello')
         this.stackPing()

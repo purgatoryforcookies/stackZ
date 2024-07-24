@@ -45,7 +45,6 @@ export class Stack {
                 if (palette.executionOrder) return
                 const orders = stack.palette.map((pal) => pal.executionOrder || 0)
                 palette.executionOrder = (Math.max(...orders) ?? 1) + 1
-
             }
         }
         return this
@@ -59,7 +58,13 @@ export class Stack {
                 }
                 this.palettes.set(
                     palette.id,
-                    new Palette(palette, this.server, this.save.bind(this), this.history, this.environment)
+                    new Palette(
+                        palette,
+                        this.server,
+                        this.save.bind(this),
+                        this.history,
+                        this.environment
+                    )
                 )
             }
         }
@@ -91,7 +96,6 @@ export class Stack {
                     akw()
                 })
                 client.on('dockerContainers', async (akw) => {
-
                     this.dockerService.reset()
 
                     try {
@@ -236,7 +240,7 @@ export class Stack {
     /**
      * Save takes a deepcopy of the stack and filters out any
      * OS Environments from the commands.
-     * 
+     *
      * Save also makes sure no remote environments pairs are kept in stacks.json
      * if remote.keep is set to false.
      *
@@ -250,24 +254,20 @@ export class Stack {
         toBeSaved.forEach((stack) => {
             stack.env = this.environment.getCopy(stack.id)
 
-            stack.env?.forEach(environment => {
-
+            stack.env?.forEach((environment) => {
                 // Remove any remote envs if we dont want to keep them
                 if (!environment.remote?.keep && environment.order !== 0) {
                     environment.pairs = {}
                 }
-
             })
 
             stack.palette?.forEach((pal) => {
                 pal.command.env = this.environment.getCopy(pal.id)
-                pal.command.env?.forEach(environment => {
-
+                pal.command.env?.forEach((environment) => {
                     // Remove any remote envs if we dont want to keep them
                     if (environment.remote && !environment.remote.keep && environment.order !== 0) {
                         environment.pairs = {}
                     }
-
                 })
                 // Remove OS Environment
                 pal.command.env = pal.command.env?.filter((o) => o.order > 0)
