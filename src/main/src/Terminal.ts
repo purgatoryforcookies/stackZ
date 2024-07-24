@@ -109,7 +109,7 @@ export class Terminal {
         }
     }
 
-    start() {
+    async start() {
         if (this.isRunning) {
             this.stop()
         }
@@ -121,13 +121,15 @@ export class Terminal {
                 this.settings.metaSettings?.loose
             )
 
+            const environment = await this.environment.bake([this.stackId, this.settings.id])
+
             this.ptyProcess = spawn(shell, cmd, {
                 name:
                     shell === 'zsh' || shell === '/bin/zsh'
                         ? 'xterm-256color'
                         : `Palette ${this.settings.id}`,
                 cwd: this.settings.command.cwd || resolveDefaultCwd(),
-                env: this.environment.bake([this.stackId, this.settings.id]),
+                env: environment,
                 useConpty: false,
                 rows: this.rows,
                 cols: this.cols
@@ -528,9 +530,9 @@ export class Terminal {
             akw(this.getState())
         })
 
-        this.socket.on('copyToClipboard', (akw) => {
-            const environment = this.environment.bake([this.stackId, this.settings.id], true)
+        this.socket.on('copyToClipboard', async (akw) => {
 
+            const environment = await this.environment.bake([this.stackId, this.settings.id], true)
             const asString = bakeEnvironmentToString(environment)
 
             const fullCommand = asString + this.settings.command.cmd

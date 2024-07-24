@@ -217,7 +217,7 @@ export class EnvironmentService {
                     error: error,
                     metadata: metadata
                 })
-            }, 1200)
+            }, 0)
         }
     }
 
@@ -263,26 +263,37 @@ export class EnvironmentService {
      * and enumerates them to one single environment.
      * This action removes duplicated keys and muted variables.
      * Dublicated key is always overwritten by the last key present.
+     * 
+     * If environment is a remote one, and autofresh is on, before bake the 
+     * environment set is refreshed.
+     * 
+     * TODO: make the refershing on remotes paraller.
      */
-    bake(id: string[], omitOS: boolean = false) {
+    async bake(id: string[], omitOS: boolean = false) {
         const reduced: Record<string, string | undefined> = {}
 
-        id.forEach((i) => {
-            const environment = this.store.get(i)
-            if (!environment) return
 
+        for (const i of id) {
+            const environment = this.store.get(i)
+            if (!environment) continue
             environment
                 .sort((a, b) => a.order - b.order)
-                .forEach((envSet) => {
-                    if (omitOS && envSet.title === NAME_FOR_OS_ENV_SET) return
 
-                    Object.keys(envSet.pairs).forEach((key) => {
-                        if (envSet.disabled.includes(key)) return
-                        reduced[key] = envSet.pairs[key]
-                    })
+            for (const envSet of environment) {
+                if (omitOS && envSet.title === NAME_FOR_OS_ENV_SET) continue
+
+                if (envSet.remote) {
+                    if (envSet.remote.autoFresh) {
+                        await this.refreshRemote(i, envSet.order)
+                    }
+                }
+
+                Object.keys(envSet.pairs).forEach((key) => {
+                    if (envSet.disabled.includes(key)) return
+                    reduced[key] = envSet.pairs[key]
                 })
-        })
-
+            }
+        }
         return reduced
     }
 
