@@ -175,9 +175,9 @@ function Command({ data, engine, stack, selected, handleDrag, stackRunning }: Co
                                 <PlayIcon className="h-4 w-4" />
                             ) : null}
                             {ping.cmd.metaSettings?.ctrlc ? (
-                                <div className='flex relative'>
+                                <div className="flex relative">
                                     <p>ctrl</p>
-                                    <p className='absolute bottom-[7px] left-2'>+C</p>
+                                    <p className="absolute bottom-[7px] left-2">+C</p>
                                 </div>
                             ) : null}
                             {ping.cmd.metaSettings?.delay ? (

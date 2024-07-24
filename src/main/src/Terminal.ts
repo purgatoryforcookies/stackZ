@@ -2,12 +2,19 @@ import {
     Cmd,
     CustomServerSocket,
     Environment,
+    EnvironmentSuggestions,
     HistoryKey,
     MetaSettingPayload,
     Status
 } from '../../types'
 import { spawn, IPty } from 'node-pty'
-import { bakeEnvironmentToString, parseBufferToEnvironment } from './util/util'
+import {
+    bakeEnvironmentToString,
+    isAfile,
+    parseBufferToEnvironment,
+    resolveDefaultCwd,
+    searchFiles
+} from './util/util'
 import path from 'path'
 import { ITerminalDimensions } from 'xterm-addon-fit'
 import { IPingFunction, ISaveFuntion } from './Palette'
@@ -32,7 +39,6 @@ export class Terminal {
     save: ISaveFuntion
     history: HistoryService
     yesSequence: YesSequencer
-    counter: number
 
     constructor(
         stackId: string,
@@ -40,7 +46,8 @@ export class Terminal {
         socket: CustomServerSocket,
         stackPing: IPingFunction,
         save: ISaveFuntion,
-        history: HistoryService
+        history: HistoryService,
+        environment: EnvironmentService
     ) {
         this.settings = cmd
         this.stackId = stackId
@@ -54,10 +61,10 @@ export class Terminal {
         this.save = save
         this.history = history
         this.yesSequence = new YesSequencer()
-        this.counter = 0
 
-        this.environment = EnvironmentService.get()
+        this.environment = environment
         this.environment.register(this.settings.id, this.settings.command.env)
+        this.environment.refresAllRemotes(this.settings.id)
     }
 
     chooseShell(shell?: string) {
@@ -100,7 +107,7 @@ export class Terminal {
         }
     }
 
-    start() {
+    async start() {
         if (this.isRunning) {
             this.stop()
         }
@@ -112,13 +119,15 @@ export class Terminal {
                 this.settings.metaSettings?.loose
             )
 
+            const environment = await this.environment.bake([this.stackId, this.settings.id])
+
             this.ptyProcess = spawn(shell, cmd, {
                 name:
                     shell === 'zsh' || shell === '/bin/zsh'
                         ? 'xterm-256color'
                         : `Palette ${this.settings.id}`,
-                cwd: this.settings.command.cwd,
-                env: this.environment.bake([this.stackId, this.settings.id]),
+                cwd: this.settings.command.cwd || resolveDefaultCwd(),
+                env: environment,
                 useConpty: false,
                 rows: this.rows,
                 cols: this.cols
@@ -319,7 +328,6 @@ export class Terminal {
     }
 
     setMetaSettings(name: string, value: MetaSettingPayload) {
-
         if (!this.settings.metaSettings) {
             this.settings.metaSettings = {}
         }
@@ -347,7 +355,6 @@ export class Terminal {
                 return item
             })
         } else {
-
             this.settings.metaSettings[name] = value
         }
 
@@ -393,6 +400,17 @@ export class Terminal {
             this.environment.removeViaOrder(args.id || this.settings.id, args.order)
             this.ping()
         })
+        this.socket.on('environmentListRefresh', async (args, akw) => {
+            console.log(this.settings.title, args.order, 'Asked for refresh')
+            try {
+                await this.environment.refreshRemote(args.id || this.settings.id, args.order)
+                akw(null)
+            } catch (error) {
+                akw('Remote failed')
+            }
+
+            this.ping()
+        })
         this.socket.on('environmentDelete', (args) => {
             if (!args.value) return
             this.environment.remove(args.id || this.settings.id, args.value, args.order)
@@ -403,17 +421,91 @@ export class Terminal {
             const environment = parseBufferToEnvironment(args.fromFile)
             this.environment.addOrder(args.id || this.settings.id, args.value, environment)
             this.ping()
-
         })
-        this.socket.on('environmentListEdit', (args) => {
-            if (!args.value) return
-            const environment = parseBufferToEnvironment(args.fromFile)
+        this.socket.on('environmentListEdit', (args, akw) => {
+            try {
+                const environment = parseBufferToEnvironment(args.fromFile)
+                this.environment.flush(args.id || this.settings.id, args.order, {
+                    env: environment
+                })
+                this.ping()
+                akw(null)
+            } catch (error) {
+                akw(String(error))
+            }
+        })
+        this.socket.on('environmentListEditRemote', async (args, akw) => {
+            try {
+                this.environment.flush(args.id || this.settings.id, args.order, {
+                    remote: {
+                        source: args.source,
+                        autoFresh: args.autoFresh,
+                        keep: args.keep
+                    }
+                })
+                await this.environment.refreshRemote(args.id || this.settings.id, args.order)
+                akw(null)
+            } catch (error) {
+                console.log(error)
+                akw(String(error))
+            }
 
-            this.environment.flush(args.id || this.settings.id, args.order, environment)
             this.ping()
-
         })
 
+        this.socket.on('environmentSuggestions', async (akw) => {
+            const foundFiles = await searchFiles(this.settings.command.cwd || resolveDefaultCwd(), [
+                '.env',
+                '.md'
+            ])
+
+            const suggestions: EnvironmentSuggestions = {
+                files: foundFiles
+            }
+
+            akw(suggestions)
+        })
+
+        this.socket.on('environmentPreview', async (args, akw) => {
+            const isAProperFile = await isAfile(args.from)
+
+            if (!isAProperFile) {
+                try {
+                    const [raw, variables] = await this.environment.readFromService(args.from)
+                    const payload = {
+                        pairs: variables,
+                        unparsed: raw,
+                        isFile: isAProperFile
+                    }
+                    akw(payload)
+                } catch (error) {
+                    const payload = {
+                        pairs: null,
+                        unparsed: null,
+                        isFile: isAProperFile
+                    }
+                    akw(payload, String(error))
+                }
+                return
+            }
+
+            try {
+                const [raw, variables] = await this.environment.readFromFile(args.from)
+                const payload = {
+                    pairs: variables,
+                    unparsed: raw,
+                    isFile: isAProperFile
+                }
+                akw(payload)
+            } catch (error) {
+                const payload = {
+                    pairs: null,
+                    unparsed: null,
+                    isFile: isAProperFile
+                }
+                akw(payload, String(error))
+            }
+        })
 
         this.socket.on('environmentMute', (arg) => {
             this.environment.mute(arg.id || this.settings.id, arg.order, arg.value)
@@ -436,9 +528,8 @@ export class Terminal {
             akw(this.getState())
         })
 
-        this.socket.on('copyToClipboard', (akw) => {
-            const environment = this.environment.bake([this.stackId, this.settings.id], true)
-
+        this.socket.on('copyToClipboard', async (akw) => {
+            const environment = await this.environment.bake([this.stackId, this.settings.id], true)
             const asString = bakeEnvironmentToString(environment)
 
             const fullCommand = asString + this.settings.command.cmd
@@ -453,6 +544,7 @@ export class Terminal {
             }
             return
         })
+
         this.socket.emit('hello')
         this.stackPing()
     }

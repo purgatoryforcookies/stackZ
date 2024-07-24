@@ -1,7 +1,15 @@
+import { ClientToServerEvents, ServerToClientEvents } from '../../types'
 import { EnvironmentService } from '../src/service/EnvironmentService'
+import { Server } from 'socket.io'
 
 describe('Utilities tests', () => {
-    const envService = EnvironmentService.get()
+    const socketServer = new Server<ClientToServerEvents, ServerToClientEvents>({
+        cors: {
+            origin: '*'
+        }
+    })
+
+    const envService = new EnvironmentService(socketServer)
 
     beforeAll(() => {
         envService.store = new Map()
@@ -74,8 +82,8 @@ describe('Utilities tests', () => {
         expect(envService.store.size).toBe(2)
     })
 
-    it('Bakes environment correctly for a terminal to run', () => {
-        const envs = envService.bake(['stack1', 'term1'])
+    it('Bakes environment correctly for a terminal to run', async () => {
+        const envs = await envService.bake(['stack1', 'term1'])
 
         const toLookFor = ['key12', 'key22', 'key32', 'key1', 'key2', 'key3']
         const toLookForValues = [
@@ -87,7 +95,6 @@ describe('Utilities tests', () => {
             'value3.2'
         ]
 
-        console.log(envs)
 
         toLookFor.forEach((key, i) => {
             expect(envs[key]).toBeDefined()

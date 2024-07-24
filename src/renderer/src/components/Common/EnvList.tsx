@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import Record from '@renderer/components/Common/ListItem'
-import { Separator } from '@renderer/@/ui/separator'
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Badge } from '@renderer/@/ui/badge'
 import { CustomToolTip } from './CustomTooltip'
 import { GoInfo } from 'react-icons/go'
 import { Cmd, CustomClientSocket, Environment } from '@t'
-import EnvEditor from './EnvEditor'
+import EnvEditor, { NAME_FOR_OS_ENV_SET } from './EnvironmentEditor/EnvEditor'
 import { Button } from '@renderer/@/ui/button'
+import RadioEnvironmentTools from './RadioEnvironmentTools'
 
 type EnvListProps = {
     data: Exclude<Cmd['command']['env'], undefined>[0]
@@ -16,9 +16,26 @@ type EnvListProps = {
 }
 
 function EnvList({ data, socket, id }: EnvListProps) {
-    const [minimized, setMinimized] = useState<boolean>(true)
-    const [hidden, setHidden] = useState<boolean>(true)
+    const [minimized, setMinimized] = useState(true)
+    const [hidden, setHidden] = useState(true)
     const [editorOpen, setEditorOpen] = useState(false)
+    const [delayedLoading, setDelayedLoading] = useState(false)
+
+    useEffect(() => {
+        socket.on('environmentHeartbeat', (resp) => {
+            if (resp.order !== data.order) {
+                return
+            }
+            //UX reason
+            if (resp.loading) {
+                setDelayedLoading(true)
+            } else {
+                setTimeout(() => {
+                    setDelayedLoading(false)
+                }, 1200)
+            }
+        })
+    }, [])
 
     const handleMute = () => {
         socket.emit('environmentMute', {
@@ -52,7 +69,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
     }
 
     useEffect(() => {
-        if (data.title === 'OS Environment' && !data.visualState) {
+        if (data.title === NAME_FOR_OS_ENV_SET && !data.visualState) {
             setHidden(true)
             setMinimized(true)
             return
@@ -71,6 +88,10 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 setHidden(true)
                 setMinimized(true)
                 break
+            default:
+                setHidden(false)
+                setMinimized(false)
+                break
         }
     }, [data])
 
@@ -82,10 +103,16 @@ function EnvList({ data, socket, id }: EnvListProps) {
     }
 
     return (
-        <div className={`${minimized ? '' : 'max-w-[35rem]'} mb-10`}>
-            <EnvEditor setOpen={setEditorOpen} editorOpen={editorOpen} data={data} socket={socket} id={id} />
+        <div className={`${minimized ? '' : 'max-w-[35rem]'} h-[calc(100%-100px)] `}>
+            <EnvEditor
+                setOpen={setEditorOpen}
+                editorOpen={editorOpen}
+                data={data}
+                socket={socket}
+                id={id}
+            />
             <div className="flex justify-center cursor-pointer" onClick={() => setEditorOpen(true)}>
-                {data.title === 'OS Environment' ? (
+                {data.title === NAME_FOR_OS_ENV_SET ? (
                     <CustomToolTip message="This environment is editable, but not persistent.">
                         <h1 className="text-center text-foreground text-nowrap flex items-center gap-1">
                             {data.title} <GoInfo className="w-4 h-4 text-white/50" />
@@ -95,7 +122,15 @@ function EnvList({ data, socket, id }: EnvListProps) {
                     <h1 className="text-center text-foreground text-nowrap">{data.title}</h1>
                 )}
             </div>
-            <Separator className="my-2" />
+            {/* <Separator className="my-2" /> */}
+            <div className=" h-[1px] my-2 relative overflow-hidden bg-border">
+                <div
+                    className={`absolute w-full h-[0.5px]
+                        ${delayedLoading ? 'bg-gradient-to-r animate-border-linear' : 'bg-border'} 
+                        from-[#ede5c200] via-[#ecdfa8] to-[#ede5c200]
+                        `}
+                />
+            </div>
             <div className="flex gap-1 justify-center mb-2">
                 <Badge
                     variant={'outline'}
@@ -123,7 +158,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 />
             </div>
             {hidden ? (
-                <div className="flex flex-col justify-center items-center pt-10 text-white/40">
+                <div className="flex flex-col justify-center items-center pt-10 text-white/40 h-full pb-10">
                     <h2 className="text-2xl">
                         {Object.keys(data.pairs).length}{' '}
                         <span className="text-base">variables</span>
@@ -134,11 +169,11 @@ function EnvList({ data, socket, id }: EnvListProps) {
                 </div>
             ) : (
                 <div
-                    className="flex flex-col gap-1 overflow-auto h-full py-2"
+                    className="flex flex-col gap-1 overflow-auto py-2 h-full relative"
                     style={{ scrollbarGutter: 'stable' }}
                 >
-                    {Object.keys(data.pairs).length > 0
-                        ? Object.keys(data.pairs).map((key: string) => (
+                    {Object.keys(data.pairs).length > 0 ? (
+                        Object.keys(data.pairs).map((key: string) => (
                             <Record
                                 key={key} //react component key
                                 id={id}
@@ -151,16 +186,17 @@ function EnvList({ data, socket, id }: EnvListProps) {
                                 onDoubleClick={() => setEditorOpen(true)}
                             />
                         ))
-                        :
-                        <div className='flex flex-col gap-6 pt-5'>
+                    ) : (
+                        <div className="flex flex-col gap-6 pt-5">
                             <h1 className="text-center text-white/40">No variables</h1>
-                            <Button
-                                size={'sm'}
-                                onClick={() => setEditorOpen(true)}>Add</Button>
+                            <Button size={'sm'} onClick={() => setEditorOpen(true)}>
+                                Add
+                            </Button>
                         </div>
-                    }
+                    )}
                 </div>
             )}
+            {data.remote ? <RadioEnvironmentTools data={data} socket={socket} id={id} /> : null}
         </div>
     )
 }

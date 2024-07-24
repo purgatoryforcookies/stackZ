@@ -39,15 +39,14 @@ export class YesSequencer {
     redactSecrets(data: string) {
         if (this.secrets.length === 0) return data
         let newData = data
-        this.secrets.forEach(secret => {
-            newData = newData.replaceAll(secret, "******")
+        this.secrets.forEach((secret) => {
+            newData = newData.replaceAll(secret, '******')
         })
         return newData
     }
 
-
     /**
-     * Writes and executes a step into the process when the following 
+     * Writes and executes a step into the process when the following
      * conditions are met:
      * * There is a pty process in the sequencer
      * * There are steps in the sequence
@@ -62,7 +61,6 @@ export class YesSequencer {
         if (!step) return
         if (this.garbage.includes(step.index)) return
         this.garbage.push(step.index)
-
 
         const command = step.echo
         let output = ''
@@ -106,10 +104,10 @@ export class YesSequencer {
     /**
      * Registers the current trace() -stored step into the registry.
      * Registry contains steps that are playable with play()
-     * 
-     * register() is currently triggered when user interacts with the terminal 
+     *
+     * register() is currently triggered when user interacts with the terminal
      * process with their keyboard.
-     * 
+     *
      * Last stored trace() is stored into registry as a message. Purpose of this
      * is to show it to the user. Makes an attempt to clean the message.
      */

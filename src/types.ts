@@ -17,7 +17,20 @@ export const stackSchema = z.array(
                     pairs: z.record(z.string().min(1), z.string().optional()),
                     title: z.string().min(1).default('Default'),
                     order: z.number().default(1),
-                    disabled: z.array(z.string())
+                    disabled: z.array(z.string()),
+                    visualState: z.enum(['0', '1', '2']).optional(),
+                    remote: z
+                        .object({
+                            source: z.string(),
+                            keep: z.boolean().default(false),
+                            autoFresh: z.boolean().default(false),
+                            metadata: z
+                                .object({
+                                    updated: z.number().nullable().default(null)
+                                })
+                                .optional()
+                        })
+                        .optional()
                 })
             )
             .optional(),
@@ -57,7 +70,19 @@ export const stackSchema = z.array(
                                     title: z.string().min(1).default('Default'),
                                     order: z.number().default(1),
                                     disabled: z.array(z.string()),
-                                    visualState: z.enum(['0', '1', '2']).optional()
+                                    visualState: z.enum(['0', '1', '2']).optional(),
+                                    remote: z
+                                        .object({
+                                            source: z.string(),
+                                            keep: z.boolean().default(false),
+                                            autoFresh: z.boolean().default(false),
+                                            metadata: z
+                                                .object({
+                                                    updated: z.number().nullable().default(null)
+                                                })
+                                                .optional()
+                                        })
+                                        .optional()
                                 })
                             )
                             .optional(),
@@ -94,6 +119,7 @@ export interface ServerToClientEvents {
     badgeHeartBeat: (state: StackStatus) => void
     haltBeat: (beat: boolean) => void
     heartBeat: (beat: number | undefined) => void
+    environmentHeartbeat: (args: EnvironmentHeartbeat) => void
     terminalState: (state: Status) => void
     output: (data: string) => void
     terminalDelete: (args: { stack: string; terminal: string }) => void
@@ -115,6 +141,14 @@ type ChangeMetaSettingEvent = (
     callback: (state: Status) => void
 ) => void
 
+export type EnvironmentHeartbeat = {
+    loading: boolean
+    id: string
+    order: number
+    error: string | null
+    metadata: Environment['remote'] | null
+}
+
 export interface ClientToServerEvents {
     state: () => void
     stackState: () => void
@@ -128,12 +162,24 @@ export interface ClientToServerEvents {
     ) => void
 
     environmentEditSingle: (args: EnvironmentEditProps) => void
-    environmentListEdit: (args: {
-        value: string
-        fromFile: ArrayBuffer | null
-        id?: string | null
-        order: number
-    }) => void
+    environmentListEdit: (
+        args: {
+            fromFile: ArrayBuffer | null
+            id?: string | null
+            order: number
+        },
+        callback: (error: string | null) => void
+    ) => void
+    environmentListEditRemote: (
+        args: {
+            source: string
+            keep: boolean
+            autoFresh: boolean
+            id?: string | null
+            order: number
+        },
+        callback: (error: string | null) => void
+    ) => void
     environmentNewList: (args: {
         value: string
         fromFile: ArrayBuffer | null
@@ -142,7 +188,16 @@ export interface ClientToServerEvents {
     environmentMute: (arg: UtilityProps) => void
     environmentListDelete: (args: UtilityProps) => void
     environmentDelete: (args: UtilityProps) => void
+    environmentListRefresh: (args: UtilityProps, callback: (error?: string | null) => void) => void
     environmentVisualState: (args: UtilityProps) => void
+    environmentSuggestions: (callback: (data: EnvironmentSuggestions, err?: string) => void) => void
+    environmentPreview: (
+        args: EnvironmentPreviewAction,
+        callback: (
+            data: { pairs: Environment['pairs'] | null; unparsed: string | null; isFile: boolean },
+            err?: string
+        ) => void
+    ) => void
 
     commandMetaSetting: ChangeMetaSettingEvent
     commandHealthSetting: () => void
@@ -219,6 +274,14 @@ export type RemoveEnvListProps = {
     order: number
 }
 
+export type EnvironmentPreviewAction = {
+    from: string
+}
+
+export type EnvironmentSuggestions = {
+    files: string[]
+}
+
 export enum Panels {
     Details,
     Terminals
@@ -248,6 +311,11 @@ export type NewCommandPayload = {
 export type MonitorPortsResponse = {
     tcp: Processes
     udp: Processes
+}
+
+export type EnvironmentFlushOptions = {
+    env?: Record<string, string | undefined>
+    remote?: Environment['remote']
 }
 
 export type StoreType = {

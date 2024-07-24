@@ -144,10 +144,9 @@ export class TerminalUIEngine {
             this.ctrlCPassthrough = true
             setTimeout(() => {
                 this.ctrlCPassthrough = false
-            }, 300);
+            }, 300)
         }
     }
-
 
     ping() {
         this.socket.emit('state')

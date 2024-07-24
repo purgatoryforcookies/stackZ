@@ -20,7 +20,7 @@ type InputWithMagicProps = {
 const LIST_OFFSET = 2
 
 /**
- * Input element with search. Makes a list of search results fetched from 
+ * Input element with search. Makes a list of search results fetched from
  * HistoryService based on input.
  * The list can be navigated with arrow, pgup, and pgdown keys.
  *
@@ -63,7 +63,6 @@ function InputWithMagic({
     )
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
         setInputBox(e.target.value.trimStart())
         if (e.target.value === '') {
             setSearchList([])
@@ -102,7 +101,7 @@ function InputWithMagic({
                 onKeyDown={update}
                 onChange={handleChange}
                 value={inputBox || ''}
-                placeholder={placeholder || "curl --fail https://google.com || exit 1"}
+                placeholder={placeholder || 'curl --fail https://google.com || exit 1'}
             />
             {searchList.length > 0 ? (
                 <ul className="absolute p-1 rounded-sm  overflow-auto z-10">

@@ -3,7 +3,6 @@ import Palette from './components/Palette'
 import DetailHeader from './components/DetailHeader/DetailHeader'
 import { useEffect, useState } from 'react'
 import { SOCKET_HOST } from './service/socket'
-import Settings from './components/settings/Settings'
 import { CommandMenu } from './components/Common/CommandMenu'
 import { useStack } from './hooks/useStack'
 import { createContext } from 'react'
@@ -21,7 +20,7 @@ type ThemeContextType = {
 
 export const ThemeContext = createContext<ThemeContextType>({
     theme: 'aurora',
-    setTheme: () => { }
+    setTheme: () => {}
 })
 
 function App(): JSX.Element {
@@ -71,7 +70,7 @@ function App(): JSX.Element {
                         }}
                     >
                         <DockerStrip docker={docker} />
-                        <div className='pl-10 mt-10 h-[calc(100%-20px)] overflow-x-auto overflow-y-hidden'>
+                        <div className="pl-10 pt-10 h-full overflow-hidden">
                             <DetailHeader stack={stack} />
                         </div>
                     </Resizable>
@@ -93,18 +92,16 @@ function App(): JSX.Element {
                     }}
                 >
                     <CommandMenu stack={stack} toggle={toggle} docker={docker} />
-
-                    <NavBar>
-                        <Settings stack={stack} />
-                    </NavBar>
+                    <NavBar stack={stack} />
 
                     {w ? (
                         <div className="text-secondary-foreground h-[calc(100%-70px)]">
                             <div
-                                className={`p-1 ${w < 450
-                                    ? 'flex flex-col-reverse justify-center items-center gap-2'
-                                    : 'sm:grid sm:grid-cols-3 sm:grid-rows-1 flex flex-col-reverse justify-center items-center gap-2'
-                                    }`}
+                                className={`p-1 ${
+                                    w < 450
+                                        ? 'flex flex-col-reverse justify-center items-center gap-2'
+                                        : 'sm:grid sm:grid-cols-3 sm:grid-rows-1 flex flex-col-reverse justify-center items-center gap-2'
+                                }`}
                             >
                                 <BranchDropdown stack={stack} />
                                 <span className="font-semibold text-lg text-center">Terminals</span>
