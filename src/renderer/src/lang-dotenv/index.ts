@@ -6,9 +6,9 @@ export const dotenv = LRLanguage.define({
     parser: parser.configure({
         props: [
             styleTags({
-                Key: t.unit,
+                Key: t.meta,
                 Value: t.atom,
-                Separator: t.blockComment,
+                Separator: t.separator,
                 LineComment: t.comment,
                 Number: t.number
             })

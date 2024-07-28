@@ -54,16 +54,16 @@ function LocalEnvEditor({ data, socket, id, setOpen }: LocalEnvEditorProps) {
     return (
         <>
             {error ? <p>{error}</p> : null}
-            <div className="h-full">
-                {/* <Textarea
+
+            {/* <Textare
                     className="w-full h-full resize-none"
                     placeholder={placeHolderTexts.join('\n')}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     spellCheck={false}
-                /> */}
-                <CodeEditor text={text} setText={setText} />
-            </div>
+                    /> */}
+            <CodeEditor text={text} setText={setText} />
+
             <Button
                 onClick={handleSave}
                 className="mt-4 w-full"

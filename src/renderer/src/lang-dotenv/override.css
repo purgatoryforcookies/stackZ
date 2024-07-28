@@ -1,0 +1,11 @@
+.cm-selectionMatch {
+    background-color: rgb(56, 55, 55) !important;
+}
+
+.cm-selectionMatch > span {
+    color: rgb(255, 255, 255) !important;
+}
+
+::selection {
+    background-color: rgb(209, 202, 202) !important;
+}

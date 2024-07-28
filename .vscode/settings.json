@@ -6,6 +6,9 @@
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
-    "css.customData": [".vscode/tailwind.json"],
-    "editor.accessibilitySupport": "off"
+    "editor.accessibilitySupport": "off",
+    "files.associations": {
+    "*.css": "css",
+    "css": "css"
+    }
 }

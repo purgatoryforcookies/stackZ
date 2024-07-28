@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { autocompletion, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import {
@@ -16,10 +17,8 @@ import {
     tooltips
 } from '@codemirror/view'
 import { langDotEnv } from '@renderer/lang-dotenv'
-
-
-import { useEffect, useRef } from "react";
-
+import { editorTheme, fixedHeightEditor } from "@renderer/lang-dotenv/theme";
+import '../../lang-dotenv/override.css'
 
 type CodeEditorProps = {
     text: string
@@ -28,11 +27,10 @@ type CodeEditorProps = {
 
 }
 
-
 function CodeEditor({ text }: CodeEditorProps) {
 
     const divRef = useRef<HTMLDivElement>(null);
-
+    const theme = editorTheme()
 
     useEffect(() => {
 
@@ -41,8 +39,10 @@ function CodeEditor({ text }: CodeEditorProps) {
 
         const editor = new EditorView({
             parent: divRef.current,
+
             state: EditorState.create({
                 doc: text,
+
                 extensions: [
                     lineNumbers(),
                     highlightActiveLineGutter(),
@@ -51,14 +51,15 @@ function CodeEditor({ text }: CodeEditorProps) {
                     foldGutter(),
                     drawSelection(),
                     dropCursor(),
-                    EditorState.allowMultipleSelections.of(true),
+                    EditorView.lineWrapping,
                     indentOnInput(),
                     syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
                     bracketMatching(),
+
                     autocompletion(),
                     tooltips(),
                     highlightActiveLine(),
-                    highlightSelectionMatches(),
+                    highlightSelectionMatches({ minSelectionLength: 3 }),
 
                     keymap.of([
                         ...closeBracketsKeymap,
@@ -69,23 +70,22 @@ function CodeEditor({ text }: CodeEditorProps) {
                         ...completionKeymap,
                         ...lintKeymap,
                     ]),
-                    langDotEnv()
+                    langDotEnv(),
+                    fixedHeightEditor,
+                    theme,
 
                 ],
             })
-
         })
 
         return () => {
             editor.destroy()
         }
 
-    }, [])
-
-
+    }, [text])
 
     return (
-        <div ref={divRef} className="h-full bg-white/50">
+        <div ref={divRef} className="h-[75%]">
         </div>
     )
 }

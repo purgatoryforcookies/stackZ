@@ -28,11 +28,12 @@ function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
 
     useEffect(() => {
         setRemote(data.remote ? true : false)
+
     }, [editorOpen])
 
 
     return (
-        <Dialog open={!editorOpen} onOpenChange={setOpen}>
+        <Dialog open={editorOpen} onOpenChange={setOpen}>
             <DialogContent
                 data-theme={theme.theme}
                 className="
@@ -40,7 +41,7 @@ function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
             w-[70%] h-[80%] 
             min-w-[200px] min-h-[300px] 
             rounded-sm
-            flex flex-col justify-between
+            flex flex-col 
             overflow-auto
             "
             >
@@ -57,11 +58,15 @@ function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
                         <Label htmlFor="integrated">Remote</Label>
                     </div>
                 </DialogHeader>
+
+
                 {!remote ? (
                     <LocalEnvEditor data={data} socket={socket} id={id} setOpen={setOpen} />
                 ) : (
                     <RemoteEnvEditor socket={socket} data={data} id={id} setOpen={setOpen} />
                 )}
+
+
             </DialogContent>
         </Dialog>
     )

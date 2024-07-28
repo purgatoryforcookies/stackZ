@@ -4,7 +4,7 @@ module.exports = {
 
     content: {
         relative: true,
-        files: ['./**/*.html', './src/renderer/src/**/*.tsx']
+        files: ['./**/*.html', './src/renderer/src/**/*.tsx', './src/renderer/src/**/*.ts']
     },
     prefix: '',
     theme: {

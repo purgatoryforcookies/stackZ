@@ -13,27 +13,35 @@ import DockerStrip from './components/Common/DockerStrip'
 import useDocker from './hooks/useDocker'
 import NavBar from './components/Common/NavBar'
 
+export type Theme =
+    | 'dark'
+    | 'aurora'
+    | 'north'
+    | 'morning'
+    | 'forrest'
+    | 'pink'
+
 type ThemeContextType = {
-    theme?: string
-    setTheme: (name: string) => void
+    theme?: Theme
+    setTheme: (name: Theme) => void
 }
 
 export const ThemeContext = createContext<ThemeContextType>({
     theme: 'aurora',
-    setTheme: () => {}
+    setTheme: () => { }
 })
 
 function App(): JSX.Element {
     const stack = useStack(SOCKET_HOST)
     const { sizeHeader, sizePalette, toggle, w, h } = useResizable()
 
-    const [theme, setTheme] = useState<string>()
+    const [theme, setTheme] = useState<Theme>()
 
     const docker = useDocker()
 
     useEffect(() => {
         const fetchTheme = async () => {
-            const savedTheme = (await window.store.get('theme')) as string
+            const savedTheme = (await window.store.get('theme')) as Theme
             if (savedTheme) setTheme(savedTheme)
         }
         fetchTheme()
@@ -97,11 +105,10 @@ function App(): JSX.Element {
                     {w ? (
                         <div className="text-secondary-foreground h-[calc(100%-70px)]">
                             <div
-                                className={`p-1 ${
-                                    w < 450
-                                        ? 'flex flex-col-reverse justify-center items-center gap-2'
-                                        : 'sm:grid sm:grid-cols-3 sm:grid-rows-1 flex flex-col-reverse justify-center items-center gap-2'
-                                }`}
+                                className={`p-1 ${w < 450
+                                    ? 'flex flex-col-reverse justify-center items-center gap-2'
+                                    : 'sm:grid sm:grid-cols-3 sm:grid-rows-1 flex flex-col-reverse justify-center items-center gap-2'
+                                    }`}
                             >
                                 <BranchDropdown stack={stack} />
                                 <span className="font-semibold text-lg text-center">Terminals</span>
