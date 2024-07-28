@@ -1,6 +1,7 @@
 import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import react from '@vitejs/plugin-react'
+import lezer from 'unplugin-lezer/vite'
 
 export default defineConfig({
 
@@ -23,6 +24,6 @@ export default defineConfig({
                 '@t': resolve('src/types.ts')
             }
         },
-        plugins: [react()]
+        plugins: [react(), lezer(),]
     }
 })

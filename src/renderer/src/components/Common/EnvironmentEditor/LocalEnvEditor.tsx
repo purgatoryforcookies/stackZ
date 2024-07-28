@@ -1,7 +1,7 @@
 import { Button } from '@renderer/@/ui/button'
-import { Textarea } from '@renderer/@/ui/textarea'
 import { Cmd, CustomClientSocket } from '@t'
 import { useEffect, useState } from 'react'
+import CodeEditor from '../CodeEditor'
 
 type LocalEnvEditorProps = {
     data: Exclude<Cmd['command']['env'], undefined>[0]
@@ -50,26 +50,19 @@ function LocalEnvEditor({ data, socket, id, setOpen }: LocalEnvEditorProps) {
         )
     }
 
-    const placeHolderTexts = [
-        'Separate key value pairs with new lines. Example:',
-        'KEY=VALUE',
-        'KEY=LONG VALUE',
-        'KEY="VALUES WITH QUOTES"',
-        'KEYWITHNOVALUE=',
-        'KEY  =   ARBITURARY SPACES'
-    ]
 
     return (
         <>
             {error ? <p>{error}</p> : null}
             <div className="h-full">
-                <Textarea
+                {/* <Textarea
                     className="w-full h-full resize-none"
                     placeholder={placeHolderTexts.join('\n')}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     spellCheck={false}
-                />
+                /> */}
+                <CodeEditor text={text} setText={setText} />
             </div>
             <Button
                 onClick={handleSave}

@@ -4,7 +4,7 @@ import { Label } from '@renderer/@/ui/label'
 import { Switch } from '@renderer/@/ui/switch'
 import { ThemeContext } from '@renderer/App'
 import { Cmd, CustomClientSocket } from '@t'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import RemoteEnvEditor from './RemoteEnvEditor'
 import LocalEnvEditor from './LocalEnvEditor'
 
@@ -24,10 +24,15 @@ export const NAME_FOR_OS_ENV_SET = 'OS Environment'
 function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
     const theme = useContext(ThemeContext)
 
-    const [remote, setRemote] = useState<boolean>(data.remote ? true : false)
+    const [remote, setRemote] = useState<boolean>(false)
+
+    useEffect(() => {
+        setRemote(data.remote ? true : false)
+    }, [editorOpen])
+
 
     return (
-        <Dialog open={editorOpen} onOpenChange={setOpen}>
+        <Dialog open={!editorOpen} onOpenChange={setOpen}>
             <DialogContent
                 data-theme={theme.theme}
                 className="
