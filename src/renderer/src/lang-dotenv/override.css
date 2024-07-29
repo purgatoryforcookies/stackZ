@@ -5,7 +5,3 @@
 .cm-selectionMatch > span {
     color: rgb(255, 255, 255) !important;
 }
-
-::selection {
-    background-color: rgb(209, 202, 202) !important;
-}

@@ -16,7 +16,7 @@ import {
     keymap, lineNumbers,
     tooltips
 } from '@codemirror/view'
-import { langDotEnv } from '@renderer/lang-dotenv'
+import { DotEnv } from '@renderer/lang-dotenv'
 import { editorTheme, fixedHeightEditor } from "@renderer/lang-dotenv/theme";
 import '../../lang-dotenv/override.css'
 
@@ -70,7 +70,7 @@ function CodeEditor({ text }: CodeEditorProps) {
                         ...completionKeymap,
                         ...lintKeymap,
                     ]),
-                    langDotEnv(),
+                    DotEnv(),
                     fixedHeightEditor,
                     theme,
 
@@ -85,7 +85,7 @@ function CodeEditor({ text }: CodeEditorProps) {
     }, [text])
 
     return (
-        <div ref={divRef} className="h-[75%]">
+        <div ref={divRef} className="h-[calc(100%-150px)]">
         </div>
     )
 }

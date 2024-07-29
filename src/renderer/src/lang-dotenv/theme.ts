@@ -39,6 +39,13 @@ export const editorTheme = () => {
                 color: '#50fa7b',
                 fontWeight: 'bold',
                 letterSpacing: '0.6px'
+            },
+            {
+                tag: t.strikethrough,
+                color: '#8f2e2e',
+                fontWeight: 'bold',
+                letterSpacing: '0.6px',
+                textDecoration: 'line-through'
             }
         ]
     })
