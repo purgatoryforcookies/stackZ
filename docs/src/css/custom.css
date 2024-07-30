@@ -10,7 +10,7 @@
 
 /* You can override the default Infima variables here. */
 :root {
-    --ifm-color-primary: hsl(35 93% 55%);
+    --ifm-color-primary: rgb(247, 158, 34);
 
     --gradient: linear-gradient(to right bottom, #1d1407, #201608, #231808, #261909, #291b09);
 
