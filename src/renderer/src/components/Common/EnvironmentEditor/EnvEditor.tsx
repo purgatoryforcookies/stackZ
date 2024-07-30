@@ -28,9 +28,7 @@ function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
 
     useEffect(() => {
         setRemote(data.remote ? true : false)
-
     }, [editorOpen])
-
 
     return (
         <Dialog open={editorOpen} onOpenChange={setOpen}>
@@ -59,14 +57,11 @@ function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
                     </div>
                 </DialogHeader>
 
-
                 {!remote ? (
                     <LocalEnvEditor data={data} socket={socket} id={id} setOpen={setOpen} />
                 ) : (
                     <RemoteEnvEditor socket={socket} data={data} id={id} setOpen={setOpen} />
                 )}
-
-
             </DialogContent>
         </Dialog>
     )

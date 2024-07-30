@@ -34,8 +34,8 @@ function SuggestionBadges({ socket, onClick }: SuggestionBadgesProps) {
         <div className="mt-5">
             <h2>File suggestions:</h2>
             <div className="flex gap-2 p-2 flex-wrap">
-                {suggestions && suggestions.files.length > 0
-                    ? suggestions.files.map((suggestion, i) => (
+                {suggestions && suggestions.files.length > 0 ? (
+                    suggestions.files.map((suggestion, i) => (
                         <Badge
                             key={i}
                             className="mt-1 hover:cursor-pointer"
@@ -45,7 +45,9 @@ function SuggestionBadges({ socket, onClick }: SuggestionBadgesProps) {
                             {suggestion.split('\\').slice(-2).join('\\')}
                         </Badge>
                     ))
-                    : <p className='text-xs'>No files found</p>}
+                ) : (
+                    <p className="text-xs">No files found</p>
+                )}
                 <div className="flex items-center relative top-[2px]">
                     <ReloadIcon
                         onClick={getFiles}

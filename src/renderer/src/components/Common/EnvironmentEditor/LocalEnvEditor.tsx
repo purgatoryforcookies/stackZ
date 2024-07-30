@@ -1,28 +1,35 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react'
 import { autocompletion, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import {
-    bracketMatching, defaultHighlightStyle, foldGutter,
-    foldKeymap, indentOnInput, syntaxHighlighting
+    bracketMatching,
+    defaultHighlightStyle,
+    foldGutter,
+    foldKeymap,
+    indentOnInput,
+    syntaxHighlighting
 } from '@codemirror/language'
 import { lintKeymap } from '@codemirror/lint'
 import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
 import { EditorState } from '@codemirror/state'
 import {
-    drawSelection, dropCursor,
-    EditorView, highlightActiveLine,
-    highlightActiveLineGutter, highlightSpecialChars,
-    keymap, lineNumbers,
+    drawSelection,
+    dropCursor,
+    EditorView,
+    highlightActiveLine,
+    highlightActiveLineGutter,
+    highlightSpecialChars,
+    keymap,
+    lineNumbers,
     tooltips
 } from '@codemirror/view'
 import { DotEnv } from '@renderer/lang-dotenv'
-import { editorTheme, fixedHeightEditor } from "@renderer/lang-dotenv/theme";
+import { editorTheme, fixedHeightEditor } from '@renderer/lang-dotenv/theme'
 import '../../../lang-dotenv/override.css'
-import { Button } from "@renderer/@/ui/button";
-import { Cmd, CustomClientSocket } from "@t";
-import { DotEnvLinter } from "@renderer/lang-dotenv/linter";
-import { AcceptWithTabKeymap, DotEnvCompletions } from "@renderer/lang-dotenv/autocomplete";
-
+import { Button } from '@renderer/@/ui/button'
+import { Cmd, CustomClientSocket } from '@t'
+import { DotEnvLinter } from '@renderer/lang-dotenv/linter'
+import { AcceptWithTabKeymap, DotEnvCompletions } from '@renderer/lang-dotenv/autocomplete'
 
 type LocalEnvEditorProps = {
     data: Exclude<Cmd['command']['env'], undefined>[0]
@@ -32,12 +39,11 @@ type LocalEnvEditorProps = {
 }
 
 function LocalEnvEditor({ data, socket, id, setOpen }: LocalEnvEditorProps) {
-
     const [text, setText] = useState<string>('')
     const [error, setError] = useState<string>('')
     const [hasChanged, setHasChanged] = useState<boolean>(false)
     const [editor, setEditor] = useState<EditorView | null>(null)
-    const divRef = useRef<HTMLDivElement>(null);
+    const divRef = useRef<HTMLDivElement>(null)
     const theme = editorTheme()
 
     useEffect(() => {
@@ -50,7 +56,6 @@ function LocalEnvEditor({ data, socket, id, setOpen }: LocalEnvEditorProps) {
     }, [data.pairs])
 
     const handleSave = () => {
-
         if (!editor) return
         const newText = editor.state.doc.toString()
 
@@ -79,10 +84,7 @@ function LocalEnvEditor({ data, socket, id, setOpen }: LocalEnvEditorProps) {
     }
 
     useEffect(() => {
-
         if (!divRef.current) return
-
-
 
         const editor = new EditorView({
             parent: divRef.current,
@@ -125,9 +127,8 @@ function LocalEnvEditor({ data, socket, id, setOpen }: LocalEnvEditorProps) {
                     DotEnvCompletions(id),
                     DotEnvLinter,
                     fixedHeightEditor,
-                    theme,
-
-                ],
+                    theme
+                ]
             })
         })
 
@@ -137,7 +138,6 @@ function LocalEnvEditor({ data, socket, id, setOpen }: LocalEnvEditorProps) {
             editor.destroy()
             setEditor(null)
         }
-
     }, [text])
 
     return (

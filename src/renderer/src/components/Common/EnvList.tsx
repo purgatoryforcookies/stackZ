@@ -23,7 +23,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
 
     useEffect(() => {
         /**
-         * OS environments are never remote, and thus can be ignored. 
+         * OS environments are never remote, and thus can be ignored.
          */
         if (data.title === NAME_FOR_OS_ENV_SET) return
         socket.on('environmentHeartbeat', (resp) => {
