@@ -1,3 +1,18 @@
+# [1.3.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.2.0...v1.3.0) (2024-07-30)
+
+
+### Bug Fixes
+
+* ok no json then. fixed tests and updated app.getpath paths for testing environment. ([827f443](https://github.com/purgatoryforcookies/stackZ/commit/827f443f0c4d2567468f77c5945f52377d974220))
+
+
+### Features
+
+* from LRparser to StreamParser. Alot simpler to setup for simpler language ([e1417e6](https://github.com/purgatoryforcookies/stackZ/commit/e1417e6a18e58df3cbc2a345f72448c5d218969e))
+* improved regexes for dotenv lang ([9e83879](https://github.com/purgatoryforcookies/stackZ/commit/9e8387934218fabee6f8a788a829c88e1ec82637))
+* new environment editor. Includes feats like autocompletion, linting, styles ([d19d2a1](https://github.com/purgatoryforcookies/stackZ/commit/d19d2a19ecd3b3ddd4b7cdb1107cbf7a362fe585))
+* preminilary support for dotenv lang in codemirror ([ba9c7e9](https://github.com/purgatoryforcookies/stackZ/commit/ba9c7e971283d2c58b45ff0c033d2c446e306e56))
+
 # [1.2.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.1.0...v1.2.0) (2024-07-24)
 
 
