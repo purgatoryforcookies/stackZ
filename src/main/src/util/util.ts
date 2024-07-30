@@ -17,7 +17,6 @@ export const readJsonFile = <T extends z.ZodTypeAny>(
         if (!existsSync(path)) {
             createJsonFileTemplate(path, schema)
         }
-
         readFile(path, 'utf-8', async (err, data) => {
             if (err) {
                 rej({ message: `No json file found, tried to create. Failed. Path: ${path}` })

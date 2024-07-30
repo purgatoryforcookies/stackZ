@@ -95,7 +95,6 @@ describe('Utilities tests', () => {
             'value3.2'
         ]
 
-
         toLookFor.forEach((key, i) => {
             expect(envs[key]).toBeDefined()
             expect(envs[key]).toBe(toLookForValues[i])

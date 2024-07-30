@@ -8,12 +8,12 @@ import { stackSchema } from '../types'
 import { exec } from 'child_process'
 
 const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
-const stack = new Stack(savedCommandsPath, socketServer, stackSchema)
+const stack = new Stack(socketServer)
 
 let windowInstance: BrowserWindow | null = null
 
 async function createWindow(): Promise<void> {
-    await stack.load()
+    await stack.load(savedCommandsPath, stackSchema)
     stack.init()?.startServer()
 
     // dev setup to open screen on 2nd monitor for refresh
@@ -48,7 +48,7 @@ async function createWindow(): Promise<void> {
     mainWindow.on('ready-to-show', () => {
         mainWindow.show()
         // dev setup to not focus on it on save
-        if (is.dev) mainWindow.blur()
+        if (!is.dev) mainWindow.blur()
     })
 
     mainWindow.webContents.setWindowOpenHandler((details) => {

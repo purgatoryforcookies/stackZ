@@ -94,6 +94,38 @@ export const stackSchema = z.array(
     })
 )
 
+export const autocompleteSchema = z.array(
+    z.object({
+        source: z.string().optional(),
+        /**
+         * Label to be searched with and entered when selected.
+         */
+        label: z.string(),
+        /**
+         * Specifies what icon to show
+         */
+        type: z.enum(['keyword', 'variable', 'property', 'text']).default('variable'),
+        /**
+         * Ranking of a result, goes from -99 to 99.
+         */
+        boost: z.number({ coerce: true }).optional(),
+        /**
+         * Used for grouping
+         */
+        section: z.string().optional(),
+        /**
+         * Tooltip text. Shown next to list item.
+         */
+        info: z.string().optional(),
+        /**
+         * Show little text next to label
+         */
+        detail: z.string().optional()
+    })
+)
+
+export type EditorAutocomplete = z.infer<typeof autocompleteSchema>[0]
+
 export type PaletteStack = z.infer<typeof stackSchema>[0]
 
 export type Cmd = Exclude<PaletteStack['palette'], undefined>[0]
@@ -103,14 +135,6 @@ export type EnginedCmd = Cmd & { engine: TerminalUIEngine }
 
 export type RecursivePartial<T> = {
     [P in keyof T]?: RecursivePartial<T[P]>
-}
-
-export enum SelectionEvents {
-    START = 'START',
-    CONN = 'CONNECT',
-    STOP = 'STOP',
-    EXPAND = 'EXPAND',
-    NEWSTACK = 'NEWSTACK'
 }
 
 export interface ServerToClientEvents {
@@ -219,6 +243,11 @@ export interface ClientToServerEvents {
     dockerStop: (id: string, callback: (data: string, err?: string) => void) => void
     dockerStart: (id: string, callback: (data: string, err?: string) => void) => void
     dockerRemove: (id: string, callback: (data: string, err?: string) => void) => void
+
+    editorAutocompletes: (
+        id: string,
+        callback: (data: EditorAutocomplete[], err?: string) => void
+    ) => void
 }
 
 export type CustomServerSocket = Socket<ClientToServerEvents, ServerToClientEvents>
@@ -308,11 +337,6 @@ export type NewCommandPayload = {
     cwd?: string
 }
 
-export type MonitorPortsResponse = {
-    tcp: Processes
-    udp: Processes
-}
-
 export type EnvironmentFlushOptions = {
     env?: Record<string, string | undefined>
     remote?: Environment['remote']
@@ -348,14 +372,6 @@ export type TPorts = {
     remotePort: number | null
     remoteAddress: string | null
 }
-
-export type Processes = {
-    process: string
-    byPort: {
-        number: number
-        ports: TPorts[]
-    }[]
-}[]
 
 export type HistoryBook = {
     stackz: string[]

@@ -9,17 +9,11 @@ import { PaletteStack } from '../../../types'
  *
  */
 export class DataStore {
-    path: string
-    schema: ZodTypeAny
+    constructor() {}
 
-    constructor(path: string, schema: ZodTypeAny) {
-        this.path = path
-        this.schema = schema
-    }
-
-    async load() {
+    async load(path: string, schema: ZodTypeAny) {
         try {
-            const raw = await readJsonFile(this.path, this.schema)
+            const raw = await readJsonFile(path, schema)
             return raw
         } catch (error) {
             console.log(error)

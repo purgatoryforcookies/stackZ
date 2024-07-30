@@ -4,7 +4,7 @@ import { Label } from '@renderer/@/ui/label'
 import { Switch } from '@renderer/@/ui/switch'
 import { ThemeContext } from '@renderer/App'
 import { Cmd, CustomClientSocket } from '@t'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import RemoteEnvEditor from './RemoteEnvEditor'
 import LocalEnvEditor from './LocalEnvEditor'
 
@@ -24,7 +24,11 @@ export const NAME_FOR_OS_ENV_SET = 'OS Environment'
 function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
     const theme = useContext(ThemeContext)
 
-    const [remote, setRemote] = useState<boolean>(data.remote ? true : false)
+    const [remote, setRemote] = useState<boolean>(false)
+
+    useEffect(() => {
+        setRemote(data.remote ? true : false)
+    }, [editorOpen])
 
     return (
         <Dialog open={editorOpen} onOpenChange={setOpen}>
@@ -35,7 +39,7 @@ function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
             w-[70%] h-[80%] 
             min-w-[200px] min-h-[300px] 
             rounded-sm
-            flex flex-col justify-between
+            flex flex-col 
             overflow-auto
             "
             >
@@ -52,6 +56,7 @@ function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
                         <Label htmlFor="integrated">Remote</Label>
                     </div>
                 </DialogHeader>
+
                 {!remote ? (
                     <LocalEnvEditor data={data} socket={socket} id={id} setOpen={setOpen} />
                 ) : (

@@ -13,9 +13,11 @@ import DockerStrip from './components/Common/DockerStrip'
 import useDocker from './hooks/useDocker'
 import NavBar from './components/Common/NavBar'
 
+export type Theme = 'dark' | 'aurora' | 'north' | 'morning' | 'forrest' | 'pink'
+
 type ThemeContextType = {
-    theme?: string
-    setTheme: (name: string) => void
+    theme?: Theme
+    setTheme: (name: Theme) => void
 }
 
 export const ThemeContext = createContext<ThemeContextType>({
@@ -27,13 +29,13 @@ function App(): JSX.Element {
     const stack = useStack(SOCKET_HOST)
     const { sizeHeader, sizePalette, toggle, w, h } = useResizable()
 
-    const [theme, setTheme] = useState<string>()
+    const [theme, setTheme] = useState<Theme>()
 
     const docker = useDocker()
 
     useEffect(() => {
         const fetchTheme = async () => {
-            const savedTheme = (await window.store.get('theme')) as string
+            const savedTheme = (await window.store.get('theme')) as Theme
             if (savedTheme) setTheme(savedTheme)
         }
         fetchTheme()

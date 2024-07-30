@@ -28,13 +28,13 @@ const SOCKET_HOST_FOR_CLIENT = 'http://localhost:3123'
 
 // Test is designed to be run in order.
 describe('stack', () => {
-    const stack = new Stack(filepath, testServer, stackSchema)
+    const stack = new Stack(testServer)
     const testTerminalNames = ['terminal1', 'terminal2', 'terminal3', 'terminal4']
     const testStacks: Map<string, string[]> = new Map()
     const uiSockets: CustomClientSocket[] = []
 
     beforeAll(async () => {
-        await stack.load()
+        await stack.load(filepath, stackSchema)
     })
 
     afterAll((done) => {

@@ -6,7 +6,7 @@ import { Label } from '@renderer/@/ui/label'
 import { Input } from '@renderer/@/ui/input'
 import { RadioGroup, RadioGroupItem } from '@renderer/@/ui/radio-group'
 import { useContext, useEffect, useState } from 'react'
-import { ThemeContext } from '@renderer/App'
+import { Theme, ThemeContext } from '@renderer/App'
 import { StoreType } from '@t'
 import { baseSocket } from '@renderer/service/socket'
 import { CustomToolTip } from '../Common/CustomTooltip'
@@ -45,7 +45,7 @@ function General() {
         }
     }
 
-    const changeTheme = (e: string) => {
+    const changeTheme = (e: Theme) => {
         theme.setTheme(e)
         window.store.set('theme', e)
     }
