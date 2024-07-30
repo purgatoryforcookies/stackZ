@@ -21,7 +21,7 @@ function RadioEnvironmentTools({ socket, id, data }: RadioEnvironmentToolsProps)
                 order: data.order,
                 id: id
             },
-            () => {}
+            () => { }
         )
     }
 
@@ -65,8 +65,8 @@ function RadioEnvironmentTools({ socket, id, data }: RadioEnvironmentToolsProps)
                     {hover
                         ? 'Refresh'
                         : data.remote?.metadata?.updated
-                          ? moment(data.remote?.metadata?.updated).fromNow()
-                          : 'Not updated'}
+                            ? moment(data.remote?.metadata?.updated).fromNow()
+                            : 'Not updated'}
                 </p>
             </div>
             <div className="flex items-center justify-center relative top-[2px]">

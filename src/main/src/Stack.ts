@@ -8,6 +8,7 @@ import { HistoryService } from './service/HistoryService'
 import { EnvironmentService } from './service/EnvironmentService'
 import { DockerService } from './service/DockerService'
 import { DockerError, DockerFaultState } from './util/error'
+import { AutocompleteService } from './service/AutocompleteService'
 
 const FAULTSTATE_ERROR_CODE = 'ERRFAULT'
 
@@ -21,21 +22,23 @@ export class Stack {
     history: HistoryService
     environment: EnvironmentService
     dockerService: DockerService
+    autocompleteService: AutocompleteService
 
-    constructor(jsonPath: string, server: CustomServer, schema: ZodTypeAny) {
-        this.path = jsonPath
+    constructor(server: CustomServer) {
         this.server = server
         this.raw = []
-        this.store = new DataStore(jsonPath, schema)
+        this.store = new DataStore()
         this.palettes = new Map<string, Palette>()
         this.scheduler = new Map<string, TerminalScheduler>()
         this.history = new HistoryService()
         this.environment = new EnvironmentService(server)
         this.dockerService = new DockerService()
+        this.autocompleteService = new AutocompleteService()
     }
 
-    async load() {
-        this.raw = await this.store.load()
+    async load(jsonPath: string, schema: ZodTypeAny) {
+        this.path = jsonPath
+        this.raw = await this.store.load(jsonPath, schema)
         for (const stack of this.raw) {
             stack.id = uuidv4()
             if (!stack.palette) return
@@ -69,6 +72,7 @@ export class Stack {
             }
         }
         this.save()
+        this.autocompleteService.loadFromStacks(this.raw)
         return this
     }
 
@@ -151,6 +155,9 @@ export class Stack {
                         }
                         akw('', 'Unknown docker error')
                     }
+                })
+                client.on('editorAutocompletes', async (_id: string, akw) => {
+                    akw(this.autocompleteService.completions)
                 })
             }
         })

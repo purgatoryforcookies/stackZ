@@ -22,7 +22,14 @@ function EnvList({ data, socket, id }: EnvListProps) {
     const [delayedLoading, setDelayedLoading] = useState(false)
 
     useEffect(() => {
+        /**
+         * OS environments are never remote, and thus can be ignored. 
+         */
+        if (data.title === NAME_FOR_OS_ENV_SET) return
         socket.on('environmentHeartbeat', (resp) => {
+            console.log(resp)
+            console.log(data)
+            console.log(id)
             if (resp.order !== data.order) {
                 return
             }

@@ -19,10 +19,14 @@ const DotnEnvLanguage = StreamLanguage.define({
         if (!state.key && stream.sol()) {
             const key = stream.string.split('=')[0]
 
-            if (key.indexOf(' ') >= 0 || !Number.isNaN(Number(key[0]))) {
+            if (key.indexOf(' ') >= 0) {
                 stream.pos = key.length
                 state.key = true
-                return 'faulKey'
+                return 'keywithspace'
+            } else if (!Number.isNaN(Number(key[0]))) {
+                stream.pos = key.length
+                state.key = true
+                return 'keywithnumber'
             } else {
                 stream.pos = key.length
                 state.key = true
@@ -52,10 +56,11 @@ const DotnEnvLanguage = StreamLanguage.define({
     },
     tokenTable: {
         key: t.meta,
+        keywithspace: t.meta,
+        keywithnumber: t.meta,
         separator: t.separator,
         value: t.atom,
-        lineComment: t.comment,
-        faulKey: t.strikethrough
+        lineComment: t.comment
     }
 })
 

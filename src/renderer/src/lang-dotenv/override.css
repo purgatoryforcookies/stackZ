@@ -5,3 +5,38 @@
 .cm-selectionMatch > span {
     color: rgb(255, 255, 255) !important;
 }
+
+.cm-tooltip-autocomplete{
+    background-color: rgb(56, 55, 55) !important;
+    height: 300px;
+    border-radius: 6px;
+    border: 1px solid #8d90826a;
+}
+
+.cm-tooltip.cm-tooltip-autocomplete > ul{
+    height: 300px;
+    max-height: 300px !important;
+    min-width: 500px !important;
+    
+}
+.cm-tooltip.cm-tooltip-autocomplete > ul > li{
+    padding: 2px 3px !important;
+}
+.cm-tooltip.cm-tooltip-autocomplete > ul > li[aria-selected="true"]{
+  background-color: #595856;
+}
+
+.cm-completionListIncompleteBottom > completion-section{
+    text-align: center;
+    padding: 5px 0 2px 0 !important;
+}
+
+.cm-completionDetail{
+    float: right;
+    color: #a2a09d;
+    font-size: 0.9rem;
+    position: relative;
+    top: 3px;
+    right: 3px;
+}
+

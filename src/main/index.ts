@@ -6,28 +6,14 @@ import { store } from './src/stores/Store'
 import { Stack } from './src/Stack'
 import { stackSchema } from '../types'
 import { exec } from 'child_process'
-import { MyParser } from './lang-dotenv/Parser'
 
 const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
-const stack = new Stack(savedCommandsPath, socketServer, stackSchema)
-
-// const parser = new MyParser()
-// try {
-//     const program = `=`
-
-//     const ast = parser.parse(program)
-
-//     console.log(JSON.stringify(ast, null, 2))
-// } catch (error) {
-//     console.log('Parsing failed', error)
-// }
-
-// console.log = () => {}
+const stack = new Stack(socketServer)
 
 let windowInstance: BrowserWindow | null = null
 
 async function createWindow(): Promise<void> {
-    await stack.load()
+    await stack.load(savedCommandsPath, stackSchema)
     stack.init()?.startServer()
 
     // dev setup to open screen on 2nd monitor for refresh
