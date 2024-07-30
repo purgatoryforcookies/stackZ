@@ -1,10 +1,10 @@
 import { app } from 'electron'
-import path from 'path'
+import { join } from 'path'
 import { autocompleteSchema, EditorAutocomplete, MkdirError, PaletteStack } from '../../../types'
 import { mkdirSync } from 'fs'
-import baked from '../stores/autocomplete.json'
+import { preloadedCompletes } from '../stores/autocomplete'
 
-const autocompletePath = path.join(app.getPath('userData'), './autocomplete')
+const autocompletePath = join(app?.getPath('userData') || '', './autocomplete')
 
 export class AutocompleteService {
     completions: EditorAutocomplete[] = []
@@ -24,7 +24,7 @@ export class AutocompleteService {
 
     async loadLocal() {
         try {
-            const raw = autocompleteSchema.parse(baked)
+            const raw = autocompleteSchema.parse(preloadedCompletes)
             this.completions = raw
         } catch (error) {
             console.log(error)
