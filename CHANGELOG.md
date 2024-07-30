@@ -1,3 +1,22 @@
+# [1.2.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.1.0...v1.2.0) (2024-07-24)
+
+
+### Bug Fixes
+
+* bugfix for deleting environments via order. Fixes erratic behaviour where removing an environment caused reordering to leave OS environments with an order of != 0 ([231956f](https://github.com/purgatoryforcookies/stackZ/commit/231956f8ec31b793a52e1e190a1de21a42f5f31e))
+* settings button on navbar had limited click area ([7e3a136](https://github.com/purgatoryforcookies/stackZ/commit/7e3a1363cbfc6b87315d9cc611562b7fd5622043))
+
+
+### Features
+
+* drafting of integrated environment set ([00cd9bf](https://github.com/purgatoryforcookies/stackZ/commit/00cd9bfb29712b89709ee6a0ec2b37aca84e8ca0))
+* environment service upgraded to handle remote sets and refresh them ([241b36b](https://github.com/purgatoryforcookies/stackZ/commit/241b36b92876db8ae2be3a6d2706067dadf8d335))
+* loading indicator, bugfixes, error messages from remote refresh ([6f04975](https://github.com/purgatoryforcookies/stackZ/commit/6f049759a236d33874bc097c316e908eb99a6bc6))
+* offline mode for remote environment sets ([43b78ca](https://github.com/purgatoryforcookies/stackZ/commit/43b78ca9565aef6aacb3d24865e82e002612939a))
+* remote environment icons to show meta options easily. clicking on timestamp also refreshes the environment ([4fd0d22](https://github.com/purgatoryforcookies/stackZ/commit/4fd0d2235e242fecf28f7d580f255600f7fb7173))
+* styles, better loading bar, remote terminals refresh on paraller during baking ([c53ba1a](https://github.com/purgatoryforcookies/stackZ/commit/c53ba1ae6025c69d35682ba57fe8df3c82f4956c))
+* synced remote environments are fetched befor terminal starts ([4ced4bc](https://github.com/purgatoryforcookies/stackZ/commit/4ced4bc701d0e37966d73fa8afde73b90f5c66f7))
+
 # [1.1.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.0.1...v1.1.0) (2024-07-18)
 
 
