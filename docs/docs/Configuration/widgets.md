@@ -25,7 +25,7 @@ Common errors:
 
 ## Docker
 
-Docker widget lists all the containers you have and their current state. You can start and stop containers, and see some additional information about them in the tooltip. Containers are also searchable from the CMD+K menu. There are no actions for them.
+Docker widget lists all the containers you have and their current state. You can start and stop containers, and see some additional information about them in the tooltip. Containers are also searchable from the CMD+K menu.
 
 Right-clicking tooltip card's file icon copies the file location of the docker-compose.yaml file (if it exists).
 
@@ -38,7 +38,3 @@ Prerequisites: Have the docker daemon exposed. Please read more about this [Dock
 Common errors:
 
 -   You don't have the daemon exposed
-
-:::note
-Docker widget disables itself if it fails to perform any actions for 10 times in row. You can reset this by restarting stackZ.
-:::
