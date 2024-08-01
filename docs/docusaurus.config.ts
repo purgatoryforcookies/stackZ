@@ -6,6 +6,7 @@ const config: Config = {
     title: 'StackZ',
     tagline: 'Little helper for your environment setups.',
     favicon: 'img/favicon.ico',
+    staticDirectories: ['public', 'static'],
     plugins: [tailwindPlugin],
     url: 'https://github.com',
     baseUrl: '/stackZ/',

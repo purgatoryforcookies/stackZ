@@ -21,9 +21,10 @@ Switching between differrent projects becomes faster and easier, letting you get
 -   Themes
 -   Code completion from your hosts bash/zsh/ps history
 -   Configurable working directories on terminal level
--   Search for terminal output
--   Input sequencing (in beta)
+-   Terminal highlighting
+-   Input sequencing for automations
 -   Docker widget
+-   Environment editor with linting, highlighting and suggestions.
 
 Each terminal process is a child process of stackZ. If stackZ closes, all of the terminals exit too.
 

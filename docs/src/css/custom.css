@@ -65,3 +65,9 @@ html {
     border-radius: 5px;
     -webkit-box-shadow: inset 0 0 4px rgba(222, 218, 218, 0.6);
 }
+
+.screenshotImage{
+    width: 70%;
+    height: auto;
+    border-radius: 10px;
+}
