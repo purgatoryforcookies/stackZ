@@ -57,14 +57,18 @@ You may also set stackZ to make a local copy of the variables (offline-mode) in 
 stackZ offer you suggestions for .env files it can find based on your terminals cwd. You're free to provide a file path of your own too. 
 Suggestions include AWS Secrets manager.
 
-The command works as a normal terminal command which outputs either text or a json-object. [./jq](https://jqlang.github.io/jq/) provides an easy to use json formatting tool which, if installed in your system, works in stackZ too. All the commands are run in the user's shell context.
+The command works as a normal terminal command which outputs either text or a json-object.
+
+:::tip
+Tools such as [./jq](https://jqlang.github.io/jq/) make it easy to manipulate json objects within your shell.
+:::
 
 :::tip
 If your secret manager charges you for each request you make, not using the automatic sync might be a good idea. This depends on your use case.
 :::
 
 :::warning
-If you keep a remote environment in offline -mode, varibales of the set will be written plaintext in stacks.json
+If you keep a remote environment in offline -mode, variables of the set will be written plaintext in stacks.json
 :::
 
 ### Shell
@@ -77,4 +81,4 @@ stackZ supports the use of the following shells:
 -   cmd.exe
 -   wsl.exe
 
-Shells are spawned as a logins shells in posix systems.
+Shells are spawned as a login shells in posix systems.

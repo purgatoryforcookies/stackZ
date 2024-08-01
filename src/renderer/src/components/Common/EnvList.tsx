@@ -180,8 +180,11 @@ function EnvList({ data, socket, id }: EnvListProps) {
                     style={{ scrollbarGutter: 'stable' }}
                 >
                     {Object.keys(data.pairs).length > 0 ? (
-                        Object.keys(data.pairs).map((key: string) => (
-                            <Record
+                        Object.keys(data.pairs).map((key: string) => {
+                            if (key.startsWith('#')) {
+                                return null
+                            }
+                            return <Record
                                 key={key} //react component key
                                 id={id}
                                 socket={socket}
@@ -192,7 +195,7 @@ function EnvList({ data, socket, id }: EnvListProps) {
                                 value={data.pairs[key]}
                                 onDoubleClick={() => setEditorOpen(true)}
                             />
-                        ))
+                        })
                     ) : (
                         <div className="flex flex-col gap-6 pt-5">
                             <h1 className="text-center text-white/40">No variables</h1>

@@ -67,12 +67,15 @@ export const parseBufferToEnvironment = (
     splitted.forEach((row) => {
         if (!row) return
         try {
-            if (row.startsWith('#')) return
+            if (row.startsWith('#')) {
+                envir[row.trim()] = ''
+                return
+            }
             if (row.length < 2) return
 
             const [key, value] = row.split('=')
-            const betterValue = value.replace(/["]+/g, '').trim()
-            const betterKey = key.replace(/["]+/g, '').trim()
+            const betterValue = value.replace(/["]+/g, '').replace(/[']+/g, '').trim()
+            const betterKey = key.replace(/["]+/g, '').replace(/[']+/g, '').trim()
             envir[betterKey] = betterValue
         } catch {
             // swallow
@@ -168,7 +171,7 @@ export const executeScript = async (script: string, shell: string, silent = fals
     }
 }
 
-export const bakeEnvironmentToString = (env: Record<string, string | undefined>) => {
+export const bakeEnvironmentToOSAwareString = (env: Record<string, string | undefined>) => {
     let envString = ''
 
     Object.entries(env).forEach((entry) => {
@@ -180,6 +183,29 @@ export const bakeEnvironmentToString = (env: Record<string, string | undefined>)
     })
 
     return envString
+}
+export const bakeEnvironmentTodotEnv = (env: Record<string, string | undefined>) => {
+    let envString: string[] = []
+
+    Object.entries(env).forEach((entry) => {
+        let key = entry[0]
+        let value = entry[1]
+
+        if (key.startsWith('#')) {
+            envString.push(key)
+        } else {
+            if (value) {
+                const specials = /[^A-Za-z0-9]/.test(value)
+                if (specials) {
+                    value = `"${value}"`
+                }
+            }
+
+            envString.push(`${key}=${value}`)
+        }
+    })
+
+    return envString.join('\n').trimEnd()
 }
 
 export const dockerHTTPRequest = <T>(options: RequestOptions) => {

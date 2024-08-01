@@ -10,7 +10,7 @@ Most of the settings take effect only when terminal is run in a stack.
 ### Stack mode
 
 :::note
-Each stacks execution order is guaranteed. You can change this by dragging terminals up and down.
+Each stacks execution order is guaranteed.
 :::
 
 #### Healthchecks and delays
@@ -41,13 +41,11 @@ In efforts to make running more complicated (and repetitive) tasks easy, stackZ 
 
 It works by recording places where you type into the session and then provides configurable interface for setting these values for later runs.
 
-Set up each step in a sequence with a command which output is then used as an input. This is particularly useful when working with sensitive data and you want to retrieve secret values from for e.g. vaults, programmatically.
+Set up each step in a sequence with a command. This command is run on your host machine's context and whatever it outputs is then fed into the running terminal and executed. 
+This is particularly useful when working with sensitive data and you want to retrieve secret values from for e.g. vaults, programmatically.
 
-Start by enabling the feature, and then run the terminal process once. After, come back to the settings and fill in the values for the steps.
 
-:::note
-While line hints in the steps can provide helpful messages, they do not show the commands typed into the terminal session.
-
+:::tip
 Marking your step as a secret, prevents it from being printed in the console.
 :::
 
@@ -59,7 +57,7 @@ The following rules apply:
 -   Each time you type into an active terminal run, the index of it is registered as a step. (this makes sense to you once you finish your setup and go fill in the steps in the settings)
 
 :::tip
-For passing command into the terminal process to execute, use echo.
+Echo's output is a string, and you can use this to directly run commands in the terminal.
 
 In windows `echo "command"`
 

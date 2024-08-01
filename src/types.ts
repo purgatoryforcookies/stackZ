@@ -237,7 +237,8 @@ export interface ClientToServerEvents {
     gitSwitchBranch: (branch: string, callback: (errors: string[]) => void) => void
 
     clearHistory: (callback: () => void) => void
-    copyToClipboard: (callback: (cmd: string) => void) => void
+    commandToClipboard: (callback: (cmd: string) => void) => void
+    environmentToClipboard: (callback: (cmd: string) => void) => void
 
     dockerContainers: (callback: (data: string, err?: string) => void) => void
     dockerStop: (id: string, callback: (data: string, err?: string) => void) => void
