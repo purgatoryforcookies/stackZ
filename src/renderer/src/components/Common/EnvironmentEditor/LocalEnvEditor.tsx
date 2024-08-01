@@ -49,7 +49,11 @@ function LocalEnvEditor({ data, socket, id, setOpen }: LocalEnvEditorProps) {
     useEffect(() => {
         let existingText = ''
         Object.keys(data.pairs).map((key) => {
-            existingText += `${key}=${data.pairs[key]}\n`
+            if (key.startsWith('#')) {
+                existingText += `${key}\n`
+            } else {
+                existingText += `${key}=${data.pairs[key]}\n`
+            }
         })
         existingText = existingText.trimEnd()
         setText(existingText)

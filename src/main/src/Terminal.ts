@@ -9,7 +9,8 @@ import {
 } from '../../types'
 import { spawn, IPty } from 'node-pty'
 import {
-    bakeEnvironmentToString,
+    bakeEnvironmentTodotEnv,
+    bakeEnvironmentToOSAwareString,
     isAfile,
     parseBufferToEnvironment,
     resolveDefaultCwd,
@@ -528,13 +529,16 @@ export class Terminal {
             akw(this.getState())
         })
 
-        this.socket.on('copyToClipboard', async (akw) => {
+        this.socket.on('commandToClipboard', async (akw) => {
             const environment = await this.environment.bake([this.stackId, this.settings.id], true)
-            const asString = bakeEnvironmentToString(environment)
-
+            const asString = bakeEnvironmentToOSAwareString(environment)
             const fullCommand = asString + this.settings.command.cmd
-
             akw(fullCommand)
+        })
+        this.socket.on('environmentToClipboard', async (akw) => {
+            const environment = await this.environment.bake([this.stackId, this.settings.id], true)
+            const asString = bakeEnvironmentTodotEnv(environment)
+            akw(asString)
         })
 
         this.socket.on('history', (key: keyof typeof HistoryKey, feed: string, akw) => {

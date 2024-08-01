@@ -42,7 +42,11 @@ function RemoteEnvEditor({ socket, data, id, setOpen }: RemoteEnvEditorProps) {
             } else {
                 let existingText = ''
                 Object.keys(pairs).map((key) => {
-                    existingText += `${key}=${pairs[key]}\n`
+                    if (key.startsWith('#')) {
+                        existingText += `${key}\n`
+                    } else {
+                        existingText += `${key}=${pairs[key]}\n`
+                    }
                 })
                 existingText = existingText.trimEnd()
                 setPreviewText(existingText)

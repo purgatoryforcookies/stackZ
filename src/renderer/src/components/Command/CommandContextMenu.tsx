@@ -33,10 +33,15 @@ export default function CommandContextMenu({ children, stack, terminal }: Comman
         stack.addTerminal(newTerminal, stackId)
     }
 
-    const copyToClipBoard = () => {
+    const commandToClipboard = () => {
         const socket = stack.terminals?.get(stack.selectedStack)?.get(terminal.id)?.socket
-
-        socket?.emit('copyToClipboard', (cmd: string) => {
+        socket?.emit('commandToClipboard', (cmd: string) => {
+            navigator.clipboard.writeText(cmd)
+        })
+    }
+    const environmentToClipboard = () => {
+        const socket = stack.terminals?.get(stack.selectedStack)?.get(terminal.id)?.socket
+        socket?.emit('environmentToClipboard', (cmd: string) => {
             navigator.clipboard.writeText(cmd)
         })
     }
@@ -51,13 +56,14 @@ export default function CommandContextMenu({ children, stack, terminal }: Comman
                 <ContextMenuItem inset onClick={stopTerminal}>
                     Stop
                 </ContextMenuItem>
-                <ContextMenuItem inset disabled>
-                    Start standalone
+                <ContextMenuSeparator />
+                <ContextMenuItem inset onClick={commandToClipboard}>
+                    Command to clipboard
+                </ContextMenuItem>
+                <ContextMenuItem inset onClick={environmentToClipboard}>
+                    Environment to clipboard
                 </ContextMenuItem>
                 <ContextMenuSeparator />
-                <ContextMenuItem inset onClick={copyToClipBoard}>
-                    Copy to clipboard
-                </ContextMenuItem>
                 <ContextMenuItem
                     inset
                     onClick={() => window.store.openFileLocation(terminal.command.cwd)}
@@ -69,15 +75,15 @@ export default function CommandContextMenu({ children, stack, terminal }: Comman
                     <ContextMenuSubContent className="w-48">
                         {stack.stack
                             ? Array.from(stack.stack.values()).map((st) => (
-                                  <ContextMenuItem
-                                      onClick={() => dublicateTo(st.id)}
-                                      key={st.id}
-                                      className="flex justify-between"
-                                  >
-                                      <p>{st.stackName}</p>
-                                      <p className="text-white/40">x{st.palette?.length || 0}</p>
-                                  </ContextMenuItem>
-                              ))
+                                <ContextMenuItem
+                                    onClick={() => dublicateTo(st.id)}
+                                    key={st.id}
+                                    className="flex justify-between"
+                                >
+                                    <p>{st.stackName}</p>
+                                    <p className="text-white/40">x{st.palette?.length || 0}</p>
+                                </ContextMenuItem>
+                            ))
                             : null}
                     </ContextMenuSubContent>
                 </ContextMenuSub>
