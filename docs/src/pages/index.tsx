@@ -34,11 +34,11 @@ export default function Home(): JSX.Element {
             </main>
             <div className='w-full flex justify-center pt-[200px] flex-col items-center'>
                 <img src={require('@site/static/img/screenshot.png').default}
-                    className='w-[90%]' />
+                    className='w-[90%] max-w-[1400px]' />
 
                 <div className='flex flex-col items-center'>
                     <img src={require('@site/static/img/remoteEnv.png').default}
-                        className='w-900px]' />
+                        className='w-[900px]' />
                     <img src={require('@site/static/img/editor.png').default}
                         className='w-[1000px]' />
                     <img src={require('@site/static/img/settings.png').default}
