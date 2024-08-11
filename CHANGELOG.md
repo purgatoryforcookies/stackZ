@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.3.0...v1.4.0) (2024-08-01)
+
+
+### Features
+
+* bake environment to clipboard as a way to export the whole environment off from stackZ. added support for comments internally in the terminal. ([f1c9cbc](https://github.com/purgatoryforcookies/stackZ/commit/f1c9cbcb0ff9ee17608c699b4c4d718e991e21d8))
+* show environment keys in the cmd k menu ([1dcd543](https://github.com/purgatoryforcookies/stackZ/commit/1dcd54383df21afa57b8297e4b9702a1ded46d12))
+
 # [1.3.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.2.0...v1.3.0) (2024-07-30)
 
 
