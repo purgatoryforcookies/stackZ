@@ -27,9 +27,6 @@ function EnvList({ data, socket, id }: EnvListProps) {
          */
         if (data.title === NAME_FOR_OS_ENV_SET) return
         socket.on('environmentHeartbeat', (resp) => {
-            console.log(resp)
-            console.log(data)
-            console.log(id)
             if (resp.order !== data.order) {
                 return
             }
