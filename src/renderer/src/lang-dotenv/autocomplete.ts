@@ -17,7 +17,8 @@ export const DotEnvCompletions = (id: string) => {
                     })
                 })
             }
-        ]
+        ],
+        closeOnBlur: false
     })
 }
 

@@ -120,7 +120,12 @@ export const autocompleteSchema = z.array(
         /**
          * Show little text next to label
          */
-        detail: z.string().optional()
+        detail: z.string().optional(),
+
+        /**
+         * Applyis given string on autocomplete accept
+         */
+        apply: z.string().optional()
     })
 )
 

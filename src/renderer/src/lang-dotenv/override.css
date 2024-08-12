@@ -25,7 +25,7 @@
     background-color: #595856;
 }
 
-.cm-completionListIncompleteBottom > completion-section {
+.cm-tooltip-autocomplete > ul > completion-section {
     text-align: center;
     padding: 5px 0 2px 0 !important;
 }
