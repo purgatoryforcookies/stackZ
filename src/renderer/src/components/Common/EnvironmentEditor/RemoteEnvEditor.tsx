@@ -87,7 +87,7 @@ function RemoteEnvEditor({ socket, data, id, setOpen }: RemoteEnvEditorProps) {
             grid-rows-[25%_25%_20%_auto] 
             p-2 mb-3 gap-y-5"
             >
-                <div className="col-start-1 row-span-2 row-start-1 mt-5 overflow-auto">
+                <div className="col-start-1 row-span-2 row-start-1 mt-5 overflow-auto max-h-[300px]">
                     <p>Remote environment variables are hosted somewhere else than stackZ.</p>
                     <p>This can be a service or a file.</p>
                     <SuggestionBadges socket={socket} onClick={getPreview} />

@@ -46,7 +46,7 @@ function EnvEditor({ setOpen, editorOpen, data, socket, id }: EnvEditorProps) {
                 <DialogHeader className="pb-1">
                     <DialogTitle>Environment editor</DialogTitle>
                     <DialogDescription>{data.title}</DialogDescription>
-                    <div className="w-full flex justify-end gap-2 items-center h-7">
+                    <div className="w-full flex justify-end gap-2 items-center h-8">
                         <Switch
                             id="integrated"
                             onCheckedChange={setRemote}

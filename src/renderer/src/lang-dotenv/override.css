@@ -13,6 +13,10 @@
     border: 1px solid #8d90826a;
 }
 
+.cm-selectionBackground{
+    background-color: #595856 !important;
+}
+
 .cm-tooltip.cm-tooltip-autocomplete > ul {
     height: 300px;
     max-height: 300px !important;
