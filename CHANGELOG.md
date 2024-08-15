@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.4.0...v1.5.0) (2024-08-12)
+
+
+### Features
+
+* load profiles from aws config to autocomplete suggestions. ([a95365b](https://github.com/purgatoryforcookies/stackZ/commit/a95365b9bcc28339564badeaa4e9487c0d5b1d1d))
+
 # [1.4.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.3.0...v1.4.0) (2024-08-01)
 
 
