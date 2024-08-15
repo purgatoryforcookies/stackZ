@@ -65,7 +65,7 @@ export class Terminal {
 
         this.environment = environment
         this.environment.register(this.settings.id, this.settings.command.env)
-        this.environment.refresAllRemotes(this.settings.id)
+        this.environment.refresAllRemotes(this.settings.id, this.settings.command.shell)
     }
 
     chooseShell(shell?: string) {
@@ -120,7 +120,11 @@ export class Terminal {
                 this.settings.metaSettings?.loose
             )
 
-            const environment = await this.environment.bake([this.stackId, this.settings.id])
+            const environment = await this.environment.bake(
+                [this.stackId, this.settings.id],
+                false,
+                shell
+            )
 
             this.ptyProcess = spawn(shell, cmd, {
                 name:
@@ -404,7 +408,11 @@ export class Terminal {
         this.socket.on('environmentListRefresh', async (args, akw) => {
             console.log(this.settings.title, args.order, 'Asked for refresh')
             try {
-                await this.environment.refreshRemote(args.id || this.settings.id, args.order)
+                await this.environment.refreshRemote(
+                    args.id || this.settings.id,
+                    args.order,
+                    this.settings.command.shell
+                )
                 akw(null)
             } catch (error) {
                 akw('Remote failed')
@@ -472,7 +480,10 @@ export class Terminal {
 
             if (!isAProperFile) {
                 try {
-                    const [raw, variables] = await this.environment.readFromService(args.from)
+                    const [raw, variables] = await this.environment.readFromService(
+                        args.from,
+                        this.settings.command.shell
+                    )
                     const payload = {
                         pairs: variables,
                         unparsed: raw,
