@@ -54,7 +54,10 @@ export class AutocompleteService {
             awsConfig.split('\n').forEach((line) => {
                 const stripped = line.trim()
                 if (stripped.startsWith('[') && stripped.endsWith(']')) {
-                    const profileString = `AWS_PROFILE=${stripped.slice(1, stripped.length - 1)}`
+                    const profileString = `AWS_PROFILE=${stripped
+                        .slice(1, stripped.length - 1)
+                        .replace('profile', '')
+                        .trim()}`
 
                     awsCompletions.push({
                         label: profileString,
