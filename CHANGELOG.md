@@ -1,3 +1,16 @@
+# [1.6.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.5.0...v1.6.0) (2024-08-15)
+
+
+### Bug Fixes
+
+* remove possible profile word from aws config profiles ([2d9f215](https://github.com/purgatoryforcookies/stackZ/commit/2d9f21509a08167ca9c0342d24cc837a997ed681))
+
+
+### Features
+
+* execute remote env with the same shell as is terminal configured ([dba9096](https://github.com/purgatoryforcookies/stackZ/commit/dba90966679584e5ded572346f2353f8bcae3410))
+* platform aware splitting ([c0464b6](https://github.com/purgatoryforcookies/stackZ/commit/c0464b6a7c15d958af1bc9da16e1ff547a3dd442))
+
 # [1.5.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.4.0...v1.5.0) (2024-08-12)
 
 
