@@ -25,6 +25,7 @@ function SuggestionBadges({ socket, onClick }: SuggestionBadgesProps) {
             }, 900)
         })
     }
+    const splitter = window.electron.process.platform === 'win32' ? '\\' : '/'
 
     useEffect(() => {
         getFiles()
@@ -42,7 +43,7 @@ function SuggestionBadges({ socket, onClick }: SuggestionBadgesProps) {
                             onClick={() => onClick(suggestion, true)}
                             onContextMenu={() => window.store.openFileLocation(suggestion)}
                         >
-                            {suggestion.split('\\').slice(-2).join('\\')}
+                            {suggestion.split(splitter).slice(-2).join(splitter)}
                         </Badge>
                     ))
                 ) : (

@@ -238,6 +238,43 @@
 
         --ring: -38 100% 46%;
     }
+
+    .ocean,
+    [data-theme='ocean'] {
+        --gradient: radial-gradient(circle, #19150d, #211c11);
+
+        --background: 191 8.45001% 20%;
+        --foreground: 191 1.3% 96.4%;
+
+        --muted: 191 6.5% 15%;
+        --muted-foreground: 191 1.3% 52.8%;
+
+        --popover: 191 62.4% 8%;
+        --popover-foreground: 191 1.3% 96.4%;
+
+        --card: 180 17% 10%;
+        --card-foreground: 191 1.3% 96.4%;
+
+        --border: 191 6.5% 15%;
+        --input: 191 6.5% 15%;
+
+        --primary: 191 50% 50%;
+        --primary-foreground: 191 1.3% 6%;
+
+        --secondary: 191 2% 90%;
+        --secondary-foreground: 191 1.3% 96.4%;
+
+        --accent: 191 6.5% 20%;
+        --accent-foreground: 191 1.3% 96.4%;
+
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 191 1.3% 96.4%;
+
+        --ring: 191 13% 35%;
+
+    }
+
+
 }
 
 @layer base {

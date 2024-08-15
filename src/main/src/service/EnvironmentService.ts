@@ -152,7 +152,7 @@ export class EnvironmentService {
         target.pairs[key] = value
     }
 
-    async refreshRemote(id: string, order: number) {
+    async refreshRemote(id: string, order: number, terminal?: string) {
         const target = this.store.get(id)?.find((list) => list.order === order)
         if (!target) throw new Error('Refresh failed. No environment found.')
         if (!target.remote) throw new Error('Refresh failed. This is not a remote environment.')
@@ -166,7 +166,7 @@ export class EnvironmentService {
                 const [_raw, variables] = await this.readFromFile(target.remote.source)
                 target.pairs = variables
             } else {
-                const [_raw, variables] = await this.readFromService(target.remote.source)
+                const [_raw, variables] = await this.readFromService(target.remote.source, terminal)
                 target.pairs = variables
             }
 
@@ -186,13 +186,13 @@ export class EnvironmentService {
      * Asynchronous behaviour. Does not wait for finish.
      *
      */
-    refresAllRemotes(id: string) {
+    refresAllRemotes(id: string, shell?: string) {
         const target = this.store.get(id)
         if (!target) throw new Error('Refresh failed. No environment found.')
 
         target.forEach((environment) => {
             if (environment.remote) {
-                this.refreshRemote(id, environment.order)
+                this.refreshRemote(id, environment.order, shell)
             }
         })
     }
@@ -270,9 +270,10 @@ export class EnvironmentService {
      * If environment is a remote one, and autofresh is on, before bake the
      * environment set is refreshed.
      *
+     * Given shell is used for refreshing remotes.
      *
      */
-    async bake(id: string[], omitOS: boolean = false) {
+    async bake(id: string[], omitOS: boolean = false, shell?: string) {
         const reduced: Record<string, string | undefined> = {}
 
         // Refresh all environments that need it in paraller.
@@ -285,7 +286,7 @@ export class EnvironmentService {
             environment.forEach((envSet) => {
                 if (envSet.remote) {
                     if (envSet.remote.autoFresh) {
-                        pendingEnvironments.push(this.refreshRemote(i, envSet.order))
+                        pendingEnvironments.push(this.refreshRemote(i, envSet.order, shell))
                     }
                 }
             })
@@ -327,8 +328,16 @@ export class EnvironmentService {
      *
      * Throws if command exits with an error or its output cannot be converted to a buffer.
      */
-    async readFromService(command: string): Promise<[string, Record<string, string | undefined>]> {
-        const shell = this.isWin ? 'powershell.exe' : 'bin/bash'
+    async readFromService(
+        command: string,
+        terminal?: string
+    ): Promise<[string, Record<string, string | undefined>]> {
+        let shell = ''
+        if (terminal) shell = terminal
+        else {
+            shell = this.isWin ? 'powershell.exe' : 'bin/bash'
+        }
+
         const data = await executeScript(command, shell, false)
         const buffer = new TextEncoder().encode(data)
         return [data, parseBufferToEnvironment(buffer)]

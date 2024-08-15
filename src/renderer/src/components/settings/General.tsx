@@ -135,6 +135,11 @@ function General() {
                                 <Label htmlFor="r6">Pink</Label>
                                 <ColorSquare theme="pink" />
                             </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="ocean" id="r7" />
+                                <Label htmlFor="r7">Ocean</Label>
+                                <ColorSquare theme="ocean" />
+                            </div>
                         </RadioGroup>
                     </div>
                 </div>
@@ -172,8 +177,8 @@ function General() {
                                 {success
                                     ? 'Done.'
                                     : deleteConfirmation
-                                      ? 'Really?'
-                                      : 'History Service'}
+                                        ? 'Really?'
+                                        : 'History Service'}
                                 <GoInfo className="size-4" />
                             </p>
                         </CustomToolTip>
