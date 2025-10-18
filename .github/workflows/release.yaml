@@ -15,12 +15,15 @@ jobs:
           - os: macos-12
             keyword: "build:mac"
             extension: ".dmg"
+            rebuildcommand: "./node_modules/.bin/electron-rebuild"
           - os: macos-14
             keyword: "build:mac"
             extension: ".dmg"
+            rebuildcommand: "./node_modules/.bin/electron-rebuild"
           - os: windows-2022
             keyword: "build:win"
             extension: ".exe"
+            rebuildcommand: "./node_modules/.bin/electron-rebuild.cmd"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +33,7 @@ jobs:
       - name: Build
         run: |
           npm ci
-          npm rebuild node-pty --update-binary
+          ${{ matrix.rebuildcommand }}
           npm run ${{ matrix.keyword }}
       - name: Store build artifacts
         uses: actions/upload-artifact@v4
