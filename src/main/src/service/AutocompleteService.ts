@@ -1,9 +1,9 @@
 import { app } from 'electron'
 import { join } from 'path'
-import { autocompleteSchema, EditorAutocomplete, MkdirError, PaletteStack } from '../../../types'
+import { autocompleteSchema, EditorAutocomplete, MkdirError, PaletteStack } from '../../../types.js'
 import { mkdirSync } from 'fs'
-import { preloadedCompletes } from '../stores/autocomplete'
-import { readAnyFile } from '../util/util'
+import { preloadedCompletes } from '../stores/autocomplete.js'
+import { readAnyFile } from '../util/util.js'
 
 const autocompletePath = join(app?.getPath('userData') || '', './autocomplete')
 

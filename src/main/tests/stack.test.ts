@@ -1,15 +1,11 @@
 import { Server } from 'socket.io'
-import { Stack } from '../src/Stack'
-import { CustomClientSocket, stackSchema } from '../../types'
+import { Stack } from '../src/Stack.js'
+import { CustomClientSocket, stackSchema } from '../../types.js'
 import { existsSync, unlinkSync } from 'fs'
 import { io } from 'socket.io-client'
 import { join } from 'path'
 
-const testServer = new Server({
-    cors: {
-        origin: '*'
-    }
-})
+const testServer = new Server({ cors: { origin: '*' } })
 
 /**
  * Mocking both of these here because
@@ -17,9 +13,7 @@ const testServer = new Server({
  * 2. They should be tested separetly.
  */
 jest.mock('../src/service/HistoryService', () => {
-    return {
-        HistoryService: jest.fn(() => {})
-    }
+    return { HistoryService: jest.fn(() => {}) }
 })
 
 const filepath = join(__dirname, './testStack1.json')
@@ -189,11 +183,7 @@ describe('stack', () => {
 
         beforeAll(async () => {
             Array.from(testStacks.keys()).forEach((id) => {
-                stackMockSockets.push(
-                    io(SOCKET_HOST_FOR_CLIENT, {
-                        query: { stack: id }
-                    })
-                )
+                stackMockSockets.push(io(SOCKET_HOST_FOR_CLIENT, { query: { stack: id } }))
             })
         })
 

@@ -1,7 +1,7 @@
-import { DockerContainer } from '../../../types'
+import { DockerContainer } from '../../../types.js'
 import http from 'http'
-import { dockerHTTPRequest } from '../util/util'
-import { DockerError, DockerFaultState } from '../util/error'
+import { dockerHTTPRequest } from '../util/util.js'
+import { DockerError, DockerFaultState } from '../util/error.js'
 
 export class DockerService {
     private port: number = 2375

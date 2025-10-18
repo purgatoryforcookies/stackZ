@@ -1,10 +1,10 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { socketServer } from './src/service/socket'
-import { store } from './src/stores/Store'
-import { Stack } from './src/Stack'
-import { stackSchema } from '../types'
+import { socketServer } from './src/service/socket.js'
+import { store } from './src/stores/Store.js'
+import { Stack } from './src/Stack.js'
+import { stackSchema } from '../types.js'
 import { exec } from 'child_process'
 
 const savedCommandsPath = path.join(app.getPath('userData'), './stacks.json')
@@ -37,10 +37,7 @@ async function createWindow(): Promise<void> {
         autoHideMenuBar: !is.dev,
 
         ...(process.platform === 'linux' ? {} : {}),
-        webPreferences: {
-            preload: join(__dirname, '../preload/index.js'),
-            sandbox: false
-        },
+        webPreferences: { preload: join(__dirname, '../preload/index.mjs'), sandbox: false },
         x: disp ? disp.bounds.x + 50 : undefined, //DEV
         y: disp ? disp.bounds.y + 50 : undefined //DEV
     })

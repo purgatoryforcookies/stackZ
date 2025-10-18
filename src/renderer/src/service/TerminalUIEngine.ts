@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client'
-import { CustomClientSocket } from '../../../types'
+import { CustomClientSocket } from '../../../types.js'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import { SearchAddon } from '@xterm/addon-search'

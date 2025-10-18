@@ -1,5 +1,5 @@
-import { ClientToServerEvents, ServerToClientEvents } from '../../types'
-import { EnvironmentService } from '../src/service/EnvironmentService'
+import { ClientToServerEvents, ServerToClientEvents } from '../../types.js'
+import { EnvironmentService } from '../src/service/EnvironmentService.js'
 import { Server } from 'socket.io'
 
 describe('Utilities tests', () => {

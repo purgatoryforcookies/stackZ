@@ -1,4 +1,4 @@
-import { CustomServer, Environment, EnvironmentFlushOptions } from '../../../types'
+import { CustomServer, Environment, EnvironmentFlushOptions } from '../../../types.js'
 import {
     envFactory,
     executeScript,
@@ -6,7 +6,7 @@ import {
     isAfile,
     parseBufferToEnvironment,
     readAnyFile
-} from '../util/util'
+} from '../util/util.js'
 
 export const NAME_FOR_OS_ENV_SET = 'OS Environment'
 
@@ -170,9 +170,7 @@ export class EnvironmentService {
                 target.pairs = variables
             }
 
-            target.remote.metadata = {
-                updated: new Date().valueOf()
-            }
+            target.remote.metadata = { updated: new Date().valueOf() }
         } catch (error) {
             this.emitStatus(id, order, false, String(error), target.remote)
             throw error

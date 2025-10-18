@@ -3,13 +3,13 @@
   "include": [
     "electron.vite.config.*",
     "src/renderer/src/env.d.ts",
-    "src/renderer/src/**/*",
+    "src/renderer/src/**/*.ts",
     "src/preload/*.d.ts",
     "src/types.ts"
   ],
   "compilerOptions": {
     "strictPropertyInitialization": false,
-    "composite": true,
+    "composite": false,
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
