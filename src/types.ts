@@ -1,5 +1,5 @@
 import { ITerminalDimensions } from 'xterm-addon-fit'
-import { TerminalUIEngine } from './renderer/src/service/TerminalUIEngine'
+import type { TerminalUIEngine } from './renderer/src/service/TerminalUIEngine.js'
 import { z } from 'zod'
 import { Server, Socket } from 'socket.io'
 import { Socket as ClientSocket } from 'socket.io-client'
@@ -25,9 +25,7 @@ export const stackSchema = z.array(
                             keep: z.boolean().default(false),
                             autoFresh: z.boolean().default(false),
                             metadata: z
-                                .object({
-                                    updated: z.number().nullable().default(null)
-                                })
+                                .object({ updated: z.number().nullable().default(null) })
                                 .optional()
                         })
                         .optional()
@@ -138,9 +136,7 @@ export type Environment = Exclude<Cmd['command']['env'], undefined>[0]
 export type CommandMetaSetting = Exclude<Cmd['metaSettings'], undefined>
 export type EnginedCmd = Cmd & { engine: TerminalUIEngine }
 
-export type RecursivePartial<T> = {
-    [P in keyof T]?: RecursivePartial<T[P]>
-}
+export type RecursivePartial<T> = { [P in keyof T]?: RecursivePartial<T[P]> }
 
 export interface ServerToClientEvents {
     hello: () => void
@@ -192,11 +188,7 @@ export interface ClientToServerEvents {
 
     environmentEditSingle: (args: EnvironmentEditProps) => void
     environmentListEdit: (
-        args: {
-            fromFile: ArrayBuffer | null
-            id?: string | null
-            order: number
-        },
+        args: { fromFile: ArrayBuffer | null; id?: string | null; order: number },
         callback: (error: string | null) => void
     ) => void
     environmentListEditRemote: (
@@ -276,10 +268,7 @@ export type StackStatus = {
     cwd: string | undefined
     cmd: string | undefined
     isReserved: boolean
-    state: {
-        running: boolean
-        id: string
-    }[]
+    state: { running: boolean; id: string }[]
 }
 
 export type EnvironmentEditProps = {
@@ -291,31 +280,16 @@ export type EnvironmentEditProps = {
     id?: string | null
 }
 
-export type UtilityProps = {
-    order: number
-    value?: string
-    id?: string | null
-}
-export type Utility2Props = {
-    stack: string
-    terminal: string
-    value: string
-}
+export type UtilityProps = { order: number; value?: string; id?: string | null }
+export type Utility2Props = { stack: string; terminal: string; value: string }
 export type StackDefaultsProps = PickStartsWith<PaletteStack, 'default'>
 
 export type UpdateCwdProps = Pick<EnvironmentEditProps, 'order' | 'value'>
-export type RemoveEnvListProps = {
-    terminal: string
-    order: number
-}
+export type RemoveEnvListProps = { terminal: string; order: number }
 
-export type EnvironmentPreviewAction = {
-    from: string
-}
+export type EnvironmentPreviewAction = { from: string }
 
-export type EnvironmentSuggestions = {
-    files: string[]
-}
+export type EnvironmentSuggestions = { files: string[] }
 
 export enum Panels {
     Details,
@@ -329,19 +303,9 @@ export enum HistoryKey {
     HEALTH
 }
 
-export type MkdirError = {
-    errno: number
-    syscall: string
-    code: string
-    path: string
-}
+export type MkdirError = { errno: number; syscall: string; code: string; path: string }
 
-export type NewCommandPayload = {
-    title: string
-    command?: string
-    shell?: string
-    cwd?: string
-}
+export type NewCommandPayload = { title: string; command?: string; shell?: string; cwd?: string }
 
 export type EnvironmentFlushOptions = {
     env?: Record<string, string | undefined>
@@ -349,16 +313,9 @@ export type EnvironmentFlushOptions = {
 }
 
 export type StoreType = {
-    paletteWidths: {
-        header: number
-        palette: number
-    }
+    paletteWidths: { header: number; palette: number }
     userSettings: {
-        global: {
-            defaultCwd: string | null
-            defaultShell: string | null
-            awsPlugin: boolean
-        }
+        global: { defaultCwd: string | null; defaultShell: string | null; awsPlugin: boolean }
     }
     theme: string
 }
@@ -379,10 +336,7 @@ export type TPorts = {
     remoteAddress: string | null
 }
 
-export type HistoryBook = {
-    stackz: string[]
-    host: string[]
-}
+export type HistoryBook = { stackz: string[]; host: string[] }
 
 export type DockerNetwork = {
     IPAMConfig: string | null

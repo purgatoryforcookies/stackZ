@@ -1,6 +1,6 @@
 import { IPty } from 'node-pty'
-import { CommandMetaSetting } from '../../../types'
-import { executeScript } from '../util/util'
+import { CommandMetaSetting } from '../../../types.js'
+import { executeScript } from '../util/util.js'
 
 /**
  * Service that allows to record and the playback sequences

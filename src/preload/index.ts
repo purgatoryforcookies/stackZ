@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { Cmd, PaletteStack, RecursivePartial } from '../types'
+import { Cmd, PaletteStack, RecursivePartial } from '../types.js'
 
 // Custom APIs for renderer
 const api = {

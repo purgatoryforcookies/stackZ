@@ -3,16 +3,21 @@
   "include": [
     "electron.vite.config.*",
     "src/main/**/*",
+    "src/preload/**/*",
+    "src/renderer/src/service/TerminalUIEngine.ts",
     "src/types.ts"
   ],
   "exclude": [
     "src/renderer/**/*"
   ],
   "compilerOptions": {
-    "composite": true,
+    "composite": false,
     "isolatedModules": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "strictPropertyInitialization": false,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "strict": true,
     "noEmit": true,
     "baseUrl": ".",

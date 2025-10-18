@@ -1,4 +1,4 @@
-import { EditorAutocomplete } from '../../../types'
+import { EditorAutocomplete } from '../../../types.js'
 
 export const preloadedCompletes: EditorAutocomplete[] = [
     {

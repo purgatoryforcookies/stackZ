@@ -6,13 +6,13 @@ import {
     RecursivePartial,
     StackDefaultsProps,
     StackStatus
-} from '../../types'
-import { Terminal } from './Terminal'
+} from '../../types.js'
+import { Terminal } from './Terminal.js'
 import { Server } from 'socket.io'
-import { store } from './stores/Store'
-import { HistoryService } from './service/HistoryService'
-import { GitService } from './service/GitService'
-import { EnvironmentService } from './service/EnvironmentService'
+import { store } from './stores/Store.js'
+import { HistoryService } from './service/HistoryService.js'
+import { GitService } from './service/GitService.js'
+import { EnvironmentService } from './service/EnvironmentService.js'
 
 export interface ISaveFuntion {
     (onExport?: boolean): void
@@ -183,11 +183,7 @@ export class Palette {
 
     pingState() {
         const terminalStates = [...this.terminals.values()].map((term) => {
-            return {
-                id: term.settings.id,
-                running: term.isRunning,
-                reserved: term.isAboutToRun
-            }
+            return { id: term.settings.id, running: term.isRunning, reserved: term.isAboutToRun }
         })
 
         const state: StackStatus = {

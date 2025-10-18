@@ -1,11 +1,11 @@
 import { readFile, writeFileSync, existsSync, promises } from 'fs'
-import { Environment } from '../../../types'
+import { Environment } from '../../../types.js'
 import { ZodTypeAny, z } from 'zod'
 import { exec } from 'child_process'
 import { RequestOptions, request } from 'http'
-import { DockerError } from './error'
-import path from 'path'
-import { NAME_FOR_OS_ENV_SET } from '../service/EnvironmentService'
+import { DockerError } from './error.js'
+import { NAME_FOR_OS_ENV_SET } from '../service/EnvironmentService.js'
+import { join } from 'path'
 
 const IGNORED_DIRS = ['node_modules']
 
@@ -48,7 +48,7 @@ const createJsonFileTemplate = (path: string, schema: ZodTypeAny) => {
 }
 
 export const parseBufferToEnvironment = (
-    buf: ArrayBuffer | null
+    buf: Uint8Array<ArrayBuffer> | null
 ): Record<string, string | undefined> => {
     if (!buf) return {}
     const enc = new TextDecoder('utf-8')
@@ -259,7 +259,7 @@ export const searchFiles = async (rootPath: string, extensions: string[]) => {
                 continue
             }
 
-            const entry = path.join(dir, d.name)
+            const entry = join(dir, d.name)
             if (d.isDirectory()) yield* walk(entry)
             else if (d.isFile()) yield entry
         }

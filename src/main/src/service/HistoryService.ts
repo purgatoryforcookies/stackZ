@@ -1,8 +1,8 @@
-import { HistoryBook, HistoryKey, MkdirError } from '../../../types'
+import { HistoryBook, HistoryKey, MkdirError } from '../../../types.js'
 import { readFile, access, constants, writeFileSync, mkdirSync, writeFile } from 'fs'
 import { join } from 'path'
 import { app } from 'electron'
-import { executeScript } from '../util/util'
+import { executeScript } from '../util/util.js'
 
 // app is not available during testing with the current suite
 // setting path to repo root fixes the issue

@@ -6,7 +6,7 @@ import {
     HistoryKey,
     MetaSettingPayload,
     Status
-} from '../../types'
+} from '../../types.js'
 import { spawn, IPty } from 'node-pty'
 import {
     bakeEnvironmentTodotEnv,
@@ -15,14 +15,14 @@ import {
     parseBufferToEnvironment,
     resolveDefaultCwd,
     searchFiles
-} from './util/util'
-import path from 'path'
+} from './util/util.js'
 import { ITerminalDimensions } from 'xterm-addon-fit'
-import { IPingFunction, ISaveFuntion } from './Palette'
-import { HistoryService } from './service/HistoryService'
-import { TerminalScheduler } from './service/TerminalScheduler'
-import { YesSequencer } from './service/YesSequencer'
-import { EnvironmentService } from './service/EnvironmentService'
+import { IPingFunction, ISaveFuntion } from './Palette.js'
+import { HistoryService } from './service/HistoryService.js'
+import { TerminalScheduler } from './service/TerminalScheduler.js'
+import { YesSequencer } from './service/YesSequencer.js'
+import { EnvironmentService } from './service/EnvironmentService.js'
+import { normalize } from 'path'
 
 export class Terminal {
     settings: Cmd
@@ -302,7 +302,7 @@ export class Terminal {
                 this.history.store('CWD', this.settings.command.cwd)
             }
         }
-        const newPath = path.normalize(value.trim())
+        const newPath = normalize(value.trim())
         this.settings.command.cwd = newPath
         this.history.store('CWD', newPath)
         this.ping()
@@ -427,13 +427,17 @@ export class Terminal {
         })
         this.socket.on('environmentNewList', (args) => {
             if (!args.value) return
-            const environment = parseBufferToEnvironment(args.fromFile)
+            const environment = parseBufferToEnvironment(
+                args.fromFile ? new Uint8Array(args.fromFile) : null
+            )
             this.environment.addOrder(args.id || this.settings.id, args.value, environment)
             this.ping()
         })
         this.socket.on('environmentListEdit', (args, akw) => {
             try {
-                const environment = parseBufferToEnvironment(args.fromFile)
+                const environment = parseBufferToEnvironment(
+                    args.fromFile ? new Uint8Array(args.fromFile) : null
+                )
                 this.environment.flush(args.id || this.settings.id, args.order, {
                     env: environment
                 })
@@ -446,11 +450,7 @@ export class Terminal {
         this.socket.on('environmentListEditRemote', async (args, akw) => {
             try {
                 this.environment.flush(args.id || this.settings.id, args.order, {
-                    remote: {
-                        source: args.source,
-                        autoFresh: args.autoFresh,
-                        keep: args.keep
-                    }
+                    remote: { source: args.source, autoFresh: args.autoFresh, keep: args.keep }
                 })
                 await this.environment.refreshRemote(args.id || this.settings.id, args.order)
                 akw(null)
@@ -468,9 +468,7 @@ export class Terminal {
                 '.md'
             ])
 
-            const suggestions: EnvironmentSuggestions = {
-                files: foundFiles
-            }
+            const suggestions: EnvironmentSuggestions = { files: foundFiles }
 
             akw(suggestions)
         })
@@ -484,18 +482,10 @@ export class Terminal {
                         args.from,
                         this.settings.command.shell
                     )
-                    const payload = {
-                        pairs: variables,
-                        unparsed: raw,
-                        isFile: isAProperFile
-                    }
+                    const payload = { pairs: variables, unparsed: raw, isFile: isAProperFile }
                     akw(payload)
                 } catch (error) {
-                    const payload = {
-                        pairs: null,
-                        unparsed: null,
-                        isFile: isAProperFile
-                    }
+                    const payload = { pairs: null, unparsed: null, isFile: isAProperFile }
                     akw(payload, String(error))
                 }
                 return
@@ -503,18 +493,10 @@ export class Terminal {
 
             try {
                 const [raw, variables] = await this.environment.readFromFile(args.from)
-                const payload = {
-                    pairs: variables,
-                    unparsed: raw,
-                    isFile: isAProperFile
-                }
+                const payload = { pairs: variables, unparsed: raw, isFile: isAProperFile }
                 akw(payload)
             } catch (error) {
-                const payload = {
-                    pairs: null,
-                    unparsed: null,
-                    isFile: isAProperFile
-                }
+                const payload = { pairs: null, unparsed: null, isFile: isAProperFile }
                 akw(payload, String(error))
             }
         })

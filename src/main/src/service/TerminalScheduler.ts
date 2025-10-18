@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
-import { Terminal } from '../Terminal'
-import { Cmd } from '../../../types'
+import { Terminal } from '../Terminal.js'
+import { Cmd } from '../../../types.js'
 
 type StartJob = {
     t_metasettings: Cmd['metaSettings']
