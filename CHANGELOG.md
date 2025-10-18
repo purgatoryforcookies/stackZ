@@ -1,3 +1,11 @@
+## [1.6.1](https://github.com/purgatoryforcookies/stackZ/compare/v1.6.0...v1.6.1) (2025-10-18)
+
+
+### Bug Fixes
+
+* possible fix for node module version mismatch ([f5d755b](https://github.com/purgatoryforcookies/stackZ/commit/f5d755be475d292b79e09d79f94abeb75d8ea33b))
+* rebuild electron packages, bump intel mac runner version ([18fa897](https://github.com/purgatoryforcookies/stackZ/commit/18fa89778850e680a3e7cd344e834d8210125e44))
+
 # [1.6.0](https://github.com/purgatoryforcookies/stackZ/compare/v1.5.0...v1.6.0) (2024-08-15)
 
 
